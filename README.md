@@ -1,10 +1,10 @@
-# Command line, configuration and persistence utilites.
+# Command line, configuration and persistence utilities.
 
 [![Travis CI Build Status][travis-badge]][travis-link]
 [![PyPI][pypi-badge]][pypi-link]
 [![Python 3.7][python37-badge]][python37-link]
 
-Command line, configuration and persistence utilites generally used for any
+Command line, configuration and persistence utilities generally used for any
 more than basic application.
 
 The command line interface library intends to make command line execution and
