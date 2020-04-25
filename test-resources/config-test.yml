@@ -1,0 +1,20 @@
+project:
+  org_name: Zensol Python
+  name: ^{project.org_name} Project
+  description: Simple Clojure project
+  template-directory:
+    description: root of source code tree
+    example: view/template/proj
+    default: make-proj
+  context:
+    project:
+      description: github repo name
+      example: nlparse
+      default: someproj
+      aval: ^{project.name}
+    litval: a non-subst ${HOME} but ^{HOME} works val
+    envval: here
+  fruit:
+    - apple
+    - banana
+    - ^{project.context.project.example} orange
