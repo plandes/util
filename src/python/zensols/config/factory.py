@@ -86,8 +86,8 @@ class ClassImporter(object):
         """
         pkg, cname = self.parse_module_class()
         logger.debug(f'pkg: {pkg}, class: {cname}')
-        pkg = pkg.split('.')
-        mod = reduce(lambda m, n: getattr(m, n), pkg[1:], __import__(pkg[0]))
+        pkg_s = pkg.split('.')
+        mod = reduce(lambda m, n: getattr(m, n), pkg_s[1:], __import__(pkg))
         logger.debug(f'mod: {mod}, reloading: {self.reload}')
         if self.reload:
             importlib.reload(mod)

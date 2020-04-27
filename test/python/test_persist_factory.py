@@ -14,9 +14,9 @@ from zensols.persist import (
 logger = logging.getLogger(__name__)
 
 
-class RangeStash1(DelegateStash):
+class RangeStashThisMod(DelegateStash):
     def __init__(self, n):
-        super(RangeStash1, self).__init__()
+        super(RangeStashThisMod, self).__init__()
         self.n = n
         self.prefix = ''
 
@@ -34,13 +34,27 @@ class TestStashFactory(unittest.TestCase):
         if self.target_path.exists():
             shutil.rmtree(self.target_path)
 
-    def test_create(self):
+    def test_create_same_module(self):
+        fac = ImportConfigFactory(self.conf)
+        inst = fac.instance('range3_stash')
+        self.assertTrue(isinstance(inst, RangeStashThisMod))
+        self.assertEqual(set(map(lambda x: (str(x), str(x)), range(6))), set(inst))
+        inst.prefix = 'pf'
+        self.assertEqual(set(map(lambda x: (str(x), f'pf{x}'), range(6))), set(inst))
+
+    def test_create_external(self):
         fac = ImportConfigFactory(self.conf)
         inst = fac.instance('range1_stash')
-        self.assertTrue(isinstance(inst, RangeStash1))
         self.assertEqual(set(map(lambda x: (str(x), str(x)), range(5))), set(inst))
         inst.prefix = 'pf'
         self.assertEqual(set(map(lambda x: (str(x), f'pf{x}'), range(5))), set(inst))
+
+    def test_create_external2(self):
+        fac = ImportConfigFactory(self.conf)
+        inst = fac.instance('range5_stash')
+        self.assertEqual(set(map(lambda x: (str(x), str(x)), range(7))), set(inst))
+        inst.prefix = 'pf'
+        self.assertEqual(set(map(lambda x: (str(x), f'pf{x}'), range(7))), set(inst))
 
     def test_delegate_create(self):
         fac = ImportConfigFactory(self.conf)
