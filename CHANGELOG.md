@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Fix nested modules not importing.
+
+
 ## [0.0.1] - 2020-04-24
 ### Added
 - Initial version.
