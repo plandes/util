@@ -1,3 +1,9 @@
+"""Classes that create new instances of classes from application configuration
+objects and files.
+
+"""
+__author__ = 'Paul Landes'
+
 import logging
 from abc import ABC
 from typing import Dict

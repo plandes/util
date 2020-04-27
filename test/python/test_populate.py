@@ -1,11 +1,12 @@
-import logging
 import unittest
+import logging
+from pathlib import Path
 from zensols.config import Config
 
 logger = logging.getLogger(__name__)
 
 
-class TestPersistWork(unittest.TestCase):
+class TestConfigPopulate(unittest.TestCase):
     def setUp(self):
         self.conf = Config('test-resources/populate-test.conf')
 
@@ -20,7 +21,14 @@ class TestPersistWork(unittest.TestCase):
         self.assertEqual(s.param7, False)
         self.assertEqual(s.param8, None)
 
-    def test_populate(self):
+    def test_eval(self):
         s = self.conf.populate()
         self.assertEqual(dict, type(s.param9))
         self.assertEqual(s.param9, {'scott': 2, 'paul': 1})
+        self.assertEqual(list, type(s.param10))
+        self.assertEqual(s.param10, [1, 5, 10])
+
+    def test_path(self):
+        s = self.conf.populate()
+        self.assertTrue(isinstance(s.param11, Path))
+        self.assertEqual('/tmp/some/file.txt', str(s.param11.absolute()))

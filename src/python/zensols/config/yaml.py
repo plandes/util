@@ -1,3 +1,8 @@
+"""Application configuration classes parsed from YAML files.
+
+"""
+__author__ = 'Paul Landes'
+
 import logging
 import yaml
 import pprint

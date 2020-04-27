@@ -9,14 +9,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ### Changed
+- Better documentation.
+
+### Removed
+- CLI stubs.
+
+
+## [1.2.1] - 2020-04-26
+### Changed
 - Fix nested modules not importing.
 
 
-## [0.0.1] - 2020-04-24
+## [1.2.0] - 2020-04-24
 ### Added
 - Initial version.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v0.0.1...HEAD
-[0.0.1]: https://github.com/plandes/util/compare/v0.0.0...v0.0.1
+[Unreleased]: https://github.com/plandes/util/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/plandes/util/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/plandes/util/compare/v0.0.0...v1.2.0

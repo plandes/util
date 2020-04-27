@@ -9,6 +9,10 @@ include ./zenbuild/main.mk
 testconfig:
 	make PY_SRC_TEST_PKGS=test_config.TestConfig test
 
+.PHONY:		testpopulate
+testpopulate:
+	make PY_SRC_TEST_PKGS=test_populate.TestConfigPopulate test
+
 .PHONY:		testconfigfactory
 testconfigfactory:
 	make PY_SRC_TEST_PKGS=test_configfactory.TestConfigFactory test

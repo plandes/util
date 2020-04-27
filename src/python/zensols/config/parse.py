@@ -1,3 +1,10 @@
+"""Classes that are used as application configuration containers parsed from
+files.
+
+"""
+__author__ = 'Paul Landes'
+
+
 import os
 import sys
 import logging
@@ -13,6 +20,9 @@ logger = logging.getLogger(__name__)
 
 
 class Settings(object):
+    """A default object used to populate in ``Configurable.populate``.
+
+    """
     def __str__(self):
         return str(self.__dict__)
 
@@ -24,11 +34,16 @@ class Settings(object):
         pprint(self.__dict__)
 
 
-class Configurable(object):
+class Configurable(metaclass=ABCMeta):
+    """An abstract base class that represents an application specific
+    configuration.
+
+    """
     FLOAT_REGEXP = re.compile(r'^[-+]?\d*\.\d+$')
     INT_REGEXP = re.compile(r'^[-+]?[0-9]+$')
     BOOL_REGEXP = re.compile(r'^True|False')
     EVAL_REGEXP = re.compile(r'^eval:\s*(.+)$')
+    PATH_REGEXP = re.compile(r'^path:\s*(.+)$')
 
     def __init__(self, config_file, default_expect):
         self.config_file = config_file
@@ -39,15 +54,28 @@ class Configurable(object):
             expect = self.default_expect
         return expect
 
+    @abstractmethod
     def get_option(self, name, expect=None):
-        raise ValueError('get_option is not implemented')
+        """Return an option from ``section`` with ``name``.
 
+        :param section: section in the ini file to fetch the value; defaults to
+        constructor's ``default_section``
+
+        """
+        pass
+
+    @abstractmethod
     def get_options(self, name, expect=None):
-        raise ValueError('get_options is not implemented')
+        """Get all options for a section.  If ``opt_keys`` is given return only
+        options with those keys.
+
+        """
+        pass
 
     @property
     def options(self):
-        raise ValueError('get_option is not implemented')
+        "Return all options from the default section."
+        return self.get_options()
 
     def populate(self, obj=None, section=None, parse_types=True):
         """Set attributes in ``obj`` with ``setattr`` from the all values in
@@ -67,6 +95,10 @@ class Configurable(object):
                     v = int(v)
                 elif self.BOOL_REGEXP.match(v):
                     v = v == 'True'
+                elif self.PATH_REGEXP.match(v):
+                    m = self.PATH_REGEXP.match(v)
+                    if m:
+                        v = Path(m.group(1))
                 else:
                     m = self.EVAL_REGEXP.match(v)
                     if m:
@@ -187,10 +219,6 @@ class Config(Configurable):
         return self.parser is not None
 
     def get_options(self, section='default', opt_keys=None, vars=None):
-        """
-        Get all options for a section.  If ``opt_keys`` is given return
-        only options with those keys.
-        """
         vars = vars if vars else self.default_vars
         conf = self.parser
         opts = {}
@@ -212,12 +240,6 @@ class Config(Configurable):
         return opts
 
     def get_option(self, name, section=None, vars=None, expect=None):
-        """Return an option from ``section`` with ``name``.
-
-        :param section: section in the ini file to fetch the value; defaults to
-        constructor's ``default_section``
-
-        """
         vars = vars if vars else self.default_vars
         if section is None:
             section = self.default_section
@@ -276,11 +298,6 @@ class Config(Configurable):
             if create == 'file':
                 path.parent.mkdir(parents=True, exist_ok=True)
         return path
-
-    @property
-    def options(self):
-        "Return all options from the default section."
-        return self.get_options()
 
     @property
     def sections(self):
