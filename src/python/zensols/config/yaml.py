@@ -4,9 +4,10 @@
 __author__ = 'Paul Landes'
 
 import logging
-import yaml
-import pprint
+import sys
+from pprint import pprint
 import copy
+import yaml
 from zensols.config import Configurable
 
 logger = logging.getLogger(__name__)
@@ -94,8 +95,8 @@ class """ + class_name + """(Template):
             self._config = self._compile()
         return self._config
 
-    def pprint(self):
-        pprint.PrettyPrinter().pprint(self.config)
+    def write(self, writer=sys.stdout):
+        pprint(self.config, writer)
 
     def _option(self, name):
         def find(n, path, name):

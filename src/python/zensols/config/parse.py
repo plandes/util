@@ -8,6 +8,7 @@ __author__ = 'Paul Landes'
 import os
 import sys
 import logging
+from pprint import pprint
 from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 import re
@@ -29,9 +30,8 @@ class Settings(object):
     def __repr__(self):
         return self.__str__()
 
-    def pprint(self):
-        from pprint import pprint
-        pprint(self.__dict__)
+    def write(self, writer=sys.stdout):
+        pprint(self.__dict__, writer)
 
 
 class Configurable(metaclass=ABCMeta):
@@ -331,7 +331,7 @@ class Config(Configurable):
         self.copy_sections(conf, copy_sections)
         return conf
 
-    def pprint(self, writer=sys.stdout):
+    def write(self, writer=sys.stdout):
         """Print a human readable list of sections and options.
 
         """
