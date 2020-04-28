@@ -327,14 +327,14 @@ class TestPersistWork(unittest.TestCase):
         path = Path('target')
         file_path = path / f'{name}.db'
         if platform == "linux" or platform == "linux2":
-            create_path = file_path
+            path = file_path
         else:
-            create_path = path / name
-        return file_path, create_path
+            path = path / name
+        return file_path, path
 
     def test_shelve_stash(self):
-        file_path, create_path = self.paths('tmp6')
-        s = ShelveStash(create_path)
+        file_path, path = self.paths('tmp6')
+        s = ShelveStash(path)
         self.assertFalse(file_path.exists())
         obj = 'obj create of tmp6'
         self.assertEqual(None, s.load('tmp6'))
@@ -347,15 +347,15 @@ class TestPersistWork(unittest.TestCase):
         self.assertFalse(file_path.exists())
 
     def test_shelve_stash_with(self):
-        file_path, create_path = self.paths('tmp7')
+        file_path, path = self.paths('tmp7')
         self.assertFalse(file_path.exists())
-        with shelve(create_path) as s:
+        with shelve(path) as s:
             self.assertFalse(s.exists('cool'))
         self.assertTrue(file_path.exists())
-        with shelve(create_path) as s:
+        with shelve(path) as s:
             s.dump('cool', [1, 2, 123])
             self.assertTrue([1, 2, 123], s.load('cool'))
-        with shelve(create_path) as s:
+        with shelve(path) as s:
             self.assertTrue([1, 2, 123], s.load('cool'))
 
 

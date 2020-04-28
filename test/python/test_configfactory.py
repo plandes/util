@@ -49,7 +49,7 @@ class WidgetManager(ConfigManager):
         super(WidgetManager, self).__init__(
             config,
             stash=DirectoryStash(
-                create_path=self.PATH, pattern='{name}_widget_from_mng.dat'),
+                path=self.PATH, pattern='{name}_widget_from_mng.dat'),
             pattern='{name}_widget_from_mng',
             default_name='defname')
 

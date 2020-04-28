@@ -4,7 +4,7 @@
 __author__ = 'Paul Landes'
 
 import logging
-from typing import List, Callable
+from typing import List, Callable, Any, Iterable
 from abc import abstractmethod, ABC, ABCMeta
 import itertools as it
 import parse
@@ -71,13 +71,13 @@ class Stash(ABC):
 
     """
     @abstractmethod
-    def load(self, name: str):
+    def load(self, name: str) -> Any:
         """Load a data value from the pickled data with key ``name``.
 
         """
         pass
 
-    def get(self, name: str, default=None):
+    def get(self, name: str, default=None) -> Any:
         """Load an object or a default if key ``name`` doesn't exist.
 
         """
@@ -117,7 +117,7 @@ class Stash(ABC):
             self.delete(k)
 
     @abstractmethod
-    def keys(self) -> List[str]:
+    def keys(self) -> Iterable[str]:
         """Return an iterable of keys in the collection.
 
         """
@@ -196,17 +196,17 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
         raise AttributeError(
             f"'{self.__class__.__name__}' object has no attribute '{attr}''")
         
-    def load(self, name: str):
+    def load(self, name: str) -> Any:
         if self.delegate is not None:
             return self.delegate.load(name)
 
-    def get(self, name: str, default=None):
+    def get(self, name: str, default=None) -> Any:
         if self.delegate is None:
             return super(DelegateStash, self).get(name, default)
         else:
             return self.delegate.get(name, default)
 
-    def exists(self, name: str):
+    def exists(self, name: str) -> bool:
         if self.delegate is not None:
             return self.delegate.exists(name)
         else:
@@ -220,7 +220,7 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
         if self.delegate is not None:
             self.delegate.delete(name)
 
-    def keys(self):
+    def keys(self) -> Iterable[str]:
         if self.delegate is not None:
             return self.delegate.keys()
         return ()
@@ -246,7 +246,7 @@ class KeyLimitStash(DelegateStash):
         super(KeyLimitStash, self).__init__(delegate)
         self.n_limit = n_limit
 
-    def keys(self):
+    def keys(self) -> Iterable[str]:
         ks = super(KeyLimitStash, self).keys()
         return it.islice(ks, self.n_limit)
 
@@ -377,7 +377,7 @@ class OneShotFactoryStash(PreemptiveStash, metaclass=ABCMeta):
         self.prime()
         return super(OneShotFactoryStash, self).load(name)
 
-    def keys(self):
+    def keys(self) -> Iterable[str]:
         self.prime()
         return super(OneShotFactoryStash, self).keys()
 
@@ -491,28 +491,28 @@ class DirectoryStash(Stash):
     pattern across all instances.
 
     """
-    def __init__(self, create_path: Path, pattern='{name}.dat'):
+    def __init__(self, path: Path, pattern='{name}.dat'):
         """Create a stash.
 
-        :param create_path: the directory of where to store the files
+        :param path: the directory of where to store the files
         :param pattern: the file name portion with ``name`` populating to the
             key of the data value
 
         """
         self.pattern = pattern
-        self.create_path = create_path
+        self.path = path
 
-    def _create_path_dir(self):
-        self.create_path.mkdir(parents=True, exist_ok=True)
+    def _path_dir(self):
+        self.path.mkdir(parents=True, exist_ok=True)
 
     def _get_instance_path(self, name):
         "Return a path to the pickled data with key ``name``."
         fname = self.pattern.format(**{'name': name})
-        logger.debug(f'path {self.create_path}: {self.create_path.exists()}')
-        self._create_path_dir()
-        return Path(self.create_path, fname)
+        logger.debug(f'path {self.path}: {self.path.exists()}')
+        self._path_dir()
+        return Path(self.path, fname)
 
-    def load(self, name):
+    def load(self, name: str) -> Any:
         path = self._get_instance_path(name)
         inst = None
         if path.exists():
@@ -522,30 +522,30 @@ class DirectoryStash(Stash):
         logger.debug(f'loaded instance: {inst}')
         return inst
 
-    def exists(self, name):
+    def exists(self, name) -> bool:
         path = self._get_instance_path(name)
         return path.exists()
 
-    def keys(self):
+    def keys(self) -> Iterable[str]:
         def path_to_key(path):
             p = parse.parse(self.pattern, path.name).named
             if 'name' in p:
                 return p['name']
 
-        if not self.create_path.is_dir():
+        if not self.path.is_dir():
             keys = ()
         else:
             keys = filter(lambda x: x is not None,
-                          map(path_to_key, self.create_path.iterdir()))
+                          map(path_to_key, self.path.iterdir()))
         return keys
 
-    def dump(self, name, inst):
+    def dump(self, name: str, inst: Any):
         logger.info(f'saving instance: {inst}')
         path = self._get_instance_path(name)
         with open(path, 'wb') as f:
             pickle.dump(inst, f)
 
-    def delete(self, name):
+    def delete(self, name: str):
         logger.info(f'deleting instance: {name}')
         path = self._get_instance_path(name)
         if path.exists():
@@ -560,15 +560,15 @@ class ShelveStash(CloseableStash):
     (like) databases.
 
     """
-    def __init__(self, create_path: Path, writeback=False):
+    def __init__(self, path: Path, writeback=False):
         """Initialize.
 
-        :param create_path: a file to be created to store and/or load for the
+        :param path: a file to be created to store and/or load for the
             data storage
         :param writeback: the writeback parameter given to ``shelve``
 
         """
-        self.create_path = create_path
+        self.path = path
         self.writeback = writeback
         self.is_open = False
 
@@ -579,30 +579,30 @@ class ShelveStash(CloseableStash):
 
         """
         logger.info('creating shelve data')
-        fname = str(self.create_path.absolute())
+        fname = str(self.path.absolute())
         inst = sh.open(fname, writeback=self.writeback)
         self.is_open = True
         return inst
 
-    def load(self, name):
+    def load(self, name: str) -> Any:
         if self.exists(name):
             return self.shelve[name]
 
     def dump(self, name, inst):
         self.shelve[name] = inst
 
-    def exists(self, name):
+    def exists(self, name) -> bool:
         return name in self.shelve
 
-    def keys(self):
+    def keys(self) -> Iterable[str]:
         return self.shelve.keys()
 
-    def delete(self, name=None):
+    def delete(self, name: str = None):
         "Delete the shelve data file."
         logger.info('clearing shelve data')
         self.close()
-        for path in Path(self.create_path.parent, self.create_path.name), \
-            Path(self.create_path.parent, self.create_path.name + '.db'):
+        for path in Path(self.path.parent, self.path.name), \
+            Path(self.path.parent, self.path.name + '.db'):
             logger.debug(f'clearing {path} if exists: {path.exists()}')
             if path.exists():
                 path.unlink()
@@ -619,8 +619,8 @@ class ShelveStash(CloseableStash):
                 self.is_open = False
 
     def clear(self):
-        if self.create_path.exists():
-            self.create_path.unlink()
+        if self.path.exists():
+            self.path.unlink()
 
 
 # utility functions

@@ -1,5 +1,11 @@
+"""Stash extensions to distribute item creation over multiple processes.
+
+"""
+__author__ = 'Paul Landes'
+
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
+from typing import Iterable, List, Any, Tuple
 import logging
 import math
 from multiprocessing import Pool
@@ -137,7 +143,7 @@ class MultiProcessStash(PreemptiveStash, metaclass=ABCMeta):
         self.workers = workers
 
     @abstractmethod
-    def _create_data(self) -> list:
+    def _create_data(self) -> List[Any]:
         """Create data in the parent process to be processed in the child process(es)
         in chunks.
 
@@ -145,7 +151,7 @@ class MultiProcessStash(PreemptiveStash, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def _process(self, chunks: list) -> (iter (str, object)):
+    def _process(self, chunks: List[Any]) -> Iterable[Tuple[str, Any]]:
         """Process a chunk of data, each created by ``_create_data`` and then grouped.
 
         """
@@ -159,7 +165,7 @@ class MultiProcessStash(PreemptiveStash, metaclass=ABCMeta):
         """
         return chunk.process()
 
-    def _create_chunk_processor(self, chunk_id: int, data: object):
+    def _create_chunk_processor(self, chunk_id: int, data: Any):
         """Factory method to create the ``ChunkProcessor`` instance.
 
         """
