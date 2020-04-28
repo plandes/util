@@ -21,6 +21,15 @@ class ClassResolver(ABC):
     """Used to resolve a class from a string.
 
     """
+    @staticmethod
+    def full_classname(cls: type) -> str:
+      module = cls.__module__
+      if module is None or module == str.__class__.__module__:
+        return cls.__name__
+      else:
+        return module + '.' + cls.__name__
+
+
     def find_class(self, class_name: str) -> type:
         """Return a class given the name of the class.
 
@@ -96,7 +105,8 @@ class ClassImporter(object):
         mod = reduce(lambda m, n: getattr(m, n), pkg_s[1:], __import__(pkg))
         logger.debug(f'mod: {mod}, reloading: {self.reload}')
         if self.reload:
-            importlib.reload(mod)
+            logger.debug(f'reload: cls: {mod}, {cname}')
+            mod = importlib.reload(mod)
         cls = getattr(mod, cname)
         logger.debug(f'class: {cls}')
         return mod, cls
@@ -111,6 +121,7 @@ class ClassImporter(object):
         """
         mod, cls = self.get_module_class()
         try:
+            logger.debug(f'class importer creating instance of {cls}')
             inst = cls(*args, **kwargs)
         except Exception as e:
             msg = f'could not instantiate {cls}({args}, {kwargs})'
@@ -140,8 +151,11 @@ class ImportClassResolver(ClassResolver):
     def __init__(self, reload: bool = False):
         self.reload = reload
 
+    def create_class_importer(self, class_name):
+        return ClassImporter(class_name, reload=self.reload)
+
     def find_class(self, class_name):
-        class_importer = ClassImporter(class_name, reload=self.reload)
+        class_importer = self.create_class_importer(class_name)
         return class_importer.get_module_class()[1]
 
 
@@ -153,7 +167,7 @@ class ConfigFactory(object):
     def __init__(self, config: Configurable, pattern: str = '{name}',
                  config_param_name: str = 'config',
                  name_param_name: str = 'name', default_name: str = 'default',
-                 class_importer: ClassImporter = None):
+                 class_resolver: ClassResolver = None):
         """Initialize a new factory instance.
 
         :param config: the configuration used to create the instance; all data
@@ -174,10 +188,10 @@ class ConfigFactory(object):
         self.config_param_name = config_param_name
         self.name_param_name = name_param_name
         self.default_name = default_name
-        if class_importer is None:
-            self.class_importer = DictionaryClassResolver(self.INSTANCE_CLASSES)
+        if class_resolver is None:
+            self.class_resolver = DictionaryClassResolver(self.INSTANCE_CLASSES)
         else:
-            self.class_importer = class_importer
+            self.class_resolver = class_resolver
 
     @classmethod
     def register(cls, instance_class, name=None):
@@ -197,7 +211,7 @@ class ConfigFactory(object):
 
     def _find_class(self, class_name):
         "Resolve the class from the name."
-        return self.class_importer.find_class(class_name)
+        return self.class_resolver.find_class(class_name)
 
     def _class_name_params(self, name):
         "Get the class name and parameters to use for ``__init__``."
@@ -234,10 +248,14 @@ class ConfigFactory(object):
         """
         logger.debug(f'args: {args}, kwargs: {kwargs}')
         try:
-            return cls(*args, **kwargs)
+            logger.debug(f'config factory creating instance of {cls}')
+            inst = cls(*args, **kwargs)
         except Exception as e:
             logger.error(f'couldnt not create class {cls}({args})({kwargs}): {e}')
             raise e
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'inst: {inst}')
+        return inst
 
     def instance(self, name=None, *args, **kwargs):
         """Create a new instance using key ``name``.
@@ -273,7 +291,7 @@ class ConfigFactory(object):
 class ImportConfigFactory(ConfigFactory):
     """Import a class by the fully qualified class name (includes the module).
 
-    This is a convenience class for setting the parent class ``class_importer``
+    This is a convenience class for setting the parent class ``class_resolver``
     parameter.
 
     """
@@ -287,9 +305,10 @@ class ImportConfigFactory(ConfigFactory):
 
         """
         logger.debug(f'creating import config factory with reload: {reload}')
-        class_importer = ImportClassResolver(reload=reload)
+        class_resolver = ImportClassResolver(reload=reload)
+        self.reload = reload
         super(ImportConfigFactory, self).__init__(
-            *args, **kwargs, class_importer=class_importer)
+            *args, **kwargs, class_resolver=class_resolver)
 
     def _class_name_params(self, name):
         class_name, params = super(ImportConfigFactory, self).\
@@ -303,6 +322,25 @@ class ImportConfigFactory(ConfigFactory):
                     insts[k] = self.instance(section)
         params.update(insts)
         return class_name, params
+
+    @staticmethod
+    def _fullname(cls):
+      module = cls.__module__
+      if module is None or module == str.__class__.__module__:
+        return cls.__name__
+      else:
+        return module + '.' + cls.__name__
+
+    def _instance(self, cls, *args, **kwargs):
+        if self.reload:
+            # some unresolved bug requires the module to be reloaded a second
+            # time when reload is true
+            class_name = ClassResolver.full_classname(cls)
+            class_resolver = self.class_resolver
+            class_importer = class_resolver.create_class_importer(class_name)
+            return class_importer.instance(*args, **kwargs)
+        else:
+            return cls(*args, **kwargs)
 
 
 class ConfigChildrenFactory(ConfigFactory):
