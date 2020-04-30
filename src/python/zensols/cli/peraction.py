@@ -18,7 +18,7 @@ class PrintActionsOptionParser(OptionParser):
 
     """
     def __init__(self, *args, **kwargs):
-        super(PrintActionsOptionParser, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def action_options(self):
@@ -97,7 +97,7 @@ class PrintActionsOptionParser(OptionParser):
 class PerActionOptionsCli(SimpleActionCli):
     def __init__(self, *args, **kwargs):
         self.action_options = {}
-        super(PerActionOptionsCli, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _init_executor(self, executor, config, args):
         mems = inspect.getmembers(executor, predicate=inspect.ismethod)
@@ -144,7 +144,7 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
     def __init__(self, opt_config, config_type=Config, **kwargs):
         self.opt_config = opt_config
         self.config_type = config_type
-        super(OneConfPerActionOptionsCli, self).__init__({}, {}, **kwargs)
+        super().__init__({}, {}, **kwargs)
 
     def _config_global(self, oc):
         parser = self.parser
@@ -197,7 +197,7 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
         self.executors[exec_name] = oc['executor']
 
     def config_parser(self):
-        super(OneConfPerActionOptionsCli, self).config_parser()
+        super().config_parser()
         parser = self.parser
         self._config_global(self.opt_config)
         for oc in self.opt_config['executors']:
@@ -212,7 +212,7 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
             config_file=conf_file, default_vars=default_vars)
 
     def _get_default_config(self, params):
-        return super(OneConfPerActionOptionsCli, self).get_config(params)
+        return super().get_config(params)
 
     def _find_conf_file(self, conf, params):
         conf_name = conf['name']
@@ -265,8 +265,7 @@ class OneConfPerActionOptionsCliEnv(OneConfPerActionOptionsCli):
             the configuration environment
 
         """
-        super(OneConfPerActionOptionsCliEnv, self).__init__(
-            opt_config, *args, **kwargs)
+        super().__init__(opt_config, *args, **kwargs)
         if config_env_name is None:
             self.default_config_file = None
         else:
@@ -288,13 +287,13 @@ class OneConfPerActionOptionsCliEnv(OneConfPerActionOptionsCli):
             logger.debug(f'adding environment to config: {os.environ}')
             defs.update(os.environ)
         logger.debug('creating with conf_file: {}'.format(conf_file))
-        return super(OneConfPerActionOptionsCliEnv, self)._create_config(
+        return super()._create_config(
             conf_file, defs)
 
     def _find_conf_file(self, conf, params):
         logger.debug('finding config: {}'.format(self.default_config_file))
         if self.default_config_file is None:
-            conf_file = super(OneConfPerActionOptionsCliEnv, self).\
+            conf_file = super().\
                 _find_conf_file(conf, params)
         else:
             conf_name = conf['name']

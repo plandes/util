@@ -4,7 +4,7 @@
 __author__ = 'Paul Landes'
 
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Iterable, List, Any, Tuple
 import logging
 import math
@@ -58,7 +58,7 @@ class StashMapReducer(object):
 
 class FunctionStashMapReducer(StashMapReducer):
     def __init__(self, stash: Stash, func, n_workers: int = 10):
-        super(FunctionStashMapReducer, self).__init__(stash, n_workers)
+        super().__init__(stash, n_workers)
         self.func = func
 
     def _map(self, id: str, val):
@@ -105,6 +105,7 @@ class ChunkProcessor(object):
         return f'{self.name}: data: {type(self.data)}'
 
 
+@dataclass
 class MultiProcessStash(PreemptiveStash, metaclass=ABCMeta):
     """A stash that forks processes to process data in a distributed fashion.  The
     stash is typically created by a ``StashFactory`` in the child process.
@@ -115,33 +116,16 @@ class MultiProcessStash(PreemptiveStash, metaclass=ABCMeta):
     To implement, the ``_create_chunks`` and ``_process`` methods must be
     implemented.
 
+    :param chunk_size: the size of each group of data sent to the child
+                       process to be handled; in some cases the child
+                       process will get a chunk of data smaller than this
+                       (the last) but never more
+    :param workers: the number of processes spawned to accomplish the work
+
     """
-    def __init__(self, config: Configurable, name: str, delegate: Stash,
-                 chunk_size: int, workers: int):
-        """Initialize the stash from a ``StashFactory``.
-
-        This class is abstract and subclasses is are usually be created by a
-        ``StashFactory`` since it needs to be able to be created by the factory
-        in the child process.
-
-        :param config: the application context configuration used to create the
-                       parent stash
-        :param delegate: the stash in charge of the actual persistance
-        :param name: the name of the stash in the configuration, which is
-                     created by a ``StashFactory``
-
-        :param chunk_size: the size of each group of data sent to the child
-                           process to be handled; in some cases the child
-                           process will get a chunk of data smaller than this
-                           (the last) but never more
-
-        """
-        super(MultiProcessStash, self).__init__(delegate)
-        self.config = config
-        self.name = name
-        self.chunk_size = chunk_size
-        self.workers = workers
-
+    chunk_size: int
+    workers: int
+ 
     @abstractmethod
     def _create_data(self) -> List[Any]:
         """Create data in the parent process to be processed in the child process(es)
@@ -151,7 +135,7 @@ class MultiProcessStash(PreemptiveStash, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def _process(self, chunks: List[Any]) -> Iterable[Tuple[str, Any]]:
+    def _process(self, chunk: List[Any]) -> Iterable[Tuple[str, Any]]:
         """Process a chunk of data, each created by ``_create_data`` and then grouped.
 
         """
@@ -199,12 +183,12 @@ class MultiProcessStash(PreemptiveStash, metaclass=ABCMeta):
 
     def get(self, name: str, default=None):
         self.prime()
-        return super(MultiProcessStash, self).get(name, default)
+        return super().get(name, default)
 
     def load(self, name: str):
         self.prime()
-        return super(MultiProcessStash, self).load(name)
+        return super().load(name)
 
     def keys(self):
         self.prime()
-        return super(MultiProcessStash, self).keys()
+        return super().keys()

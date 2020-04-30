@@ -173,7 +173,7 @@ class Config(Configurable):
                                 baked in to the configuration file
         """
 
-        super(Config, self).__init__(config_file, default_expect)
+        super().__init__(config_file, default_expect)
         self.default_section = default_section
         self.robust = robust
         self.default_vars = self._munge_default_vars(default_vars)
@@ -375,7 +375,7 @@ class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
         else:
             self.env = env
         self.env_sec = env_sec
-        super(ExtendedInterpolationEnvConfig, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _munge_default_vars(self, vars):
         if vars is not None and self.remove_vars is not None:
@@ -385,7 +385,7 @@ class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
         return vars
 
     def _create_config_parser(self):
-        parser = super(ExtendedInterpolationEnvConfig, self)._create_config_parser()
+        parser = super()._create_config_parser()
         sec = self.env_sec
         parser.add_section(sec)
         for k, v in self.env.items():
@@ -408,7 +408,7 @@ class CommandLineConfig(Config, metaclass=ABCMeta):
 
     """
     def __init__(self, *args, **kwargs):
-        super(CommandLineConfig, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def set_default(self, name: str, value: str, clobber: bool = None):
         """Set a default value in the ``default`` section of the configuration.

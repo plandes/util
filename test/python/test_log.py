@@ -1,7 +1,10 @@
 import unittest
 import logging
 from io import StringIO
-from zensols.util import LogConfigurer
+from zensols.util import LogConfigurer, loglevel
+
+#logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 class TestLogConf(unittest.TestCase):
@@ -41,3 +44,9 @@ class TestLogConf(unittest.TestCase):
         self.assertEqual('INFO test123\nWARNING warnmsg\nDEBUG debugmsg\n',
                          out.getvalue())
         self.assertEqual('ERROR err123\n', err.getvalue())
+
+
+class TestLog(unittest.TestCase):
+    def tests_with_log(self):
+        with loglevel(__name__):
+            logger.debug('test')

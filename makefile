@@ -17,6 +17,10 @@ testpopulate:
 testconfigfactory:
 	make PY_SRC_TEST_PKGS=test_configfactory.TestConfigFactory test
 
+.PHONY:		testlog
+testlog:
+	make PY_SRC_TEST_PKGS=test_log.TestLog test
+
 .PHONY:		testcli
 testcli:
 	make PY_SRC_TEST_PKGS=test_cli.TestActionCli test

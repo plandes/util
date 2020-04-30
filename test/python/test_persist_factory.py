@@ -1,5 +1,6 @@
-import logging
 import unittest
+import logging
+from dataclasses import dataclass
 from pathlib import Path
 import shutil
 from zensols.config import (
@@ -9,12 +10,13 @@ from zensols.config import (
 from zensols.persist import (
     DelegateStash,
     FactoryStash,
+    ReadOnlyStash,
 )
 
 logger = logging.getLogger(__name__)
 
 
-class RangeStashThisMod(DelegateStash):
+class RangeStashThisMod(ReadOnlyStash):
     def __init__(self, n):
         super(RangeStashThisMod, self).__init__()
         self.n = n
@@ -25,6 +27,11 @@ class RangeStashThisMod(DelegateStash):
 
     def keys(self):
         return map(str, range(self.n))
+
+
+@dataclass
+class RangeHolder(object):
+    some_range: object
 
 
 class TestStashFactory(unittest.TestCase):
@@ -65,3 +72,11 @@ class TestStashFactory(unittest.TestCase):
         self.assertTrue(self.target_path.is_dir())
         inst.prefix = 'pf'
         self.assertEqual(set(map(lambda x: (str(x), f'{x}'), range(5))), set(inst))
+
+    def test_instance_param(self):
+        fac = ImportConfigFactory(self.conf)
+        inst = fac.instance('range_holder')
+        self.assertTrue(isinstance(inst, RangeHolder))
+        arange = inst.some_range
+        self.assertTrue(isinstance(arange, RangeStashThisMod))
+        self.assertEqual(123, arange.n)

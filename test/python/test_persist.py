@@ -15,6 +15,8 @@ from zensols.persist import (
     DelegateStash,
     DictionaryStash,
     CacheStash,
+    ReadOnlyStash,
+    Stash,
 )
 
 logger = logging.getLogger(__name__)
@@ -359,7 +361,7 @@ class TestPersistWork(unittest.TestCase):
             self.assertTrue([1, 2, 123], s.load('cool'))
 
 
-class IncStash(DelegateStash):
+class IncStash(ReadOnlyStash):
     def __init__(self):
         super(IncStash, self).__init__()
         self.c = 0
@@ -368,10 +370,13 @@ class IncStash(DelegateStash):
         self.c += 1
         return f'{name}-{self.c}'
 
+    def keys(self):
+        return ()
 
-class RangeStash(DelegateStash):
+
+class RangeStash(ReadOnlyStash):
     def __init__(self, n):
-        super(RangeStash, self).__init__()
+        super(Stash, self).__init__()
         self.n = n
 
     def load(self, name: str):
@@ -418,7 +423,7 @@ class TestStash(unittest.TestCase):
         self.assertEqual(([0, 1, 2, 3, 4,],), tuple(stash.key_groups(6)))
 
     def test_cache_stash(self):
-        stash = CacheStash(RangeStash(5))
+        stash = CacheStash(delegate=RangeStash(5))
         self.assertEqual(((0, 0), (1, 1), (2, 2), (3, 3), (4, 4)), tuple(stash))
         self.assertEqual({0: 0, 1: 1, 2: 2, 3: 3, 4: 4}, stash.cache_stash.data)
         stash.delete(3)

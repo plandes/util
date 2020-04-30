@@ -5,6 +5,7 @@ __author__ = 'Paul Landes'
 
 import logging
 from typing import List, Callable, Any, Iterable
+from dataclasses import dataclass, field
 from abc import abstractmethod, ABC, ABCMeta
 import itertools as it
 import parse
@@ -87,12 +88,17 @@ class Stash(ABC):
         else:
             return ret
 
-    @abstractmethod
     def exists(self, name: str) -> bool:
         """Return ``True`` if data with key ``name`` exists.
 
+        *Implementation note*: This (in ``Stash``) method is very inefficient
+         and should be overriden.
+
         """
-        pass
+        for k in self.keys():
+            if k == name:
+                return True
+        return False
 
     @abstractmethod
     def dump(self, name: str, inst):
@@ -100,7 +106,7 @@ class Stash(ABC):
         pass
 
     @abstractmethod
-    def delete(self, name=None):
+    def delete(self, name: str = None):
         """Delete the resource for data pointed to by ``name`` or the entire resource
         if ``name`` is not given.
 
@@ -162,6 +168,14 @@ class Stash(ABC):
         return len(tuple(self.keys()))
 
 
+class ReadOnlyStash(Stash):
+    def dump(self, name: str, inst):
+        raise ValueError('dump not implemented for read only stashes')
+
+    def delete(self, name: str = None):
+        raise ValueError('delete not implemented for read only stashes')
+
+
 class CloseableStash(Stash):
     """Any stash that has a resource that needs to be closed.
 
@@ -172,6 +186,7 @@ class CloseableStash(Stash):
         pass
 
 
+@dataclass
 class DelegateStash(CloseableStash, metaclass=ABCMeta):
     """Delegate pattern.  It can also be used as a no-op if no delegate is given.
 
@@ -180,29 +195,33 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
     usually used as the ``factory`` in a ``FactoryStash``.
 
     """
-    def __init__(self, delegate: Stash = None):
-        if delegate is not None and not isinstance(delegate, Stash):
-            raise ValueError(f'not a stash: {delegate}')
-        self.delegate = delegate
+    delegate: Stash
+
+    def __post_init__(self):
+        if self.delegate is None:
+            raise ValueError(f'delegate not set')
+        if not isinstance(self.delegate, Stash):
+            raise ValueError(f'not a stash: {self.delegate}')
+        self.delegate_attr = True
 
     def __getattr__(self, attr, default=None):
-        try:
-            delegate = super(DelegateStash, self).__getattribute__('delegate')
-        except AttributeError:
-            raise AttributeError(
-                f"'{self.__class__.__name__}' object has no attribute '{attr}'; delegate not set'")
-        if delegate is not None:
+        if self.delegate_attr:
+            try:
+                delegate = super().__getattribute__('delegate')
+            except AttributeError:
+                raise AttributeError(
+                    f"'{self.__class__.__name__}' object has no attribute '{attr}'; delegate not set'")
             return delegate.__getattribute__(attr)
-        raise AttributeError(
-            f"'{self.__class__.__name__}' object has no attribute '{attr}''")
-        
+        else:
+            return super().__getattribute__(attr)
+
     def load(self, name: str) -> Any:
         if self.delegate is not None:
             return self.delegate.load(name)
 
     def get(self, name: str, default=None) -> Any:
         if self.delegate is None:
-            return super(DelegateStash, self).get(name, default)
+            return super().get(name, default)
         else:
             return self.delegate.get(name, default)
 
@@ -226,7 +245,7 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
         return ()
 
     def clear(self):
-        super(DelegateStash, self).clear()
+        super().clear()
         if self.delegate is not None:
             self.delegate.clear()
 
@@ -235,6 +254,7 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
             return self.delegate.close()
 
 
+@dataclass
 class KeyLimitStash(DelegateStash):
     """A stash that limits the number of generated keys useful for debugging.
 
@@ -242,20 +262,21 @@ class KeyLimitStash(DelegateStash):
     on key mapping.
 
     """
-    def __init__(self, delegate: Stash, n_limit=10):
-        super(KeyLimitStash, self).__init__(delegate)
-        self.n_limit = n_limit
+    n_limit: int = field(default=10)
 
     def keys(self) -> Iterable[str]:
-        ks = super(KeyLimitStash, self).keys()
+        ks = super().keys()
         return it.islice(ks, self.n_limit)
 
 
-
+@dataclass
 class PreemptiveStash(DelegateStash):
     """Provide support for preemptively creating data in a stash.
 
     """
+    def __post_init__(self):
+        super().__post_init__()
+        self._has_data = None
 
     @property
     def has_data(self):
@@ -268,7 +289,7 @@ class PreemptiveStash(DelegateStash):
         """Return ``True`` if the delegate has keys.
 
         """
-        if not hasattr(self, '_has_data'):
+        if self._has_data is None:
             try:
                 next(iter(self.delegate.keys()))
                 self._has_data = True
@@ -280,8 +301,7 @@ class PreemptiveStash(DelegateStash):
         """Reset the state of whether the stash has data or not.
 
         """
-        if hasattr(self, '_has_data'):
-            delattr(self, '_has_data')
+        self._has_data = None
 
     def _set_has_data(self, has_data=True):
         """Set the state of whether the stash has data or not.
@@ -291,34 +311,29 @@ class PreemptiveStash(DelegateStash):
 
     def clear(self):
         if self._calculate_has_data():
-            super(PreemptiveStash, self).clear()
+            super().clear()
         self._reset_has_data()
 
 
+@dataclass
 class FactoryStash(PreemptiveStash):
     """A stash that defers to creation of new items to another ``factory`` stash.
 
-    """
-    def __init__(self, delegate, factory, enable_preemptive=True):
-        """Initialize.
+    :param delegate: the stash used for persistence
+    :param factory: the stash used to create using ``load`` and ``keys``
 
-        :param delegate: the stash used for persistence
-        :type delegate: Stash
-        :param factory: the stash used to create using ``load`` and ``keys``
-        :type factory: Stash
-        """
-        super(FactoryStash, self).__init__(delegate)
-        self.factory = factory
-        self.enable_preemptive = enable_preemptive
+    """
+    factory: Stash = field(default=None)
+    enable_preemptive: bool = field(default=True)
 
     def _calculate_has_data(self) -> bool:
         if self.enable_preemptive:
-            return super(FactoryStash, self)._calculate_has_data()
+            return super()._calculate_has_data()
         else:
             return False
 
     def load(self, name: str):
-        item = super(FactoryStash, self).load(name)
+        item = super().load(name)
         if item is None:
             self._reset_has_data()
             item = self.factory.load(name)
@@ -326,27 +341,21 @@ class FactoryStash(PreemptiveStash):
 
     def keys(self) -> List[str]:
         if self.has_data:
-            ks = super(FactoryStash, self).keys()
+            ks = super().keys()
         else:
             ks = self.factory.keys()
         return ks
 
 
+@dataclass
 class OneShotFactoryStash(PreemptiveStash, metaclass=ABCMeta):
     """A stash that is populated by a callable or an iterable 'worker'.  The data
     is generated by the worker and dumped to the delegate.
 
+    :param worker: either a callable (i.e. function) or an interable that
+                   return tuples or lists of (key, object)
+
     """
-    def __init__(self, worker, *args, **kwargs):
-        """Initialize the stash.
-
-        :param worker: either a callable (i.e. function) or an interable that
-                       return tuples or lists of (key, object)
-
-        """
-        super(OneShotFactoryStash, self).__init__(*args, **kwargs)
-        self.worker = worker
-
     def _process_work(self):
         """Invoke the worker to generate the data and dump it to the delegate.
 
@@ -371,29 +380,28 @@ class OneShotFactoryStash(PreemptiveStash, metaclass=ABCMeta):
 
     def get(self, name: str, default=None):
         self.prime()
-        return super(OneShotFactoryStash, self).get(name, default)
+        return super().get(name, default)
 
     def load(self, name: str):
         self.prime()
-        return super(OneShotFactoryStash, self).load(name)
+        return super().load(name)
 
     def keys(self) -> Iterable[str]:
         self.prime()
-        return super(OneShotFactoryStash, self).keys()
+        return super().keys()
 
 
+@dataclass
 class OrderedKeyStash(DelegateStash):
     """Specify an ordering to how keys in a stash are returned.  This usually also
     has an impact on the order in which values are iterated since a call to get
     the keys determins it.
 
     """
-    def __init__(self, delegate: Stash, order_function: Callable = int):
-        super(OrderedKeyStash, self).__init__(delegate)
-        self.order_function = order_function
+    order_function: Callable = field(default=int)
 
     def keys(self) -> List[str]:
-        keys = super(OrderedKeyStash, self).keys()
+        keys = super().keys()
         if self.order_function:
             keys = sorted(keys, key=self.order_function)
         else:
@@ -401,17 +409,13 @@ class OrderedKeyStash(DelegateStash):
         return keys
 
 
-class DictionaryStash(DelegateStash):
+@dataclass
+class DictionaryStash(Stash):
     """Use a dictionary as a backing store to the stash.  If one is not provided in
     the initializer a new ``dict`` is created.
 
     """
-    def __init__(self, data: dict = None):
-        super(DictionaryStash, self).__init__()
-        if data is None:
-            self._data = {}
-        else:
-            self._data = data
+    _data: dict = field(default_factory=dict)
 
     @property
     def data(self):
@@ -437,31 +441,31 @@ class DictionaryStash(DelegateStash):
 
     def clear(self):
         self.data.clear()
-        super(DictionaryStash, self).clear()
+        super().clear()
 
     def __getitem__(self, key):
         return self.data[key]
 
 
+@dataclass
 class CacheStash(DelegateStash):
     """Provide a dictionary based caching based stash.
 
+    :param delegate: the underlying persistence stash
+    :param cache_stash: a stash used for caching (defaults to
+                        ``DictionaryStash``)
+
+
     """
-    def __init__(self, delegate, cache_stash=None, read_only=False):
+    cache_stash: Stash = field(default=None)
+
+    def __post_init__(self):
         """Initialize.
 
-        :param delegate: the underlying persistence stash
-        :param cache_stash: a stash used for caching (defaults to
-                            ``DictionaryStash``)
-        :param read_only: if ``True``, make no changes to ``delegate``
-
         """
-        super(CacheStash, self).__init__(delegate)
-        if cache_stash is None:
+        super().__post_init__()
+        if self.cache_stash is None:
             self.cache_stash = DictionaryStash()
-        else:
-            self.cache_stash = cache_stash
-        self.read_only = read_only
 
     def load(self, name: str):
         if self.cache_stash.exists(name):
@@ -477,30 +481,27 @@ class CacheStash(DelegateStash):
     def delete(self, name=None):
         if self.cache_stash.exists(name):
             self.cache_stash.delete(name)
-        if not self.read_only:
+        if not isinstance(self.delegate, ReadOnlyStash):
             self.delegate.delete(name)
 
     def clear(self):
-        if not self.read_only:
-            super(CacheStash, self).clear()
+        if not isinstance(self.delegate, ReadOnlyStash):
+            super().clear()
         self.cache_stash.clear()
 
 
+@dataclass
 class DirectoryStash(Stash):
     """Creates a pickeled data file with a file name in a directory with a given
     pattern across all instances.
 
+    :param path: the directory of where to store the files
+    :param pattern: the file name portion with ``name`` populating to the
+        key of the data value
+
     """
-    def __init__(self, path: Path, pattern='{name}.dat'):
-        """Create a stash.
-
-        :param path: the directory of where to store the files
-        :param pattern: the file name portion with ``name`` populating to the
-            key of the data value
-
-        """
-        self.pattern = pattern
-        self.path = path
+    path: Path
+    pattern: str = field(default='{name}.dat')
 
     def _path_dir(self):
         self.path.mkdir(parents=True, exist_ok=True)
@@ -555,21 +556,21 @@ class DirectoryStash(Stash):
         pass
 
 
+@dataclass
 class ShelveStash(CloseableStash):
     """Stash that uses Python's shelve library to store key/value pairs in dbm
     (like) databases.
 
+    :param path: a file to be created to store and/or load for the
+                 data storage
+    :param writeback: the writeback parameter given to ``shelve``
+
     """
-    def __init__(self, path: Path, writeback=False):
-        """Initialize.
 
-        :param path: a file to be created to store and/or load for the
-            data storage
-        :param writeback: the writeback parameter given to ``shelve``
+    path: Path
+    writeback: bool = field(default=False)
 
-        """
-        self.path = path
-        self.writeback = writeback
+    def __post_init__(self):
         self.is_open = False
 
     @property
@@ -659,7 +660,7 @@ class ConfigManager(ConfigFactory):
         :param stash: the stash object used to persist instances
 
         """
-        super(ConfigManager, self).__init__(config, *args, **kwargs)
+        super().__init__(config, *args, **kwargs)
         self.stash = stash
 
     def load(self, name=None, *args, **kwargs):
@@ -698,7 +699,7 @@ class SingleClassConfigManager(ConfigManager):
         :param config: the configuration object
         :param cls: the class used to create each instance
         """
-        super(SingleClassConfigManager, self).__init__(config, *args, **kwargs)
+        super().__init__(config, *args, **kwargs)
         self.cls = cls
 
     def _find_class(self, class_name):

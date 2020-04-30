@@ -23,12 +23,11 @@ class ClassResolver(ABC):
     """
     @staticmethod
     def full_classname(cls: type) -> str:
-      module = cls.__module__
-      if module is None or module == str.__class__.__module__:
-        return cls.__name__
-      else:
-        return module + '.' + cls.__name__
-
+        module = cls.__module__
+        if module is None or module == str.__class__.__module__:
+            return cls.__name__
+        else:
+            return module + '.' + cls.__name__
 
     def find_class(self, class_name: str) -> type:
         """Return a class given the name of the class.
@@ -219,7 +218,9 @@ class ConfigFactory(object):
         logger.debug(f'section: {sec}')
         params = {}
         params.update(self.config.populate({}, section=sec))
-        class_name = params['class_name']
+        class_name = params.get('class_name')
+        if class_name is None:
+            raise ValueError(f'no class_name parameter for \'{name}\'')
         del params['class_name']
         return class_name, params
 
@@ -261,7 +262,7 @@ class ConfigFactory(object):
         """Create a new instance using key ``name``.
 
         :param name: the name of the class (by default) or the key name of the
-            class used to find the class
+                     class used to find the class
         :param args: given to the ``__init__`` method
         :param kwargs: given to the ``__init__`` method
 
@@ -295,7 +296,7 @@ class ImportConfigFactory(ConfigFactory):
     parameter.
 
     """
-    CHILD_REGEXP = re.compile(r'^instance:\s*(.+)$')
+    CHILD_REGEXP = re.compile(r'^instance(?:\((.+)\))?:\s*(.+)$')
 
     def __init__(self, *args, reload: bool = False, **kwargs):
         """Initialize the configuration factory.
@@ -305,33 +306,44 @@ class ImportConfigFactory(ConfigFactory):
 
         """
         logger.debug(f'creating import config factory with reload: {reload}')
-        class_resolver = ImportClassResolver(reload=reload)
+        super().__init__(*args, **kwargs, class_resolver=ImportClassResolver())
+        self._set_reload(reload)
+
+    def _set_reload(self, reload: bool):
         self.reload = reload
-        super(ImportConfigFactory, self).__init__(
-            *args, **kwargs, class_resolver=class_resolver)
+        self.class_resolver.reload = reload
 
     def _class_name_params(self, name):
-        class_name, params = super(ImportConfigFactory, self).\
-            _class_name_params(name)
+        class_name, params = super()._class_name_params(name)
         insts = {}
-        for k, v in params.items():
-            if isinstance(v, str):
-                m = self.CHILD_REGEXP.match(v)
-                if m:
-                    section = m.group(1)
-                    insts[k] = self.instance(section)
+        initial_reload = self.reload
+        try:
+            for k, v in params.items():
+                if isinstance(v, str):
+                    m = self.CHILD_REGEXP.match(v)
+                    if m:
+                        pconfig, section = m.groups()
+                        child_params = {}
+                        reload = False
+                        if pconfig is not None:
+                            logger.debug(f'parsing param config: {pconfig}')
+                            pconfig = eval(pconfig)
+                            if 'param' in pconfig:
+                                child_params.update(pconfig['param'])
+                            if 'reload' in pconfig:
+                                reload = pconfig['reload']
+                                logger.debug(f'setting reload: {reload}')
+                            logger.debug(f'applying param config: {pconfig}')
+                        logger.debug(f'creating instance in section {section}')
+                        self._set_reload(reload)
+                        insts[k] = self.instance(section, **child_params)
+        finally:
+            self._set_reload(initial_reload)
         params.update(insts)
         return class_name, params
 
-    @staticmethod
-    def _fullname(cls):
-      module = cls.__module__
-      if module is None or module == str.__class__.__module__:
-        return cls.__name__
-      else:
-        return module + '.' + cls.__name__
-
     def _instance(self, cls, *args, **kwargs):
+        logger.debug(f'import fctry: cls={cls}, args={args}, kwargs={kwargs}')
         if self.reload:
             # some unresolved bug requires the module to be reloaded a second
             # time when reload is true
@@ -340,7 +352,7 @@ class ImportConfigFactory(ConfigFactory):
             class_importer = class_resolver.create_class_importer(class_name)
             return class_importer.instance(*args, **kwargs)
         else:
-            return cls(*args, **kwargs)
+            return super()._instance(cls, *args, **kwargs)
 
 
 class ConfigChildrenFactory(ConfigFactory):
@@ -381,8 +393,7 @@ class ConfigChildrenFactory(ConfigFactory):
     def _instance(self, cls, *args, **kwargs):
         logger.debug(f'stash create: {cls}({args})({kwargs})')
         self._instance_children(kwargs)
-        return super(ConfigChildrenFactory, self)._instance(
-            cls, *args, **kwargs)
+        return super()._instance(cls, *args, **kwargs)
 
 
 class CachingConfigFactory(object):

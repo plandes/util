@@ -4,12 +4,13 @@ from zensols.persist import (
     DelegateStash,
     StashMapReducer,
     FunctionStashMapReducer,
+    ReadOnlyStash,
 )
 
 logger = logging.getLogger(__name__)
 
 
-class RangeStash(DelegateStash):
+class RangeStash(ReadOnlyStash):
     def __init__(self, n):
         super(RangeStash, self).__init__()
         self.n = n

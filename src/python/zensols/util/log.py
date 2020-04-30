@@ -38,7 +38,7 @@ class StreamLogDumper(threading.Thread):
 
     """
     def __init__(self, stream, logger, level):
-        super(StreamLogDumper, self).__init__()
+        super().__init__()
         self.stream = stream
         self.logger = logger
         self.level = level
@@ -104,3 +104,23 @@ class LogConfigurer(object):
             sys.stdout = LoggerStream(stdout_logger, logging.INFO)
         if stderr_logger is not None:
             sys.stderr = LoggerStream(stderr_logger, logging.INFO)
+
+
+class loglevel(object):
+    """Object used with a ``with`` scope that sets the logging level temporarily
+    and sets it back.  For example:
+
+    with loglevel(__name__):
+        logger.debug('test')
+
+    """
+    def __init__(self, name: str, level: int = logging.DEBUG):
+        self.logger = logging.getLogger(name)
+        self.initial_level = self.logger.level
+        self.level = level
+
+    def __enter__(self):
+        self.logger.setLevel(self.level)
+
+    def __exit__(self, type, value, traceback):
+        self.logger.setLevel(self.initial_level)
