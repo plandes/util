@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Better documentation.
+- Fix reload module for `ImportConfigFactory` on `reload=True`.
+- Pass parameters and optionally reload by parameters in `instance` directive
+  in configuration files.
+- Update super method call style (Python 3.7 at least).
+- Make consistent pretty print naming.
 
 ### Removed
 - CLI stubs.
