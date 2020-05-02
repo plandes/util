@@ -4,7 +4,7 @@
 __author__ = 'Paul Landes'
 
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Iterable, List, Any, Tuple
 import logging
 import math

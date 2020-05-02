@@ -195,6 +195,7 @@ class SimpleActionCli(object):
                 self._parser_error(format(err))
 
     def invoke(self, args=sys.argv[1:]):
+        logging.debug(f'invoking with args: {args}')
         meth, exec_obj = self.create_executor(args)
         if exec_obj is not None:
             try:

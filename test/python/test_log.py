@@ -3,7 +3,6 @@ import logging
 from io import StringIO
 from zensols.util import LogConfigurer, loglevel
 
-#logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -23,6 +22,7 @@ class TestLogConf(unittest.TestCase):
         lconf = LogConfigurer(logger, log_format='%(levelname)s %(message)s',
                               level=logging.INFO)
         lconf.config_stream(out, err)
+        logging.StreamHandler(stream=None)
         logger.info('test123')
         logger.warning('warnmsg')
         logger.debug('debugmsg')

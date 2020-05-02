@@ -14,10 +14,6 @@ from pathlib import Path
 import shelve as sh
 import zensols.util.time as time
 from zensols.persist import persisted
-from zensols.config import (
-    Configurable,
-    ConfigFactory,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -645,70 +641,3 @@ class shelve(object):
 
     def __exit__(self, type, value, traceback):
         self.shelve.close()
-
-
-
-# factory
-class ConfigManager(ConfigFactory):
-    """Like ``ConfigFactory`` base saves off instances (really CRUDs).
-
-    """
-    def __init__(self, config: Configurable, stash: Stash, *args, **kwargs):
-        """Initialize.
-
-        :param config: the configuration object used to configure the new
-            instance
-        :param stash: the stash object used to persist instances
-
-        """
-        super().__init__(config, *args, **kwargs)
-        self.stash = stash
-
-    def load(self, name=None, *args, **kwargs):
-        "Load the instance of the object from the stash."
-        inst = self.stash.load(name)
-        if inst is None:
-            inst = self.instance(name, *args, **kwargs)
-        logger.debug(f'loaded (conf mng) instance: {inst}')
-        return inst
-
-    def exists(self, name: str):
-        "Return ``True`` if data with key ``name`` exists."
-        return self.stash.exists(name)
-
-    def keys(self):
-        """Return an iterable of keys in the collection."""
-        return self.stash.keys()
-
-    def dump(self, name: str, inst):
-        "Save the object instance to the stash."
-        self.stash.dump(name, inst)
-
-    def delete(self, name=None):
-        "Delete the object instance from the backing store."
-        self.stash.delete(name)
-
-
-class SingleClassConfigManager(ConfigManager):
-    """A configuration manager that specifies a single class.  This is useful when
-    you don't want to specify the class in the configuration.
-
-    """
-    def __init__(self, config: Configurable, cls, *args, **kwargs):
-        """Initialize.
-
-        :param config: the configuration object
-        :param cls: the class used to create each instance
-        """
-        super().__init__(config, *args, **kwargs)
-        self.cls = cls
-
-    def _find_class(self, class_name):
-        return self.cls
-
-    def _class_name_params(self, name):
-        sec = self.pattern.format(**{'name': name})
-        logger.debug(f'section: {sec}')
-        params = {}
-        params.update(self.config.populate({}, section=sec))
-        return None, params

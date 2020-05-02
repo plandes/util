@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 - CLI stubs.
+- `Removed the `ConfigFactory`` class.  Use ``ImportConfigFactory`` is its place.
+
 
 
 ## [1.2.1] - 2020-04-26

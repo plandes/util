@@ -23,11 +23,17 @@ testlog:
 
 .PHONY:		testcli
 testcli:
-	make PY_SRC_TEST_PKGS=test_cli.TestActionCli test
+	make PY_SRC_TEST_PAT=test_* test
+#	make PY_SRC_TEST_PKGS=test_cli.TestActionCli test
+
 
 .PHONY:		testpersist
 testpersist:
 	make PY_SRC_TEST_PKGS=test_persist.TestStash test
+
+.PHONY:		testpersistattach
+testpersistattach:
+	make PY_SRC_TEST_PKGS=test_persist_attach.TestPersistAttach test
 
 .PHONY:		testpersistfactory
 testpersistfactory:

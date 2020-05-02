@@ -13,6 +13,7 @@ import re
 from functools import reduce
 from time import time
 from zensols.config import Configurable
+#from zensols.persist import PersistedWork, persisted
 
 logger = logging.getLogger(__name__)
 
@@ -341,97 +342,3 @@ class ImportConfigFactory(ConfigFactory):
             return class_importer.instance(*args, **kwargs)
         else:
             return super()._instance(cls, *args, **kwargs)
-
-
-class ConfigChildrenFactory(ConfigFactory):
-    """Like ``ConfigFactory``, but create children defined with the configuration
-    key ``CREATE_CHILDREN_KEY``.  For each of these defined in the comma
-    separated property child property is set and then passed on to the
-    initializer of the object created.
-
-    In addition, any parameters passed to the initializer of the instance
-    method are passed on the comma separate list ``<name>_pass_param`` where
-    ``name`` is the name of the next object to instantiate per the
-    configuraiton.
-
-    """
-    CREATE_CHILDREN_KEY = 'create_children'
-
-    def _process_pass_params(self, name, kwargs):
-        passkw = {}
-        kname = f'{name}_pass_param'
-        if kname in kwargs:
-            for k in kwargs[kname].split(','):
-                logger.debug(f'passing parameter {k}')
-                passkw[k] = kwargs[k]
-            del kwargs[kname]
-        return passkw
-
-    def _instance_children(self, kwargs):
-        if self.CREATE_CHILDREN_KEY in kwargs:
-            for k in kwargs[self.CREATE_CHILDREN_KEY].split(','):
-                passkw = self._process_pass_params(k, kwargs)
-                logger.debug(f'create {k}: {kwargs}')
-                if k in kwargs:
-                    kwargs[k] = self.instance(kwargs[k], **passkw)
-                    for pk in passkw.keys():
-                        del kwargs[pk]
-            del kwargs[self.CREATE_CHILDREN_KEY]
-
-    def _instance(self, cls, *args, **kwargs):
-        logger.debug(f'stash create: {cls}({args})({kwargs})')
-        self._instance_children(kwargs)
-        return super()._instance(cls, *args, **kwargs)
-
-
-class CachingConfigFactory(object):
-    """Just like ``ConfigFactory`` but caches instances in memory by name.
-
-    """
-    def __init__(self, delegate: ConfigFactory):
-        """Initialize.
-
-        :param delegate: the delegate factory to use for the actual instance
-            creation
-
-        """
-        self.delegate = delegate
-        self.insts = {}
-
-    def instance(self, name=None, *args, **kwargs):
-        logger.debug(f'cache config instance for {name}')
-        if name in self.insts:
-            logger.debug(f'reusing cached instance of {name}')
-            return self.insts[name]
-        else:
-            logger.debug(f'creating new instance of {name}')
-            inst = self.delegate.instance(name, *args, **kwargs)
-            self.insts[name] = inst
-            return inst
-
-    def load(self, name=None, *args, **kwargs):
-        if name in self.insts:
-            logger.debug(f'reusing (load) cached instance of {name}')
-            return self.insts[name]
-        else:
-            logger.debug(f'load new instance of {name}')
-            inst = self.delegate.load(name, *args, **kwargs)
-            self.insts[name] = inst
-            return inst
-
-    def exists(self, name: str):
-        return self.delegate.exists(name)
-
-    def dump(self, name: str, inst):
-        self.delegate.dump(name, inst)
-
-    def delete(self, name):
-        self.delegate.delete(name)
-        self.evict(name)
-
-    def evict(self, name):
-        if name in self.insts:
-            del self.insts[name]
-
-    def evict_all(self):
-        self.insts.clear()

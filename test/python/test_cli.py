@@ -98,3 +98,4 @@ class TestActionCli(unittest.TestCase):
         good_conf = type(None)
         os.environ['SOME_OPT_NAME'] = 'test1'
         AppCommandLine(use_environ=True).invoke('info'.split(' '))
+        del os.environ['SOME_OPT_NAME']
