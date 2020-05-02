@@ -6,14 +6,15 @@ __author__ = 'Paul Landes'
 
 import logging
 from abc import ABC
-from typing import Dict
+from typing import Dict, Any
+import types
 import inspect
 import importlib
 import re
 from functools import reduce
 from time import time
 from zensols.config import Configurable
-from zensols.persist import PersistedWork, persisted
+from zensols.persist import persisted, PersistedWork
 
 logger = logging.getLogger(__name__)
 
@@ -107,6 +108,8 @@ class ClassImporter(object):
         if self.reload:
             logger.debug(f'reload: cls: {mod}, {cname}')
             mod = importlib.reload(mod)
+        if not hasattr(mod, cname):
+            raise ValueError(f"no class '{cname}' found in module '{mod}'")
         cls = getattr(mod, cname)
         logger.debug(f'class: {cls}')
         return mod, cls
@@ -297,10 +300,39 @@ class ImportConfigFactory(ConfigFactory):
         logger.debug(f'creating import config factory with reload: {reload}')
         super().__init__(*args, **kwargs, class_resolver=ImportClassResolver())
         self._set_reload(reload)
+        self.last_sec_name = None
 
     def _set_reload(self, reload: bool):
         self.reload = reload
         self.class_resolver.reload = reload
+
+    def _attach_persistent(self, inst: Any, name: str, kwargs: Dict[str, str]):
+        persist = persisted(**kwargs)
+        new_meth = persist(lambda self: getattr(inst, name))
+        new_meth = types.MethodType(new_meth, inst)
+        setattr(inst, name, new_meth)
+
+    def _populate_instances(self, name: str, pconfig: str, section: str):
+        child_params = {}
+        # persist_config = None
+        reload = False
+        if pconfig is not None:
+            logger.debug(f'parsing param config: {pconfig}')
+            pconfig = eval(pconfig)
+            if 'param' in pconfig:
+                child_params.update(pconfig['param'])
+            if 'reload' in pconfig:
+                reload = pconfig['reload']
+                logger.debug(f'setting reload: {reload}')
+            # if 'persist' in pconfig:
+            #     persist_config = pconfig['persist']
+            logger.debug(f'applying param config: {pconfig}')
+        logger.debug(f'creating instance in section {section}')
+        self._set_reload(reload)
+        inst = self.instance(section, **child_params)
+        # if persist_config is not None:
+        #     self._attach_persistent(self._attach_persistent())
+        return inst
 
     def _class_name_params(self, name):
         class_name, params = super()._class_name_params(name)
@@ -312,33 +344,55 @@ class ImportConfigFactory(ConfigFactory):
                     m = self.CHILD_REGEXP.match(v)
                     if m:
                         pconfig, section = m.groups()
-                        child_params = {}
-                        reload = False
-                        if pconfig is not None:
-                            logger.debug(f'parsing param config: {pconfig}')
-                            pconfig = eval(pconfig)
-                            if 'param' in pconfig:
-                                child_params.update(pconfig['param'])
-                            if 'reload' in pconfig:
-                                reload = pconfig['reload']
-                                logger.debug(f'setting reload: {reload}')
-                            logger.debug(f'applying param config: {pconfig}')
-                        logger.debug(f'creating instance in section {section}')
-                        self._set_reload(reload)
-                        insts[k] = self.instance(section, **child_params)
+                        insts[k] = self._populate_instances(k, pconfig, section)
         finally:
             self._set_reload(initial_reload)
         params.update(insts)
+        self.last_sec_name = name
         return class_name, params
+
+    def _process_injects(self, cls, kwargs):
+        pname = 'injects'
+        pw_param_set = kwargs.get(pname)
+        props = []
+        if pw_param_set is not None:
+            del kwargs[pname]
+            for params in eval(pw_param_set):
+                prop_name = params['name']
+                del params['name']
+                pw_name = f'_{prop_name}_pw'
+                params['path'] = pw_name
+                if prop_name not in kwargs:
+                    raise ValueError(f"no property '{prop_name}' found in '" +
+                                     f"section '{self.last_sec_name}'")
+                params['initial_value'] = kwargs[prop_name]
+                del kwargs[prop_name]
+                props.append((pw_name, params))
+                if not hasattr(cls, prop_name):
+                    prop = property(lambda s: getattr(s, pw_name)(),
+                                    lambda s, v: getattr(s, pw_name).set(v))
+                    setattr(cls, prop_name, prop)
+        return props
 
     def _instance(self, cls, *args, **kwargs):
         logger.debug(f'import fctry: cls={cls}, args={args}, kwargs={kwargs}')
+        pw_injects = self._process_injects(cls, kwargs)
         if self.reload:
             # some unresolved bug requires the module to be reloaded a second
             # time when reload is true
             class_name = ClassResolver.full_classname(cls)
             class_resolver = self.class_resolver
             class_importer = class_resolver.create_class_importer(class_name)
-            return class_importer.instance(*args, **kwargs)
+            inst = class_importer.instance(*args, **kwargs)
         else:
-            return super()._instance(cls, *args, **kwargs)
+            inst = super()._instance(cls, *args, **kwargs)
+            #new_meth = persist(lambda self: getattr(self, pw_name)())
+            #new_meth = types.MethodType(new_meth, inst)
+        for pw_name, inject in pw_injects:
+            init_val = inject.pop('initial_value')
+            pw = PersistedWork(owner=inst, **inject)
+            if not pw.is_set():
+                pw.set(init_val)
+            setattr(inst, pw_name, pw)
+        self.last_sec_name = None
+        return inst

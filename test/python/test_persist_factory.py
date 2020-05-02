@@ -8,7 +8,6 @@ from zensols.config import (
     ImportConfigFactory,
 )
 from zensols.persist import (
-    DelegateStash,
     FactoryStash,
     ReadOnlyStash,
 )

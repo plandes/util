@@ -24,7 +24,6 @@ class ShelveStash(CloseableStash):
     :param writeback: the writeback parameter given to ``shelve``
 
     """
-
     path: Path
     writeback: bool = field(default=False)
 

@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Union
+from typing import Union, Any
 import logging
 import sys
 import re
@@ -34,7 +34,8 @@ class PersistedWork(object):
 
     """
     def __init__(self, path: Union[str, Path], owner: object,
-                 cache_global: bool = False, transient: bool = False):
+                 cache_global: bool = False, transient: bool = False,
+                 initial_value: Any = None):
         """Create an instance of the class.
 
         :param path: if type of ``pathlib.Path`` then use disk storage to cache
@@ -61,6 +62,8 @@ class PersistedWork(object):
             fname = str(path)
         cstr = owner.__module__ + '.' + owner.__class__.__name__
         self.varname = f'_{cstr}_{fname}_pwvinst'
+        if initial_value is not None:
+            self.set(initial_value)
 
     def _info(self, msg, *args):
         if logger.isEnabledFor(logging.DEBUG):
@@ -135,6 +138,13 @@ class PersistedWork(object):
         if self.cache_global:
             if vname not in globals():
                 globals()[vname] = obj
+
+    def is_set(self) -> bool:
+        vname = self.varname
+        if self.cache_global:
+            return vname in globals()
+        else:
+            return self.owner is not None and hasattr(self.owner, vname)
 
     def __getstate__(self):
         """We must null out the owner and worker as they are not pickelable.
@@ -284,11 +294,11 @@ class persisted(object):
         def someprop(self):
             return tuple(range(5))
     """
-    def __init__(self, attr_name, path=None, cache_global=False,
+    def __init__(self, name, path=None, cache_global=False,
                  transient=False):
         logger.debug('persisted decorator on attr: {}, global={}'.format(
-            attr_name, cache_global))
-        self.attr_name = attr_name
+            name, cache_global))
+        self.attr_name = name
         self.path = path
         self.cache_global = cache_global
         self.transient = transient
