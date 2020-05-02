@@ -30,7 +30,7 @@ class time(object):
     loggers.
 
     """
-    def __init__(self, msg, level=logging.INFO, logger=None):
+    def __init__(self, msg: str = 'finished', level=logging.INFO, logger=None):
         """Create the time object.
 
         If a logger is not given, it is taken from the calling frame's global
@@ -56,11 +56,28 @@ class time(object):
         except Exception as e:
             time_logger.error(e)
 
+    @staticmethod
+    def format_elapse(msg: str, seconds: int):
+        mins = seconds / 60.
+        hours = mins / 60.
+        mins = int(mins % 60)
+        hours = int(hours)
+        tparts = []
+        if hours > 0:
+            suffix = 's' if hours > 1 else ''
+            tparts.append(f'{hours} hour{suffix}')
+        if mins > 0:
+            suffix = 's' if mins > 1 else ''
+            tparts.append(f'{mins} minute{suffix}')
+        seconds = int(seconds % 60)
+        tparts.append(f'{seconds}s')
+        return f'{msg} in ' + ', '.join(tparts)
+
     def __enter__(self):
         self.t0 = tm.time()
 
     def __exit__(self, type, value, traceback):
-        elapse = tm.time() - self.t0
+        seconds = tm.time() - self.t0
         msg = self.msg
         frame = inspect.currentframe()
         try:
@@ -68,11 +85,11 @@ class time(object):
             msg = msg.format(**locals)
         except Exception as e:
             time_logger.error(e)
-        msgstr = f'{msg} in {elapse:.1f}s'
+        msg = self.format_elapse(msg, seconds)
         if self.logger is not None:
-            self.logger.log(self.level, msgstr)
+            self.logger.log(self.level, msg)
         else:
-            print(msgstr)
+            print(msg)
 
 
 class TimeoutError(Exception):

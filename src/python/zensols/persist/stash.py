@@ -533,6 +533,7 @@ class DirectoryStash(Stash):
             if 'name' in p:
                 return p['name']
 
+        logger.debug(f'checking path {self.path} ({type(self.path)})')
         if not self.path.is_dir():
             keys = ()
         else:

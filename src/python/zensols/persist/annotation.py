@@ -3,6 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
+from typing import Union
 import logging
 import sys
 import re
@@ -32,7 +33,8 @@ class PersistedWork(object):
     ``__do_work__``.
 
     """
-    def __init__(self, path, owner, cache_global=False, transient=False):
+    def __init__(self, path: Union[str, Path], owner: object,
+                 cache_global: bool = False, transient: bool = False):
         """Create an instance of the class.
 
         :param path: if type of ``pathlib.Path`` then use disk storage to cache

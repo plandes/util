@@ -164,8 +164,7 @@ class ConfigFactory(object):
 
     """
     def __init__(self, config: Configurable, pattern: str = '{name}',
-                 config_param_name: str = 'config',
-                 name_param_name: str = 'name', default_name: str = 'default',
+                 default_name: str = 'default',
                  class_resolver: ClassResolver = None):
         """Initialize a new factory instance.
 
@@ -184,8 +183,6 @@ class ConfigFactory(object):
         """
         self.config = config
         self.pattern = pattern
-        self.config_param_name = config_param_name
-        self.name_param_name = name_param_name
         self.default_name = default_name
         if class_resolver is None:
             self.class_resolver = DictionaryClassResolver(self.INSTANCE_CLASSES)
@@ -224,21 +221,9 @@ class ConfigFactory(object):
         del params['class_name']
         return class_name, params
 
-    def _has_init_config(self, cls):
-        """Return whether the class has a ``config`` parameter in the ``__init__``
-        method.
-
-        """
+    def _has_init_parameter(self, cls, param_name):
         args = inspect.signature(cls.__init__)
-        return self.config_param_name in args.parameters
-
-    def _has_init_name(self, cls):
-        """Return whether the class has a ``name`` parameter in the ``__init__``
-        method.
-
-        """
-        args = inspect.signature(cls.__init__)
-        return self.name_param_name in args.parameters
+        return param_name in args.parameters
 
     def _instance(self, cls, *args, **kwargs):
         """Return the instance.
@@ -274,12 +259,15 @@ class ConfigFactory(object):
         class_name, params = self._class_name_params(name)
         cls = self._find_class(class_name)
         params.update(kwargs)
-        if self._has_init_config(cls):
+        if self._has_init_parameter(cls, 'config'):
             logger.debug(f'found config parameter')
             params['config'] = self.config
-        if self._has_init_name(cls):
+        if self._has_init_parameter(cls, 'name'):
             logger.debug(f'found name parameter')
             params['name'] = name
+        if self._has_init_parameter(cls, 'config_factory'):
+            logger.debug(f'found config factory parameter')
+            params['config_factory'] = self
         if logger.level >= logging.DEBUG:
             for k, v in params.items():
                 logger.debug(f'populating {k} -> {v} ({type(v)})')
