@@ -13,7 +13,7 @@ import re
 from functools import reduce
 from time import time
 from zensols.config import Configurable
-#from zensols.persist import PersistedWork, persisted
+from zensols.persist import PersistedWork, persisted
 
 logger = logging.getLogger(__name__)
 

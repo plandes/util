@@ -2,9 +2,11 @@ import logging
 import unittest
 from zensols.persist import (
     DelegateStash,
+    ReadOnlyStash,
+)
+from zensols.multi import (
     StashMapReducer,
     FunctionStashMapReducer,
-    ReadOnlyStash,
 )
 
 logger = logging.getLogger(__name__)
