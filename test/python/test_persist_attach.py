@@ -20,21 +20,31 @@ class Temp(object):
 
 @dataclass
 class Temp2(object):
+    aval: int
     initval: int = field(default=1)
 
 
 @dataclass
-class Temp3:
-    pass
+class Temp3(object):
+    bval: int = field(default=3)
+
+
+@dataclass
+class Temp4:
+    t2: Temp2
+    t3: Temp3
 
 
 class TestPersistAttach(unittest.TestCase):
+    def setUp(self):
+        conf = Config('test-resources/test_persist_attach.conf')
+        self.fac = ImportConfigFactory(conf)
+
     def test_attach(self):
         t1 = Temp()
         self.assertEqual(1, t1.get_n())
         self.assertEqual(1, t1.get_n())
 
-        #old_get_m = t1.get_m
         t1.get_m = types.MethodType(
             persisted('_m')(lambda s: getattr(s, 'get_n')()), t1)
         self.assertEqual(1, t1.get_m())
@@ -45,8 +55,7 @@ class TestPersistAttach(unittest.TestCase):
         self.assertEqual(1, t1.m_val)
 
     def test_inst_attach(self):
-        conf = Config('test-resources/test_persist_attach.conf')
-        fac = ImportConfigFactory(conf)
+        fac = self.fac
         obj = fac.instance('temp2')
         self.assertTrue(isinstance(obj.aval, int))
         self.assertEqual(1, obj.aval)
@@ -57,23 +66,30 @@ class TestPersistAttach(unittest.TestCase):
         self.assertEqual(3, obj.aval)
         self.assertEqual(3, pw())
 
-        obj = fac.instance('temp3')
-        self.assertTrue(isinstance(obj, Temp3))
-        self.assertTrue(isinstance(obj.t2, Temp2))
+    def test_global_attach(self):
+        fac = self.fac
+        obj = fac.instance('temp4')
+        self.assertTrue(isinstance(obj, Temp4))
+        self.assertTrue(isinstance(obj.t3, Temp3))
+        self.assertEquals(Temp2, obj.t2.__class__)
         self.assertEqual(1, obj.t2.aval)
+        self.assertEqual(3, obj.t3.bval)
 
-        #obj.t2.aval = 4
-        obj = fac.instance('temp3')
-        self.assertTrue(isinstance(obj, Temp3))
+        obj = fac.instance('temp4')
+        self.assertTrue(isinstance(obj, Temp4))
         self.assertTrue(isinstance(obj.t2, Temp2))
         self.assertEqual(1, obj.t2.aval)
+        self.assertEqual(3, obj.t3.bval)
 
         obj.t2.aval = 4
-        obj = fac.instance('temp3')
-        self.assertTrue(isinstance(obj, Temp3))
+        obj.t3.bval = 10
+        obj = fac.instance('temp4')
+        self.assertTrue(isinstance(obj, Temp4))
         self.assertTrue(isinstance(obj.t2, Temp2))
         self.assertEqual(4, obj.t2.aval)
+        self.assertEqual(3, obj.t3.bval)
 
         obj = fac.instance('temp2')
         self.assertTrue(isinstance(obj.aval, int))
         self.assertEqual(1, obj.aval)
+

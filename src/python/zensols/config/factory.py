@@ -244,7 +244,7 @@ class ConfigFactory(object):
             logger.error(f'couldnt not create class {cls}({args})({kwargs}): {e}')
             raise e
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'inst: {inst}')
+            logger.debug(f'inst: {inst.__class__}')
         return inst
 
     def instance(self, name=None, *args, **kwargs):
@@ -314,7 +314,6 @@ class ImportConfigFactory(ConfigFactory):
 
     def _populate_instances(self, name: str, pconfig: str, section: str):
         child_params = {}
-        # persist_config = None
         reload = False
         if pconfig is not None:
             logger.debug(f'parsing param config: {pconfig}')
@@ -324,14 +323,10 @@ class ImportConfigFactory(ConfigFactory):
             if 'reload' in pconfig:
                 reload = pconfig['reload']
                 logger.debug(f'setting reload: {reload}')
-            # if 'persist' in pconfig:
-            #     persist_config = pconfig['persist']
             logger.debug(f'applying param config: {pconfig}')
         logger.debug(f'creating instance in section {section}')
         self._set_reload(reload)
         inst = self.instance(section, **child_params)
-        # if persist_config is not None:
-        #     self._attach_persistent(self._attach_persistent())
         return inst
 
     def _class_name_params(self, name):
@@ -351,13 +346,14 @@ class ImportConfigFactory(ConfigFactory):
         self.last_sec_name = name
         return class_name, params
 
-    def _process_injects(self, cls, kwargs):
+    def _process_injects(self, kwargs):
         pname = 'injects'
         pw_param_set = kwargs.get(pname)
         props = []
         if pw_param_set is not None:
             del kwargs[pname]
             for params in eval(pw_param_set):
+                params = dict(params)
                 prop_name = params['name']
                 del params['name']
                 pw_name = f'_{prop_name}_pw'
@@ -366,33 +362,40 @@ class ImportConfigFactory(ConfigFactory):
                     raise ValueError(f"no property '{prop_name}' found in '" +
                                      f"section '{self.last_sec_name}'")
                 params['initial_value'] = kwargs[prop_name]
-                del kwargs[prop_name]
-                props.append((pw_name, params))
-                if not hasattr(cls, prop_name):
-                    prop = property(lambda s: getattr(s, pw_name)(),
-                                    lambda s, v: getattr(s, pw_name).set(v))
-                    setattr(cls, prop_name, prop)
+                #del kwargs[prop_name]
+                props.append((pw_name, prop_name, params))
         return props
 
     def _instance(self, cls, *args, **kwargs):
         logger.debug(f'import fctry: cls={cls}, args={args}, kwargs={kwargs}')
-        pw_injects = self._process_injects(cls, kwargs)
+        pw_injects = self._process_injects(kwargs)
+        reset_props = False
         if self.reload:
-            # some unresolved bug requires the module to be reloaded a second
-            # time when reload is true
+            # we still have to reload at the top level
             class_name = ClassResolver.full_classname(cls)
             class_resolver = self.class_resolver
             class_importer = class_resolver.create_class_importer(class_name)
             inst = class_importer.instance(*args, **kwargs)
+            reset_props = True
         else:
             inst = super()._instance(cls, *args, **kwargs)
-            #new_meth = persist(lambda self: getattr(self, pw_name)())
-            #new_meth = types.MethodType(new_meth, inst)
-        for pw_name, inject in pw_injects:
+        cls = inst.__class__
+
+        for pw_name, prop_name, inject in pw_injects:
+            logger.debug(f'inject: {pw_name}, {prop_name}, {inject}')
             init_val = inject.pop('initial_value')
             pw = PersistedWork(owner=inst, **inject)
             if not pw.is_set():
                 pw.set(init_val)
+            logger.debug(f'setting member {pw_name}={pw} on {cls}')
             setattr(inst, pw_name, pw)
+            if reset_props or not hasattr(cls, prop_name):
+                logger.debug(f'setting property {prop_name}={pw_name}')
+                getter = eval(f"lambda s: getattr(s, '{pw_name}')() if hasattr(s, '{pw_name}') else getattr(s, '{prop_name}')")
+                setter = eval(f"lambda s, v: hasattr(s, '{pw_name}') and getattr(s, '{pw_name}').set(v)")
+                prop = property(getter, setter)
+                logger.debug(f'set property: {prop}')
+                setattr(cls, prop_name, prop)
         self.last_sec_name = None
+        logger.debug(f'create instance {cls}')
         return inst
