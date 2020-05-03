@@ -11,6 +11,8 @@ from zensols.persist import (
     FactoryStash,
     ReadOnlyStash,
 )
+import mock.domain
+import mock.mod2
 
 logger = logging.getLogger(__name__)
 

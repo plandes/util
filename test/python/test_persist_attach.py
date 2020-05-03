@@ -71,7 +71,7 @@ class TestPersistAttach(unittest.TestCase):
         obj = fac.instance('temp4')
         self.assertTrue(isinstance(obj, Temp4))
         self.assertTrue(isinstance(obj.t3, Temp3))
-        self.assertEquals(Temp2, obj.t2.__class__)
+        self.assertEqual(Temp2, obj.t2.__class__)
         self.assertEqual(1, obj.t2.aval)
         self.assertEqual(3, obj.t3.bval)
 
