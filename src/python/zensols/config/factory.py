@@ -314,10 +314,6 @@ class ImportConfigFactory(ConfigFactory):
 
         """
         logger.debug(f'creating import config factory with reload: {reload}')
-        if reload and shared:
-            s = ('both reload and shared can not both be set ' +
-                 'since reloading shared instances is not possible')
-            raise ValueError(s)
         super().__init__(*args, **kwargs, class_resolver=ImportClassResolver())
         self._set_reload(reload)
         if shared:
