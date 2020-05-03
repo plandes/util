@@ -1,1 +1,0 @@
-from mock.domain import *

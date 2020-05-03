@@ -1,4 +1,6 @@
 language: python
 python:
   - "3.7.4"
+before_install:
+  - "export PYTHONPATH=$PYTHONPATH:test/python"
 script: make deps info test
