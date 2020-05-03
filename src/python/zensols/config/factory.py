@@ -301,17 +301,36 @@ class ImportConfigFactory(ConfigFactory):
     # track injections to fail on any attempts to redefine
     INJECTS = {}
 
-    def __init__(self, *args, reload: bool = False, **kwargs):
+    def __init__(self, *args, reload: bool = False, shared: bool = False,
+                 **kwargs):
         """Initialize the configuration factory.
 
         :param reload: whether or not to reload the module when resolving the
                        class, which is useful for debugging in a REPL
 
+        :param shared: when ``True`` instances are shared and only created
+                        once across sections for the life of this
+                        ``ImportConfigFactory`` instance
+
         """
         logger.debug(f'creating import config factory with reload: {reload}')
         super().__init__(*args, **kwargs, class_resolver=ImportClassResolver())
         self._set_reload(reload)
+        if shared:
+            self.shared = {}
+        else:
+            self.shared = None
         self.last_sec_name = None
+
+    def instance(self, name=None, *args, **kwargs):
+        if self.shared is None:
+            inst = super().instance(name, *args, **kwargs)
+        else:
+            inst = self.shared.get(name)
+            if inst is None:
+                inst = super().instance(name, *args, **kwargs)
+                self.shared[name] = inst
+        return inst
 
     def _set_reload(self, reload: bool):
         self.reload = reload

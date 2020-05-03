@@ -39,11 +39,16 @@ class Temp4:
     t2: Temp2
     t3: Temp3
 
+@dataclass
+class Temp7:
+    t2: Temp2
+    t3: Temp3
+
 
 class TestPersistAttach(unittest.TestCase):
     def setUp(self):
-        conf = Config('test-resources/test-persist-attach.conf')
-        self.fac = ImportConfigFactory(conf)
+        self.conf = Config('test-resources/test-persist-attach.conf')
+        self.fac = ImportConfigFactory(self.conf)
 
     def test_attach(self):
         t1 = Temp()
@@ -100,3 +105,59 @@ class TestPersistAttach(unittest.TestCase):
 
         self.assertRaises(RedefinedInjectionError, lambda: fac.instance('temp5'))
         self.assertRaises(RedefinedInjectionError, lambda: fac.instance('temp6'))
+
+        # assert class level tracking in the import factory
+        fac = ImportConfigFactory(self.conf)
+        self.assertRaises(RedefinedInjectionError, lambda: fac.instance('temp5'))
+        self.assertRaises(RedefinedInjectionError, lambda: fac.instance('temp6'))
+
+
+class TestPersistShare(unittest.TestCase):
+    def setUp(self):
+        self.conf = Config('test-resources/test-persist-attach.conf')
+
+    def test_not_shared(self):
+        fac = ImportConfigFactory(self.conf)
+        temp2_a = fac.instance('temp2')
+        temp2_b = fac.instance('temp2')
+        self.assertEqual(1, temp2_a.aval)
+        self.assertEqual(1, temp2_b.aval)
+        temp2_a.aval = 2
+        self.assertEqual(2, temp2_a.aval)
+        self.assertEqual(1, temp2_b.aval)
+        self.assertNotEqual(id(temp2_a), id(temp2_b))
+
+        temp7 = fac.instance('temp7')
+        self.assertEqual(1, temp7.t2.aval)
+        self.assertEqual(3, temp7.t3.bval)
+
+    def test_shared(self):
+        fac = ImportConfigFactory(self.conf, shared=True)
+        temp2_a = fac.instance('temp2')
+        temp2_b = fac.instance('temp2')
+        temp3 = fac.instance('temp3')
+
+        self.assertEqual(1, temp2_a.aval)
+        self.assertEqual(1, temp2_b.aval)
+        temp2_a.aval = 2
+        self.assertEqual(2, temp2_a.aval)
+        self.assertEqual(2, temp2_b.aval)
+        self.assertEqual(id(temp2_a), id(temp2_b))
+
+        temp7 = fac.instance('temp7')
+        self.assertEqual(2, temp7.t2.aval)
+        self.assertEqual(3, temp7.t3.bval)
+
+        self.assertEqual(3, temp3.bval)
+        self.assertEqual(3, temp7.t3.bval)
+        temp3.bval = 10
+        self.assertEqual(10, temp3.bval)
+        self.assertEqual(10, temp7.t3.bval)
+
+        self.assertEqual(id(temp3), id(temp7.t3))
+
+    def test_shared_consistent_state(self):
+        self.test_not_shared()
+        self.test_shared()
+        self.test_not_shared()
+        self.test_shared()
