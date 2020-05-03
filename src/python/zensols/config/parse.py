@@ -42,8 +42,8 @@ class Configurable(metaclass=ABCMeta):
     FLOAT_REGEXP = re.compile(r'^[-+]?\d*\.\d+$')
     INT_REGEXP = re.compile(r'^[-+]?[0-9]+$')
     BOOL_REGEXP = re.compile(r'^True|False')
-    EVAL_REGEXP = re.compile(r'^eval:\s*(.+)$')
     PATH_REGEXP = re.compile(r'^path:\s*(.+)$')
+    EVAL_REGEXP = re.compile(r'^eval(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
 
     def __init__(self, config_file, default_expect):
         self.config_file = config_file
@@ -77,6 +77,17 @@ class Configurable(metaclass=ABCMeta):
         "Return all options from the default section."
         return self.get_options()
 
+    def _parse_eval(self, pconfig: str, evalstr: str) -> str:
+        if pconfig is not None:
+            pconfig = eval(pconfig)
+            if 'import' in pconfig:
+                imports = pconfig['import']
+                logger.debug(f'imports: {imports}')
+                for i in imports:
+                    logger.debug(f'importing: {i}')
+                    exec(f'import {i}')
+        return eval(evalstr)
+
     def populate(self, obj=None, section=None, parse_types=True):
         """Set attributes in ``obj`` with ``setattr`` from the all values in
         ``section``.
@@ -102,8 +113,8 @@ class Configurable(metaclass=ABCMeta):
                 else:
                     m = self.EVAL_REGEXP.match(v)
                     if m:
-                        evalstr = m.group(1)
-                        v = eval(evalstr)
+                        pconfig, evalstr = m.groups()
+                        v = self._parse_eval(pconfig, evalstr)
             logger.debug('setting {} => {} on {}'.format(k, v, obj))
             if is_dict:
                 obj[k] = v

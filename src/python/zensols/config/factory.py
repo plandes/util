@@ -16,11 +16,6 @@ from time import time
 from zensols.config import Configurable
 from zensols.persist import persisted, PersistedWork
 
-# used in configuraiton evaluation
-import sys
-from pathlib import Path
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -223,7 +218,11 @@ class ConfigFactory(object):
         sec = self.pattern.format(**{'name': name})
         logger.debug(f'section: {sec}')
         params = {}
-        params.update(self.config.populate({}, section=sec))
+        try:
+            params.update(self.config.populate({}, section=sec))
+        except Exception as e:
+            logger.error(f'could not populate from section {sec}: {e}')
+            raise e
         class_name = params.get('class_name')
         if class_name is None:
             raise ValueError(f'no class_name parameter for \'{name}\'')

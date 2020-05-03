@@ -32,3 +32,12 @@ class TestConfigPopulate(unittest.TestCase):
         s = self.conf.populate()
         self.assertTrue(isinstance(s.param11, Path))
         self.assertEqual('/tmp/some/file.txt', str(s.param11.absolute()))
+
+    def test_by_section(self):
+        s = self.conf.populate({}, section='single_section')
+        self.assertEqual({'car': 'bmw', 'animal': 'dog'}, s)
+
+    def test_eval_import(self):
+        s = self.conf.populate({}, section='eval_test')
+        counts = tuple(range(3))
+        self.assertEqual({'car': 'bmw', 'animal': 'dog', 'counts': counts}, s)

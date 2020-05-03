@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Persistable work injections.
+- Evaluation statements in configuration now allow for local imports.
 
 
 ## [1.2.1] - 2020-04-26
