@@ -3,8 +3,13 @@ import types
 import logging
 import unittest
 from zensols.persist import persisted, PersistedWork
-from zensols.config import ImportConfigFactory, Config
+from zensols.config import (
+    ImportConfigFactory,
+    Config,
+    RedefinedInjectionError,
+)
 
+#logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -37,7 +42,7 @@ class Temp4:
 
 class TestPersistAttach(unittest.TestCase):
     def setUp(self):
-        conf = Config('test-resources/test_persist_attach.conf')
+        conf = Config('test-resources/test-persist-attach.conf')
         self.fac = ImportConfigFactory(conf)
 
     def test_attach(self):
@@ -93,3 +98,4 @@ class TestPersistAttach(unittest.TestCase):
         self.assertTrue(isinstance(obj.aval, int))
         self.assertEqual(1, obj.aval)
 
+        self.assertRaises(RedefinedInjectionError, lambda: fac.instance('temp5'))

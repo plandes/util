@@ -205,6 +205,9 @@ class PersistedWork(object):
     def __str__(self):
         return self.varname
 
+    def __repr__(self):
+        return self.__str__()
+
 
 class PersistableContainerMetadata(object):
     def __init__(self, container):

@@ -7,6 +7,7 @@ __author__ = 'Paul Landes'
 import logging
 from abc import ABC
 from typing import Dict, Any
+import copy as cp
 import types
 import inspect
 import importlib
@@ -17,6 +18,10 @@ from zensols.config import Configurable
 from zensols.persist import persisted, PersistedWork
 
 logger = logging.getLogger(__name__)
+
+
+class RedefinedInjectionError(ValueError):
+    pass
 
 
 class ClassResolver(ABC):
@@ -370,13 +375,31 @@ class ImportConfigFactory(ConfigFactory):
                 props.append((pw_name, prop_name, params))
         return props
 
+    INJECTS = {}
+
     def _instance(self, cls, *args, **kwargs):
-        logger.debug(f'import inst: cls={cls}, args={args}, kwargs={kwargs}')
-        pw_injects = self._process_injects(kwargs)
         reset_props = False
+        sec_name = self.last_sec_name
+        class_name = ClassResolver.full_classname(cls)
+        logger.debug(f'import instance: section name: {sec_name}, ' +
+                     f'cls={class_name}, args={args}, kwargs={kwargs}')
+        pw_injects = self._process_injects(kwargs)
+
+        logger.debug(f'injects: {len(pw_injects)}, found: {class_name in self.INJECTS}')
+
+        if len(pw_injects) == 0:
+            prev_defined_sec = self.INJECTS.get(class_name)
+            if prev_defined_sec is not None and prev_defined_sec != sec_name:
+                msg = (f'attempt redefine or reuse injectsion for class ' +
+                       f'{class_name} in section {sec_name} previously ' +
+                       f'defined in section {prev_defined_sec}')
+                raise RedefinedInjectionError(msg)
+        elif class_name not in self.INJECTS:
+            logger.debug(f'sec assign {sec_name} = {class_name}')
+            self.INJECTS[class_name] = sec_name
+
         if self.reload:
             # we still have to reload at the top level
-            class_name = ClassResolver.full_classname(cls)
             class_resolver = self.class_resolver
             class_importer = class_resolver.create_class_importer(class_name)
             inst = class_importer.instance(*args, **kwargs)
@@ -385,17 +408,36 @@ class ImportConfigFactory(ConfigFactory):
             inst = super()._instance(cls, *args, **kwargs)
         cls = inst.__class__
 
+        # print('INJ')
+        # print(self.INJECTS)
+        # prev_injects = self.INJECTS.get(cls.__name__)
+        # if len(pw_injects) == 0 and prev_injects is not None:
+        #     pw_injects = cp.deepcopy(prev_injects)
+        # elif len(pw_injects) > 0:
+        #     data = cp.deepcopy(pw_injects)
+        #     print('COPY data')
+        #     print('THIS DATA', pw_injects)
+        #     print('DATA', data)
+        #     self.INJECTS[cls.__name__] = data
+
+        # if hasattr(cls, '_pw_injected'):
+        #     raise RedefinedInjectionError(f'attempt redefine or reuse injectsion on {cls}')
+        # else:
+        #     cls._pw_injected = True
+
+        logger.debug(f'adding injects: {len(pw_injects)}')
         for pw_name, prop_name, inject in pw_injects:
             logger.debug(f'inject: {pw_name}, {prop_name}, {inject}')
             init_val = inject.pop('initial_value')
             pw = PersistedWork(owner=inst, **inject)
+            logger.debug(f'set: {pw.is_set()}: {pw}')
             if not pw.is_set():
                 pw.set(init_val)
             logger.debug(f'setting member {pw_name}={pw} on {cls}')
             setattr(inst, pw_name, pw)
             if reset_props or not hasattr(cls, prop_name):
                 logger.debug(f'setting property {prop_name}={pw_name}')
-                getter = eval(f"lambda s: getattr(s, '{pw_name}')() if hasattr(s, '{pw_name}') else getattr(s, '{prop_name}')")
+                getter = eval(f"lambda s: getattr(s, '{pw_name}')()")
                 setter = eval(f"lambda s, v: hasattr(s, '{pw_name}') and getattr(s, '{pw_name}').set(v)")
                 prop = property(getter, setter)
                 logger.debug(f'set property: {prop}')

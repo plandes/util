@@ -12,7 +12,6 @@ from zensols.persist import (
     ShelveStash,
     shelve,
     FactoryStash,
-    DelegateStash,
     DictionaryStash,
     CacheStash,
     ReadOnlyStash,
@@ -432,4 +431,3 @@ class TestStash(unittest.TestCase):
         self.assertEqual(((0, 0), (1, 1), (2, 2), (3, 3), (4, 4)), tuple(stash))
         self.assertEqual(((0, 0), (1, 1), (2, 2), (3, 3), (4, 4)),
                          tuple(sorted(stash.cache_stash, key=lambda x: x[0])))
-

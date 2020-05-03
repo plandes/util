@@ -13,10 +13,6 @@ testconfig:
 testpopulate:
 		make PY_SRC_TEST_PAT=test_populate.py test
 
-.PHONY:		testconfigfactory
-testconfigfactory:
-		make PY_SRC_TEST_PAT=test_configfactory.py test
-
 .PHONY:		testlog
 testlog:
 		make PY_SRC_TEST_PAT=test_log.py test
