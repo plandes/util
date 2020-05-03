@@ -298,6 +298,8 @@ class ImportConfigFactory(ConfigFactory):
 
     """
     CHILD_REGEXP = re.compile(r'^instance(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
+    # track injections to fail on any attempts to redefine
+    INJECTS = {}
 
     def __init__(self, *args, reload: bool = False, **kwargs):
         """Initialize the configuration factory.
@@ -375,8 +377,6 @@ class ImportConfigFactory(ConfigFactory):
                 props.append((pw_name, prop_name, params))
         return props
 
-    INJECTS = {}
-
     def _instance(self, cls, *args, **kwargs):
         reset_props = False
         sec_name = self.last_sec_name
@@ -384,17 +384,17 @@ class ImportConfigFactory(ConfigFactory):
         logger.debug(f'import instance: section name: {sec_name}, ' +
                      f'cls={class_name}, args={args}, kwargs={kwargs}')
         pw_injects = self._process_injects(kwargs)
+        prev_defined_sec = self.INJECTS.get(class_name)
 
-        logger.debug(f'injects: {len(pw_injects)}, found: {class_name in self.INJECTS}')
+        if prev_defined_sec is not None and prev_defined_sec != sec_name:
+            # fail when redefining injections, and thus class metadata,
+            # configuration
+            msg = (f'attempt redefine or reuse injectsion for class ' +
+                   f'{class_name} in section {sec_name} previously ' +
+                   f'defined in section {prev_defined_sec}')
+            raise RedefinedInjectionError(msg)
 
-        if len(pw_injects) == 0:
-            prev_defined_sec = self.INJECTS.get(class_name)
-            if prev_defined_sec is not None and prev_defined_sec != sec_name:
-                msg = (f'attempt redefine or reuse injectsion for class ' +
-                       f'{class_name} in section {sec_name} previously ' +
-                       f'defined in section {prev_defined_sec}')
-                raise RedefinedInjectionError(msg)
-        elif class_name not in self.INJECTS:
+        if len(pw_injects) > 0 and class_name not in self.INJECTS:
             logger.debug(f'sec assign {sec_name} = {class_name}')
             self.INJECTS[class_name] = sec_name
 
@@ -407,23 +407,6 @@ class ImportConfigFactory(ConfigFactory):
         else:
             inst = super()._instance(cls, *args, **kwargs)
         cls = inst.__class__
-
-        # print('INJ')
-        # print(self.INJECTS)
-        # prev_injects = self.INJECTS.get(cls.__name__)
-        # if len(pw_injects) == 0 and prev_injects is not None:
-        #     pw_injects = cp.deepcopy(prev_injects)
-        # elif len(pw_injects) > 0:
-        #     data = cp.deepcopy(pw_injects)
-        #     print('COPY data')
-        #     print('THIS DATA', pw_injects)
-        #     print('DATA', data)
-        #     self.INJECTS[cls.__name__] = data
-
-        # if hasattr(cls, '_pw_injected'):
-        #     raise RedefinedInjectionError(f'attempt redefine or reuse injectsion on {cls}')
-        # else:
-        #     cls._pw_injected = True
 
         logger.debug(f'adding injects: {len(pw_injects)}')
         for pw_name, prop_name, inject in pw_injects:

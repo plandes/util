@@ -99,3 +99,4 @@ class TestPersistAttach(unittest.TestCase):
         self.assertEqual(1, obj.aval)
 
         self.assertRaises(RedefinedInjectionError, lambda: fac.instance('temp5'))
+        self.assertRaises(RedefinedInjectionError, lambda: fac.instance('temp6'))
