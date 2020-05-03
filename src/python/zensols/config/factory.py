@@ -16,6 +16,11 @@ from time import time
 from zensols.config import Configurable
 from zensols.persist import persisted, PersistedWork
 
+# used in configuraiton evaluation
+import sys
+from pathlib import Path
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -288,7 +293,7 @@ class ImportConfigFactory(ConfigFactory):
     parameter.
 
     """
-    CHILD_REGEXP = re.compile(r'^instance(?:\((.+)\))?:\s*(.+)$')
+    CHILD_REGEXP = re.compile(r'^instance(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
 
     def __init__(self, *args, reload: bool = False, **kwargs):
         """Initialize the configuration factory.
@@ -367,7 +372,7 @@ class ImportConfigFactory(ConfigFactory):
         return props
 
     def _instance(self, cls, *args, **kwargs):
-        logger.debug(f'import fctry: cls={cls}, args={args}, kwargs={kwargs}')
+        logger.debug(f'import inst: cls={cls}, args={args}, kwargs={kwargs}')
         pw_injects = self._process_injects(kwargs)
         reset_props = False
         if self.reload:

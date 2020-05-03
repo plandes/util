@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 - CLI stubs.
-- `Removed the `ConfigFactory`` class.  Use ``ImportConfigFactory`` is its place.
+- Removed the `ConfigFactory` class.  Use `ImportConfigFactory` is its place.
 
 ### Added
 - Persistable work injections.
