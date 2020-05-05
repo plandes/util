@@ -15,6 +15,7 @@ from zensols.config import (
 )
 from zensols.persist import (
     PreemptiveStash,
+    PrimeableStash,
     chunks,
 )
 
@@ -24,7 +25,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ChunkProcessor(object):
     """Represents a chunk of work created by the parent and processed on the child.
-    
+
     :param config: the application context configuration used to create the
                    parent stash
     :param name: the name of the parent stash used to create the chunk, and
@@ -57,7 +58,7 @@ class ChunkProcessor(object):
 
 
 @dataclass
-class MultiProcessStash(PreemptiveStash, metaclass=ABCMeta):
+class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
     """A stash that forks processes to process data in a distributed fashion.  The
     stash is typically created by a ``StashFactory`` in the child process.
     Work is chunked (grouped) and then sent to child processes.  In each, a new
@@ -76,7 +77,7 @@ class MultiProcessStash(PreemptiveStash, metaclass=ABCMeta):
     """
     chunk_size: int
     workers: int
- 
+
     @abstractmethod
     def _create_data(self) -> List[Any]:
         """Create data in the parent process to be processed in the child process(es)
