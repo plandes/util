@@ -7,7 +7,6 @@ __author__ = 'Paul Landes'
 import logging
 from abc import ABC
 from typing import Dict, Any
-import copy as cp
 import types
 import inspect
 import importlib
@@ -288,6 +287,12 @@ class ConfigFactory(object):
         logger.info(f'created {name} instance of {cls.__name__} ' +
                     f'in {(time() - t0):.2f}s')
         return inst
+
+    def __call__(self, *args, **kwargs):
+        """Calls ``instance``.
+
+        """
+        return self.instance(*args, **kwargs)
 
 
 class ImportConfigFactory(ConfigFactory):
