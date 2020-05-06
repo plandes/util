@@ -350,11 +350,17 @@ class ImportConfigFactory(ConfigFactory):
     def _populate_instances(self, name: str, pconfig: str, section: str):
         child_params = {}
         reload = False
+        defined_directives = set('param reload'.split())
         if pconfig is not None:
             logger.debug(f'parsing param config: {pconfig}')
             pconfig = eval(pconfig)
+            unknown = set(pconfig.keys()) - defined_directives
+            if len(unknown) > 0:
+                raise ValueError(f'unknown directive(s): {unknown}')
             if 'param' in pconfig:
-                child_params.update(pconfig['param'])
+                cparams = pconfig['param']
+                cparams = Configurable.populate_state(cparams, {})
+                child_params.update(cparams)
             if 'reload' in pconfig:
                 reload = pconfig['reload']
                 logger.debug(f'setting reload: {reload}')
@@ -397,7 +403,10 @@ class ImportConfigFactory(ConfigFactory):
                     raise ValueError(f"no property '{prop_name}' found in '" +
                                      f"section '{self.last_sec_name}'")
                 params['initial_value'] = kwargs[prop_name]
-                #del kwargs[prop_name]
+                # don't delete the key here so that the type can be defined for
+                # dataclasses, effectively as documentation
+                #
+                # del kwargs[prop_name]
                 props.append((pw_name, prop_name, params))
         return props
 

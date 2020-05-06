@@ -188,6 +188,11 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
     methods overriden.  Inheriting and implementing a ``Stash`` such as this is
     usually used as the ``factory`` in a ``FactoryStash``.
 
+    This class delegates attribute fetches to the delegate for the
+    unimplemented methods using a decrator pattern.  This can cause strange and
+    unexpected behavior and can be turned off by settings
+    ``self.delegate_attr`` to ``False`` in the ``__post_init__`` method.
+
     """
     delegate: Stash
 
@@ -311,9 +316,9 @@ class PreemptiveStash(DelegateStash):
 
 @dataclass
 class PrimeableStash(Stash):
-    @abstractmethod
     def prime(self):
-        pass
+        if isinstance(self, DelegateStash):
+            self.delegate.prime()
 
 
 @dataclass

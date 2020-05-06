@@ -8,6 +8,7 @@ from zensols.config import (
     ImportConfigFactory,
 )
 from zensols.persist import (
+    DirectoryStash,
     FactoryStash,
     ReadOnlyStash,
 )
@@ -31,6 +32,11 @@ class RangeStashThisMod(ReadOnlyStash):
 @dataclass
 class RangeHolder(object):
     some_range: object
+
+
+@dataclass
+class StashHolder(object):
+    stash: DirectoryStash
 
 
 class TestStashFactory(unittest.TestCase):
@@ -79,3 +85,27 @@ class TestStashFactory(unittest.TestCase):
         arange = inst.some_range
         self.assertTrue(isinstance(arange, RangeStashThisMod))
         self.assertEqual(123, arange.n)
+
+    def test_not_import(self):
+        fac = ImportConfigFactory(self.conf)
+        inst = fac.instance('stash_holder')
+        self.assertTrue(isinstance(inst, StashHolder))
+        stash = inst.stash
+        self.assertTrue(isinstance(stash, DirectoryStash))
+        path = stash.path
+        self.assertTrue(isinstance(path, Path))
+
+    def test_with_badkey(self):
+        fac = ImportConfigFactory(self.conf)
+        self.assertRaises(
+            ValueError, lambda: fac.instance('stash_holder_badkey'))
+
+    def test_with_import(self):
+        fac = ImportConfigFactory(self.conf)
+        inst = fac.instance('stash_holder_param')
+        self.assertTrue(isinstance(inst, StashHolder))
+        stash = inst.stash
+        self.assertTrue(isinstance(stash, DirectoryStash))
+        path = stash.path
+        self.assertTrue(isinstance(path, Path))
+        self.assertTrue('range10_stash', path.name)

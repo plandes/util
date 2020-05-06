@@ -54,7 +54,14 @@ class ChunkProcessor(object):
         return cnt
 
     def __str__(self):
-        return f'{self.name}: data: {type(self.data)}'
+        data = self.data
+        if data is not None:
+            if isinstance(data, list) and len(data) > 0:
+                data = data[0]
+            dtype = data.__class__.__name__
+        else:
+            dtype = 'None'
+        return f'{self.chunk_id}: {self.name}: data: {dtype}'
 
 
 @dataclass
@@ -99,7 +106,8 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         process.
 
         """
-        return chunk.process()
+        with time(f'processed chunk {chunk}'):
+            return chunk.process()
 
     def _create_chunk_processor(self, chunk_id: int, data: Any):
         """Factory method to create the ``ChunkProcessor`` instance.
@@ -114,8 +122,8 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         """
         data = map(lambda x: self._create_chunk_processor(*x),
                    enumerate(chunks(self._create_data(), self.chunk_size)))
-        logger.debug(f'spawning {self.chunk_size} chunks across ' +
-                     f'{self.workers} workers')
+        logger.info(f'spawning work with chunk size {self.chunk_size} ' +
+                    f'across {self.workers} workers')
         with Pool(self.workers) as p:
             with time('processed chunks'):
                 cnt = sum(p.map(self.__class__._process_work, data))
@@ -129,7 +137,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         has_data = self.has_data
         logger.debug(f'asserting data: {has_data}')
         if not has_data:
-            with time('spawining work in {self}'):
+            with time('completed work in {self.__class__.__name__}'):
                 self._spawn_work()
             self._reset_has_data()
 

@@ -5,11 +5,12 @@ files.
 __author__ = 'Paul Landes'
 
 
+from typing import Union, Dict
+from abc import ABCMeta, abstractmethod
 import os
 import sys
 import logging
 from pprint import pprint
-from abc import ABCMeta, abstractmethod
 from copy import deepcopy
 import re
 import configparser
@@ -77,7 +78,8 @@ class Configurable(metaclass=ABCMeta):
         "Return all options from the default section."
         return self.get_options()
 
-    def _parse_eval(self, pconfig: str, evalstr: str) -> str:
+    @staticmethod
+    def _parse_eval(pconfig: str, evalstr: str = None) -> str:
         if pconfig is not None:
             pconfig = eval(pconfig)
             if 'import' in pconfig:
@@ -86,18 +88,17 @@ class Configurable(metaclass=ABCMeta):
                 for i in imports:
                     logger.debug(f'importing: {i}')
                     exec(f'import {i}')
-        return eval(evalstr)
+        if evalstr is not None:
+            return eval(evalstr)
 
-    def populate(self, obj=None, section=None, parse_types=True):
-        """Set attributes in ``obj`` with ``setattr`` from the all values in
-        ``section``.
-
-        """
-        section = self.default_section if section is None else section
+    @classmethod
+    def populate_state(self, state: Dict[str, str],
+                       obj: Union[dict, object] = None,
+                       parse_types: bool = True) -> Union[dict, object]:
         obj = Settings() if obj is None else obj
         is_dict = isinstance(obj, dict)
-        for k, v in self.get_options(section).items():
-            if parse_types:
+        for k, v in state.items():
+            if parse_types and isinstance(v, str):
                 if v == 'None':
                     v = None
                 elif self.FLOAT_REGEXP.match(v):
@@ -121,6 +122,15 @@ class Configurable(metaclass=ABCMeta):
             else:
                 setattr(obj, k, v)
         return obj
+
+    def populate(self, obj=None, section=None, parse_types=True):
+        """Set attributes in ``obj`` with ``setattr`` from the all values in
+        ``section``.
+
+        """
+        section = self.default_section if section is None else section
+        sec = self.get_options(section)
+        return self.populate_state(sec, obj, parse_types)
 
     def _get_calling_module(self):
         """Get the last module in the call stack that is not this module or ``None`` if
