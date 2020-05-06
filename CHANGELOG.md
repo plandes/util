@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.2.2] - 2020-05-05
 ### Changed
 - Better documentation.
 - Fix reload module for `ImportConfigFactory` on `reload=True`.
@@ -37,6 +38,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.2.2...HEAD
+[1.2.2]: https://github.com/plandes/util/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/plandes/util/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/plandes/util/compare/v0.0.0...v1.2.0
