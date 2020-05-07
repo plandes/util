@@ -5,6 +5,10 @@ PROJ_TYPE=	python
 
 include ./zenbuild/main.mk
 
+.PHONY:		testall
+testall:	test
+		make PY_SRC_TEST_PAT=defer_test_time.py test
+
 .PHONY:		testconfig
 testconfig:
 		make PY_SRC_TEST_PAT=test_config.py test
