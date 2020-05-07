@@ -432,6 +432,7 @@ class TestStash(unittest.TestCase):
         self.assertEqual(None, stash.get(5))
         self.assertEqual(None, stash.get(6))
         self.assertFalse(stash.exists(6))
+        self.assertEqual('nada', stash.get(6, 'nada'))
 
     def test_cache_stash(self):
         stash = CacheStash(delegate=RangeStash(5))
