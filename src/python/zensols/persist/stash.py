@@ -76,10 +76,11 @@ class Stash(ABC):
         """Load an object or a default if key ``name`` doesn't exist.
 
         """
-        item = self.load(name)
-        if item is None:
-            item = default
-        return item
+        ret = self.load(name)
+        if ret is None:
+            return default
+        else:
+            return ret
 
     def exists(self, name: str) -> bool:
         """Return ``True`` if data with key ``name`` exists.
@@ -137,9 +138,12 @@ class Stash(ABC):
         return map(lambda k: (k, self.__getitem__(k)), self.keys())
 
     def __getitem__(self, key):
-        item = self.get(key)
+        exists = self.exists(key)
+        item = self.load(key)
         if item is None:
             raise KeyError(key)
+        if not exists:
+            self.dump(key, item)
         return item
 
     def __setitem__(self, key, value):
@@ -159,10 +163,6 @@ class Stash(ABC):
 
 
 class ReadOnlyStash(Stash):
-    def __getitem__(self, key):
-        if self.exists(key):
-            return self.load(key)
-
     def dump(self, name: str, inst):
         raise ValueError('dump not implemented for read only stashes')
 
@@ -224,12 +224,9 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
 
     def get(self, name: str, default=None) -> Any:
         if self.delegate is None:
-            item = super().get(name, default)
+            return super().get(name, default)
         else:
-            item = self.delegate.get(name, default)
-        if item is None:
-            item = default
-        return item
+            return self.delegate.get(name, default)
 
     def exists(self, name: str) -> bool:
         if self.delegate is not None:
@@ -357,15 +354,6 @@ class FactoryStash(PreemptiveStash):
             item = self.factory.load(name)
         return item
 
-    def get(self, name: str, default=None) -> Any:
-        exists = self.exists(name)
-        item = self.load(name)
-        if not exists:
-            self.dump(name, item)
-        if item is None:
-            item = default
-        return item
-
     def keys(self) -> List[str]:
         if self.has_data:
             ks = super().keys()
@@ -407,10 +395,7 @@ class OneShotFactoryStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
 
     def get(self, name: str, default=None):
         self.prime()
-        item = super().get(name, default)
-        if item is None:
-            item = default
-        return item
+        return super().get(name, default)
 
     def load(self, name: str):
         self.prime()
@@ -433,7 +418,10 @@ class OrderedKeyStash(DelegateStash):
 
     def keys(self) -> List[str]:
         keys = super().keys()
-        keys = sorted(keys, key=self.order_function)
+        if self.order_function:
+            keys = sorted(keys, key=self.order_function)
+        else:
+            keys = sorted(keys)
         return keys
 
 
@@ -497,13 +485,6 @@ class CacheStash(DelegateStash):
 
     def exists(self, name: str):
         return self.cache_stash.exists(name) or self.delegate.exists(name)
-
-    def get(self, name: str, default=None) -> Any:
-        exists = self.exists(name)
-        item = self.load(name)
-        if not exists:
-            self.dump(name, item)
-        return item
 
     def delete(self, name=None):
         if self.cache_stash.exists(name):

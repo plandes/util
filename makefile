@@ -25,6 +25,7 @@ testlog:
 testcli:
 		make PY_SRC_TEST_PAT=test_cli.py test
 
+.PHONY:		testpersist
 testpersist:
 		make PY_SRC_TEST_PAT=test_persist.py test
 
@@ -35,6 +36,10 @@ testpersistattach:
 .PHONY:		testpersistfactory
 testpersistfactory:
 		make PY_SRC_TEST_PAT=test_persist_factory.py test
+
+.PHONY:		teststash
+teststash:
+		make PY_SRC_TEST_PAT=test_stash.py test
 
 .PHONY:		testmulti
 testmulti:
