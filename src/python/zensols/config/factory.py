@@ -237,7 +237,7 @@ class ConfigFactory(object):
         args = inspect.signature(cls.__init__)
         return param_name in args.parameters
 
-    def _instance(self, cls, *args, **kwargs):
+    def _instance(self, cls_desc, cls, *args, **kwargs):
         """Return the instance.
 
         :param cls: the class to create the instance from
@@ -249,7 +249,8 @@ class ConfigFactory(object):
             logger.debug(f'config factory creating instance of {cls}')
             inst = cls(*args, **kwargs)
         except Exception as e:
-            logger.error(f'couldnt not create class {cls}({args})({kwargs}): {e}')
+            logger.error(f'could not create {cls_desc} for class ' +
+                         f'{cls}({args})({kwargs}): {e}')
             raise e
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'inst: {inst.__class__}')
@@ -283,7 +284,7 @@ class ConfigFactory(object):
         if logger.level >= logging.DEBUG:
             for k, v in params.items():
                 logger.debug(f'populating {k} -> {v} ({type(v)})')
-        inst = self._instance(cls, *args, **params)
+        inst = self._instance(name, cls, *args, **params)
         logger.info(f'created {name} instance of {cls.__name__} ' +
                     f'in {(time() - t0):.2f}s')
         return inst
@@ -325,7 +326,6 @@ class ImportConfigFactory(ConfigFactory):
             self.shared = {}
         else:
             self.shared = None
-        self.last_sec_name = None
 
     def instance(self, name=None, *args, **kwargs):
         if self.shared is None:
@@ -384,10 +384,9 @@ class ImportConfigFactory(ConfigFactory):
         finally:
             self._set_reload(initial_reload)
         params.update(insts)
-        self.last_sec_name = name
         return class_name, params
 
-    def _process_injects(self, kwargs):
+    def _process_injects(self, sec_name, kwargs):
         pname = 'injects'
         pw_param_set = kwargs.get(pname)
         props = []
@@ -401,7 +400,7 @@ class ImportConfigFactory(ConfigFactory):
                 params['path'] = pw_name
                 if prop_name not in kwargs:
                     raise ValueError(f"no property '{prop_name}' found in '" +
-                                     f"section '{self.last_sec_name}'")
+                                     f"section '{sec_name}'")
                 params['initial_value'] = kwargs[prop_name]
                 # don't delete the key here so that the type can be defined for
                 # dataclasses, effectively as documentation
@@ -410,13 +409,13 @@ class ImportConfigFactory(ConfigFactory):
                 props.append((pw_name, prop_name, params))
         return props
 
-    def _instance(self, cls, *args, **kwargs):
+    def _instance(self, cls_desc, cls, *args, **kwargs):
+        sec_name = cls_desc
         reset_props = False
-        sec_name = self.last_sec_name
         class_name = ClassResolver.full_classname(cls)
         logger.debug(f'import instance: section name: {sec_name}, ' +
                      f'cls={class_name}, args={args}, kwargs={kwargs}')
-        pw_injects = self._process_injects(kwargs)
+        pw_injects = self._process_injects(sec_name, kwargs)
         prev_defined_sec = self.INJECTS.get(class_name)
 
         if prev_defined_sec is not None and prev_defined_sec != sec_name:
@@ -438,7 +437,7 @@ class ImportConfigFactory(ConfigFactory):
             inst = class_importer.instance(*args, **kwargs)
             reset_props = True
         else:
-            inst = super()._instance(cls, *args, **kwargs)
+            inst = super()._instance(sec_name, cls, *args, **kwargs)
         cls = inst.__class__
 
         logger.debug(f'adding injects: {len(pw_injects)}')
@@ -458,6 +457,5 @@ class ImportConfigFactory(ConfigFactory):
                 prop = property(getter, setter)
                 logger.debug(f'set property: {prop}')
                 setattr(cls, prop_name, prop)
-        self.last_sec_name = None
         logger.debug(f'create instance {cls}')
         return inst
