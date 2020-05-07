@@ -82,6 +82,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
     :param workers: the number of processes spawned to accomplish the work
 
     """
+    ATTR_EXP_META = ('chunk_size', 'workers')
     chunk_size: int
     workers: int
 

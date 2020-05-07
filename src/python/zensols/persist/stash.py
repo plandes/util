@@ -76,11 +76,12 @@ class Stash(ABC):
         """Load an object or a default if key ``name`` doesn't exist.
 
         """
-        ret = self.load(name)
-        if ret is None:
-            return default
-        else:
-            return ret
+        exists = self.exists(name)
+        item = self.load(name)
+        if item is None:
+            raise NameError(name)
+        if not exists:
+            self.dump(name, item)
 
     def exists(self, name: str) -> bool:
         """Return ``True`` if data with key ``name`` exists.
@@ -138,12 +139,9 @@ class Stash(ABC):
         return map(lambda k: (k, self.__getitem__(k)), self.keys())
 
     def __getitem__(self, key):
-        exists = self.exists(key)
-        item = self.load(key)
+        item = self.get(key)
         if item is None:
             raise KeyError(key)
-        if not exists:
-            self.dump(key, item)
         return item
 
     def __setitem__(self, key, value):
@@ -163,6 +161,10 @@ class Stash(ABC):
 
 
 class ReadOnlyStash(Stash):
+    def __getitem__(self, key):
+        if self.exists(key):
+            return self.load(key)
+
     def dump(self, name: str, inst):
         raise ValueError('dump not implemented for read only stashes')
 
@@ -189,9 +191,13 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
     usually used as the ``factory`` in a ``FactoryStash``.
 
     This class delegates attribute fetches to the delegate for the
-    unimplemented methods using a decrator pattern.  This can cause strange and
-    unexpected behavior and can be turned off by settings
-    ``self.delegate_attr`` to ``False`` in the ``__post_init__`` method.
+    unimplemented methods using a decorator pattern.  This can cause strange
+    and unexpected behavior and can be turned off by settings
+    ``self.delegate_attr`` to ``False`` in the ``__post_init__`` method.  This
+    should only be necessary while debugging when an incorrect attribute is
+    accessed or method dispatching arrives here by (programmer) mistake.
+
+    :see delegate_attr:
 
     """
     delegate: Stash
@@ -261,7 +267,9 @@ class KeyLimitStash(DelegateStash):
     on key mapping.
 
     """
-    n_limit: int = field(default=10)
+    ATTR_EXP_META = ('n_limit',)
+
+    n_limit: int
 
     def keys(self) -> Iterable[str]:
         ks = super().keys()
@@ -317,7 +325,8 @@ class PreemptiveStash(DelegateStash):
 @dataclass
 class PrimeableStash(Stash):
     def prime(self):
-        if isinstance(self, DelegateStash):
+        if isinstance(self, DelegateStash) and \
+           isinstance(self.delete, PrimeableStash):
             self.delegate.prime()
 
 
@@ -329,7 +338,8 @@ class FactoryStash(PreemptiveStash):
     :param factory: the stash used to create using ``load`` and ``keys``
 
     """
-    factory: Stash = field(default=None)
+    ATTR_EXP_META = ('enable_preemptive',)
+    factory: Stash
     enable_preemptive: bool = field(default=True)
 
     def _calculate_has_data(self) -> bool:
@@ -343,6 +353,13 @@ class FactoryStash(PreemptiveStash):
         if item is None:
             self._reset_has_data()
             item = self.factory.load(name)
+        return item
+
+    def get(self, name: str, default=None) -> Any:
+        exists = self.exists(name)
+        item = self.load(name)
+        if not exists:
+            self.dump(name, item)
         return item
 
     def keys(self) -> List[str]:
@@ -404,14 +421,12 @@ class OrderedKeyStash(DelegateStash):
     the keys determins it.
 
     """
-    order_function: Callable = field(default=int)
+    ATTR_EXP_META = ('order_function',)
+    order_function: Callable
 
     def keys(self) -> List[str]:
         keys = super().keys()
-        if self.order_function:
-            keys = sorted(keys, key=self.order_function)
-        else:
-            keys = sorted(keys)
+        keys = sorted(keys, key=self.order_function)
         return keys
 
 
@@ -463,15 +478,7 @@ class CacheStash(DelegateStash):
 
 
     """
-    cache_stash: Stash = field(default=None)
-
-    def __post_init__(self):
-        """Initialize.
-
-        """
-        super().__post_init__()
-        if self.cache_stash is None:
-            self.cache_stash = DictionaryStash()
+    cache_stash: Stash = field(default_factory=lambda: DictionaryStash())
 
     def load(self, name: str):
         if self.cache_stash.exists(name):
@@ -483,6 +490,13 @@ class CacheStash(DelegateStash):
 
     def exists(self, name: str):
         return self.cache_stash.exists(name) or self.delegate.exists(name)
+
+    def get(self, name: str, default=None) -> Any:
+        exists = self.exists(name)
+        item = self.load(name)
+        if not exists:
+            self.dump(name, item)
+        return item
 
     def delete(self, name=None):
         if self.cache_stash.exists(name):
@@ -506,6 +520,8 @@ class DirectoryStash(Stash):
         key of the data value
 
     """
+    ATTR_EXP_META = ('path', 'pattern')
+
     path: Path
     pattern: str = field(default='{name}.dat')
 

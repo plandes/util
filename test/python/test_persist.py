@@ -125,7 +125,7 @@ class TransientPickle(PersistableContainer):
 
 class TransientPickleOverride(TransientPickle):
     def __setstate__(self, state):
-        super(TransientPickleOverride, self).__setstate__(state)
+        super().__setstate__(state)
         self.n = 40
 
 
@@ -362,7 +362,7 @@ class TestPersistWork(unittest.TestCase):
 
 class IncStash(ReadOnlyStash):
     def __init__(self):
-        super(IncStash, self).__init__()
+        super().__init__()
         self.c = 0
 
     def load(self, name: str):
@@ -375,7 +375,7 @@ class IncStash(ReadOnlyStash):
 
 class RangeStash(ReadOnlyStash):
     def __init__(self, n):
-        super(Stash, self).__init__()
+        super().__init__()
         self.n = n
 
     def load(self, name: str):
