@@ -76,12 +76,10 @@ class Stash(ABC):
         """Load an object or a default if key ``name`` doesn't exist.
 
         """
-        exists = self.exists(name)
         item = self.load(name)
         if item is None:
-            raise NameError(name)
-        if not exists:
-            self.dump(name, item)
+            item = default
+        return item
 
     def exists(self, name: str) -> bool:
         """Return ``True`` if data with key ``name`` exists.
@@ -339,6 +337,7 @@ class FactoryStash(PreemptiveStash):
 
     """
     ATTR_EXP_META = ('enable_preemptive',)
+
     factory: Stash
     enable_preemptive: bool = field(default=True)
 
