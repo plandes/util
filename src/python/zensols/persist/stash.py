@@ -76,11 +76,13 @@ class Stash(ABC):
         """Load an object or a default if key ``name`` doesn't exist.
 
         """
-        ret = self.load(name)
-        if ret is None:
-            return default
-        else:
-            return ret
+        exists = self.exists(name)
+        item = self.load(name)
+        if not exists:
+            self.dump(name, item)
+        if item is None:
+            item = default
+        return item
 
     def exists(self, name: str) -> bool:
         """Return ``True`` if data with key ``name`` exists.
@@ -140,10 +142,10 @@ class Stash(ABC):
     def __getitem__(self, key):
         exists = self.exists(key)
         item = self.load(key)
-        if item is None:
-            raise KeyError(key)
         if not exists:
             self.dump(key, item)
+        if item is None:
+            raise KeyError(key)
         return item
 
     def __setitem__(self, key, value):
@@ -162,14 +164,21 @@ class Stash(ABC):
         return len(tuple(self.keys()))
 
 
+@dataclass
 class ReadOnlyStash(Stash):
+    def __post_init__(self):
+        self.strict = False
+
     def dump(self, name: str, inst):
-        raise ValueError('dump not implemented for read only stashes')
+        if self.strict:
+            raise ValueError('dump not implemented for read only stashes')
 
     def delete(self, name: str = None):
-        raise ValueError('delete not implemented for read only stashes')
+        if self.strict:
+            raise ValueError('delete not implemented for read only stashes')
 
 
+@dataclass
 class CloseableStash(Stash):
     """Any stash that has a resource that needs to be closed.
 
