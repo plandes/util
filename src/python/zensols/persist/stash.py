@@ -224,9 +224,12 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
 
     def get(self, name: str, default=None) -> Any:
         if self.delegate is None:
-            return super().get(name, default)
+            item = super().get(name, default)
         else:
-            return self.delegate.get(name, default)
+            item = self.delegate.get(name, default)
+        if item is None:
+            item = default
+        return item
 
     def exists(self, name: str) -> bool:
         if self.delegate is not None:
@@ -359,6 +362,8 @@ class FactoryStash(PreemptiveStash):
         item = self.load(name)
         if not exists:
             self.dump(name, item)
+        if item is None:
+            item = default
         return item
 
     def keys(self) -> List[str]:
@@ -402,7 +407,10 @@ class OneShotFactoryStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
 
     def get(self, name: str, default=None):
         self.prime()
-        return super().get(name, default)
+        item = super().get(name, default)
+        if item is None:
+            item = default
+        return item
 
     def load(self, name: str):
         self.prime()

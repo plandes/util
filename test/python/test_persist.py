@@ -379,6 +379,9 @@ class RangeStash(ReadOnlyStash):
         self.n = n
 
     def load(self, name: str):
+        n = int(name)
+        if n >= self.n:
+            return None
         return name
 
     def keys(self):
@@ -420,6 +423,15 @@ class TestStash(unittest.TestCase):
         self.assertEqual(([0, 1, 2, 3], [4,]), tuple(stash.key_groups(4)))
         self.assertEqual(([0, 1, 2, 3, 4,],), tuple(stash.key_groups(5)))
         self.assertEqual(([0, 1, 2, 3, 4,],), tuple(stash.key_groups(6)))
+
+    def test_not_exist(self):
+        stash = RangeStash(5)
+        self.assertTrue(stash.exists(4))
+        self.assertFalse(stash.exists(5))
+        self.assertEqual(4, stash.get(4))
+        self.assertEqual(None, stash.get(5))
+        self.assertEqual(None, stash.get(6))
+        self.assertFalse(stash.exists(6))
 
     def test_cache_stash(self):
         stash = CacheStash(delegate=RangeStash(5))
