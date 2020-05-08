@@ -431,7 +431,8 @@ class ImportConfigFactory(ConfigFactory):
             self.INJECTS[class_name] = sec_name
 
         if self.reload:
-            # we still have to reload at the top level
+            # we still have to reload at the top level (root in the instance
+            # graph)
             class_resolver = self.class_resolver
             class_importer = class_resolver.create_class_importer(class_name)
             inst = class_importer.instance(*args, **kwargs)
