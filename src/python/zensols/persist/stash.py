@@ -115,7 +115,10 @@ class Stash(ABC):
         *Important*: Exercise caution with this method, of course.
 
         """
+        logger.debug(f'clearing stash {self.__class__}')
         for k in self.keys():
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug('deleting key: {k}')
             self.delete(k)
 
     @abstractmethod
@@ -259,8 +262,10 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
         return ()
 
     def clear(self):
+        logger.debug(f'delegate clear in {self.__class__}')
         super().clear()
         if self.delegate is not None:
+            logger.debug(f'calling super clear on {self.delegate.__class__}')
             self.delegate.clear()
 
     def close(self):
