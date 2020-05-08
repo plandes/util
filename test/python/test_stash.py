@@ -85,7 +85,6 @@ class TestStash(unittest.TestCase):
         self.assertEqual('nada', stash.get(6, 'nada'))
 
     def test_cache_stash(self):
-        print()
         stash = CacheStash(delegate=RangeStash(5))
         self.assertEqual(((0, 0), (1, 1), (2, 2), (3, 3), (4, 4)), tuple(stash))
         self.assertEqual({0: 0, 1: 1, 2: 2, 3: 3, 4: 4}, stash.cache_stash.data)
@@ -99,3 +98,10 @@ class TestStash(unittest.TestCase):
         # disabled since a caching stash is read only
         #self.assertEqual(0, len(stash))
         #self.assertEqual((), tuple(stash.keys()))
+
+    def test_delegate_to_delegate(self):
+        stash = CacheStash(delegate=RangeStash(5))
+        self.assertEqual(((0, 0), (1, 1), (2, 2), (3, 3), (4, 4)), tuple(stash))
+        self.assertRaises(AttributeError, lambda: stash.n)
+        stash.delegate_attr = True
+        stash.n

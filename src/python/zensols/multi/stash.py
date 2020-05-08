@@ -5,8 +5,10 @@ __author__ = 'Paul Landes'
 
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from typing import Iterable, List, Any, Tuple
+from typing import Iterable, List, Any, Tuple, Callable, Union
+import os
 import logging
+import math
 from multiprocessing import Pool
 from zensols.util.time import time
 from zensols.config import (
@@ -40,7 +42,9 @@ class ChunkProcessor(object):
     data: object
 
     def _create_stash(self):
-        return ImportConfigFactory(self.config).instance(self.name)
+        fac = ImportConfigFactory(self.config)
+        with time(f'constructed instance of {self.name}', logging.DEBUG):
+            return fac.instance(self.name)
 
     def process(self):
         """Create the stash used to process the data, then persisted in the stash.
@@ -48,6 +52,7 @@ class ChunkProcessor(object):
         """
         stash = self._create_stash()
         cnt = 0
+        logger.debug(f'processing chunk with stash {stash.__class__}')
         for id, inst in stash._process(self.data):
             stash.delegate.dump(id, inst)
             cnt += 1
@@ -75,19 +80,31 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
     To implement, the ``_create_chunks`` and ``_process`` methods must be
     implemented.
 
-    :param chunk_size: the size of each group of data sent to the child
-                       process to be handled; in some cases the child
-                       process will get a chunk of data smaller than this
-                       (the last) but never more
-    :param workers: the number of processes spawned to accomplish the work
+    :param chunk_size: the size of each group of data sent to the child process
+                       to be handled; in some cases the child process will get
+                       a chunk of data smaller than this (the last) but never
+                       more; if this number is 0, then evenly divide the work
+                       so that each worker takes the largets amount of work to
+                       minimize the number of chunks (in this case the data is
+                       tupleized)
+    :param workers: the number of processes spawned to accomplish the work; if
+                     this is a negative number, add the number of CPU
+                     processors with this number, so -1 would result in one
+                     fewer works utilized than the number of CPUs, which is a
+                     good policy for a busy server.
 
     """
     ATTR_EXP_META = ('chunk_size', 'workers')
     chunk_size: int
     workers: int
 
+    def __post_init__(self):
+        super().__post_init__()
+        if self.workers < 1:
+            self.workers = os.cpu_count() + self.workers
+
     @abstractmethod
-    def _create_data(self) -> List[Any]:
+    def _create_data(self) -> Union[List[Any], Iterable[Any]]:
         """Create data in the parent process to be processed in the child process(es)
         in chunks.
 
@@ -107,6 +124,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         process.
 
         """
+        logger.info(f'processing chunk {chunk}')
         with time(f'processed chunk {chunk}'):
             return chunk.process()
 
@@ -114,20 +132,31 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         """Factory method to create the ``ChunkProcessor`` instance.
 
         """
+        logger.debug(f'creating chunk processor for id {chunk_id}')
         return ChunkProcessor(self.config, self.name, chunk_id, data)
+
+    def _invoke_pool(self, pool: Pool, fn: Callable, data: iter) -> int:
+        return pool.map(fn, data)
 
     def _spawn_work(self) -> int:
         """Chunks and invokes a multiprocessing pool to invokes processing on the
         children.
 
         """
+        chunk_size, workers = self.chunk_size, self.workers
+        if workers < 1:
+            workers = os.cpu_count() + workers
+        data = self._create_data()
+        if chunk_size < 1:
+            data = tuple(data)
+            chunk_size = math.ceil(len(data) / workers)
         data = map(lambda x: self._create_chunk_processor(*x),
-                   enumerate(chunks(self._create_data(), self.chunk_size)))
-        logger.info(f'spawning work with chunk size {self.chunk_size} ' +
-                    f'across {self.workers} workers')
-        with Pool(self.workers) as p:
+                   enumerate(chunks(data, chunk_size)))
+        logger.info(f'spawning work with chunk size {chunk_size} ' +
+                    f'across {workers} workers')
+        with Pool(workers) as p:
             with time('processed chunks'):
-                cnt = sum(p.map(self.__class__._process_work, data))
+                cnt = self._invoke_pool(p, self.__class__._process_work, data)
         return cnt
 
     def prime(self):

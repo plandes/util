@@ -198,11 +198,13 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
     usually used as the ``factory`` in a ``FactoryStash``.
 
     This class delegates attribute fetches to the delegate for the
-    unimplemented methods using a decorator pattern.  This can cause strange
-    and unexpected behavior and can be turned off by settings
-    ``self.delegate_attr`` to ``False`` in the ``__post_init__`` method.  This
-    should only be necessary while debugging when an incorrect attribute is
-    accessed or method dispatching arrives here by (programmer) mistake.
+    unimplemented methods and attributes using a decorator pattern when
+    attribute ``delegate_attr`` is set to ``True``.
+
+    *Note:* Delegate attribute fetching can cause strange and unexpected
+     behavior, so use this funcationlity with care.  It is advised to leave it
+     off if unexpected ``AttributeError``s are raised due to incorrect
+     attribute is access or method dispatching.
 
     :see delegate_attr:
 
@@ -214,7 +216,7 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
             raise ValueError(f'delegate not set')
         if not isinstance(self.delegate, Stash):
             raise ValueError(f'not a stash: {self.delegate}')
-        self.delegate_attr = True
+        self.delegate_attr = False
 
     def __getattr__(self, attr, default=None):
         if self.delegate_attr:
