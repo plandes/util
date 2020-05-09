@@ -192,7 +192,7 @@ class PersistedWork(object):
         """
         return self.worker(*argv, **kwargs)
 
-    def pprint(self, writer=sys.stdout, indent=0, include_content=False):
+    def write(self, indent=0, include_content=False, writer=sys.stdout):
         sp = ' ' * indent
         writer.write(f'{sp}{self}:\n')
         sp = ' ' * (indent + 1)
@@ -224,13 +224,13 @@ class PersistableContainerMetadata(object):
                 pws[k] = v
         return pws
 
-    def pprint(self, writer=sys.stdout, indent=0,
-               include_content=False, recursive=False):
+    def write(self, indent=0, include_content=False,
+              recursive=False, writer=sys.stdout):
         sp = ' ' * indent
         spe = ' ' * (indent + 1)
         for k, v in self.container.__dict__.items():
             if isinstance(v, PersistedWork):
-                v.pprint(writer, indent, include_content)
+                v.write(indent, include_content, writer=writer)
             else:
                 writer.write(f'{sp}{k}:\n')
                 writer.write(f'{spe}type: {type(v)}\n')
