@@ -204,7 +204,7 @@ class ConfigFactory(object):
 
         :param instance_class: the class to register with the factory (not a
                                string)
-        :param name: the name to use as the key for instance class lookups;
+v        :param name: the name to use as the key for instance class lookups;
                      defaults to the name of the class
 
         """
@@ -308,7 +308,7 @@ class ImportConfigFactory(ConfigFactory):
     INJECTS = {}
 
     def __init__(self, *args, reload: bool = False, shared: bool = False,
-                 **kwargs):
+                 reload_root=None, **kwargs):
         """Initialize the configuration factory.
 
         :param reload: whether or not to reload the module when resolving the
@@ -326,6 +326,7 @@ class ImportConfigFactory(ConfigFactory):
             self.shared = {}
         else:
             self.shared = None
+        self.reload_root = reload_root if reload_root is not None else reload
 
     def instance(self, name=None, *args, **kwargs):
         if self.shared is None:
@@ -430,15 +431,21 @@ class ImportConfigFactory(ConfigFactory):
             logger.debug(f'sec assign {sec_name} = {class_name}')
             self.INJECTS[class_name] = sec_name
 
-        if self.reload:
-            # we still have to reload at the top level (root in the instance
-            # graph)
-            class_resolver = self.class_resolver
-            class_importer = class_resolver.create_class_importer(class_name)
-            inst = class_importer.instance(*args, **kwargs)
-            reset_props = True
-        else:
-            inst = super()._instance(sec_name, cls, *args, **kwargs)
+        initial_reload = self.reload
+        try:
+            self._set_reload(self.reload_root)
+            if self.reload:
+                # we still have to reload at the top level (root in the instance
+                # graph)
+                class_resolver = self.class_resolver
+                class_importer = class_resolver.create_class_importer(class_name)
+                inst = class_importer.instance(*args, **kwargs)
+                reset_props = True
+            else:
+                inst = super()._instance(sec_name, cls, *args, **kwargs)
+        finally:
+            self._set_reload(initial_reload)
+            
         cls = inst.__class__
 
         logger.debug(f'adding injects: {len(pw_injects)}')

@@ -6,7 +6,7 @@ __author__ = 'Paul Landes'
 
 
 from typing import Union, Dict
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, ABC
 import os
 import sys
 import logging
@@ -19,6 +19,25 @@ import inspect
 import pkg_resources
 
 logger = logging.getLogger(__name__)
+
+
+class Writable(ABC):
+    """An interface for classes that have multi-line debuging capability.
+
+    """
+    def _sp(self, depth: int):
+        """Utility method to create a space string.
+
+        """
+        indent = getattr(self, 'indent', 4)
+        return ' ' * (depth * indent)
+
+    @abstractmethod
+    def write(self, depth: int = 0, writer=sys.stdout):
+        """Write the contents of this instance to ``writer`` using indention ``depth``.
+
+        """
+        pass
 
 
 class Settings(object):
