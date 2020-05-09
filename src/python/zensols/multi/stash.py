@@ -44,7 +44,9 @@ class ChunkProcessor(object):
     def _create_stash(self):
         fac = ImportConfigFactory(self.config)
         with time(f'constructed instance of {self.name}', logging.DEBUG):
-            return fac.instance(self.name)
+            inst = fac.instance(self.name)
+            inst.is_child = True
+            return inst
 
     def process(self):
         """Create the stash used to process the data, then persisted in the stash.
@@ -54,6 +56,8 @@ class ChunkProcessor(object):
         cnt = 0
         logger.debug(f'processing chunk with stash {stash.__class__}')
         for id, inst in stash._process(self.data):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'dumping {id} -> {inst.__class__}')
             stash.delegate.dump(id, inst)
             cnt += 1
         return cnt
@@ -102,6 +106,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         super().__post_init__()
         if self.workers < 1:
             self.workers = os.cpu_count() + self.workers
+        self.is_child = False
 
     @abstractmethod
     def _create_data(self) -> Union[List[Any], Iterable[Any]]:
@@ -164,6 +169,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         generate the data and process in children processes.
 
         """
+        logger.debug(f'multi prime, is child: {self.is_child}')
         has_data = self.has_data
         logger.debug(f'asserting data: {has_data}')
         if not has_data:
