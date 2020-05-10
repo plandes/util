@@ -529,18 +529,25 @@ class DirectoryStash(Stash):
     path: Path
     pattern: str = field(default='{name}.dat')
 
-    def _path_dir(self):
+    def __post_init__(self):
+        if not isinstance(self.path, Path):
+            raise ValueError(
+                f'expecting pathlib.Path but got: {self.path.__class__}')
+
+    def assert_path_dir(self):
         self.path.mkdir(parents=True, exist_ok=True)
 
-    def _get_instance_path(self, name):
-        "Return a path to the pickled data with key ``name``."
+    def key_to_path(self, name: str) -> Path:
+        """Return a path to the pickled data with key ``name``.
+
+        """
         fname = self.pattern.format(**{'name': name})
         logger.debug(f'path {self.path}: {self.path.exists()}')
-        self._path_dir()
+        self.assert_path_dir()
         return Path(self.path, fname)
 
     def load(self, name: str) -> Any:
-        path = self._get_instance_path(name)
+        path = self.key_to_path(name)
         inst = None
         if path.exists():
             logger.info(f'loading instance from {path}')
@@ -550,14 +557,17 @@ class DirectoryStash(Stash):
         return inst
 
     def exists(self, name) -> bool:
-        path = self._get_instance_path(name)
+        path = self.key_to_path(name)
         return path.exists()
 
     def keys(self) -> Iterable[str]:
         def path_to_key(path):
-            p = parse.parse(self.pattern, path.name).named
-            if 'name' in p:
-                return p['name']
+            p = parse.parse(self.pattern, path.name)
+            # avoid files that don't match the pattern
+            if p is not None:
+                p = p.named
+                if 'name' in p:
+                    return p['name']
 
         logger.debug(f'checking path {self.path} ({type(self.path)})')
         if not self.path.is_dir():
@@ -569,13 +579,13 @@ class DirectoryStash(Stash):
 
     def dump(self, name: str, inst: Any):
         logger.info(f'saving instance: {inst}')
-        path = self._get_instance_path(name)
+        path = self.key_to_path(name)
         with open(path, 'wb') as f:
             pickle.dump(inst, f)
 
     def delete(self, name: str):
         logger.info(f'deleting instance: {name}')
-        path = self._get_instance_path(name)
+        path = self.key_to_path(name)
         if path.exists():
             path.unlink()
 

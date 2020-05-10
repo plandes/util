@@ -33,6 +33,24 @@ class Writable(ABC):
         indent = getattr(self, 'indent', 4)
         return ' ' * (depth * indent)
 
+    def _write_line(self, line: str, depth: int = 0,
+                    writer: TextIOWrapper = sys.stdout):
+        """Write a line of text ``line`` with the correct indentation per ``depth`` to
+        ``writer``.
+
+        """
+        writer.write(f'{self._sp(depth)}{line}\n')
+
+    def _write_dict(self, data: dict, depth: int = 0,
+                    writer: TextIOWrapper = sys.stdout):
+        """Write dictionary ``data`` with the correct indentation per ``depth`` to
+        ``writer``.
+
+        """
+        sp = self._sp(depth)
+        for k, v in data.items():
+            writer.write(f'{sp}{k}: {v}\n')
+
     @abstractmethod
     def write(self, depth: int = 0, writer: TextIOWrapper = sys.stdout):
         """Write the contents of this instance to ``writer`` using indention ``depth``.
@@ -55,7 +73,7 @@ class Settings(object):
         pprint(self.__dict__, writer)
 
 
-class Configurable(metaclass=ABCMeta):
+class Configurable(Writable, metaclass=ABCMeta):
     """An abstract base class that represents an application specific
     configuration.
 
@@ -372,14 +390,14 @@ class Config(Configurable):
         self.copy_sections(conf, copy_sections)
         return conf
 
-    def write(self, writer=sys.stdout):
+    def write(self, depth: int = 0, writer: TextIOWrapper = sys.stdout):
         """Print a human readable list of sections and options.
 
         """
         for sec in self.sections:
-            writer.write(f'{sec}:\n')
+            self._write_line(sec, depth, writer)
             for k, v in self.get_options(sec).items():
-                writer.write(f'  {k}: {v}\n')
+                self._write_line(f'{k}: {v}', depth + 1, writer)
 
     def __str__(self):
         return str('file: {}, section: {}'.

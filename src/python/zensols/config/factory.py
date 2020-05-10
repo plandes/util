@@ -328,6 +328,12 @@ class ImportConfigFactory(ConfigFactory):
             self.shared = None
         self.reload_root = reload_root if reload_root is not None else reload
 
+    def clear(self):
+        """Clear any shared instances.
+
+        """
+        self.shared.clear()
+
     def instance(self, name=None, *args, **kwargs):
         if self.shared is None:
             inst = super().instance(name, *args, **kwargs)
