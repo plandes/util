@@ -131,7 +131,7 @@ class ClassImporter(object):
             logger.debug(f'class importer creating instance of {cls}')
             inst = cls(*args, **kwargs)
         except Exception as e:
-            msg = f'could not instantiate {cls}({args}, {kwargs})'
+            msg = f'can not instantiate {cls}({args}, {kwargs})'
             logger.error(msg, e)
             raise e
         if logger.isEnabledFor(logging.DEBUG):
@@ -225,7 +225,7 @@ class ConfigFactory(object):
         try:
             params.update(self.config.populate({}, section=sec))
         except Exception as e:
-            logger.error(f'could not populate from section {sec}: {e}')
+            logger.error(f'can not populate from section {sec}: {e}')
             raise e
         class_name = params.get('class_name')
         if class_name is None:
@@ -249,7 +249,7 @@ class ConfigFactory(object):
             logger.debug(f'config factory creating instance of {cls}')
             inst = cls(*args, **kwargs)
         except Exception as e:
-            logger.error(f'could not create {cls_desc} for class ' +
+            logger.error(f'can not create \'{cls_desc}\' for class ' +
                          f'{cls}({args})({kwargs}): {e}')
             raise e
         if logger.isEnabledFor(logging.DEBUG):

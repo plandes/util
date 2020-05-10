@@ -8,6 +8,7 @@ from zensols.config import (
     ImportConfigFactory,
 )
 from zensols.persist import (
+    DelegateDefaults,
     DirectoryStash,
     FactoryStash,
     ReadOnlyStash,
@@ -45,6 +46,7 @@ class TestStashFactory(unittest.TestCase):
         self.target_path = Path('target')
         if self.target_path.exists():
             shutil.rmtree(self.target_path)
+        DelegateDefaults.CLASS_CHECK = True
 
     def test_create_same_module(self):
         fac = ImportConfigFactory(self.conf)

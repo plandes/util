@@ -192,6 +192,13 @@ class CloseableStash(Stash):
         pass
 
 
+class DelegateDefaults(object):
+    # setting to True breaks stash reloads from ImportConfigFactory, so set to
+    # True for tests etc
+    CLASS_CHECK = False
+    DELEGATE_ATTR = False
+
+
 @dataclass
 class DelegateStash(CloseableStash, metaclass=ABCMeta):
     """Delegate pattern.  It can also be used as a no-op if no delegate is given.
@@ -217,9 +224,10 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
     def __post_init__(self):
         if self.delegate is None:
             raise ValueError(f'delegate not set')
-        if not isinstance(self.delegate, Stash):
+        if DelegateDefaults.CLASS_CHECK and \
+           not isinstance(self.delegate, Stash):
             raise ValueError(f'not a stash: {self.delegate}')
-        self.delegate_attr = False
+        self.delegate_attr = DelegateDefaults.DELEGATE_ATTR
 
     def __getattr__(self, attr, default=None):
         if self.delegate_attr:

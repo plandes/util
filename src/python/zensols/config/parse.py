@@ -30,7 +30,7 @@ class Writable(ABC):
         """Utility method to create a space string.
 
         """
-        indent = getattr(self, 'indent', 4)
+        indent = getattr(self, '_indent', 4)
         return ' ' * (depth * indent)
 
     def _write_line(self, line: str, depth: int = 0,

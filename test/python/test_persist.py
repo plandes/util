@@ -5,6 +5,7 @@ import pickle
 from io import BytesIO
 import unittest
 from zensols.persist import (
+    DelegateDefaults,
     persisted,
     PersistedWork,
     PersistableContainer,
@@ -135,6 +136,7 @@ class TestPersistWork(unittest.TestCase):
             if p.exists():
                 p.unlink()
         targdir.mkdir(0o0755, exist_ok=True)
+        DelegateDefaults.CLASS_CHECK = True
 
     def _freeze_thaw(self, o):
         bio = BytesIO()

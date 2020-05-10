@@ -8,10 +8,11 @@ __author__ = 'Paul Landes'
 from typing import Set, Type
 import sys
 import collections
-from zensols.config import ClassResolver
+from io import TextIOWrapper
+from zensols.config import ClassResolver, Writable
 
 
-class ClassExplorer(object):
+class ClassExplorer(Writable):
     ATTR_META_NAME = 'ATTR_EXP_META'
 
     def __init__(self, include_classes: Set[Type],
@@ -59,10 +60,8 @@ class ClassExplorer(object):
                 dat['children'] = children
         return dat
 
-    def _sp(self, depth: int):
-        return ' ' * (depth * self.indent)
-
-    def write(self, metadata: dict, depth: int = 0, writer=sys.stdout):
+    def write(self, depth: int = 0, writer: TextIOWrapper = sys.stdout,
+              metadata: dict = None):
         self._write(metadata, depth, None, writer)
 
     def _write(self, metadata: dict, depth: int, attr: str, writer):

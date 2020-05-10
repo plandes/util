@@ -1,6 +1,7 @@
 import logging
 import unittest
 from zensols.persist import (
+    DelegateDefaults,
     FactoryStash,
     DictionaryStash,
     CacheStash,
@@ -39,6 +40,9 @@ class RangeStash(ReadOnlyStash):
 
 
 class TestStash(unittest.TestCase):
+    def setUp(self):
+        DelegateDefaults.CLASS_CHECK = True
+
     def test_dict(self):
         ds = DictionaryStash()
         self.assertEqual(0, len(ds.keys()))
