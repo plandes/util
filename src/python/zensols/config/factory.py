@@ -204,7 +204,7 @@ class ConfigFactory(object):
 
         :param instance_class: the class to register with the factory (not a
                                string)
-v        :param name: the name to use as the key for instance class lookups;
+        :param name: the name to use as the key for instance class lookups;
                      defaults to the name of the class
 
         """

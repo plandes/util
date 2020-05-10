@@ -9,6 +9,7 @@ from typing import Union, Dict
 from abc import ABCMeta, abstractmethod, ABC
 import os
 import sys
+from io import TextIOWrapper
 import logging
 from pprint import pprint
 from copy import deepcopy
@@ -33,7 +34,7 @@ class Writable(ABC):
         return ' ' * (depth * indent)
 
     @abstractmethod
-    def write(self, depth: int = 0, writer=sys.stdout):
+    def write(self, depth: int = 0, writer: TextIOWrapper = sys.stdout):
         """Write the contents of this instance to ``writer`` using indention ``depth``.
 
         """
@@ -404,7 +405,6 @@ class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
     environment variables passed.
 
     """
-
     def __init__(self, *args, remove_vars: bool = None,
                  env: dict = None, env_sec: str = 'env', **kwargs):
         if 'default_expect' not in kwargs:
