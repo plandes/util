@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.2.3] - 2020-05-10
+### Added
+- Meta data walker with class level annotation to better debug stash instance
+  graphs.
+- `Writable` interface that provides a basic multi-line indention specific
+  pretty print.
+- More unit tests for stashes and increased coverage in other areas.
+
+### Changed
+- Use `testall` to invoke all unit tests.  Standard `test` tests all but the
+  *time* specific unit tests.
+- More robust configuration reloading strategy.
+
+
 ## [1.2.2] - 2020-05-05
 ### Changed
 - Better documentation.
@@ -38,7 +52,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.2.2...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.2.3...HEAD
+[1.2.3]: https://github.com/plandes/util/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/plandes/util/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/plandes/util/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/plandes/util/compare/v0.0.0...v1.2.0
