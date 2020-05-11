@@ -224,9 +224,12 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
     def __post_init__(self):
         if self.delegate is None:
             raise ValueError(f'delegate not set')
-        if DelegateDefaults.CLASS_CHECK and \
-           not isinstance(self.delegate, Stash):
-            raise ValueError(f'not a stash: {self.delegate}')
+        if not isinstance(self.delegate, Stash):
+            msg = f'not a stash: {self.delegate.__class__} or reloaded'
+            if DelegateDefaults.CLASS_CHECK:
+                raise ValueError(msg)
+            else:
+                logger.warning(msg)
         self.delegate_attr = DelegateDefaults.DELEGATE_ATTR
 
     def __getattr__(self, attr, default=None):
