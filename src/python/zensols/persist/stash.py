@@ -5,7 +5,7 @@ __author__ = 'Paul Landes'
 
 import logging
 from typing import List, Callable, Any, Iterable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
 from abc import abstractmethod, ABC, ABCMeta
 import itertools as it
 import parse
@@ -602,3 +602,66 @@ class DirectoryStash(Stash):
 
     def close(self):
         pass
+
+
+@dataclass
+class IncrementKeyDirectoryStash(DirectoryStash):
+    """A stash that increments integer value keys in a stash and dumps/loads using
+    the last key available in the stash.
+
+    """
+    name: InitVar[str] = field(default='data')
+
+    def __post_init__(self, name: str):
+        super().__post_init__()
+        self.pattern = name + '-{name}.dat'
+        self._last_key = None
+
+    def get_last_key(self, inc: bool = False) -> str:
+        """Get the last available (highest number) keys in the stash.
+
+        """
+        if self._last_key is None:
+            keys = tuple(map(int, self.keys()))
+            if len(keys) == 0:
+                key = 0
+            else:
+                key = max(keys)
+            self._last_key = key
+        if inc:
+            self._last_key += 1
+        return str(self._last_key)
+
+    def keys(self) -> Iterable[str]:
+        def is_good_key(data):
+            try:
+                int(data)
+                return True
+            except ValueError:
+                return False
+
+        return filter(is_good_key, super().keys())
+
+    def dump(self, name_or_inst, inst=None):
+        """If only one argument is given, it is used as the data and the key name is
+        derived from ``get_last_key``.
+
+        """
+        if inst is None:
+            key = self.get_last_key(True)
+            inst = name_or_inst
+        else:
+            key = name_or_inst
+        path = self.key_to_path(key)
+        logger.debug(f'dumping result {self.name} to {path}')
+        super().dump(key, inst)
+
+    def load(self, name: str = None) -> Any:
+        """Just like ``Stash.load``, but if the key is omitted, return the value of the
+        last key in the stash.
+
+        """
+        if name is None:
+            name = self.get_last_key(False)
+        if len(self) > 0:
+            return super().load(name)

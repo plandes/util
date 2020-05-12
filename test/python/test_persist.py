@@ -1,6 +1,7 @@
 import logging
 from sys import platform
 from pathlib import Path
+import shutil
 import pickle
 from io import BytesIO
 import unittest
@@ -10,6 +11,7 @@ from zensols.persist import (
     PersistedWork,
     PersistableContainer,
     DirectoryStash,
+    IncrementKeyDirectoryStash,
     ShelveStash,
     shelve,
 )
@@ -136,6 +138,7 @@ class TestPersistWork(unittest.TestCase):
             if p.exists():
                 p.unlink()
         targdir.mkdir(0o0755, exist_ok=True)
+        self.targdir = targdir
         DelegateDefaults.CLASS_CHECK = True
 
     def _freeze_thaw(self, o):
@@ -307,7 +310,7 @@ class TestPersistWork(unittest.TestCase):
         self.assertEqual(TransientPickle, type(sc3))
 
     def test_dir_stash(self):
-        path = Path('target')
+        path = self.targdir
         file_path = path / 'tmp5.dat'
         s = DirectoryStash(path)
         self.assertFalse(file_path.exists())
@@ -321,8 +324,41 @@ class TestPersistWork(unittest.TestCase):
         s.delete('tmp5')
         self.assertFalse(file_path.exists())
 
+    def test_increment_key_directory_stash(self):
+        path = self.targdir / 'ids'
+        if path.exists():
+            shutil.rmtree(path)
+        path.mkdir(parents=True, exist_ok=True)
+        stash = IncrementKeyDirectoryStash(path, name='some-name')
+        self.assertEqual(0, len(stash))
+
+        key = 'a-non-conform-key'
+        stash.dump(key, 'data')
+        key_path = path / f'some-name-{key}.dat'
+        self.assertTrue(key_path.exists())
+        self.assertEqual('0', stash.get_last_key())
+        self.assertFalse(stash.exists('data'))
+
+        stash.dump('newdata')
+        self.assertEqual('1', stash.get_last_key())
+        key_path = path / f'some-name-1.dat'
+        self.assertEqual(1, len(stash))
+        self.assertTrue(key_path.exists())
+        self.assertEqual('newdata', stash.load())
+
+        stash = IncrementKeyDirectoryStash(path, name='some-name')
+        self.assertEqual('1', stash.get_last_key())
+        self.assertEqual('newdata', stash.load())
+
+        stash.dump('yetmoredata')
+        self.assertEqual(2, len(stash))
+        self.assertEqual(2, len(tuple(stash.values())))
+        self.assertEqual(2, len(tuple(stash.keys())))
+        self.assertEqual('2', stash.get_last_key())
+        self.assertEqual('yetmoredata', stash.load())
+
     def paths(self, name):
-        path = Path('target')
+        path = self.targdir
         file_path = path / f'{name}.db'
         if platform == "linux" or platform == "linux2":
             path = file_path
