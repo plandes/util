@@ -233,6 +233,8 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
         self.delegate_attr = DelegateDefaults.DELEGATE_ATTR
 
     def __getattr__(self, attr, default=None):
+        if attr == 'delegate_attr':
+            return False
         if self.delegate_attr:
             try:
                 delegate = super().__getattribute__('delegate')

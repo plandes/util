@@ -328,6 +328,16 @@ class ImportConfigFactory(ConfigFactory):
             self.shared = None
         self.reload_root = reload_root if reload_root is not None else reload
 
+    def __getstate__(self):
+        state = dict(self.__dict__)
+        state['shared'] = {}
+        del state['class_resolver']
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.class_resolver = ImportClassResolver()
+
     def clear(self):
         """Clear any shared instances.
 
