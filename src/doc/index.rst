@@ -3,13 +3,16 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Command line, configuration and persistence utilities.
-======================================================
+Command line, configuration and persistence utilities
+=====================================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
+   :glob:
 
-   mods.rst
+   Overview <readme.md>
+   doc/*
+   API Reference <api.rst>
 
 
 Indices and tables

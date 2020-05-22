@@ -1,4 +1,4 @@
-# Command line, configuration and persistence utilities.
+# Zensols Utilities
 
 [![Travis CI Build Status][travis-badge]][travis-link]
 [![PyPI][pypi-badge]][pypi-link]
@@ -22,6 +22,19 @@ This package also has other packages to:
 - Streamline in memory and on disk persistence
 - Construct objects using configuration files (both INI and YAML).
 - Multi-processing work with a persistence layer.
+
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+## Table of Contents
+
+- [Obtaining](#obtaining)
+- [API](#api)
+- [Usage](#usage)
+    - [Command Line Interface](#command-line-interface)
+- [Changelog](#changelog)
+- [License](#license)
+
+<!-- markdown-toc end -->
+
 
 
 ## Obtaining
@@ -50,46 +63,13 @@ java -jar mkproj.jar
 
 ### Command Line Interface
 
-If you want to skip templating it out (i.e. don't like Java), create a command
-line module:
+The API provides an advanced command line interface library for quickly easily
+tying action based commands, such as operands given after the program name, to
+Python classes.
 
-```python
-from zensols.cli import OneConfPerActionOptionsCli
-from zensols.cli import SimpleActionCli
-from zensols.tools import HelloWorld
+See [Command Action Library](md/command-line.md).
 
-VERSION='0.1'
-
-class ConfAppCommandLine(OneConfPerActionOptionsCli):
-    def __init__(self):
-        cnf = {'executors':
-               [{'name': 'hello',
-                 'executor': lambda params: HelloWorld(**params),
-                 'actions':[{'name': 'doit',
-                             'meth': 'print_message',
-                             'opts': [['-m', '--message', True, # require argument
-                                       {'dest': 'message', 'metavar': 'STRING',
-                                        'help': 'a message to print'}]]}]}],
-               # uncomment to add a configparse (ini format) configuration file
-               # 'config_option': {'name': 'config',
-               #                   'opt': ['-c', '--config', False,
-               #                           {'dest': 'config', 'metavar': 'FILE',
-               #                            'help': 'configuration file'}]},
-               'whine': 1}
-        super(ConfAppCommandLine, self).__init__(cnf, version=VERSION)
-
-def main():
-    cl = ConfAppCommandLine()
-    cl.invoke()
-```
-
-This uses the `OneConfPerActionOptionsCliEnv` class, which provides a data
-driven way of configuring the action based command line.  An extention of this
-class is the `OneConfPerActionOptionsCliEnv` class, which imports environment
-variables and allows adding to the configuration via adding a resource like
-file (i.e. `~/.<program name>rc`) type file.  See the
-
-See the [command line test cases](test/python/cli_env_test.py) for more
+See the [command line test cases](test/python/test_cli_env.py) for more
 examples.
 
 
