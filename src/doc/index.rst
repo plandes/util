@@ -8,7 +8,6 @@ Command line, configuration and persistence utilities.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
    mods.rst
 
