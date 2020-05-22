@@ -94,19 +94,30 @@ class Configurable(Writable, metaclass=ABCMeta):
         return expect
 
     @abstractmethod
-    def get_option(self, name, expect=None):
+    def get_option(self, name, section=None, vars=None, expect=None):
         """Return an option from ``section`` with ``name``.
 
         :param section: section in the ini file to fetch the value; defaults to
-        constructor's ``default_section``
+                        constructor's ``default_section``
+
+        :param vars: contains the defaults for missing values of ``name``
+
+        :param expect: if ``True`` raise an exception if the value does not
+                       exist
 
         """
         pass
 
     @abstractmethod
-    def get_options(self, name, expect=None):
+    def get_options(self, section='default', opt_keys=None, vars=None):
         """Get all options for a section.  If ``opt_keys`` is given return only
         options with those keys.
+
+        :param section: section in the ini file to fetch the value; defaults to
+                        constructor's ``default_section``
+        :param vars: contains the defaults for missing values of ``name``
+        :param expect: if ``True`` raise an exception if the value does not
+                       exist
 
         """
         pass
@@ -189,9 +200,9 @@ class Configurable(Writable, metaclass=ABCMeta):
         a path on the file system.
 
         :param: resource_name the file name of the resource to obtain (or name
-            if obtained from an installed module)
+                if obtained from an installed module)
         :param module_name: the name of the module to obtain the data, which
-            defaults to ``__name__``
+                            defaults to ``__name__``
         :return: a path on the file system or resource of the installed module
 
         """

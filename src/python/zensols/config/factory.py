@@ -101,7 +101,7 @@ class ClassImporter(object):
         initializer.
 
         :param reload: if ``True`` then reload the module before returning the
-        class
+                       class
 
         """
         pkg, cname = self.parse_module_class()

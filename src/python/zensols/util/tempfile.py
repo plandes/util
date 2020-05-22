@@ -79,10 +79,12 @@ class tempfile(object):
 
     Example:
 
+    .. code-block:: python
+
         with tempfile('./tmp', create=True) as fname:
             print(f'writing to {fname}')
             with open(fname, 'w') as f:
-                f.write("this file will be deleted, but left with ./tmp\n")
+                f.write('this file will be deleted, but left with ./tmp\\n')
 
     """
     def __init__(self, *args, **kwargs):

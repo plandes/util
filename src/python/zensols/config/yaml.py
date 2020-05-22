@@ -22,7 +22,6 @@ class YamlConfig(Configurable):
     See the test cases for example.
 
     """
-
     CLASS_VER = 0
 
     def __init__(self, config_file=None, default_vars=None, delimiter='$',
@@ -133,7 +132,10 @@ class """ + class_name + """(Template):
                 self._options[k] = self._get_option(k, expect=True)
         return self._options
 
-    def get_option(self, name, expect=None):
+    def get_option(self, name, section=None, vars=None, expect=None):
+        """Return an option using a dot encoded path.
+
+        """
         if self.default_vars and name in self.default_vars:
             return self.default_vars[name]
         else:
@@ -143,7 +145,8 @@ class """ + class_name + """(Template):
             elif self._narrow_expect(expect):
                 raise ValueError('no such option: {}'.format(name))
 
-    def get_options(self, name, expect=None):
+    def get_options(self, name='default', opt_keys=None, vars=None,
+                    expect=None):
         if self.default_vars and name in self.default_vars:
             return self.default_vars[name]
         else:

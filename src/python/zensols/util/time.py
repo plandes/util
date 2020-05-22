@@ -103,7 +103,7 @@ def timeout(seconds=TIMEOUT_DEFAULT, error_message=os.strerror(errno.ETIME)):
     """This creates a decorator called @timeout that can be applied to any long
     running functions.
 
-    So, in your application code, you can use the decorator like so:
+    So, in your application code, you can use the decorator like so::
 
         from timeout import timeout
 
@@ -111,9 +111,10 @@ def timeout(seconds=TIMEOUT_DEFAULT, error_message=os.strerror(errno.ETIME)):
         # TIMEOUT_DEFAULT seconds.
         @timeout
         def long_running_function1():
+            pass
 
-    :see https://stackoverflow.com/questions/2281850/timeout-function-if-it-takes-too-long-to-finish:
-    :author David Narayan
+    This was derived from the `David Narayan's <https://stackoverflow.com/questions/2281850/timeout-function-if-it-takes-too-long-to-finish>`_
+    StackOverflow thread.
 
     """
     def decorator(func):
@@ -146,7 +147,7 @@ class timeprotect(object):
     :param context: an object accessible from the ``timeout_hander`` via
                           ``self``, which defaults to ``None``
 
-    :see timeout:
+    :py:meth:`timeout`
 
     """
     def __init__(self, seconds=TIMEOUT_DEFAULT, timeout_handler=None,

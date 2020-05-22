@@ -139,7 +139,8 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
 
     :param opt_config: the option configuration (see project documentation)
     :param config_type: the class used for the configuration and defaults to
-    ``zensols.actioncli.Config``
+                        ``zensols.actioncli.Config``.
+
     """
     def __init__(self, opt_config, config_type=Config, **kwargs):
         self.opt_config = opt_config

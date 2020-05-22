@@ -39,11 +39,13 @@ class PersistedWork(object):
         """Create an instance of the class.
 
         :param path: if type of ``pathlib.Path`` then use disk storage to cache
-            of the pickeled data, otherwise a string used to store in the owner
-        :type path: pathlib.Path or str
+                     of the pickeled data, otherwise a string used to store in
+                     the owner
+
         :param owner: an owning class to get and retrieve as an attribute
+
         :param cache_global: cache the data globals; this shares data across
-            instances but not classes
+                             instances but not classes
 
         """
         if logger.isEnabledFor(logging.DEBUG):
@@ -288,14 +290,16 @@ class PersistableContainer(object):
 class persisted(object):
     """Class level annotation to further simplify usage with PersistedWork.
 
-
     For example:
 
-    class SomeClass(object):
-        @property
-        @persisted('counter', 'tmp.dat')
-        def someprop(self):
-            return tuple(range(5))
+    .. highlight:: python
+    .. code-block:: python
+
+        class SomeClass(object):
+            @property
+            @persisted('counter', 'tmp.dat')
+            def someprop(self):
+                return tuple(range(5))
     """
     def __init__(self, name, path=None, cache_global=False,
                  transient=False):
@@ -337,16 +341,19 @@ class resource(object):
     example, you can declare class methods to create database connections and
     then close them.  This example looks like this:
 
-    class CrudManager(object):
-        def _create_connection(self):
-            return sqlite3.connect(':memory:')
+    .. highlight:: python
+    .. code-block:: python
 
-        def _dispose_connection(self, conn):
-            conn.close()
+        class CrudManager(object):
+            def _create_connection(self):
+                return sqlite3.connect(':memory:')
 
-        @resource('_create_connection', '_dispose_connection')
-        def commit_work(self, conn, obj):
-            conn.execute(...)
+            def _dispose_connection(self, conn):
+                conn.close()
+
+            @resource('_create_connection', '_dispose_connection')
+            def commit_work(self, conn, obj):
+                conn.execute(...)
 
     """
     def __init__(self, create_method_name, destroy_method_name):

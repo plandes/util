@@ -212,11 +212,11 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
     attribute ``delegate_attr`` is set to ``True``.
 
     *Note:* Delegate attribute fetching can cause strange and unexpected
-     behavior, so use this funcationlity with care.  It is advised to leave it
-     off if unexpected ``AttributeError``s are raised due to incorrect
-     attribute is access or method dispatching.
+    behavior, so use this funcationlity with care.  It is advised to leave it
+    off if unexpected ``AttributeError`` are raised due to incorrect
+    attribute is access or method dispatching.
 
-    :see delegate_attr:
+    :py:meth:`DelegateStash.delegate_attr`
 
     """
     delegate: Stash
