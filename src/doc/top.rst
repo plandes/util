@@ -7,10 +7,10 @@ Command line, configuration and persistence utilities
 =====================================================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
    :glob:
 
-   Overview <readme.md>
+   Overview <index.md>
    doc/*
    API Reference <api.rst>
 
