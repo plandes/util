@@ -2,7 +2,7 @@
 
 # type of project
 PROJ_TYPE=	python
-PROJ_MODULES=	python-doc
+PROJ_MODULES=	git python-doc
 
 
 include ./zenbuild/main.mk

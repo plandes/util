@@ -21,6 +21,7 @@ sys.path.insert(0, 'src/python')
 
 # -- Project information -----------------------------------------------------
 
+# this assumes the git.mk has been included in zenbuild to create this file
 with open('../../build.json') as f:
     build = json.load(f)
 
@@ -28,7 +29,7 @@ project = build['short_description']
 author = build['author']
 copyright = f'{datetime.now().year}, {author}'
 
-# The full version, including alpha/beta/rc tags
+# the full version, including alpha/beta/rc tags
 version = build['build']['tag']
 release = build['build']['tag']
 
@@ -40,12 +41,13 @@ release = build['build']['tag']
 # ones.
 extensions = [
     'sphinx_rtd_theme',
-#    'sphinx.ext.viewcode',
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
 
+    # markdown
     'recommonmark',
-    # Auto-generate section labels.
+    # auto-generate section labels.
     'sphinx.ext.autosectionlabel',
 ]
 
@@ -77,7 +79,6 @@ html_static_path = ['_static']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
-
 
 
 # markdown

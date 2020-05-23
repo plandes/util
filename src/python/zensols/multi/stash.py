@@ -76,13 +76,16 @@ class ChunkProcessor(object):
 @dataclass
 class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
     """A stash that forks processes to process data in a distributed fashion.  The
-    stash is typically created by a ``StashFactory`` in the child process.
+    stash is typically created by a
+    :class:`zensols.config.factory.ImportConfigFactory` in the child process.
     Work is chunked (grouped) and then sent to child processes.  In each, a new
-    instance of this same stash is created using the ``StashFactory`` and then
-    an abstract method is called to dump the data.
+    instance of this same stash is created using the ``ImportConfigFactory``
+    and then an abstract method is called to dump the data.
 
-    To implement, the ``_create_chunks`` and ``_process`` methods must be
-    implemented.
+    This implemetation of :meth:`prime` is to fork processes to accomplish the
+    work.
+
+    The :meth:`._create_data` and :meth:`_process` methods must be implemented.
 
     :param chunk_size: the size of each group of data sent to the child process
                        to be handled; in some cases the child process will get
@@ -96,6 +99,12 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
                      processors with this number, so -1 would result in one
                      fewer works utilized than the number of CPUs, which is a
                      good policy for a busy server.
+
+    .. document private functions
+    .. automethod:: _create_data
+    .. automethod:: _process,
+    .. automethod:: _process_work
+    .. automethod:: _create_chunk_processor
 
     """
     ATTR_EXP_META = ('chunk_size', 'workers')
