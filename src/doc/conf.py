@@ -45,6 +45,8 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
 
+#    'sphinxtogithub',
+
     # markdown
     'recommonmark',
     # auto-generate section labels.

@@ -106,6 +106,8 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
     .. automethod:: _process_work
     .. automethod:: _create_chunk_processor
 
+    :see: :class:`zensols.config.factory.ImportConfigFactory`
+
     """
     ATTR_EXP_META = ('chunk_size', 'workers')
     chunk_size: int
