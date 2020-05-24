@@ -1,4 +1,4 @@
-"""Abstracts the concept of a Python ``dict`` with additional functionality.
+"""Uses the ``shelve`` OS level API to CRUD binary data.
 
 """
 __author__ = 'Paul Landes'
@@ -59,8 +59,8 @@ class ShelveStash(CloseableStash):
         "Delete the shelve data file."
         logger.info('clearing shelve data')
         self.close()
-        for path in Path(self.path.parent, self.path.name), \
-            Path(self.path.parent, self.path.name + '.db'):
+        for path in (Path(self.path.parent, self.path.name),
+                     Path(self.path.parent, self.path.name + '.db')):
             logger.debug(f'clearing {path} if exists: {path.exists()}')
             if path.exists():
                 path.unlink()
