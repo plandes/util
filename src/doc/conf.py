@@ -49,6 +49,9 @@ extensions = [
     'recommonmark',
     # auto-generate section labels.
     'sphinx.ext.autosectionlabel',
+
+    # pdf
+    'rst2pdf.pdfbuilder',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -61,6 +64,12 @@ exclude_patterns = ['api/zensols.rst']
 
 # The master toctree document.
 master_doc = 'top'
+
+
+# PDF
+
+pdf_documents = [('index', 'rst2pdf', build['name'], author)]
+latex_engine = 'xelatex'
 
 
 # -- Options for HTML output -------------------------------------------------
