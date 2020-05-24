@@ -8,6 +8,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.2.5] - 2020-05-23
+### Added
+- API and framework Sphinx documentation.
+
+
+## [1.2.4] - 2020-05-23
+### Changed
+- Better logging.
+
+### Added
+- `Writable` abstract class used to as an object oriented pretty print based
+  API.
+- Delegate attribute: flag to pass messages to the delegate.
+- Class space defaults set for delegate attribute.
+
+
 ## [1.2.3] - 2020-05-10
 ### Added
 - Meta data walker with class level annotation to better debug stash instance
@@ -52,7 +68,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.2.3...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.2.5...HEAD
+[1.2.5]: https://github.com/plandes/util/compare/v1.2.4...v1.2.5
+[1.2.4]: https://github.com/plandes/util/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/plandes/util/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/plandes/util/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/plandes/util/compare/v1.2.0...v1.2.1
