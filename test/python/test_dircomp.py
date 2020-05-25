@@ -1,5 +1,4 @@
 from dataclasses import dataclass, asdict, field, InitVar
-from typing import Any
 import random
 import collections
 import logging
@@ -62,7 +61,7 @@ class TestDirectoryCompStash(unittest.TestCase):
         stash = DcsTestStash(path, self.groups)
         self.assertFalse(path.exists())
         di = DataItem(1, 2, 'rover', 'fuzzy')
-        composite = stash._to_composite(di)[3]
+        composite = stash._to_composite(di, di.agg)[1]
         composite = dict(composite)
         self.assertEqual(set(composite.keys()), set('apple-orange cat-dog'.split()))
         s1 = composite['apple-orange']

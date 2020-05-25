@@ -4,9 +4,9 @@
 __author__ = 'Paul Landes'
 
 import logging
-from typing import List, Callable, Any, Iterable, Set, Tuple, Dict
+from typing import List, Callable, Any, Iterable, Set, Tuple
 from dataclasses import dataclass, field, InitVar
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 import collections
 import parse
 import pickle
@@ -165,8 +165,9 @@ class DirectoryStash(Stash):
     pattern across all instances.
 
     :param path: the directory of where to store the files
+
     :param pattern: the file name portion with ``name`` populating to the
-        key of the data value
+                    key of the data value
 
     """
     ATTR_EXP_META = ('path', 'pattern')
@@ -302,11 +303,52 @@ class IncrementKeyDirectoryStash(DirectoryStash):
 
 
 class DirectoryCompositeStash(DirectoryStash):
+    """A stash distributes the data of each item out over several directories.  On
+    dumping, an attribute holding a ``dict`` is removed from the item, it's
+    data is persisted over multiple directories, then the attribute is restored
+    after pickling.
+
+    The data is split up amoung groups of keys in the attribute ``dict`` of the
+    item.  Persistence works similar to the parent :class:`DirectoryStash`,
+    except the path points a directory that has an instance of each item
+    without the attribute (called the item instance directory), and the split
+    data (called the composite data directory).
+
+    The composite data is grouped across keys from the composite attribute.
+    When the data is loaded, if no ``load_keys`` are requested from a group,
+    the data is not accessed.  In this way, loading data becomes *much* faster
+    for very large objects (i.e. matrix/tensor) data.
+
+    For this reason, it is important to properly group your load keys so the
+    most related data goes together.  This is because if only one key is from
+    the data is needed, the entire composite item is loaded.
+
+    *Note:* If order of the data is important, use an instance of
+     :class:`collections.OrderedDict` as the attribute data.
+
+    """
     INSTANCE_DIRECTORY_NAME = 'inst'
     COMPOSITE_DIRECTORY_NAME = 'comp'
 
     def __init__(self, path: Path, groups: Tuple[Set[str]],
                  attribute_name: str, load_keys: Set[str] = None):
+        """Initialize using the parent class's default pattern.
+
+        :param path: the directory of where to store the files
+
+        :param groups: the groups of the ``dict`` composite attribute, which
+                        are sets of keys, each of which are persisted to their
+                        respective directory
+
+        :param attribute_name: the name of the attribute in each item to split
+                               across groups/directories
+
+        :param load_keys: the keys used to load the data from the composite
+                          stashs in to the attribute ``dict`` instance; only
+                          these keys will exist in the loaded data, or ``None``
+                          for all keys
+
+        """
         super().__init__(path)
         stashes = {}
         comp_path = self.path / self.COMPOSITE_DIRECTORY_NAME
@@ -336,13 +378,20 @@ class DirectoryCompositeStash(DirectoryStash):
                 stashes[k] = comp_stash
                 self.stash_by_group[name] = comp_stash
 
-    def _to_composite(self, inst: Any) -> Tuple[str, Any, Tuple[str, Any]]:
-        return self._dict_to_composite(self.attribute_name, inst)
-
-    def _dict_to_composite(self, attr_name: str, inst: Any) -> \
+    def _to_composite(self, inst: Any, data: dict) -> \
             Tuple[str, Any, Tuple[str, Any]]:
+        """Create the composite data used to by the composite stashes to persist.
+
+        :param inst: the instance data to persist having the composite
+                     attribute of type ``dict``
+
+        :return: a tuple with the following:
+                 * attribute name
+                 * original attriubte value to be repopulated after pickling
+                 * context used when loading, which is the ordered keys for now
+                 * list of tuples each having (stash name, data dict)
+        """
         data_group = collections.defaultdict(lambda: {})
-        data: dict = getattr(inst, attr_name)
         is_ordered = isinstance(data, collections.OrderedDict)
         context = tuple(data.keys()) if is_ordered else None
         for k, v in data.items():
@@ -354,14 +403,15 @@ class DirectoryCompositeStash(DirectoryStash):
         data_group = tuple(data_group.items())
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'create group {data_group}')
-        return attr_name, data, context, data_group
+        return context, data_group
 
     def dump(self, name: str, inst: Any):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'dump {name} -> {inst}')
-        attr_name, org_attr_val, context, composite = self._to_composite(inst)
+        org_attr_val = getattr(inst, self.attribute_name)
+        context, composite = self._to_composite(inst, org_attr_val)
         try:
-            setattr(inst, attr_name, None)
+            setattr(inst, self.attribute_name, None)
             for group_name, composite_inst in composite:
                 stash = self.stash_by_group[group_name]
                 stash.dump(name, composite_inst)
@@ -370,19 +420,23 @@ class DirectoryCompositeStash(DirectoryStash):
                                  f'context={context}, inst={composite_inst}')
             super().dump(name, (inst, context))
         finally:
-            setattr(inst, attr_name, org_attr_val)
+            setattr(inst, self.attribute_name, org_attr_val)
 
-    def _from_composite(self, name: str, context: Any, inst: Any) -> Any:
-        return self._composite_to_dict(self.attribute_name, name, context, inst)
+    def _from_composite(self, name: str, context: Any) -> Any:
+        """Restore the item's attribute ``dict`` values on load.
 
-    def _composite_to_dict(self, attr_name: str, name: str,
-                           context: Any, inst: Any) -> Any:
+        :param name: the ID key of the data item used in the composite stashes
+
+        :param context: the load context (see :meth:`_to_composite`)
+
+        """
+        attr_name = self.attribute_name
         comp_data = {}
         attribs = set(self.stash_by_attribute.keys())
         if self.load_keys is not None:
             attribs = attribs & self.load_keys
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'load inst: {inst}, attribs: {attribs}')
+            logger.debug(f'load attribs: {attribs}')
         for stash in self.stash_by_group.values():
             if len(stash.group & attribs) > 0:
                 data = stash.load(name)
@@ -403,11 +457,12 @@ class DirectoryCompositeStash(DirectoryStash):
                 if k in comp_data:
                     ordered_data[k] = comp_data[k]
             comp_data = ordered_data
-        setattr(inst, attr_name, comp_data)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'comp_data: {comp_data}')
-        return inst
+        return comp_data
 
     def load(self, name: str) -> Any:
         inst, context = super().load(name)
-        return self._from_composite(name, context, inst)
+        attr_val = self._from_composite(name, context)
+        setattr(inst, self.attribute_name, attr_val)
+        return inst
