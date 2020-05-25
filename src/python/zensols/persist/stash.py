@@ -299,3 +299,66 @@ class IncrementKeyDirectoryStash(DirectoryStash):
             name = self.get_last_key(False)
         if len(self) > 0:
             return super().load(name)
+
+
+#@dataclass
+class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
+    INSTANCE_DIRECTORY_NAME = '_dir_comp_inst'
+    #groups: InitVar[Tuple[Set[str]]] = field(default=None)
+
+    #def __post_init__(self, groups: Tuple[Set[str]]):
+    def __init__(self, path: Path, groups: Tuple[Set[str]]):
+        super().__init__(path, '{name}.dat')
+        # if groups is None:
+        #     raise ValueError('missing groups attribute')
+        # super().__post_init__()
+        stashes = {}
+        self.stash_by_group = {}
+        base_path = self.path
+        self.composite_stashes = stashes
+        self.path = base_path / self.INSTANCE_DIRECTORY_NAME
+        comps: Set[str]
+        for group in groups:
+            if not isinstance(group, set):
+                raise ValueError(
+                    f'composition not set: {group} ({type(group)})')
+            name = '-'.join(sorted(group))
+            path = base_path / name
+            comp_stash = DirectoryStash(path)
+            comp_stash.group_name = name
+            #comp_stash.group = group
+            for k in group:
+                if k in stashes:
+                    raise ValueError(
+                        f'duplicate name \'{k}\' in {groups}')
+                stashes[k] = comp_stash
+                self.stash_by_group[name] = comp_stash
+
+    @abstractmethod
+    def _to_composite(self, inst: Any) -> \
+            Tuple[str, Any, Dict[str, Dict[str, Any]]]:
+        pass
+
+    def _to_dict(self, inst: Any, attr_name: str) -> \
+            Tuple[str, Any, Dict[str, Dict[str, Any]]]:
+        data_group = collections.defaultdict(lambda: {})
+        data: dict = getattr(inst, attr_name)
+        for k, v in data.items():
+            stash = self.composite_stashes[k]
+            data_group[stash.group_name][k] = v
+        return attr_name, data, data_group
+
+    def dump(self, name: str, inst: Any):
+        attr_name, org_attr_val, composite = self._to_composite(inst)
+        try:
+            delattr(inst, attr_name)
+            for group_name, composite_inst in composite.items():
+                stash = self.stash_by_group[group_name]
+                stash.dump(name, composite_inst)
+            super().dump(name, inst)
+        finally:
+            setattr(inst, attr_name, org_attr_val)
+        super().dump(name, inst)
+
+    def load(self, name: str) -> Any:
+        pass

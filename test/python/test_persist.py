@@ -341,7 +341,7 @@ class TestPersistWork(unittest.TestCase):
 
         stash.dump('newdata')
         self.assertEqual('1', stash.get_last_key())
-        key_path = path / f'some-name-1.dat'
+        key_path = path / 'some-name-1.dat'
         self.assertEqual(1, len(stash))
         self.assertTrue(key_path.exists())
         self.assertEqual('newdata', stash.load())

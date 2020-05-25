@@ -46,3 +46,7 @@ teststash:
 .PHONY:		testmulti
 testmulti:
 		make PY_SRC_TEST_PAT=test_multi_proc.py test
+
+.PHONY:		testdircomp
+testdircomp:
+		make PY_SRC_TEST_PAT=test_dircomp.py test
