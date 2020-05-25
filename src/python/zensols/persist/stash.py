@@ -302,8 +302,8 @@ class IncrementKeyDirectoryStash(DirectoryStash):
 
 
 class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
-    INSTANCE_DIRECTORY_NAME = '_inst'
-    COMPOSITE_DIRECTORY_NAME = '_comp'
+    INSTANCE_DIRECTORY_NAME = 'inst'
+    COMPOSITE_DIRECTORY_NAME = 'comp'
 
     def __init__(self, path: Path, groups: Tuple[Set[str]]):
         super().__init__(path)
@@ -339,7 +339,7 @@ class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
         data_group = collections.defaultdict(lambda: {})
         data: dict = getattr(inst, attr_name)
         is_ordered = isinstance(data, collections.OrderedDict)
-        context = (is_ordered, tuple(data.keys()))
+        context = tuple(data.keys()) if is_ordered else None
         for k, v in data.items():
             if k not in self.stash_by_attribute:
                 raise ValueError(
@@ -373,8 +373,6 @@ class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
 
     def _composite_to_dict(self, name: str, attr_name: str,
                            context: Any, inst: Any) -> Any:
-        is_ordered: bool = context[0]
-        keys: tuple = context[1]
         comp_data = {}
         attribs = set(self.stash_by_attribute.keys())
         if logger.isEnabledFor(logging.DEBUG):
@@ -384,9 +382,9 @@ class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
                 data = stash.load(name)
                 logger.debug(f'loaded: {data}')
                 comp_data.update(data)
-        if is_ordered:
+        if context is not None:
             ordered_data = collections.OrderedDict()
-            for k in keys:
+            for k in context:
                 if k in comp_data:
                     ordered_data[k] = comp_data[k]
             comp_data = ordered_data

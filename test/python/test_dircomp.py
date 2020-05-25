@@ -98,6 +98,7 @@ class TestDirectoryCompStash(unittest.TestCase):
         self.assertNotEqual(id(di), id(di2))
 
     def test_load_ordered(self):
+        self.groups = self.groups = (set('apple orange'.split()), set('dog cat fish'.split()))
         path = self.targdir / 'load-ordered'
         stash = DcsTestStash(path, self.groups)
         tdata = [[2, 3, 'blue', 'paws'],
