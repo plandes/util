@@ -301,11 +301,12 @@ class IncrementKeyDirectoryStash(DirectoryStash):
             return super().load(name)
 
 
-class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
+class DirectoryCompositeStash(DirectoryStash):
     INSTANCE_DIRECTORY_NAME = 'inst'
     COMPOSITE_DIRECTORY_NAME = 'comp'
 
-    def __init__(self, path: Path, groups: Tuple[Set[str]]):
+    def __init__(self, path: Path, groups: Tuple[Set[str]],
+                 attribute_name: str, load_keys: Set[str] = None):
         super().__init__(path)
         stashes = {}
         comp_path = self.path / self.COMPOSITE_DIRECTORY_NAME
@@ -313,7 +314,12 @@ class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
         self.stash_by_attribute = stashes
         self.path = self.path / self.INSTANCE_DIRECTORY_NAME
         self.groups = groups
+        self.load_keys = load_keys
+        self.attribute_name = attribute_name
         comps: Set[str]
+        if load_keys is not None and not isinstance(load_keys, set):
+            raise ValueError(
+                f'expecting set but got {load_keys} {type(load_keys)}')
         for group in groups:
             if not isinstance(group, set):
                 raise ValueError(
@@ -330,11 +336,10 @@ class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
                 stashes[k] = comp_stash
                 self.stash_by_group[name] = comp_stash
 
-    @abstractmethod
     def _to_composite(self, inst: Any) -> Tuple[str, Any, Tuple[str, Any]]:
-        pass
+        return self._dict_to_composite(self.attribute_name, inst)
 
-    def _dict_to_composite(self, inst: Any, attr_name: str) -> \
+    def _dict_to_composite(self, attr_name: str, inst: Any) -> \
             Tuple[str, Any, Tuple[str, Any]]:
         data_group = collections.defaultdict(lambda: {})
         data: dict = getattr(inst, attr_name)
@@ -367,21 +372,31 @@ class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
         finally:
             setattr(inst, attr_name, org_attr_val)
 
-    @abstractmethod
     def _from_composite(self, name: str, context: Any, inst: Any) -> Any:
-        pass
+        return self._composite_to_dict(self.attribute_name, name, context, inst)
 
-    def _composite_to_dict(self, name: str, attr_name: str,
+    def _composite_to_dict(self, attr_name: str, name: str,
                            context: Any, inst: Any) -> Any:
         comp_data = {}
         attribs = set(self.stash_by_attribute.keys())
+        if self.load_keys is not None:
+            attribs = attribs & self.load_keys
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'load inst: {inst}, attribs: {attribs}')
         for stash in self.stash_by_group.values():
             if len(stash.group & attribs) > 0:
                 data = stash.load(name)
                 logger.debug(f'loaded: {data}')
-                comp_data.update(data)
+                if data is None:
+                    raise ValueError(
+                        f'missing composite data for id: {name}, ' +
+                        f'stash: {stash.group}, path: {stash.path}, ' +
+                        f'attribute: \'{attr_name}\'')
+                if self.load_keys is None:
+                    comp_data.update(data)
+                else:
+                    for k in set(data.keys()) & attribs:
+                        comp_data[k] = data[k]
         if context is not None:
             ordered_data = collections.OrderedDict()
             for k in context:

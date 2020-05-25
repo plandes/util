@@ -12,11 +12,8 @@ logger = logging.getLogger(__name__)
 
 
 class DcsTestStash(DirectoryCompositeStash):
-    def _to_composite(self, inst: Any) -> Any:
-        return self._dict_to_composite(inst, 'agg')
-
-    def _from_composite(self, name: str, context: Any, inst: Any) -> Any:
-        return self._composite_to_dict(name, 'agg', context, inst)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, attribute_name='agg', **kwargs)
 
 
 @dataclass
@@ -98,7 +95,6 @@ class TestDirectoryCompStash(unittest.TestCase):
         self.assertNotEqual(id(di), id(di2))
 
     def test_load_ordered(self):
-        self.groups = self.groups = (set('apple orange'.split()), set('dog cat fish'.split()))
         path = self.targdir / 'load-ordered'
         stash = DcsTestStash(path, self.groups)
         tdata = [[2, 3, 'blue', 'paws'],
@@ -112,3 +108,30 @@ class TestDirectoryCompStash(unittest.TestCase):
                 di2 = stash.load(key)
                 self.assertNotEqual(id(di), id(di2))
                 self.assertEqual(di.agg, di2.agg)
+
+    def test_load_comp_missing(self):
+        path = self.targdir / 'load-comp'
+        stash = DcsTestStash(path, self.groups)
+        di = DataItem(1, 2, 'rover', 'fuzzy')
+        stash.dump('1', di)
+        comp_path = path / DcsTestStash.COMPOSITE_DIRECTORY_NAME
+        dat_path = comp_path / 'apple-orange' / '1.dat'
+        self.assertTrue(dat_path.is_file())
+        dat_path = comp_path / 'cat-dog' / '1.dat'
+        self.assertTrue(dat_path.is_file())
+        dat_path.unlink()
+        self.assertRaises(ValueError, lambda: stash.load('1'))
+
+    def test_load_comp_skip_load(self):
+        path = self.targdir / 'load-comp'
+        stash = DcsTestStash(path, self.groups, load_keys=set('apple'.split()))
+        di = DataItem(1, 2, 'rover', 'fuzzy')
+        stash.dump('1', di)
+        comp_path = path / DcsTestStash.COMPOSITE_DIRECTORY_NAME
+        dat_path = comp_path / 'apple-orange' / '1.dat'
+        self.assertTrue(dat_path.is_file())
+        dat_path = comp_path / 'cat-dog' / '1.dat'
+        self.assertTrue(dat_path.is_file())
+        dat_path.unlink()
+        di2 = stash.load('1')
+        self.assertEqual({'apple': 1}, di2.agg)
