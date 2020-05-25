@@ -301,17 +301,11 @@ class IncrementKeyDirectoryStash(DirectoryStash):
             return super().load(name)
 
 
-#@dataclass
 class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
     INSTANCE_DIRECTORY_NAME = '_dir_comp_inst'
-    #groups: InitVar[Tuple[Set[str]]] = field(default=None)
 
-    #def __post_init__(self, groups: Tuple[Set[str]]):
     def __init__(self, path: Path, groups: Tuple[Set[str]]):
         super().__init__(path, '{name}.dat')
-        # if groups is None:
-        #     raise ValueError('missing groups attribute')
-        # super().__post_init__()
         stashes = {}
         self.stash_by_group = {}
         base_path = self.path
@@ -326,7 +320,6 @@ class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
             path = base_path / name
             comp_stash = DirectoryStash(path)
             comp_stash.group_name = name
-            #comp_stash.group = group
             for k in group:
                 if k in stashes:
                     raise ValueError(

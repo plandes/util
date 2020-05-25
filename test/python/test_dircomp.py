@@ -34,7 +34,7 @@ class TestDirectoryCompStash(unittest.TestCase):
         self.targdir = targdir
         self.groups = (set('apple orange'.split()), set('dog cat'.split()))
 
-    def Xtest_create(self):
+    def test_create(self):
         path = self.targdir / 'create'
         stash = DcsTestStash(path, groups=self.groups)
         stash_path = self.targdir / 'create' / DcsTestStash.INSTANCE_DIRECTORY_NAME
@@ -45,17 +45,13 @@ class TestDirectoryCompStash(unittest.TestCase):
         self.assertEqual(gnames, set('cat-dog apple-orange '.split()))
         self.assertEqual(set(stash.stash_by_group.keys()), set('cat-dog apple-orange '.split()))
 
-    def Xtest_to_dict(self):
+    def test_to_dict(self):
         path = self.targdir / 'to_dict'
         stash = DcsTestStash(path, self.groups)
         self.assertFalse(path.exists())
         di = DataItem(1, 2, 'rover', 'fuzzy')
         composite = stash._to_composite(di)[2]
         self.assertEqual(set(composite.keys()), set('apple-orange cat-dog'.split()))
-        from pprint import pprint
-        print()
-        pprint(composite)
-        return
         s1 = composite['apple-orange']
         s2 = composite['cat-dog']
         self.assertEqual({'apple': 1, 'orange': 2}, s1)
