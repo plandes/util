@@ -302,23 +302,26 @@ class IncrementKeyDirectoryStash(DirectoryStash):
 
 
 class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
-    INSTANCE_DIRECTORY_NAME = '_dir_comp_inst'
+    INSTANCE_DIRECTORY_NAME = '_inst'
+    COMPOSITE_DIRECTORY_NAME = '_comp'
 
     def __init__(self, path: Path, groups: Tuple[Set[str]]):
-        super().__init__(path, '{name}.dat')
+        super().__init__(path)
         stashes = {}
+        comp_path = self.path / self.COMPOSITE_DIRECTORY_NAME
         self.stash_by_group = {}
-        base_path = self.path
-        self.composite_stashes = stashes
-        self.path = base_path / self.INSTANCE_DIRECTORY_NAME
+        self.stash_by_attribute = stashes
+        self.path = self.path / self.INSTANCE_DIRECTORY_NAME
+        self.groups = groups
         comps: Set[str]
         for group in groups:
             if not isinstance(group, set):
                 raise ValueError(
                     f'composition not set: {group} ({type(group)})')
             name = '-'.join(sorted(group))
-            path = base_path / name
+            path = comp_path / name
             comp_stash = DirectoryStash(path)
+            comp_stash.group = group
             comp_stash.group_name = name
             for k in group:
                 if k in stashes:
@@ -328,30 +331,70 @@ class DirectoryCompositeStash(DirectoryStash, metaclass=ABCMeta):
                 self.stash_by_group[name] = comp_stash
 
     @abstractmethod
-    def _to_composite(self, inst: Any) -> \
-            Tuple[str, Any, Dict[str, Dict[str, Any]]]:
+    def _to_composite(self, inst: Any) -> Tuple[str, Any, Tuple[str, Any]]:
         pass
 
-    def _to_dict(self, inst: Any, attr_name: str) -> \
-            Tuple[str, Any, Dict[str, Dict[str, Any]]]:
+    def _dict_to_composite(self, inst: Any, attr_name: str) -> \
+            Tuple[str, Any, Tuple[str, Any]]:
         data_group = collections.defaultdict(lambda: {})
         data: dict = getattr(inst, attr_name)
+        is_ordered = isinstance(data, collections.OrderedDict)
+        context = (is_ordered, tuple(data.keys()))
         for k, v in data.items():
-            stash = self.composite_stashes[k]
+            if k not in self.stash_by_attribute:
+                raise ValueError(
+                    f'unmapping/grouped attribute: {k} in {self.groups}')
+            stash = self.stash_by_attribute[k]
             data_group[stash.group_name][k] = v
-        return attr_name, data, data_group
+        data_group = tuple(data_group.items())
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'create group {data_group}')
+        return attr_name, data, context, data_group
 
     def dump(self, name: str, inst: Any):
-        attr_name, org_attr_val, composite = self._to_composite(inst)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'dump {name} -> {inst}')
+        attr_name, org_attr_val, context, composite = self._to_composite(inst)
         try:
-            delattr(inst, attr_name)
-            for group_name, composite_inst in composite.items():
+            setattr(inst, attr_name, None)
+            for group_name, composite_inst in composite:
                 stash = self.stash_by_group[group_name]
                 stash.dump(name, composite_inst)
-            super().dump(name, inst)
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'dump composite {group_name}/{name}: ' +
+                                 f'context={context}, inst={composite_inst}')
+            super().dump(name, (inst, context))
         finally:
             setattr(inst, attr_name, org_attr_val)
-        super().dump(name, inst)
+
+    @abstractmethod
+    def _from_composite(self, name: str, context: Any, inst: Any) -> Any:
+        pass
+
+    def _composite_to_dict(self, name: str, attr_name: str,
+                           context: Any, inst: Any) -> Any:
+        is_ordered: bool = context[0]
+        keys: tuple = context[1]
+        comp_data = {}
+        attribs = set(self.stash_by_attribute.keys())
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'load inst: {inst}, attribs: {attribs}')
+        for stash in self.stash_by_group.values():
+            if len(stash.group & attribs) > 0:
+                data = stash.load(name)
+                logger.debug(f'loaded: {data}')
+                comp_data.update(data)
+        if is_ordered:
+            ordered_data = collections.OrderedDict()
+            for k in keys:
+                if k in comp_data:
+                    ordered_data[k] = comp_data[k]
+            comp_data = ordered_data
+        setattr(inst, attr_name, comp_data)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'comp_data: {comp_data}')
+        return inst
 
     def load(self, name: str) -> Any:
-        pass
+        inst, context = super().load(name)
+        return self._from_composite(name, context, inst)
