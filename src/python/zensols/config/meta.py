@@ -5,7 +5,7 @@ This is handy for deeply nested ``Stash`` instances.
 __author__ = 'Paul Landes'
 
 
-from typing import Set, Type
+from typing import Set, Type, Any
 import sys
 import collections
 from io import TextIOWrapper
@@ -23,17 +23,17 @@ class ClassExplorer(Writable):
         self.indent = indent
         self.attr_truncate_len = attr_truncate_len
 
-    def get_metadata(self, inst: object) -> dict:
+    def get_metadata(self, inst: Any) -> dict:
         include_classes = set(self.include_classes | set([inst.__class__]))
         return self._get_metadata(inst, include_classes, self.exclude_classes)
 
-    def _should_explore(self, inst: object, include_classes: Set[Type],
+    def _should_explore(self, inst: Any, include_classes: Set[Type],
                         exclude_classes: Set[Type]) -> bool:
         has_inc = any(map(lambda t: isinstance(inst, t), include_classes))
         has_exc = any(map(lambda t: isinstance(inst, t), exclude_classes))
         return has_inc and not has_exc
 
-    def _get_metadata(self, inst: object, include_classes: Set[Type],
+    def _get_metadata(self, inst: Any, include_classes: Set[Type],
                       exclude_classes: Set[Type]) -> dict:
         dat = None
         self._should_explore(inst, include_classes, exclude_classes)
@@ -60,10 +60,16 @@ class ClassExplorer(Writable):
                 dat['children'] = children
         return dat
 
-    def write(self, depth: int = 0, writer: TextIOWrapper = sys.stdout,
-              metadata: dict = None):
-        self._write(metadata, depth, None, writer)
+    def write(self, inst: Any, depth: int = 0,
+              writer: TextIOWrapper = sys.stdout):
+        meta = self.get_metadata(inst)
+        self._write(meta, depth, None, writer)
 
+    def write_metadata(self, depth: int = 0,
+                       writer: TextIOWrapper = sys.stdout,
+                       metadata: dict = None):
+        self._write(metadata, depth, None, writer)
+        
     def _write(self, metadata: dict, depth: int, attr: str, writer):
         cn = f'{attr}: ' if attr is not None else ''
         name = f" ({metadata['name']})" if 'name' in metadata else ''
