@@ -48,7 +48,7 @@ class Temp7:
 class TestPersistAttach(unittest.TestCase):
     def setUp(self):
         self.conf = Config('test-resources/test-persist-attach.conf')
-        self.fac = ImportConfigFactory(self.conf)
+        self.fac = ImportConfigFactory(self.conf, shared=False)
 
     def test_attach(self):
         t1 = Temp()
@@ -117,7 +117,7 @@ class TestPersistShare(unittest.TestCase):
         self.conf = Config('test-resources/test-persist-attach.conf')
 
     def test_not_shared(self):
-        fac = ImportConfigFactory(self.conf)
+        fac = ImportConfigFactory(self.conf, shared=False)
         temp2_a = fac.instance('temp2')
         temp2_b = fac.instance('temp2')
         self.assertEqual(1, temp2_a.aval)

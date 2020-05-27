@@ -83,6 +83,7 @@ class SimpleActionCli(object):
             root = logging.getLogger()
             map(root.removeHandler, root.handlers[:])
             logging.basicConfig(format=fmt, level=levelno)
+            root.handlers[0].setFormatter(logging.Formatter(fmt))
             root.setLevel(levelno)
 
     def print_actions(self, short):

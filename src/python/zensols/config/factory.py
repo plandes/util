@@ -307,7 +307,7 @@ class ImportConfigFactory(ConfigFactory):
     # track injections to fail on any attempts to redefine
     INJECTS = {}
 
-    def __init__(self, *args, reload: bool = False, shared: bool = False,
+    def __init__(self, *args, reload: bool = False, shared: bool = True,
                  reload_root=None, **kwargs):
         """Initialize the configuration factory.
 
@@ -317,6 +317,11 @@ class ImportConfigFactory(ConfigFactory):
         :param shared: when ``True`` instances are shared and only created
                         once across sections for the life of this
                         ``ImportConfigFactory`` instance
+
+        :param reload_root: when ``True``, only reload the module of the class
+                            from the configuration indicated in
+                            :meth:`instance` rather than following the instance
+                            dependency tree
 
         """
         logger.debug(f'creating import config factory with reload: {reload}')

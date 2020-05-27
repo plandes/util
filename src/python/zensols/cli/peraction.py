@@ -150,7 +150,7 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
     def _config_global(self, oc):
         parser = self.parser
         logger.debug('global opt config: %s' % oc)
-        if 'whine' in oc and oc['whine']:
+        if 'whine' in oc and oc['whine'] is not None:
             logger.debug('configuring whine option')
             self._add_whine_option(parser, default=oc['whine'])
         if 'short' in oc and oc['short']:

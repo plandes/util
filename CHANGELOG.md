@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [Unreleased]
+### Changed
+- Default for `zensols.config.ImportConfigFactory.shared` is `True`.
+  **Important:** this is a big change, so it would be prudent to retest your
+  dependent code.
 
 
 ## [1.2.5] - 2020-05-23
