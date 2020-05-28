@@ -4,7 +4,7 @@
 __author__ = 'Paul Landes'
 
 import logging
-from typing import List, Any, Iterable
+from typing import Any, Iterable, Tuple
 from dataclasses import dataclass, field
 from abc import abstractmethod, ABC, ABCMeta
 import itertools as it
@@ -128,13 +128,13 @@ class Stash(ABC):
         "Return an iterable of groups of keys, each of size at least ``n``."
         return chunks(self.keys(), n)
 
-    def values(self):
+    def values(self) -> Iterable[Any]:
         """Return the values in the hash.
 
         """
         return map(lambda k: self.__getitem__(k), self.keys())
 
-    def items(self):
+    def items(self) -> Tuple[str, Any]:
         """Return an iterable of all stash items."""
         return map(lambda k: (k, self.__getitem__(k)), self.keys())
 
@@ -165,6 +165,14 @@ class Stash(ABC):
 
 @dataclass
 class ReadOnlyStash(Stash):
+    """An abstract base class for subclasses that do not support write methods
+    (i.e. :meth:`load`).
+
+    The only method that needs to be implemented is :meth:`load` and
+    :meth:`keys`.  However, it is recommended to implement :meth:`exists` to
+    speed things up.
+
+    """
     def __post_init__(self):
         self.strict = False
 
@@ -379,7 +387,7 @@ class FactoryStash(PreemptiveStash):
             item = self.factory.load(name)
         return item
 
-    def keys(self) -> List[str]:
+    def keys(self) -> Iterable[str]:
         if self.has_data:
             ks = super().keys()
         else:

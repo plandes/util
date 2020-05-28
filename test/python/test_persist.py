@@ -14,6 +14,9 @@ from zensols.persist import (
     IncrementKeyDirectoryStash,
     ShelveStash,
     shelve,
+    OneShotFactoryStash,
+    SortedStash,
+    DictionaryStash,
 )
 
 logger = logging.getLogger(__name__)
@@ -130,14 +133,9 @@ class TransientPickleOverride(TransientPickle):
 class TestPersistWork(unittest.TestCase):
     def setUp(self):
         targdir = Path('target')
-        for f in 'tmp tmp2 tmp3 tmp4 tmp5 tmp6 tmp7'.split():
-            p = Path(targdir, f + '.dat')
-            if p.exists():
-                p.unlink()
-            p = Path(targdir, f + '.db')
-            if p.exists():
-                p.unlink()
-        targdir.mkdir(0o0755, exist_ok=True)
+        if targdir.exists():
+            shutil.rmtree(targdir)
+        targdir.mkdir(exist_ok=True)
         self.targdir = targdir
         DelegateDefaults.CLASS_CHECK = True
 
@@ -391,3 +389,24 @@ class TestPersistWork(unittest.TestCase):
             self.assertTrue([1, 2, 123], s.load('cool'))
         with shelve(path) as s:
             self.assertTrue([1, 2, 123], s.load('cool'))
+
+    def _test_sorted(self, delegate, ordered):
+        data = (('2', '6'), ('0', '1'), ('9', '2'), ('32', '4'), ('3', '5'))
+        stash = OneShotFactoryStash(delegate)
+        stash.worker = data
+        if ordered:
+            self.assertEqual(('2', '0', '9', '32', '3'), tuple(stash.keys()))
+            self.assertEqual(('6', '1', '2', '4', '5'), tuple(stash.values()))
+            self.assertEqual(data, tuple(stash))
+        sorted_keys = ('0', '2', '3', '9', '32')
+        sort_stash = SortedStash(stash)
+        self.assertEqual(sorted_keys, tuple(sort_stash.keys()))
+        sorted_values = ('1', '6', '5', '2', '4')
+        self.assertEqual(sorted_values, tuple(sort_stash.values()))
+        sorted_data = (('0', '1'), ('2', '6'), ('3', '5'), ('9', '2'), ('32', '4'))
+        self.assertEqual(sorted_data, tuple(sort_stash))
+
+    def test_sorted_dictionary(self):
+        self._test_sorted(DictionaryStash(), True)
+        path = Path('target/tmp8.dat')
+        self._test_sorted(DirectoryStash(path), False)

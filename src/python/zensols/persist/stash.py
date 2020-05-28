@@ -4,7 +4,7 @@
 __author__ = 'Paul Landes'
 
 import logging
-from typing import List, Callable, Any, Iterable
+from typing import Callable, Any, Iterable, Tuple
 from dataclasses import dataclass, field, InitVar
 from abc import ABCMeta
 import parse
@@ -49,7 +49,7 @@ class OneShotFactoryStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'asserting data: {has_data}')
         if not has_data:
-            with time(f'processing work in {self}'):
+            with time('processing work in OneShotFactoryStash'):
                 self._process_work()
             self._reset_has_data()
 
@@ -67,22 +67,27 @@ class OneShotFactoryStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
 
 
 @dataclass
-class OrderedKeyStash(DelegateStash):
-    """Specify an ordering to how keys in a stash are returned.  This usually also
-    has an impact on the order in which values are iterated since a call to get
+class SortedStash(DelegateStash):
+    """Specify an sorting to how keys in a stash are returned.  This usually also
+    has an impact on the sort in which values are iterated since a call to get
     the keys determins it.
 
     """
-    ATTR_EXP_META = ('order_function',)
-    order_function: Callable
+    ATTR_EXP_META = ('sort_function',)
+    sort_function: Callable = field(default_factory=lambda: int)
 
-    def keys(self) -> List[str]:
+    def __iter__(self):
+        return map(lambda x: (x, self.__getitem__(x),), self.keys())
+
+    def values(self) -> Iterable[Any]:
+        return map(lambda k: self.__getitem__(k), self.keys())
+
+    def items(self) -> Tuple[str, Any]:
+        return map(lambda k: (k, self.__getitem__(k)), self.keys())
+
+    def keys(self) -> Iterable[str]:
         keys = super().keys()
-        if self.order_function:
-            keys = sorted(keys, key=self.order_function)
-        else:
-            keys = sorted(keys)
-        return keys
+        return sorted(keys, key=self.sort_function)
 
 
 @dataclass

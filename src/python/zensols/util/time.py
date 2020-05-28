@@ -6,6 +6,7 @@ __author__ = 'Paul Landes'
 import logging
 import inspect
 import time as tm
+import traceback as trc
 from functools import wraps
 import errno
 import os
@@ -54,7 +55,8 @@ class time(object):
             if 'logger' in globs:
                 self.logger = globs['logger']
         except Exception as e:
-            time_logger.error(e)
+            time_logger.error(f'error in initializing time: {e} with \'{msg}\'')
+            trc.print_exc()
 
     @staticmethod
     def format_elapse(msg: str, seconds: int):
@@ -84,7 +86,8 @@ class time(object):
             locals = frame.f_back.f_locals
             msg = msg.format(**locals)
         except Exception as e:
-            time_logger.error(e)
+            time_logger.error(f'error in exiting time: {e} with \'{msg}\'')
+            trc.print_exc()
         msg = self.format_elapse(msg, seconds)
         if self.logger is not None:
             self.logger.log(self.level, msg)

@@ -90,7 +90,7 @@ class PersistedWork(object):
 
         """
         vname = self.varname
-        if self.path.exists():
+        if self.path.is_file():
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug('deleting cached work: {}'.format(self.path))
             self.path.unlink()
@@ -116,7 +116,7 @@ class PersistedWork(object):
 
         If the file does not exist, calling ``__do_work__`` and save it.
         """
-        if self.path.exists():
+        if self.path.is_file():
             self._info('loading work from {}'.format(self.path))
             with open(self.path, 'rb') as f:
                 obj = pickle.load(f)
