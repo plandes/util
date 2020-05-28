@@ -74,7 +74,7 @@ class SortedStash(DelegateStash):
 
     """
     ATTR_EXP_META = ('sort_function',)
-    sort_function: Callable = field(default_factory=lambda: int)
+    sort_function: Callable = field(default=None)
 
     def __iter__(self):
         return map(lambda x: (x, self.__getitem__(x),), self.keys())
@@ -87,7 +87,11 @@ class SortedStash(DelegateStash):
 
     def keys(self) -> Iterable[str]:
         keys = super().keys()
-        return sorted(keys, key=self.sort_function)
+        if self.sort_function is None:
+            keys = sorted(keys)
+        else:
+            keys = sorted(keys, key=self.sort_function)
+        return keys
 
 
 @dataclass

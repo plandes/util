@@ -390,7 +390,23 @@ class TestPersistWork(unittest.TestCase):
         with shelve(path) as s:
             self.assertTrue([1, 2, 123], s.load('cool'))
 
-    def _test_sorted(self, delegate, ordered):
+    def _test_sorted_lexical(self, delegate, ordered, sort_fn):
+        data = (('2', '6'), ('100', '1'), ('10', '2'), ('32', '4'), ('3', '5'))
+        stash = OneShotFactoryStash(delegate)
+        stash.worker = data
+        if ordered:
+            self.assertEqual(('2', '100', '10', '32', '3'), tuple(stash.keys()))
+            self.assertEqual(('6', '1', '2', '4', '5'), tuple(stash.values()))
+            self.assertEqual(data, tuple(stash))
+        sorted_keys = ('10', '100', '2', '3', '32')
+        sort_stash = SortedStash(stash, sort_function=sort_fn)
+        self.assertEqual(sorted_keys, tuple(sort_stash.keys()))
+        sorted_values = ('2', '1', '6', '5', '4')
+        self.assertEqual(sorted_values, tuple(sort_stash.values()))
+        sorted_data = (('10', '2'), ('100', '1'), ('2', '6'), ('3', '5'), ('32', '4'))
+        self.assertEqual(sorted_data, tuple(sort_stash))
+
+    def _test_sorted_numeric(self, delegate, ordered, sort_fn):
         data = (('2', '6'), ('100', '1'), ('10', '2'), ('32', '4'), ('3', '5'))
         stash = OneShotFactoryStash(delegate)
         stash.worker = data
@@ -399,7 +415,7 @@ class TestPersistWork(unittest.TestCase):
             self.assertEqual(('6', '1', '2', '4', '5'), tuple(stash.values()))
             self.assertEqual(data, tuple(stash))
         sorted_keys = ('2', '3', '10', '32', '100')
-        sort_stash = SortedStash(stash)
+        sort_stash = SortedStash(stash, sort_function=sort_fn)
         self.assertEqual(sorted_keys, tuple(sort_stash.keys()))
         sorted_values = ('6', '5', '2', '4', '1')
         self.assertEqual(sorted_values, tuple(sort_stash.values()))
@@ -407,6 +423,14 @@ class TestPersistWork(unittest.TestCase):
         self.assertEqual(sorted_data, tuple(sort_stash))
 
     def test_sorted_dictionary(self):
-        self._test_sorted(DictionaryStash(), True)
+        self._test_sorted_lexical(DictionaryStash(), True, None)
         path = Path('target/tmp8.dat')
-        self._test_sorted(DirectoryStash(path), False)
+        self._test_sorted_lexical(DirectoryStash(path), False, None)
+
+        self._test_sorted_numeric(DictionaryStash(), True, int)
+        path = Path('target/tmp9.dat')
+        self._test_sorted_numeric(DirectoryStash(path), False, int)
+
+        self._test_sorted_numeric(DictionaryStash(), True, float)
+        path = Path('target/tmp10.dat')
+        self._test_sorted_numeric(DirectoryStash(path), False, float)
