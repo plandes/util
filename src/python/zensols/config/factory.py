@@ -335,7 +335,7 @@ class ImportConfigFactory(ConfigFactory):
 
     def __getstate__(self):
         state = dict(self.__dict__)
-        state['shared'] = {}
+        state['shared'] = None if self.shared is None else {}
         del state['class_resolver']
         return state
 
