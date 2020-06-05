@@ -14,7 +14,7 @@ import re
 from functools import reduce
 from time import time
 from zensols.config import Configurable
-from zensols.persist import persisted, PersistedWork
+from zensols.persist import persisted, PersistedWork, Deallocatable
 
 logger = logging.getLogger(__name__)
 
@@ -273,13 +273,13 @@ class ConfigFactory(object):
         cls = self._find_class(class_name)
         params.update(kwargs)
         if self._has_init_parameter(cls, 'config'):
-            logger.debug(f'found config parameter')
+            logger.debug('found config parameter')
             params['config'] = self.config
         if self._has_init_parameter(cls, 'name'):
-            logger.debug(f'found name parameter')
+            logger.debug('found name parameter')
             params['name'] = name
         if self._has_init_parameter(cls, 'config_factory'):
-            logger.debug(f'found config factory parameter')
+            logger.debug('found config factory parameter')
             params['config_factory'] = self
         if logger.level >= logging.DEBUG:
             for k, v in params.items():
@@ -296,7 +296,7 @@ class ConfigFactory(object):
         return self.instance(*args, **kwargs)
 
 
-class ImportConfigFactory(ConfigFactory):
+class ImportConfigFactory(ConfigFactory, Deallocatable):
     """Import a class by the fully qualified class name (includes the module).
 
     This is a convenience class for setting the parent class ``class_resolver``
@@ -348,6 +348,15 @@ class ImportConfigFactory(ConfigFactory):
 
         """
         self.shared.clear()
+
+    def deallocate(self):
+        super().deallocate()
+        if hasattr(self, 'shared') and self.shared is not None:
+            for v in self.shared.values():
+                if isinstance(v, Deallocatable):
+                    v.deallocate()
+            self.shared.clear()
+            del self.shared
 
     def instance(self, name=None, *args, **kwargs):
         if self.shared is None:

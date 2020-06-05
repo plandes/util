@@ -4,6 +4,7 @@
 __author__ = 'Paul Landes'
 
 from typing import Union, Any
+from abc import ABC
 import logging
 import sys
 import re
@@ -16,8 +17,24 @@ import zensols.util.time as time
 logger = logging.getLogger(__name__)
 
 
+class Deallocatable(ABC):
+    """All subclasses have the ability to deallocate any resources.  This is useful
+    for cases where there could be reference cycles or deallocation (i.e. CUDA
+    tensors) need happen implicitly and faster.
+
+    """
+    logger = logging.getLogger(__name__ + '.Deallocatable')
+
+    def deallocate(self):
+        """Deallocate all resources for this instance.
+
+        """
+        if self.logger.isEnabledFor(logging.DEBUG):
+            self.logger.debug(f'deallocating {self.__class__}')
+
+
 # class level persistance
-class PersistedWork(object):
+class PersistedWork(Deallocatable):
     """This class automatically caches work that's serialized to the disk.
 
     In order, it first looks for the data in ``owner``, then in globals (if
@@ -102,6 +119,17 @@ class PersistedWork(object):
                 logger.debug('removing instance var: {}'.format(vname))
             delattr(self.owner, vname)
         self.clear_global()
+
+    def deallocate(self):
+        super().deallocate()
+        vname = self.varname
+        if self.owner is not None and hasattr(self.owner, vname):
+            obj = getattr(self.owner, vname)
+            if isinstance(obj, Deallocatable):
+                obj.deallocate()
+            delattr(self.owner, vname)
+        self.clear_global()
+        self.owner = None
 
     def _do_work(self, *argv, **kwargs):
         t0 = tm.time()
@@ -211,7 +239,7 @@ class PersistedWork(object):
         return self.__str__()
 
 
-class PersistableContainerMetadata(object):
+class PersistableContainerMetadata(Deallocatable):
     def __init__(self, container):
         self.container = container
 
@@ -249,8 +277,13 @@ class PersistableContainerMetadata(object):
         for pw in self.persisted.values():
             pw.clear()
 
+    def deallocate(self):
+        super().deallocate()
+        for pw in self.persisted.values():
+            pw.deallocate()
 
-class PersistableContainer(object):
+
+class PersistableContainer(Deallocatable):
     """Classes can extend this that want to persist ``PersistableWork`` instances,
     which otherwise are not persistable.
 
@@ -285,6 +318,10 @@ class PersistableContainer(object):
 
         """
         return PersistableContainerMetadata(self)
+
+    def deallocate(self):
+        super().deallocate()
+        self._get_persistable_metadata().deallocate()
 
 
 class persisted(object):
