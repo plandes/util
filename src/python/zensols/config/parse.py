@@ -405,7 +405,7 @@ class Config(Configurable):
         """Print a human readable list of sections and options.
 
         """
-        for sec in self.sections:
+        for sec in sorted(self.sections):
             self._write_line(sec, depth, writer)
             for k, v in self.get_options(sec).items():
                 self._write_line(f'{k}: {v}', depth + 1, writer)
