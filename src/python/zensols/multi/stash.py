@@ -85,7 +85,8 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
     This implemetation of :meth:`prime` is to fork processes to accomplish the
     work.
 
-    The :meth:`._create_data` and :meth:`_process` methods must be implemented.
+    The :meth:`_create_data` and :meth:`_process` methods must be
+    implemented.
 
     :param chunk_size: the size of each group of data sent to the child process
                        to be handled; in some cases the child process will get
@@ -102,7 +103,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
 
     .. document private functions
     .. automethod:: _create_data
-    .. automethod:: _process,
+    .. automethod:: _process
     .. automethod:: _process_work
     .. automethod:: _create_chunk_processor
 

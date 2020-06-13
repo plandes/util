@@ -164,6 +164,8 @@ class PersistedWork(Deallocatable):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'saving in memory value {type(obj)}')
         vname = self.varname
+        if self.owner is None:
+            raise ValueError(f'no such variable to set on {vname}')
         setattr(self.owner, vname, obj)
         if self.cache_global:
             if vname not in globals():
