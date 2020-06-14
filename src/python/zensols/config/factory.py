@@ -171,6 +171,10 @@ class ConfigFactory(object):
     configuration ``Configurable`` instance.
 
     """
+    NAME_ATTRIBUTE = 'name'
+    CONFIG_ATTRIBUTE = 'config'
+    CONIFG_FACTORY_ATTRIBUTE = 'config_factory'
+
     def __init__(self, config: Configurable, pattern: str = '{name}',
                  default_name: str = 'default',
                  class_resolver: ClassResolver = None):
@@ -272,13 +276,13 @@ class ConfigFactory(object):
         class_name, params = self._class_name_params(name)
         cls = self._find_class(class_name)
         params.update(kwargs)
-        if self._has_init_parameter(cls, 'config'):
+        if self._has_init_parameter(cls, self.CONFIG_ATTRIBUTE):
             logger.debug('found config parameter')
             params['config'] = self.config
-        if self._has_init_parameter(cls, 'name'):
+        if self._has_init_parameter(cls, self.NAME_ATTRIBUTE):
             logger.debug('found name parameter')
             params['name'] = name
-        if self._has_init_parameter(cls, 'config_factory'):
+        if self._has_init_parameter(cls, self.CONIFG_FACTORY_ATTRIBUTE):
             logger.debug('found config factory parameter')
             params['config_factory'] = self
         if logger.level >= logging.DEBUG:
@@ -390,7 +394,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 raise ValueError(f'unknown directive(s): {unknown}')
             if 'param' in pconfig:
                 cparams = pconfig['param']
-                cparams = Configurable.populate_state(cparams, {})
+                cparams = self.config.populate_state(cparams, {})
                 child_params.update(cparams)
             if 'reload' in pconfig:
                 reload = pconfig['reload']

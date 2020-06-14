@@ -15,6 +15,10 @@ testall:	test
 testconfig:
 		make PY_SRC_TEST_PAT=test_config.py test
 
+.PHONY:		testconfigwrite
+testconfigwrite:
+		make PY_SRC_TEST_PAT=test_config_write.py test
+
 .PHONY:		testpopulate
 testpopulate:
 		make PY_SRC_TEST_PAT=test_populate.py test

@@ -5,7 +5,7 @@ files.
 __author__ = 'Paul Landes'
 
 
-from typing import Union, Dict
+from typing import Union, Dict, Any
 from abc import ABCMeta, abstractmethod, ABC
 import os
 import sys
@@ -14,6 +14,7 @@ import logging
 from pprint import pprint
 from copy import deepcopy
 import re
+import json
 import configparser
 from pathlib import Path
 import inspect
@@ -83,6 +84,8 @@ class Configurable(Writable, metaclass=ABCMeta):
     BOOL_REGEXP = re.compile(r'^True|False')
     PATH_REGEXP = re.compile(r'^path:\s*(.+)$')
     EVAL_REGEXP = re.compile(r'^eval(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
+    JSON_REGEXP = re.compile(r'^json:\s*(.+)$', re.DOTALL)
+    PRIMITIVES = set([bool, float, int, None.__class__])
 
     def __init__(self, config_file, default_expect):
         self.config_file = config_file
@@ -115,20 +118,110 @@ class Configurable(Writable, metaclass=ABCMeta):
 
         :param section: section in the ini file to fetch the value; defaults to
                         constructor's ``default_section``
+
         :param vars: contains the defaults for missing values of ``name``
+
         :param expect: if ``True`` raise an exception if the value does not
                        exist
 
         """
         pass
 
+    def get_option_list(self, name, section=None, vars=None,
+                        expect=None, separator=','):
+        """Just like :py:meth:`get_option` but parse as a list using ``split``.
+
+        :param section: section in the ini file to fetch the value; defaults to
+                        constructor's ``default_section``
+
+        :param vars: contains the defaults for missing values of ``name``
+
+        :param expect: if ``True`` raise an exception if the value does not
+                       exist
+
+        """
+        val = self.get_option(name, section, vars, expect)
+        return val.split(separator) if val else []
+
+    def get_option_boolean(self, name, section=None, vars=None, expect=None):
+        """Just like :py:meth:`get_option` but parse as a boolean (any case `true`).
+
+        :param section: section in the ini file to fetch the value; defaults to
+                        constructor's ``default_section``
+
+        :param vars: contains the defaults for missing values of ``name``
+
+        :param expect: if ``True`` raise an exception if the value does not
+                       exist
+
+        """
+        val = self.get_option(name, section, vars, expect)
+        val = val.lower() if val else 'false'
+        return val == 'true'
+
+    def get_option_int(self, name, section=None, vars=None, expect=None):
+        """Just like :py:meth:`get_option` but parse as an integer.
+
+        :param section: section in the ini file to fetch the value; defaults to
+                        constructor's ``default_section``
+
+        :param vars: contains the defaults for missing values of ``name``
+
+        :param expect: if ``True`` raise an exception if the value does not
+                       exist
+
+        """
+        val = self.get_option(name, section, vars, expect)
+        if val:
+            return int(val)
+
+    def get_option_float(self, name, section=None, vars=None, expect=None):
+        """Just like :py:meth:`get_option` but parse as a float.
+
+        """
+        val = self.get_option(name, section, vars, expect)
+        if val:
+            return float(val)
+
+    def get_option_path(self, name, section=None, vars=None,
+                        expect=None, create=None):
+        """Just like :py:meth:`get_option` but return a ``pathlib.Path`` object of the
+        string.
+
+        :param create: if ``parent`` then create the path and all parents not
+                       including the file; if ``dir``, then create all parents;
+                       otherwise do not create anything
+
+        """
+        val = self.get_option(name, section, vars, expect)
+        path = None
+        if val is not None:
+            path = Path(val)
+            if create == 'dir':
+                path.mkdir(parents=True, exist_ok=True)
+            if create == 'file':
+                path.parent.mkdir(parents=True, exist_ok=True)
+        return path
+
+    def get_option_object(self, name, section=None, vars=None, expect=None):
+        """Just like :py:meth:`get_option` but parse as an object per object syntax
+        rules.
+
+        :see: :py:meth:`.parse_object`
+
+        """
+        val = self.get_option(name, section, vars, expect)
+        if val:
+            return self.parse_object(val)
+
     @property
     def options(self):
-        "Return all options from the default section."
+        """Return all options from the default section.
+
+        """
         return self.get_options()
 
-    @staticmethod
-    def _parse_eval(pconfig: str, evalstr: str = None) -> str:
+    def _parse_eval(self, pconfig: str, evalstr: str = None) -> str:
         if pconfig is not None:
             pconfig = eval(pconfig)
             if 'import' in pconfig:
@@ -140,31 +233,61 @@ class Configurable(Writable, metaclass=ABCMeta):
         if evalstr is not None:
             return eval(evalstr)
 
-    @classmethod
+    def parse_object(self, v: str) -> Any:
+        """Parse as a string in to a Python object.  The following is done to parse the
+        string in order:
+
+          1. Primitive (i.e. ``1.23`` is a float, ``True`` is a boolean)
+          2. A :class:`pathlib.Path` object when prefixed with ``path:``.
+          3. Evaluate using the Python parser when prefixed ``eval:``.
+          4. Evaluate as JSON when prefixed with ``json:``.
+
+        """
+        if v == 'None':
+            v = None
+        elif self.FLOAT_REGEXP.match(v):
+            v = float(v)
+        elif self.INT_REGEXP.match(v):
+            v = int(v)
+        elif self.BOOL_REGEXP.match(v):
+            v = v == 'True'
+        else:
+            parsed = None
+            m = self.PATH_REGEXP.match(v)
+            if m:
+                parsed = Path(m.group(1))
+            if parsed is None:
+                m = self.EVAL_REGEXP.match(v)
+                if m:
+                    pconfig, evalstr = m.groups()
+                    parsed = self._parse_eval(pconfig, evalstr)
+            if parsed is None:
+                m = self.JSON_REGEXP.match(v)
+                if m:
+                    parsed = json.loads(m.group(1))
+            if parsed is not None:
+                v = parsed
+        return v
+
     def populate_state(self, state: Dict[str, str],
                        obj: Union[dict, object] = None,
                        parse_types: bool = True) -> Union[dict, object]:
+        """Populate an object with at string dictionary.  The keys are used for the
+        output, and the values are parsed in to Python objects using
+        :py:meth:`.parse_object`.  The keys in the input are used as the same
+        keys if ``obj`` is a ``dict``.  Otherwise, set data as attributes on
+        the object with :py:func:`setattr`.
+
+        :param state: the data to parse
+
+        :param obj: the object to populate
+
+        """
         obj = Settings() if obj is None else obj
         is_dict = isinstance(obj, dict)
         for k, v in state.items():
             if parse_types and isinstance(v, str):
-                if v == 'None':
-                    v = None
-                elif self.FLOAT_REGEXP.match(v):
-                    v = float(v)
-                elif self.INT_REGEXP.match(v):
-                    v = int(v)
-                elif self.BOOL_REGEXP.match(v):
-                    v = v == 'True'
-                elif self.PATH_REGEXP.match(v):
-                    m = self.PATH_REGEXP.match(v)
-                    if m:
-                        v = Path(m.group(1))
-                else:
-                    m = self.EVAL_REGEXP.match(v)
-                    if m:
-                        pconfig, evalstr = m.groups()
-                        v = self._parse_eval(pconfig, evalstr)
+                v = self.parse_object(v)
             logger.debug('setting {} => {} on {}'.format(k, v, obj))
             if is_dict:
                 obj[k] = v
@@ -180,6 +303,25 @@ class Configurable(Writable, metaclass=ABCMeta):
         section = self.default_section if section is None else section
         sec = self.get_options(section)
         return self.populate_state(sec, obj, parse_types)
+
+    def format_option(self, obj: Any) -> str:
+        """Format a Python object in to the string represetation per object syntax
+        rules.
+
+        :see: :py:meth:`.parse_object`
+
+        """
+        v = None
+        cls = obj.__class__
+        if cls == str:
+            v = obj
+        elif cls in self.PRIMITIVES:
+            v = str(obj)
+        elif isinstance(obj, Path):
+            return f'path: {obj}'
+        else:
+            v = 'json: ' + json.dumps(obj)
+        return v
 
     def _get_calling_module(self):
         """Get the last module in the call stack that is not this module or ``None`` if
@@ -232,12 +374,17 @@ class Config(Configurable):
         """Create with a configuration file path.
 
         Keyword arguments:
+
         :param str config_file: the configuration file path to read from
+
         :param str default_section: default section (defaults to `default`)
+
         :param bool robust: if `True`, then don't raise an error when the
                             configuration file is missing
+
         :param default_expect: if ``True``, raise exceptions when keys and/or
-                              sections are not found in the configuration
+                               sections are not found in the configuration
+
         :param create_defaults: used to initialize the configuration parser,
                                 and useful for when substitution values are
                                 baked in to the configuration file
@@ -321,54 +468,6 @@ class Config(Configurable):
                 raise ValueError('no option \'{}\' found in section {}'.
                                  format(name, section))
 
-    def get_option_list(self, name, section=None, vars=None,
-                        expect=None, separator=','):
-        """Just like ``get_option`` but parse as a list using ``split``.
-
-        """
-        val = self.get_option(name, section, vars, expect)
-        return val.split(separator) if val else []
-
-    def get_option_boolean(self, name, section=None, vars=None, expect=None):
-        """Just like ``get_option`` but parse as a boolean (any case `true`).
-
-        """
-        val = self.get_option(name, section, vars, expect)
-        val = val.lower() if val else 'false'
-        return val == 'true'
-
-    def get_option_int(self, name, section=None, vars=None, expect=None):
-        """Just like ``get_option`` but parse as an integer."""
-        val = self.get_option(name, section, vars, expect)
-        if val:
-            return int(val)
-
-    def get_option_float(self, name, section=None, vars=None, expect=None):
-        """Just like ``get_option`` but parse as a float."""
-        val = self.get_option(name, section, vars, expect)
-        if val:
-            return float(val)
-
-    def get_option_path(self, name, section=None, vars=None,
-                        expect=None, create=None):
-        """Just like ``get_option`` but return a ``pathlib.Path`` object of
-        the string.
-
-        :param create: if ``parent`` then create the path and all parents not
-                       including the file; if ``dir``, then create all parents;
-                       otherwise do not create anything
-
-        """
-        val = self.get_option(name, section, vars, expect)
-        path = None
-        if val is not None:
-            path = Path(val)
-            if create == 'dir':
-                path.mkdir(parents=True, exist_ok=True)
-            if create == 'file':
-                path.parent.mkdir(parents=True, exist_ok=True)
-        return path
-
     @property
     def sections(self):
         "Return all sections."
@@ -377,6 +476,10 @@ class Config(Configurable):
             return set(secs)
 
     def set_option(self, name, value, section=None):
+        try:
+            value = self.format_option(value)
+        except TypeError as e:
+            raise TypeError(f'can not serialize {name}:{section}: {e}')
         logger.debug(f'setting option {name}: {value} in section {section}')
         if not self.parser.has_section(section):
             self.parser.add_section(section)

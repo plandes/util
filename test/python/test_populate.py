@@ -22,6 +22,14 @@ class TestConfigPopulate(unittest.TestCase):
         self.assertEqual(s.param8, None)
 
     def test_eval(self):
+        s = self.conf.get_option_object('param9')
+        self.assertEqual(s, {'scott': 2, 'paul': 1})
+        s = self.conf.get_option_object('param10')
+        self.assertEqual(list, type(s))
+        self.assertEqual(s, [1, 5, 10])
+        self.assertEqual(None, self.conf.get_option_object('param8'))
+
+    def test_eval_populate(self):
         s = self.conf.populate()
         self.assertEqual(dict, type(s.param9))
         self.assertEqual(s.param9, {'scott': 2, 'paul': 1})
@@ -38,6 +46,17 @@ class TestConfigPopulate(unittest.TestCase):
         self.assertEqual({'car': 'bmw', 'animal': 'dog'}, s)
 
     def test_eval_import(self):
-        s = self.conf.populate({}, section='eval_test')
         counts = tuple(range(3))
-        self.assertEqual({'car': 'bmw', 'animal': 'dog', 'counts': counts}, s)
+        s = self.conf.get_option_object('counts', 'eval_test')
+        self.assertEqual(counts, s)
+        should = {'car': 'bmw', 'animal': 'dog', 'counts': counts}
+        s = self.conf.populate({}, section='eval_test')
+        self.assertEqual(should, s)
+
+    def test_json(self):
+        dat = self.conf.get_option_object('data', 'json_test')
+        self.assertEqual(dat.__class__, list)
+        self.assertEqual(3, len(dat))
+        self.assertEqual({"animal": "dog", "car": "bmw"}, dat[0])
+        self.assertEqual({"somefloat": 1.23, "someint": 5}, dat[1])
+        self.assertEqual([5.5, 6.7, True, False], dat[2])
