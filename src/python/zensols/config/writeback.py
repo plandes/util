@@ -7,7 +7,6 @@ from typing import Set, Any
 from dataclasses import dataclass
 import logging
 from itertools import chain
-from zensols.persist import PersistedWork, PersistableContainer
 from zensols.config import Configurable, ConfigFactory
 
 logger = logging.getLogger(__name__)
@@ -41,10 +40,19 @@ class Writeback(object):
             return True
         return value.__class__ in self._get_allow_types()
 
+    def _set_option(self, name: str, value: Any):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'set option {self.name}:{name} = {value}')
+        self.config.set_option(name, value, section=self.name)
+
     def __setattr__(self, name: str, value: Any):
+        try:
+            super().__setattr__(name, value)
+        except AttributeError as e:
+            raise AttributeError(
+                f'can\'t set attribute \'{name}\' = {value.__class__}: {e}')
         skip_attribs = self._get_skip_attributes()
-        super().__setattr__(name, value)
         if hasattr(self, 'config') and \
            name not in skip_attribs and \
            self._is_allow_type(value):
-            self.config.set_option(name, value, section=self.name)
+            self._set_option(name, value)
