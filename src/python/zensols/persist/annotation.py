@@ -1,3 +1,4 @@
+
 """Contains general purpose persistence library classes.
 
 """
@@ -165,7 +166,7 @@ class PersistedWork(Deallocatable):
             logger.debug(f'saving in memory value {type(obj)}')
         vname = self.varname
         if self.owner is None:
-            raise ValueError(f'no such variable to set on {vname}')
+            raise ValueError(f'owner is not set for persistable: {vname}')
         setattr(self.owner, vname, obj)
         if self.cache_global:
             if vname not in globals():
