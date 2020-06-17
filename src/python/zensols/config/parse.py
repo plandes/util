@@ -323,6 +323,8 @@ class Configurable(Writable, metaclass=ABCMeta):
             v = str(obj)
         elif isinstance(obj, Path):
             return f'path: {obj}'
+        elif isinstance(obj, set):
+            raise ValueError('to implement')
         else:
             v = 'json: ' + json.dumps(obj)
         return v

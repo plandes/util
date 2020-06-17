@@ -28,7 +28,9 @@ class Writeback(object):
         return self.DEFAULT_ALLOW_TYPES
 
     def _is_allow_type(self, value: Any) -> bool:
-        if isinstance(value, tuple) or isinstance(value, list):
+        if isinstance(value, tuple) or \
+           isinstance(value, list) or \
+           isinstance(value, set):
             for i in value:
                 if not self._is_allow_type(i):
                     return False
@@ -41,9 +43,11 @@ class Writeback(object):
         return value.__class__ in self._get_allow_types()
 
     def _set_option(self, name: str, value: Any):
+        has_option = self.config.has_option(name, section=self.name)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'set option {self.name}:{name} = {value}')
-        if self.config.has_option(name, section=self.name):
+            logger.debug(f'set option {self.name}:{name} = ' +
+                         f'{value}: {has_option}')
+        if has_option:
             self.config.set_option(name, value, section=self.name)
 
     def __setattr__(self, name: str, value: Any):
@@ -52,8 +56,10 @@ class Writeback(object):
         except AttributeError as e:
             raise AttributeError(
                 f'can\'t set attribute \'{name}\' = {value.__class__}: {e}')
-        skip_attribs = self._get_skip_attributes()
-        if hasattr(self, 'config') and \
-           name not in skip_attribs and \
-           self._is_allow_type(value):
+        is_skip = name in self._get_skip_attributes()
+        has_config = hasattr(self, 'config')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'{name}: has config: {has_config}, skip: {is_skip}' +
+                         f', is allow: {self._is_allow_type(value)}')
+        if has_config and not is_skip and self._is_allow_type(value):
             self._set_option(name, value)
