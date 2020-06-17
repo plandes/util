@@ -1,6 +1,6 @@
 import logging
 import unittest
-from zensols.config import Config
+from zensols.config import IniConfig
 from zensols.cli import (
     PerActionOptionsCli,
     OneConfPerActionOptionsCli,
@@ -47,7 +47,7 @@ class AppCommandLine(PerActionOptionsCli):
         invokes = {'start': ['app_test_key', 'startaction', 'test doc'],
                    'stop': ['app_test_key', 'stopaction', 'test doc']}
         if conf_file:
-            conf = Config(conf_file, robust=True)
+            conf = IniConfig(conf_file, robust=True)
         else:
             conf = None
         super(AppCommandLine, self).__init__(

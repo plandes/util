@@ -4,7 +4,7 @@ import unittest
 import logging
 import collections
 from zensols.config import (
-    Config,
+    IniConfig,
     ImportConfigFactory,
     Writeback,
 )
@@ -35,7 +35,7 @@ class Temp2(Writeback, PersistableContainer):
 
 class TestConfigWriteBase(unittest.TestCase):
     def setUp(self):
-        self.config = Config('test-resources/config-write.conf')
+        self.config = IniConfig('test-resources/config-write.conf')
         self.factory = ImportConfigFactory(self.config)
 
 
@@ -111,3 +111,12 @@ class TestConfigWriteBack(TestConfigWriteBase):
         self.assertEqual(1, t1.aval)
         t1.NOVAL = 5
         self.assertFalse(self.config.has_option('NOVAL', 'temp1'))
+
+    def test_write_object(self):
+        t1 = self.factory('temp1')
+        self.assertTrue(isinstance(t1, Temp1))
+        self.assertTrue(self.config.has_option('aval', 'temp1'))
+        self.assertEqual(1, t1.aval)
+        t1.aval = set([1, 2])
+        self.assertEqual('json: {"_object_type": "set", "data": [1, 2]}',
+                         self.config.get_option('aval', 'temp1'))

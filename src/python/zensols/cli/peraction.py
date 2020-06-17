@@ -6,7 +6,7 @@ import inspect
 from functools import reduce
 import optparse
 from optparse import OptionParser
-from zensols.config import Config
+from zensols.config import IniConfig
 from zensols.cli import SimpleActionCli
 
 logger = logging.getLogger(__name__)
@@ -142,7 +142,7 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
                         ``zensols.actioncli.Config``.
 
     """
-    def __init__(self, opt_config, config_type=Config, **kwargs):
+    def __init__(self, opt_config, config_type=IniConfig, **kwargs):
         self.opt_config = opt_config
         self.config_type = config_type
         super().__init__({}, {}, **kwargs)

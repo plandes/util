@@ -394,7 +394,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 raise ValueError(f'unknown directive(s): {unknown}')
             if 'param' in pconfig:
                 cparams = pconfig['param']
-                cparams = self.config.populate_state(cparams, {})
+                cparams = self.config.serializer.populate_state(cparams, {})
                 child_params.update(cparams)
             if 'reload' in pconfig:
                 reload = pconfig['reload']

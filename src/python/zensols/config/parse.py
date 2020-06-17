@@ -1,379 +1,26 @@
-"""Classes that are used as application configuration containers parsed from
-files.
+"""Implementation classes that are used as application configuration containers
+parsed from files.
 
 """
 __author__ = 'Paul Landes'
 
-
-from typing import Union, Dict, Any
-from abc import ABCMeta, abstractmethod, ABC
+from abc import ABCMeta, abstractmethod
 import os
 import sys
 from io import TextIOWrapper
 import logging
-from pprint import pprint
 from copy import deepcopy
-import re
-import json
 import configparser
-from pathlib import Path
-import inspect
-import pkg_resources
+from . import Configurable
 
 logger = logging.getLogger(__name__)
 
 
-class Writable(ABC):
-    """An interface for classes that have multi-line debuging capability.
-
-    """
-    def _sp(self, depth: int):
-        """Utility method to create a space string.
-
-        """
-        indent = getattr(self, '_indent', 4)
-        return ' ' * (depth * indent)
-
-    def _write_line(self, line: str, depth: int = 0,
-                    writer: TextIOWrapper = sys.stdout):
-        """Write a line of text ``line`` with the correct indentation per ``depth`` to
-        ``writer``.
-
-        """
-        writer.write(f'{self._sp(depth)}{line}\n')
-
-    def _write_dict(self, data: dict, depth: int = 0,
-                    writer: TextIOWrapper = sys.stdout):
-        """Write dictionary ``data`` with the correct indentation per ``depth`` to
-        ``writer``.
-
-        """
-        sp = self._sp(depth)
-        for k, v in data.items():
-            writer.write(f'{sp}{k}: {v}\n')
-
-    @abstractmethod
-    def write(self, depth: int = 0, writer: TextIOWrapper = sys.stdout):
-        """Write the contents of this instance to ``writer`` using indention ``depth``.
-
-        """
-        pass
-
-
-class Settings(object):
-    """A default object used to populate in ``Configurable.populate``.
-
-    """
-    def __str__(self):
-        return str(self.__dict__)
-
-    def __repr__(self):
-        return self.__str__()
-
-    def write(self, writer=sys.stdout):
-        pprint(self.__dict__, writer)
-
-
-class Configurable(Writable, metaclass=ABCMeta):
-    """An abstract base class that represents an application specific
-    configuration.
-
-    """
-    FLOAT_REGEXP = re.compile(r'^[-+]?\d*\.\d+$')
-    INT_REGEXP = re.compile(r'^[-+]?[0-9]+$')
-    BOOL_REGEXP = re.compile(r'^True|False')
-    PATH_REGEXP = re.compile(r'^path:\s*(.+)$')
-    EVAL_REGEXP = re.compile(r'^eval(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
-    JSON_REGEXP = re.compile(r'^json:\s*(.+)$', re.DOTALL)
-    PRIMITIVES = set([bool, float, int, None.__class__])
-
-    def __init__(self, config_file, default_expect):
-        self.config_file = config_file
-        self.default_expect = default_expect
-
-    def _narrow_expect(self, expect):
-        if expect is None:
-            expect = self.default_expect
-        return expect
-
-    @abstractmethod
-    def get_option(self, name, section=None, vars=None, expect=None):
-        """Return an option from ``section`` with ``name``.
-
-        :param section: section in the ini file to fetch the value; defaults to
-                        constructor's ``default_section``
-
-        :param vars: contains the defaults for missing values of ``name``
-
-        :param expect: if ``True`` raise an exception if the value does not
-                       exist
-
-        """
-        pass
-
-    @abstractmethod
-    def get_options(self, section='default', opt_keys=None, vars=None):
-        """Get all options for a section.  If ``opt_keys`` is given return only
-        options with those keys.
-
-        :param section: section in the ini file to fetch the value; defaults to
-                        constructor's ``default_section``
-
-        :param vars: contains the defaults for missing values of ``name``
-
-        :param expect: if ``True`` raise an exception if the value does not
-                       exist
-
-        """
-        pass
-
-    @abstractmethod
-    def has_option(self, name, section=None):
-        pass
-
-    def get_option_list(self, name, section=None, vars=None,
-                        expect=None, separator=','):
-        """Just like :py:meth:`get_option` but parse as a list using ``split``.
-
-        :param section: section in the ini file to fetch the value; defaults to
-                        constructor's ``default_section``
-
-        :param vars: contains the defaults for missing values of ``name``
-
-        :param expect: if ``True`` raise an exception if the value does not
-                       exist
-
-        """
-        val = self.get_option(name, section, vars, expect)
-        return val.split(separator) if val else []
-
-    def get_option_boolean(self, name, section=None, vars=None, expect=None):
-        """Just like :py:meth:`get_option` but parse as a boolean (any case `true`).
-
-        :param section: section in the ini file to fetch the value; defaults to
-                        constructor's ``default_section``
-
-        :param vars: contains the defaults for missing values of ``name``
-
-        :param expect: if ``True`` raise an exception if the value does not
-                       exist
-
-        """
-        val = self.get_option(name, section, vars, expect)
-        val = val.lower() if val else 'false'
-        return val == 'true'
-
-    def get_option_int(self, name, section=None, vars=None, expect=None):
-        """Just like :py:meth:`get_option` but parse as an integer.
-
-        :param section: section in the ini file to fetch the value; defaults to
-                        constructor's ``default_section``
-
-        :param vars: contains the defaults for missing values of ``name``
-
-        :param expect: if ``True`` raise an exception if the value does not
-                       exist
-
-        """
-        val = self.get_option(name, section, vars, expect)
-        if val:
-            return int(val)
-
-    def get_option_float(self, name, section=None, vars=None, expect=None):
-        """Just like :py:meth:`get_option` but parse as a float.
-
-        """
-        val = self.get_option(name, section, vars, expect)
-        if val:
-            return float(val)
-
-    def get_option_path(self, name, section=None, vars=None,
-                        expect=None, create=None):
-        """Just like :py:meth:`get_option` but return a ``pathlib.Path`` object of the
-        string.
-
-        :param create: if ``parent`` then create the path and all parents not
-                       including the file; if ``dir``, then create all parents;
-                       otherwise do not create anything
-
-        """
-        val = self.get_option(name, section, vars, expect)
-        path = None
-        if val is not None:
-            path = Path(val)
-            if create == 'dir':
-                path.mkdir(parents=True, exist_ok=True)
-            if create == 'file':
-                path.parent.mkdir(parents=True, exist_ok=True)
-        return path
-
-    def get_option_object(self, name, section=None, vars=None, expect=None):
-        """Just like :py:meth:`get_option` but parse as an object per object syntax
-        rules.
-
-        :see: :py:meth:`.parse_object`
-
-        """
-        val = self.get_option(name, section, vars, expect)
-        if val:
-            return self.parse_object(val)
-
-    @property
-    def options(self):
-        """Return all options from the default section.
-
-        """
-        return self.get_options()
-
-    def _parse_eval(self, pconfig: str, evalstr: str = None) -> str:
-        if pconfig is not None:
-            pconfig = eval(pconfig)
-            if 'import' in pconfig:
-                imports = pconfig['import']
-                logger.debug(f'imports: {imports}')
-                for i in imports:
-                    logger.debug(f'importing: {i}')
-                    exec(f'import {i}')
-        if evalstr is not None:
-            return eval(evalstr)
-
-    def parse_object(self, v: str) -> Any:
-        """Parse as a string in to a Python object.  The following is done to parse the
-        string in order:
-
-          1. Primitive (i.e. ``1.23`` is a float, ``True`` is a boolean)
-          2. A :class:`pathlib.Path` object when prefixed with ``path:``.
-          3. Evaluate using the Python parser when prefixed ``eval:``.
-          4. Evaluate as JSON when prefixed with ``json:``.
-
-        """
-        if v == 'None':
-            v = None
-        elif self.FLOAT_REGEXP.match(v):
-            v = float(v)
-        elif self.INT_REGEXP.match(v):
-            v = int(v)
-        elif self.BOOL_REGEXP.match(v):
-            v = v == 'True'
-        else:
-            parsed = None
-            m = self.PATH_REGEXP.match(v)
-            if m:
-                parsed = Path(m.group(1))
-            if parsed is None:
-                m = self.EVAL_REGEXP.match(v)
-                if m:
-                    pconfig, evalstr = m.groups()
-                    parsed = self._parse_eval(pconfig, evalstr)
-            if parsed is None:
-                m = self.JSON_REGEXP.match(v)
-                if m:
-                    parsed = json.loads(m.group(1))
-            if parsed is not None:
-                v = parsed
-        return v
-
-    def populate_state(self, state: Dict[str, str],
-                       obj: Union[dict, object] = None,
-                       parse_types: bool = True) -> Union[dict, object]:
-        """Populate an object with at string dictionary.  The keys are used for the
-        output, and the values are parsed in to Python objects using
-        :py:meth:`.parse_object`.  The keys in the input are used as the same
-        keys if ``obj`` is a ``dict``.  Otherwise, set data as attributes on
-        the object with :py:func:`setattr`.
-
-        :param state: the data to parse
-
-        :param obj: the object to populate
-
-        """
-        obj = Settings() if obj is None else obj
-        is_dict = isinstance(obj, dict)
-        for k, v in state.items():
-            if parse_types and isinstance(v, str):
-                v = self.parse_object(v)
-            logger.debug('setting {} => {} on {}'.format(k, v, obj))
-            if is_dict:
-                obj[k] = v
-            else:
-                setattr(obj, k, v)
-        return obj
-
-    def populate(self, obj=None, section=None, parse_types=True):
-        """Set attributes in ``obj`` with ``setattr`` from the all values in
-        ``section``.
-
-        """
-        section = self.default_section if section is None else section
-        sec = self.get_options(section)
-        return self.populate_state(sec, obj, parse_types)
-
-    def format_option(self, obj: Any) -> str:
-        """Format a Python object in to the string represetation per object syntax
-        rules.
-
-        :see: :py:meth:`.parse_object`
-
-        """
-        v = None
-        cls = obj.__class__
-        if cls == str:
-            v = obj
-        elif cls in self.PRIMITIVES:
-            v = str(obj)
-        elif isinstance(obj, Path):
-            return f'path: {obj}'
-        elif isinstance(obj, set):
-            raise ValueError('to implement')
-        else:
-            v = 'json: ' + json.dumps(obj)
-        return v
-
-    def _get_calling_module(self):
-        """Get the last module in the call stack that is not this module or ``None`` if
-        the call originated from this module.
-
-        """
-        for frame in inspect.stack():
-            mod = inspect.getmodule(frame[0])
-            logger.debug(f'calling module: {mod}')
-            if mod is not None:
-                mod_name = mod.__name__
-                if mod_name != __name__:
-                    return mod
-
-    def resource_filename(self, resource_name, module_name=None):
-        """Return a resource based on a file name.  This uses the ``pkg_resources``
-        package first to find the resources.  If it doesn't find it, it returns
-        a path on the file system.
-
-        :param: resource_name the file name of the resource to obtain (or name
-                if obtained from an installed module)
-        :param module_name: the name of the module to obtain the data, which
-                            defaults to ``__name__``
-        :return: a path on the file system or resource of the installed module
-
-        """
-        if module_name is None:
-            mod = self._get_calling_module()
-            logger.debug(f'calling module: {mod}')
-            if mod is not None:
-                mod_name = mod.__name__
-        if module_name is None:
-            module_name = __name__
-        if pkg_resources.resource_exists(mod_name, resource_name):
-            res = pkg_resources.resource_filename(mod_name, resource_name)
-        else:
-            res = resource_name
-        return Path(res)
-
-
-class Config(Configurable):
+class IniConfig(Configurable):
     """Application configuration utility.  This reads from a configuration and
     returns sets or subsets of options.
 
     """
-
     def __init__(self, config_file=None, default_section='default',
                  robust=False, default_vars=None, default_expect=False,
                  create_defaults=None):
@@ -493,7 +140,7 @@ class Config(Configurable):
 
     def set_option(self, name, value, section=None):
         try:
-            value = self.format_option(value)
+            value = self.serializer.format_option(value)
         except TypeError as e:
             raise TypeError(f'can not serialize {name}:{section}: {e}')
         logger.debug(f'setting option {name}: {value} in section {section}')
@@ -537,7 +184,7 @@ class Config(Configurable):
         return self.__str__()
 
 
-class ExtendedInterpolationConfig(Config):
+class ExtendedInterpolationConfig(IniConfig):
     """Configuration class extends using advanced interpolation with
     ``configparser.ExtendedInterpolation``.
 
@@ -584,7 +231,7 @@ class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
         return parser
 
 
-class CommandLineConfig(Config, metaclass=ABCMeta):
+class CommandLineConfig(IniConfig, metaclass=ABCMeta):
     """A configuration object that allows creation by using command line arguments
     as defaults when the configuration file is missing.
 

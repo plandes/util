@@ -1,14 +1,14 @@
 import unittest
 import logging
 from pathlib import Path
-from zensols.config import Config
+from zensols.config import IniConfig
 
 logger = logging.getLogger(__name__)
 
 
 class TestConfigPopulate(unittest.TestCase):
     def setUp(self):
-        self.conf = Config('test-resources/populate-test.conf')
+        self.conf = IniConfig('test-resources/populate-test.conf')
 
     def test_primitive(self):
         s = self.conf.populate()

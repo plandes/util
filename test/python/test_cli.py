@@ -2,7 +2,7 @@ import logging
 import unittest
 import os
 from zensols.cli import SimpleActionCli
-from zensols.config import Config
+from zensols.config import IniConfig
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class AppCommandLine(SimpleActionCli):
         executors = {'app_test_key': lambda params: AppTester(**params)}
         invokes = {'info': ['app_test_key', 'startaction', 'test doc']}
         if conf_file:
-            conf = Config(conf_file, robust=True)
+            conf = IniConfig(conf_file, robust=True)
         else:
             conf = None
         super(AppCommandLine, self).__init__(
@@ -75,7 +75,7 @@ class TestActionCli(unittest.TestCase):
     def test_with_config(self):
         global good_val, good_conf
         good_val = 'test1'
-        good_conf = Config
+        good_conf = IniConfig
         AppCommandLine('test-resources/actioncli-test.confDNE').invoke(
             'info -o test1'.split(' '))
         good_val = 'conf-test1'
@@ -88,7 +88,7 @@ class TestActionCli(unittest.TestCase):
     def test_with_override_config(self):
         global good_val, good_conf
         good_val = 'testx'
-        good_conf = Config
+        good_conf = IniConfig
         AppCommandLine('test-resources/actioncli-test.conf').invoke(
             'info -o testx'.split(' '))
 

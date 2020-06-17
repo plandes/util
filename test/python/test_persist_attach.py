@@ -5,7 +5,7 @@ import unittest
 from zensols.persist import persisted, PersistedWork
 from zensols.config import (
     ImportConfigFactory,
-    Config,
+    IniConfig,
     RedefinedInjectionError,
 )
 
@@ -47,7 +47,7 @@ class Temp7:
 
 class TestPersistAttach(unittest.TestCase):
     def setUp(self):
-        self.conf = Config('test-resources/test-persist-attach.conf')
+        self.conf = IniConfig('test-resources/test-persist-attach.conf')
         self.fac = ImportConfigFactory(self.conf, shared=False)
 
     def test_attach(self):
@@ -114,7 +114,7 @@ class TestPersistAttach(unittest.TestCase):
 
 class TestPersistShare(unittest.TestCase):
     def setUp(self):
-        self.conf = Config('test-resources/test-persist-attach.conf')
+        self.conf = IniConfig('test-resources/test-persist-attach.conf')
 
     def test_not_shared(self):
         fac = ImportConfigFactory(self.conf, shared=False)

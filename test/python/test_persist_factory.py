@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import shutil
 from zensols.config import (
-    Config,
+    IniConfig,
     ImportConfigFactory,
 )
 from zensols.persist import (
@@ -42,7 +42,7 @@ class StashHolder(object):
 
 class TestStashFactory(unittest.TestCase):
     def setUp(self):
-        self.conf = Config('test-resources/stash-factory.conf')
+        self.conf = IniConfig('test-resources/stash-factory.conf')
         self.target_path = Path('target')
         if self.target_path.exists():
             shutil.rmtree(self.target_path)
