@@ -4,10 +4,11 @@ objects and files.
 """
 __author__ = 'Paul Landes'
 
-import logging
-from abc import ABC
-from typing import Dict, Any
+from abc import ABC, abstractmethod
+from typing import Dict, Any, Type
+from enum import Enum
 import types
+import logging
 import inspect
 import importlib
 import re
@@ -20,7 +21,32 @@ logger = logging.getLogger(__name__)
 
 
 class RedefinedInjectionError(ValueError):
+    """Raised when any attempt to redefine or reuse injections for a class
+    """
     pass
+
+
+class FactoryState(Enum):
+    """The state updated from an instance of :class:`.ConfigFactory`.  Currently
+    the only state is that an object has finished being created.
+
+    Future states might inlude when a :class:`ImportConfigFactory` has created
+    all objects from a configuration shared session.
+
+    """
+    CREATED = 1
+
+
+class FactoryStateObserver(ABC):
+    """An interface that recieves notifications that the factory has created this
+    instance.  This is useful for classes such as :class:`.Writeback`.
+
+    :see: :class:`.Writeback`
+
+    """
+    @abstractmethod
+    def _notify_state(self, state: FactoryState):
+        pass
 
 
 class ClassResolver(ABC):
@@ -130,6 +156,8 @@ class ClassImporter(object):
         try:
             logger.debug(f'class importer creating instance of {cls}')
             inst = cls(*args, **kwargs)
+            if isinstance(inst, FactoryStateObserver):
+                inst._notify_state(FactoryState.CREATED)
         except Exception as e:
             msg = f'can not instantiate {cls}({args}, {kwargs})'
             logger.error(msg, e)
@@ -252,6 +280,8 @@ class ConfigFactory(object):
         try:
             logger.debug(f'config factory creating instance of {cls}')
             inst = cls(*args, **kwargs)
+            if isinstance(inst, FactoryStateObserver):
+                inst._notify_state(FactoryState.CREATED)
         except Exception as e:
             logger.error(f'can not create \'{cls_desc}\' for class ' +
                          f'{cls}({args})({kwargs}): {e}')
@@ -260,12 +290,14 @@ class ConfigFactory(object):
             logger.debug(f'inst: {inst.__class__}')
         return inst
 
-    def instance(self, name=None, *args, **kwargs):
+    def instance(self, name: Type = None, *args, **kwargs):
         """Create a new instance using key ``name``.
 
         :param name: the name of the class (by default) or the key name of the
                      class used to find the class
+
         :param args: given to the ``__init__`` method
+
         :param kwargs: given to the ``__init__`` method
 
         """
@@ -292,6 +324,13 @@ class ConfigFactory(object):
         logger.info(f'created {name} instance of {cls.__name__} ' +
                     f'in {(time() - t0):.2f}s')
         return inst
+
+    def from_config_string(self, v: str) -> Any:
+        try:
+            v = eval(v)
+        except Exception:
+            pass
+        return self.instance(v)
 
     def __call__(self, *args, **kwargs):
         """Calls ``instance``.
@@ -382,7 +421,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         new_meth = types.MethodType(new_meth, inst)
         setattr(inst, name, new_meth)
 
-    def _populate_instances(self, name: str, pconfig: str, section: str):
+    def _populate_instances(self, pconfig: str, section: str):
         child_params = {}
         reload = False
         defined_directives = set('param reload'.split())
@@ -402,8 +441,14 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             logger.debug(f'applying param config: {pconfig}')
         logger.debug(f'creating instance in section {section}')
         self._set_reload(reload)
-        inst = self.instance(section, **child_params)
-        return inst
+        return self.instance(section, **child_params)
+
+    def from_config_string(self, v: str) -> Any:
+        m = self.CHILD_REGEXP.match(v)
+        if m:
+            pconfig, section = m.groups()
+            v = self._populate_instances(pconfig, section)
+        return v
 
     def _class_name_params(self, name):
         class_name, params = super()._class_name_params(name)
@@ -415,7 +460,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                     m = self.CHILD_REGEXP.match(v)
                     if m:
                         pconfig, section = m.groups()
-                        insts[k] = self._populate_instances(k, pconfig, section)
+                        insts[k] = self._populate_instances(pconfig, section)
         finally:
             self._set_reload(initial_reload)
         params.update(insts)
@@ -456,7 +501,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         if prev_defined_sec is not None and prev_defined_sec != sec_name:
             # fail when redefining injections, and thus class metadata,
             # configuration
-            msg = (f'attempt redefine or reuse injectsion for class ' +
+            msg = ('attempt redefine or reuse injection for class ' +
                    f'{class_name} in section {sec_name} previously ' +
                    f'defined in section {prev_defined_sec}')
             raise RedefinedInjectionError(msg)

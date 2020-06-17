@@ -15,20 +15,20 @@ import re
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
+OBJECT_KEYS = {'_type', '_data'}
 
 
 class PythonObjectEncoder(JSONEncoder):
-    def default(self, obj):
+    def default(self, obj: Any):
         if isinstance(obj, set):
-            return {'_object_type': obj.__class__.__name__,
-                    'data': tuple(obj)}
+            return {'_type': obj.__class__.__name__, '_data': tuple(obj)}
         return JSONEncoder.default(self, obj)
 
 
-def as_python_object(dct):
-    if '_object_type' in dct:
-        cls = eval(dct['_object_type'])
-        return cls(dct['data'])
+def as_python_object(dct: Dict[str, str]):
+    if set(dct.keys()) == OBJECT_KEYS:
+        cls = eval(dct['_type'])
+        return cls(dct['_data'])
     return dct
 
 
@@ -118,7 +118,7 @@ class Serializer(object):
             if parsed is None:
                 m = self.JSON_REGEXP.match(v)
                 if m:
-                    parsed = json.loads(m.group(1))
+                    parsed = self._json_load(m.group(1))
             if parsed is not None:
                 v = parsed
         return v
@@ -152,8 +152,8 @@ class Serializer(object):
     def _json_dump(self, data: Any) -> str:
         return json.dumps(data, cls=PythonObjectEncoder)
 
-    def _json_load(self, json: str) -> Any:
-        return json.loads(json, object_hook=as_python_object)
+    def _json_load(self, json_str: str) -> Any:
+        return json.loads(json_str, object_hook=as_python_object)
 
     def format_option(self, obj: Any) -> str:
         """Format a Python object in to the string represetation per object syntax

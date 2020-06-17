@@ -117,6 +117,16 @@ class TestConfigWriteBack(TestConfigWriteBase):
         self.assertTrue(isinstance(t1, Temp1))
         self.assertTrue(self.config.has_option('aval', 'temp1'))
         self.assertEqual(1, t1.aval)
-        t1.aval = set([1, 2])
-        self.assertEqual('json: {"_object_type": "set", "data": [1, 2]}',
+        should = set([1, 2])
+        t1.aval = should
+        self.assertEqual('json: {"_type": "set", "_data": [1, 2]}',
                          self.config.get_option('aval', 'temp1'))
+        obj = self.config.get_option_object('aval', 'temp1')
+        self.assertEqual(should, obj)
+
+    def test_write_instance(self):
+        t1 = self.factory('temp1')
+        self.assertTrue(isinstance(t1, Temp1))
+        self.assertTrue(self.config.has_option('aval', 'temp1'))
+        t1.aval = 'instance: temp2'
+        self.assertEquals(Temp2, type(t1.aval))
