@@ -132,6 +132,10 @@ class """ + class_name + """(Template):
                 self._options[k] = self._get_option(k, expect=True)
         return self._options
 
+    def has_option(self, name):
+        opts = self.options
+        return name in opts
+
     def get_option(self, name, section=None, vars=None, expect=None):
         """Return an option using a dot encoded path.
 

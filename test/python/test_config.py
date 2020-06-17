@@ -41,3 +41,10 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(False, conf.get_option_boolean('param5'))
         self.assertEqual(False, conf.get_option_boolean('no_such_param'))
         self.assertEqual([], conf.get_option_list('no_such_param'))
+
+    def test_has_option(self):
+        conf = Config('test-resources/config-test-option.conf')
+        self.assertTrue(conf.has_option('param1'))
+        self.assertTrue(conf.has_option('param1', section='default'))
+        self.assertFalse(conf.has_option('param1', section='NOSEC'))
+        self.assertFalse(conf.has_option('NOPARARM'))

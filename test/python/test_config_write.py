@@ -103,3 +103,11 @@ class TestConfigWriteBack(TestConfigWriteBase):
         t2.aval = 5
         self.assertEqual(5, t2.aval)
         self.assertEqual('5', self.config.get_option('aval', section='temp2'))
+
+    def test_write_not_existant(self):
+        t1 = self.factory('temp1')
+        self.assertTrue(isinstance(t1, Temp1))
+        self.assertTrue(self.config.has_option('aval', 'temp1'))
+        self.assertEqual(1, t1.aval)
+        t1.NOVAL = 5
+        self.assertFalse(self.config.has_option('NOVAL', 'temp1'))

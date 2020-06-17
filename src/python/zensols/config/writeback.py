@@ -43,7 +43,8 @@ class Writeback(object):
     def _set_option(self, name: str, value: Any):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'set option {self.name}:{name} = {value}')
-        self.config.set_option(name, value, section=self.name)
+        if self.config.has_option(name, section=self.name):
+            self.config.set_option(name, value, section=self.name)
 
     def __setattr__(self, name: str, value: Any):
         try:

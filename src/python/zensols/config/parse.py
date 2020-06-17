@@ -127,6 +127,10 @@ class Configurable(Writable, metaclass=ABCMeta):
         """
         pass
 
+    @abstractmethod
+    def has_option(self, name, section=None):
+        pass
+
     def get_option_list(self, name, section=None, vars=None,
                         expect=None, separator=','):
         """Just like :py:meth:`get_option` but parse as a list using ``split``.
@@ -435,7 +439,17 @@ class Config(Configurable):
     def file_exists(self):
         return self.parser is not None
 
-    def get_options(self, section='default', opt_keys=None, vars=None):
+    def has_option(self, name, section=None):
+        section = self.default_section if section is None else section
+        conf = self.parser
+        if conf.has_section(section):
+            opts = self.get_options(section, opt_keys=[name])
+            return opts is not None and name in opts
+        else:
+            return False
+
+    def get_options(self, section=None, opt_keys=None, vars=None):
+        section = self.default_section if section is None else section
         vars = vars if vars else self.default_vars
         conf = self.parser
         opts = {}
