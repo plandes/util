@@ -7,11 +7,13 @@ class Writable(ABC):
     """An interface for classes that have multi-line debuging capability.
 
     """
+    WRITABLE_INDENT_SPACE = 4
+
     def _sp(self, depth: int):
         """Utility method to create a space string.
 
         """
-        indent = getattr(self, '_indent', 4)
+        indent = getattr(self, '_indent', self.WRITABLE_INDENT_SPACE)
         return ' ' * (depth * indent)
 
     def _write_line(self, line: str, depth: int = 0,

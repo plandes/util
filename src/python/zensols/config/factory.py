@@ -392,6 +392,13 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         """
         self.shared.clear()
 
+    def clear_instance(self, name: str):
+        """Remove a shared (cached) object instance.
+
+        """
+        if self.shared is not None:
+            return self.shared.pop(name, None)
+
     def deallocate(self):
         super().deallocate()
         if hasattr(self, 'shared') and self.shared is not None:
