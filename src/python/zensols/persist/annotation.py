@@ -8,6 +8,8 @@ from typing import Union, Any
 from abc import ABC
 import logging
 import sys
+import traceback
+from io import StringIO
 import re
 from copy import copy
 import pickle
@@ -24,14 +26,57 @@ class Deallocatable(ABC):
     tensors) need happen implicitly and faster.
 
     """
+    PRINT_TRACE = False
+    ALLOCATION_TRACKING = False
+    ALLOCATIONS = {}
     logger = logging.getLogger(__name__ + '.Deallocatable')
+
+    def __init__(self):
+        super().__init__()
+        if self.ALLOCATION_TRACKING:
+            k = id(self)
+            sio = StringIO()
+            traceback.print_stack(file=sio)
+            if self.logger.isEnabledFor(logging.DEBUG):
+                self.logger.debug(f'adding allocated key: {k} = {type(self)}')
+            self.ALLOCATIONS[k] = (self, sio.getvalue())
 
     def deallocate(self):
         """Deallocate all resources for this instance.
 
         """
+        k = id(self)
+        if self.PRINT_TRACE:
+            traceback.print_stack()
         if self.logger.isEnabledFor(logging.DEBUG):
-            self.logger.debug(f'deallocating {self.__class__}')
+            self.logger.debug(f'deallocating {k}: {self.__class__}')
+        if self.ALLOCATION_TRACKING:
+            if k in self.ALLOCATIONS:
+                if self.logger.isEnabledFor(logging.DEBUG):
+                    self.logger.debug(f'removing allocated key: {k}')
+                del self.ALLOCATIONS[k]
+            else:
+                self.logger.info(f'no key to deallocate: {k} ({type(self)})')
+
+    def _try_deallocate(self, obj: Any):
+        cls = globals()['Deallocatable']
+        if isinstance(obj, cls):
+            obj.deallocate()
+            return True
+        return False
+
+    @classmethod
+    def _print_undeallocated(self, include_stack: bool = False):
+        """Print all unallocated objects.
+
+        """
+        for k, (v, stack) in self.ALLOCATIONS.items():
+            vstr = str(type(v))
+            if hasattr(v, 'name'):
+                vstr = f'{vstr} ({v.name})'
+            print(f'{k} -> {vstr}')
+            if include_stack:
+                print(stack)
 
 
 # class level persistance
@@ -66,6 +111,7 @@ class PersistedWork(Deallocatable):
                              instances but not classes
 
         """
+        super().__init__()
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug('pw inst: path={}, global={}'.format(path, cache_global))
         self.owner = owner
@@ -173,6 +219,9 @@ class PersistedWork(Deallocatable):
                 globals()[vname] = obj
 
     def is_set(self) -> bool:
+        """Return whether or not the persisted work has been engaged and has data.
+
+        """
         vname = self.varname
         if self.cache_global:
             return vname in globals()
@@ -244,6 +293,7 @@ class PersistedWork(Deallocatable):
 
 class PersistableContainerMetadata(Deallocatable):
     def __init__(self, container):
+        super().__init__()
         self.container = container
 
     @property
@@ -343,6 +393,7 @@ class persisted(object):
     """
     def __init__(self, name, path=None, cache_global=False,
                  transient=False):
+        super().__init__()
         logger.debug('persisted decorator on attr: {}, global={}'.format(
             name, cache_global))
         self.attr_name = name

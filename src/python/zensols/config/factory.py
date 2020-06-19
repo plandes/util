@@ -12,6 +12,7 @@ import logging
 import inspect
 import importlib
 import re
+import copy as cp
 from functools import reduce
 from time import time
 from zensols.config import Configurable
@@ -332,6 +333,9 @@ class ConfigFactory(object):
             pass
         return self.instance(v)
 
+    def clone(self) -> Any:
+        return cp.copy(self)
+
     def __call__(self, *args, **kwargs):
         """Calls ``instance``.
 
@@ -390,7 +394,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         """Clear any shared instances.
 
         """
-        self.shared.clear()
+        if self.shared is not None:
+            self.shared.clear()
 
     def clear_instance(self, name: str):
         """Remove a shared (cached) object instance.
@@ -399,14 +404,18 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         if self.shared is not None:
             return self.shared.pop(name, None)
 
+    def clone(self) -> Any:
+        clone = super().clone()
+        clone.clear()
+        return clone
+
     def deallocate(self):
         super().deallocate()
-        if hasattr(self, 'shared') and self.shared is not None:
+        if self.shared is not None:
             for v in self.shared.values():
                 if isinstance(v, Deallocatable):
                     v.deallocate()
             self.shared.clear()
-            del self.shared
 
     def instance(self, name=None, *args, **kwargs):
         if self.shared is None:

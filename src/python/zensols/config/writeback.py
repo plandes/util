@@ -7,6 +7,7 @@ from typing import Set, Any
 from dataclasses import dataclass, field
 import logging
 from zensols.config import (
+    ClassResolver,
     ConfigFactory,
     FactoryState,
     FactoryStateObserver,
@@ -159,3 +160,16 @@ class Writeback(FactoryStateObserver):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'settings option {name} = {value}')
             self._set_option(name, value)
+
+    def asdict(self, class_name_param: str = None):
+        wcls = globals()['Writeback']
+        ret = {}
+        if class_name_param is not None:
+            cls = self.__class__
+            ret[class_name_param] = ClassResolver.full_classname(cls)
+        for k, v in self.__dict__.items():
+            if isinstance(v, wcls):
+                ret[k] = v.asdict()
+            elif self._is_allowed_type(v):
+                ret[k] = v
+        return ret
