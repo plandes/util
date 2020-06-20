@@ -48,3 +48,12 @@ class TestConfig(unittest.TestCase):
         self.assertTrue(conf.has_option('param1', section='default'))
         self.assertFalse(conf.has_option('param1', section='NOSEC'))
         self.assertFalse(conf.has_option('NOPARARM'))
+
+    def test_merge(self):
+        conf = IniConfig('test-resources/config-test-option.conf')
+        override = IniConfig('test-resources/config-test.conf')
+        self.assertEquals('one,two,three', conf.get_option('param1'))
+        self.assertEquals('true', conf.get_option('param2'))
+        conf.merge(override)
+        self.assertEquals('3.14', conf.get_option('param1'))
+        self.assertEquals('true', conf.get_option('param2'))

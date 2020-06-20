@@ -3,6 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
+from typing import Any
 from abc import ABCMeta, abstractmethod
 import logging
 from pathlib import Path
@@ -16,6 +17,9 @@ logger = logging.getLogger(__name__)
 class Configurable(Writable, metaclass=ABCMeta):
     """An abstract base class that represents an application specific
     configuration.
+
+    Note that many of the getters are implemented in ``configparser``.
+    However, they are reimplemented here for consistency among parser.
 
     """
     def __init__(self, config_file, default_expect):
@@ -165,6 +169,36 @@ class Configurable(Writable, metaclass=ABCMeta):
         section = self.default_section if section is None else section
         sec = self.get_options(section)
         return self.serializer.populate_state(sec, obj, parse_types)
+
+    @property
+    def sections(self):
+        """All sections of the configuration file.
+
+        """
+        return ()
+
+    def copy_sections(self, to_populate: Any, sections: list):
+        """Copy all sections from this configuruable to ``to_populate``.
+
+        :param to_populate: the target configuration object
+
+        :type to_populate: Configurable
+
+        """
+        for sec in sections:
+            for k, v in self.get_options(sec).items():
+                to_populate.set_option(k, v, sec)
+
+    def merge(self, to_populate: Any):
+        """Copy all data from this configuruable to ``to_populate``, and clobber any
+        overlapping properties in the process.
+
+        :param to_populate: the target configuration object
+
+        :type to_populate: Configurable
+
+        """
+        to_populate.copy_sections(self, to_populate.sections)
 
     def _get_calling_module(self):
         """Get the last module in the call stack that is not this module or ``None`` if

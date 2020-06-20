@@ -133,7 +133,9 @@ class IniConfig(Configurable):
 
     @property
     def sections(self):
-        "Return all sections."
+        """All sections of the INI file.
+
+        """
         secs = self.parser.sections()
         if secs:
             return set(secs)
@@ -147,11 +149,6 @@ class IniConfig(Configurable):
         if not self.parser.has_section(section):
             self.parser.add_section(section)
         self.parser.set(section, name, value)
-
-    def copy_sections(self, to_populate: Configurable, sections: list):
-        for sec in sections:
-            for k, v in self.get_options(sec).items():
-                to_populate.set_option(k, v, sec)
 
     def derive_from_resource(self, path: str, copy_sections=()) -> Configurable:
         """Derive a new configuration from the resource file name ``path``.
