@@ -27,6 +27,10 @@ testpopulate:
 testlog:
 		make PY_SRC_TEST_PAT=test_log.py test
 
+.PHONY:		testdealloc
+testdealloc:
+		make PY_SRC_TEST_PAT=test_dealloc.py test
+
 .PHONY:		testcli
 testcli:
 		make PY_SRC_TEST_PAT=test_cli.py test

@@ -1,7 +1,7 @@
 import logging
 import unittest
 from time import sleep
-from zensols.util.time import timeout, timeprotect, TimeoutError
+from zensols.util.time import time, timeout, timeprotect, TimeoutError
 
 logger = logging.getLogger(__name__)
 
@@ -51,3 +51,17 @@ class TestTime(unittest.TestCase):
             sleep(1.5)
 
         self.assertEqual(1, state[0])
+
+    def _test_with_time(self, newval, doret):
+        v = 1
+        with time('log msg with {inner_var}'):
+            inner_var = 1
+            v = newval
+            if doret:
+                return (newval, doret)
+        self.assertEqual(v, newval)
+
+    def test_with_time(self):
+        self.assertEqual(None, self._test_with_time(1, False))
+        self.assertEqual((2, True), self._test_with_time(2, True))
+        self.assertEqual(('s', True), self._test_with_time('s', True))
