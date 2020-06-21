@@ -19,6 +19,10 @@ testconfig:
 testconfigwrite:
 		make PY_SRC_TEST_PAT=test_config_write.py test
 
+.PHONY:		testconfigstring
+testconfigstring:
+		make PY_SRC_TEST_PAT=test_config_str.py test
+
 .PHONY:		testpopulate
 testpopulate:
 		make PY_SRC_TEST_PAT=test_populate.py test

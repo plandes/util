@@ -26,7 +26,8 @@ class YamlConfig(Configurable):
 
     def __init__(self, config_file=None, default_vars=None, delimiter='$',
                  default_expect=False):
-        super().__init__(config_file, default_expect)
+        super().__init__(default_expect)
+        self.config_file = config_file
         self.default_vars = default_vars if default_vars else {}
         self.delimiter = delimiter
 

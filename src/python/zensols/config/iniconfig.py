@@ -5,9 +5,9 @@ parsed from files.
 __author__ = 'Paul Landes'
 
 from abc import ABCMeta, abstractmethod
+from typing import Set, Dict
 import os
-import sys
-from io import TextIOWrapper
+from pathlib import Path
 import logging
 from copy import deepcopy
 import configparser
@@ -21,9 +21,10 @@ class IniConfig(Configurable):
     returns sets or subsets of options.
 
     """
-    def __init__(self, config_file=None, default_section='default',
-                 robust=False, default_vars=None, default_expect=False,
-                 create_defaults=None):
+    def __init__(self, config_file: Path = None,
+                 default_section: str = 'default', robust: bool = False,
+                 default_vars: dict = None, default_expect: bool = False,
+                 create_defaults: bool = None):
         """Create with a configuration file path.
 
         Keyword arguments:
@@ -43,7 +44,8 @@ class IniConfig(Configurable):
                                 baked in to the configuration file
         """
 
-        super().__init__(config_file, default_expect)
+        super().__init__(default_expect)
+        self.config_file = config_file
         self.default_section = default_section
         self.robust = robust
         self.default_vars = self._munge_default_vars(default_vars)
@@ -85,10 +87,10 @@ class IniConfig(Configurable):
         return self._conf
 
     @property
-    def file_exists(self):
+    def file_exists(self) -> bool:
         return self.parser is not None
 
-    def has_option(self, name, section=None):
+    def has_option(self, name: str, section: str = None) -> bool:
         section = self.default_section if section is None else section
         conf = self.parser
         if conf.has_section(section):
@@ -97,7 +99,8 @@ class IniConfig(Configurable):
         else:
             return False
 
-    def get_options(self, section=None, opt_keys=None, vars=None):
+    def get_options(self, section: str = None, opt_keys: Set[str] = None,
+                    vars: Dict[str, str] = None) -> Dict[str, str]:
         section = self.default_section if section is None else section
         vars = vars if vars else self.default_vars
         conf = self.parser
@@ -120,7 +123,7 @@ class IniConfig(Configurable):
         return opts
 
     @property
-    def sections(self):
+    def sections(self) -> Set[str]:
         """All sections of the INI file.
 
         """
@@ -151,15 +154,6 @@ class IniConfig(Configurable):
         conf = self.__class__(**kwargs)
         self.copy_sections(conf, copy_sections)
         return conf
-
-    def write(self, depth: int = 0, writer: TextIOWrapper = sys.stdout):
-        """Print a human readable list of sections and options.
-
-        """
-        for sec in sorted(self.sections):
-            self._write_line(sec, depth, writer)
-            for k, v in self.get_options(sec).items():
-                self._write_line(f'{k}: {v}', depth + 1, writer)
 
     def __str__(self):
         return str('file: {}, section: {}'.

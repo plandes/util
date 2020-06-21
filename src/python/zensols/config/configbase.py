@@ -3,10 +3,12 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any
+from typing import Any, Dict, Set
 from abc import ABCMeta, abstractmethod
 import logging
 from pathlib import Path
+import sys
+from io import TextIOWrapper
 import inspect
 import pkg_resources
 from . import Serializer, Writable
@@ -22,8 +24,7 @@ class Configurable(Writable, metaclass=ABCMeta):
     However, they are reimplemented here for consistency among parser.
 
     """
-    def __init__(self, config_file, default_expect):
-        self.config_file = config_file
+    def __init__(self, default_expect):
         self.default_expect = default_expect
         self.serializer = Serializer()
 
@@ -32,7 +33,7 @@ class Configurable(Writable, metaclass=ABCMeta):
             expect = self.default_expect
         return expect
 
-    def get_option(self, name, section=None, vars=None, expect=None):
+    def get_option(self, name, section=None, vars=None, expect=None) -> str:
         """Return an option from ``section`` with ``name``.
 
         :param section: section in the ini file to fetch the value; defaults to
@@ -56,7 +57,8 @@ class Configurable(Writable, metaclass=ABCMeta):
                                  format(name, section))
 
     @abstractmethod
-    def get_options(self, section='default', opt_keys=None, vars=None):
+    def get_options(self, section: str = None, opt_keys: Set[str] = None,
+                    vars: Dict[str, str] = None) -> Dict[str, str]:
         """Get all options for a section.  If ``opt_keys`` is given return only
         options with those keys.
 
@@ -72,7 +74,7 @@ class Configurable(Writable, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def has_option(self, name, section=None):
+    def has_option(self, name: str, section: str = None) -> bool:
         pass
 
     def get_option_list(self, name, section=None, vars=None,
@@ -179,7 +181,7 @@ class Configurable(Writable, metaclass=ABCMeta):
         return self.serializer.populate_state(sec, obj, parse_types)
 
     @property
-    def sections(self):
+    def sections(self) -> Set[str]:
         """All sections of the configuration file.
 
         """
@@ -207,6 +209,15 @@ class Configurable(Writable, metaclass=ABCMeta):
 
         """
         to_populate.copy_sections(self, to_populate.sections)
+
+    def write(self, depth: int = 0, writer: TextIOWrapper = sys.stdout):
+        """Print a human readable list of sections and options.
+
+        """
+        for sec in sorted(self.sections):
+            self._write_line(sec, depth, writer)
+            for k, v in self.get_options(sec).items():
+                self._write_line(f'{k}: {v}', depth + 1, writer)
 
     def _get_calling_module(self):
         """Get the last module in the call stack that is not this module or ``None`` if
