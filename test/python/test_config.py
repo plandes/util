@@ -1,6 +1,6 @@
 import unittest
 import logging
-from configparser import NoSectionError
+from configparser import NoSectionError, DuplicateSectionError
 from zensols.config import IniConfig
 
 logger = logging.getLogger(__name__)
@@ -57,3 +57,15 @@ class TestConfig(unittest.TestCase):
         conf.merge(override)
         self.assertEquals('3.14', conf.get_option('param1'))
         self.assertEquals('true', conf.get_option('param2'))
+
+
+class TestDirConfig(unittest.TestCase):
+    def test_happy_path(self):
+        conf = IniConfig('test-resources/dconf/happy')
+        self.assertEqual({'default', 'sec1'}, conf.sections)
+        self.assertEqual({'param1': '3.14'}, conf.get_options('default'))
+        self.assertEqual({'param1': 'p1', 'param2': 'p2'}, conf.get_options('sec1'))
+
+    def test_unhappy_path(self):
+        conf = IniConfig('test-resources/dconf/sad')
+        self.assertRaises(DuplicateSectionError, lambda: conf.sections)

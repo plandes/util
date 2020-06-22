@@ -5,12 +5,13 @@ parsed from files.
 __author__ = 'Paul Landes'
 
 from abc import ABCMeta, abstractmethod
-from typing import Set, Dict
+from typing import Set, Dict, List
 import os
+from io import StringIO
 from pathlib import Path
 import logging
 from copy import deepcopy
-import configparser
+from configparser import ConfigParser, ExtendedInterpolation
 from . import Configurable
 
 logger = logging.getLogger(__name__)
@@ -45,7 +46,10 @@ class IniConfig(Configurable):
         """
 
         super().__init__(default_expect)
-        self.config_file = config_file
+        if isinstance(config_file, str):
+            self.config_file = Path(config_file).expanduser()
+        else:
+            self._config_file = config_file
         self.default_section = default_section
         self.robust = robust
         self.default_vars = self._munge_default_vars(default_vars)
@@ -58,37 +62,38 @@ class IniConfig(Configurable):
     def _munge_create_defaults(self, vars):
         return vars
 
-    def _create_config_parser(self):
+    def _create_config_parser(self) -> ConfigParser:
         "Factory method to create the ConfigParser."
-        return configparser.ConfigParser(defaults=self.create_defaults)
-
-    @property
-    def content(self):
-        "Return the contents of the configuration file."
-        with open(os.path.expanduser(self.config_file)) as f:
-            return f.read()
+        return ConfigParser(defaults=self.create_defaults)
 
     @property
     def parser(self):
-        "Load the configuration file."
-        if not hasattr(self, '_conf'):
-            cfile = self.config_file
-            logger.debug('loading config %s' % cfile)
-            if os.path.isfile(cfile):
-                conf = self._create_config_parser()
-                conf.read(os.path.expanduser(cfile))
-            else:
-                if self.robust:
-                    logger.debug(f'no default config file {cfile}--skipping')
-                else:
-                    raise IOError(f'no such file: {cfile}')
-                conf = None
-            self._conf = conf
-        return self._conf
+        """Load the configuration file.
 
-    @property
-    def file_exists(self) -> bool:
-        return self.parser is not None
+        """
+        if not hasattr(self, '_conf'):
+            cpath = self.config_file
+            logger.debug(f'loading config {cpath}')
+            if not cpath.exists():
+                if self.robust:
+                    logger.debug(f'no default config file {cpath}--skipping')
+                else:
+                    raise IOError(f'no such file: {cpath}')
+                self._conf = None
+            elif cpath.is_file():
+                self._conf = self._create_config_parser()
+                self._conf.read(cpath)
+            elif cpath.is_dir():
+                agg = StringIO()
+                for fname in cpath.iterdir():
+                    with open(fname) as f:
+                        agg.write(f.read())
+                self._conf = self._create_config_parser()
+                agg.seek(0)
+                self._conf.read_file(agg)
+            else:
+                raise OSError(f'unknown file type: {cpath}')
+        return self._conf
 
     def has_option(self, name: str, section: str = None) -> bool:
         section = self.default_section if section is None else section
@@ -168,18 +173,17 @@ class ExtendedInterpolationConfig(IniConfig):
     ``configparser.ExtendedInterpolation``.
 
     """
-    def _create_config_parser(self):
-        inter = configparser.ExtendedInterpolation()
-        return configparser.ConfigParser(
-            defaults=self.create_defaults, interpolation=inter)
+    def _create_config_parser(self) -> ConfigParser:
+        inter = ExtendedInterpolation()
+        return ConfigParser(defaults=self.create_defaults, interpolation=inter)
 
 
 class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
-    """A ``Config`` implementation that creates a section called ``env`` with
-    environment variables passed.
+    """An :class:`.IniConfig` implementation that creates a section called ``env``
+    with environment variables passed.
 
     """
-    def __init__(self, *args, remove_vars: bool = None,
+    def __init__(self, *args, remove_vars: List[str] = None,
                  env: dict = None, env_sec: str = 'env', **kwargs):
         if 'default_expect' not in kwargs:
             kwargs['default_expect'] = True
@@ -198,7 +202,7 @@ class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
                     del vars[n]
         return vars
 
-    def _create_config_parser(self):
+    def _create_config_parser(self) -> ConfigParser:
         parser = super()._create_config_parser()
         sec = self.env_sec
         parser.add_section(sec)
@@ -221,9 +225,6 @@ class CommandLineConfig(IniConfig, metaclass=ABCMeta):
     subclass ``SimpleActionCli``.
 
     """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def set_default(self, name: str, value: str, clobber: bool = None):
         """Set a default value in the ``default`` section of the configuration.
         """
