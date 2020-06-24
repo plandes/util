@@ -1,2 +1,2 @@
-from zensols.cli.simple import *
-from zensols.cli.peraction import *
+from .simple import *
+from .peraction import *

@@ -1,2 +1,2 @@
-from zensols.multi.reducer import *
-from zensols.multi.stash import *
+from .reducer import *
+from .stash import *
