@@ -1,8 +1,14 @@
+"""More advanced implementation of an action based command line.
+
+"""
+__author__ = 'Paul Landes'
+
 import re
 import os
 import sys
 import logging
 import inspect
+from pathlib import Path
 from functools import reduce
 import optparse
 from optparse import OptionParser
@@ -35,8 +41,9 @@ class PrintActionsOptionParser(OptionParser):
                      format('|'.join(self.action_names))
 
     def print_help(self, file=sys.stdout):
-        logger.debug('print help: %s' % self.invokes)
-        logger.debug('action options: %s' % self.action_options)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('print help: %s' % self.invokes)
+            logger.debug('action options: %s' % self.action_options)
         OptionParser.print_help(self, file)
 
         action_name_len = reduce(lambda x, y: max(x, y),
@@ -51,8 +58,8 @@ class PrintActionsOptionParser(OptionParser):
                 action_doc = self.invokes[action_name][2].capitalize()
                 opts = map(lambda x: x['opt_obj'],
                            self.action_options[action_name])
-                logger.debug('{} -> {}, {}'.format(
-                    action_name, action_doc, opts))
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'{action_name} -> {action_doc}, {opts}')
                 opt_strs = []
                 for opt in opts:
                     short_opt, long_opt, sep, default = '', '', '', ''
@@ -61,15 +68,14 @@ class PrintActionsOptionParser(OptionParser):
                     if opt._long_opts and len(opt._long_opts) > 0:
                         long_opt = opt._long_opts[0]
                     if opt.metavar is not None:
-                        otype = ' <{}>'.format(opt.metavar)
+                        otype = f' <{opt.metavar}>'
                     elif opt.type is not None:
-                        otype = ' <{}>'.format(opt.type.upper())
+                        otype = f' <{opt.type.upper()}>'
                     else:
                         otype = ''
                     if len(short_opt) > 0 and len(long_opt) > 0:
                         sep = ', '
-                    opt_str = '  {}{}{}{}'.format(
-                        short_opt, sep, long_opt, otype)
+                    opt_str = f'  {short_opt}{sep}{long_opt}{otype}'
                     if opt.default and opt.default != ('NO', 'DEFAULT'):
                         default = str(opt.default)
                     opt_strs.append({'str': opt_str,
@@ -105,11 +111,12 @@ class PerActionOptionsCli(SimpleActionCli):
             executor.set_args(args)
 
     def _log_config(self):
-        logger.debug('executors: %s' % self.executors)
-        logger.debug('invokes: %s' % self.invokes)
-        logger.debug('action options: %s' % self.action_options)
-        logger.debug('opts: %s' % self.opts)
-        logger.debug('manditory opts: %s' % self.manditory_opts)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('executors: %s' % self.executors)
+            logger.debug('invokes: %s' % self.invokes)
+            logger.debug('action options: %s' % self.action_options)
+            logger.debug('opts: %s' % self.opts)
+            logger.debug('manditory opts: %s' % self.manditory_opts)
 
     def make_option(self, *args, **kwargs):
         return optparse.make_option(*args, **kwargs)
@@ -119,14 +126,16 @@ class PerActionOptionsCli(SimpleActionCli):
             usage=usage, version='%prog ' + str(self.version))
 
     def _config_parser_for_action(self, args, parser):
-        logger.debug('config parser for action: %s' % args)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('config parser for action: %s' % args)
         action = args[0]
         if action in self.action_options:
             for opt_cfg in self.action_options[action]:
                 opt_obj = opt_cfg['opt_obj']
                 parser.add_option(opt_obj)
                 self.opts.add(opt_obj.dest)
-                logger.debug('manditory: %s' % opt_cfg['manditory'])
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug('manditory: %s' % opt_cfg['manditory'])
                 if opt_cfg['manditory']:
                     self.manditory_opts.add(opt_obj.dest)
         self._log_config()
@@ -149,7 +158,8 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
 
     def _config_global(self, oc):
         parser = self.parser
-        logger.debug('global opt config: %s' % oc)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('global opt config: %s' % oc)
         if 'whine' in oc and oc['whine'] is not None:
             logger.debug('configuring whine option')
             self._add_whine_option(parser, default=oc['whine'])
@@ -178,7 +188,8 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
     def _config_executor(self, oc):
         exec_name = oc['name']
         gaopts = self.action_options
-        logger.debug('config opt config: %s' % oc)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('config opt config: %s' % oc)
         for action in oc['actions']:
             action_name = action['name']
             meth = action['meth'] if 'meth' in action else re.sub(r'[- ]', '_', action_name)
@@ -206,7 +217,8 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
         parser.action_options = self.action_options
         parser.invokes = self.invokes
         self._log_config()
-        logger.debug('finished config parser')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('finished config parser')
 
     def _create_config(self, conf_file, default_vars):
         return self.config_type(
@@ -217,11 +229,12 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
 
     def _find_conf_file(self, conf, params):
         conf_name = conf['name']
-        conf_file = params[conf_name]
-        logger.debug('config configuration: %s, name: %s, params: %s' %
-                     (conf, conf_name, params))
+        conf_file = Path(params[conf_name])
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'config configuration: {conf}, name: {conf_name}, ' +
+                         f'params: {params}')
         if conf_file is not None:
-            if not os.path.isfile(conf_file) and \
+            if not conf_file.exists() and \
                ('expect' not in conf or conf['expect']):
                 raise IOError('no such configuration file: %s' % conf_file)
         return conf_file
@@ -272,13 +285,13 @@ class OneConfPerActionOptionsCliEnv(OneConfPerActionOptionsCli):
         else:
             conf_env_var = config_env_name.upper()
             if conf_env_var in os.environ:
-                default_config_file = os.environ[conf_env_var]
+                cfile = os.environ[conf_env_var]
             else:
-                default_config_file = os.path.expanduser(
-                    '~/.{}'.format(config_env_name))
-            logger.debug('configured default config file: {}'.format(
-                default_config_file))
-            self.default_config_file = default_config_file
+                cfile = '~/.{config_env_name}'
+            cfile = Path(cfile).expanduser()
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'configured default config file: {cfile}')
+            self.default_config_file = cfile
         self.no_os_environ = no_os_environ
 
     def _create_config(self, conf_file, default_vars):
@@ -292,16 +305,18 @@ class OneConfPerActionOptionsCliEnv(OneConfPerActionOptionsCli):
             conf_file, defs)
 
     def _find_conf_file(self, conf, params):
-        logger.debug('finding config: {}'.format(self.default_config_file))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('finding config: {}'.format(self.default_config_file))
         if self.default_config_file is None:
             conf_file = super().\
                 _find_conf_file(conf, params)
         else:
             conf_name = conf['name']
             conf_file = params[conf_name]
-            logger.debug('config: {}, name: {}, params: {}, default_config_file: {}'
-                         .format(conf, conf_name, params,
-                                 self.default_config_file))
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'config: {conf}, name: {conf_name}, ' +
+                             f'params: {params}, default_config_file: ' +
+                             f'{self.default_config_file}')
             if conf_file is None:
                 if os.path.isfile(self.default_config_file):
                     conf_file = self.default_config_file

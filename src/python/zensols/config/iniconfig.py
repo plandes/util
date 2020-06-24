@@ -49,7 +49,7 @@ class IniConfig(Configurable):
         if isinstance(config_file, str):
             self.config_file = Path(config_file).expanduser()
         else:
-            self._config_file = config_file
+            self.config_file = config_file
         self.default_section = default_section
         self.robust = robust
         self.default_vars = self._munge_default_vars(default_vars)
@@ -161,8 +161,7 @@ class IniConfig(Configurable):
         return conf
 
     def __str__(self):
-        return str('file: {}, section: {}'.
-                   format(self.config_file, self.sections))
+        return f'file: {self.config_file}, section: {self.sections}'
 
     def __repr__(self):
         return self.__str__()

@@ -1,3 +1,10 @@
+"""A simple straight forward CLI implementation used for the first phase
+command line parsing.  More advanced INI (etc) configuration is optionally, and
+usually used down stream.
+
+"""
+__author__ = 'Paul Landes'
+
 import logging
 import sys
 import os
@@ -144,13 +151,16 @@ class SimpleActionCli(object):
         parser = self._create_parser(usage)
         self.parser = parser
         self.config_parser()
-        logger.debug(f'configured parser: {parser}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'configured parser: {parser}')
         if len(args) > 0 and args[0] in self.invokes:
             logger.debug('configuring parser on action: %s' % args[0])
             self._config_parser_for_action(args, parser)
-        logger.debug(f'parsing arguments: {args}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'parsing arguments: {args}')
         (options, args) = parser.parse_args(args)
-        logger.debug('options: <%s>, args: <%s>' % (options, args))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('options: <%s>, args: <%s>' % (options, args))
         self.parsed_options = options
         self.parsed_args = args
         if len(args) > 0:
@@ -161,7 +171,8 @@ class SimpleActionCli(object):
             else:
                 logger.debug('using default action: %s' % self.default_action)
                 action = self.default_action
-        logger.debug('adding logging')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('adding logging')
         if self.add_logging:
             self._config_logging(options.whine)
         if action == 'list':
@@ -181,7 +192,8 @@ class SimpleActionCli(object):
             for k, v in params.items():
                 if v is None and k in def_params:
                     params[k] = def_params[k]
-            logger.debug('before filter: %s' % params)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug('before filter: %s' % params)
             params = {k: params[k] for k in params.keys() & self.opts}
             for opt in self.manditory_opts:
                 if opt not in params or params[opt] is None:
@@ -196,7 +208,11 @@ class SimpleActionCli(object):
                 self._parser_error(format(err))
 
     def invoke(self, args=sys.argv[1:]):
-        logging.debug(f'invoking with args: {args}')
+        """Entry point invoked, usually called from ``main``.
+
+        """
+        if logger.isEnabledFor(logging.DEBUG):
+            logging.debug(f'invoking with args: {args}')
         meth, exec_obj = self.create_executor(args)
         if exec_obj is not None:
             try:
