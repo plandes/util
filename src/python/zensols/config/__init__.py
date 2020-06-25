@@ -1,5 +1,5 @@
 from .serial import *
-from .writeable import *
+from .writable import *
 from .configbase import *
 from .iniconfig import *
 from .yaml import *
