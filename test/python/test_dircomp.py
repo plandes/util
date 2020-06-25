@@ -144,4 +144,8 @@ class TestDirectoryCompStash(unittest.TestCase):
         stash = DcsTestStash(path, self.groups)
         di = DataItem(1, 2, 'rover', 'fuzzy')
         del di.agg['dog']
-        self.assertRaises(MissingDataKeys, lambda: stash.dump('1', di))
+        try:
+            stash.dump('1', di)
+            self.assertTrue(False, 'should have thrown exception')
+        except MissingDataKeys as e:
+            self.assertEqual({'dog'}, e.keys)

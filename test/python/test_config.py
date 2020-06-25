@@ -58,6 +58,14 @@ class TestConfig(unittest.TestCase):
         self.assertEquals('3.14', conf.get_option('param1'))
         self.assertEquals('true', conf.get_option('param2'))
 
+    def test_reload(self):
+        conf = IniConfig('test-resources/config-test.conf')
+        self.assertEqual('3.14', conf.get_option('param1'))
+        conf.set_option('param1', 'newval')
+        self.assertEqual('newval', conf.get_option('param1'))
+        conf.reload()
+        self.assertEqual('3.14', conf.get_option('param1'))
+
 
 class TestDirConfig(unittest.TestCase):
     def test_happy_path(self):

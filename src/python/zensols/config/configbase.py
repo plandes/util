@@ -77,6 +77,12 @@ class Configurable(Writable, metaclass=ABCMeta):
     def has_option(self, name: str, section: str = None) -> bool:
         pass
 
+    def reload(self):
+        """Reload the configuration from the backing store.
+
+        """
+        pass
+
     def get_option_list(self, name, section=None, vars=None,
                         expect=None, separator=','):
         """Just like :py:meth:`get_option` but parse as a list using ``split``.

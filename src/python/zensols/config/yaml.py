@@ -133,6 +133,11 @@ class """ + class_name + """(Template):
                 self._options[k] = self._get_option(k, expect=True)
         return self._options
 
+    def reload(self):
+        if hasattr(self, '_options'):
+            del self._options
+            del self._all_keys
+
     def has_option(self, name):
         opts = self.options
         return name in opts

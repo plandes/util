@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Union, Any, Set
+from typing import Dict, Union, Any, Set, Tuple
 from dataclasses import dataclass, field
 from pprint import pprint
 import sys
@@ -59,11 +59,10 @@ class Serializer(object):
     allow_types: Set[type] = field(
         default_factory=lambda:
         set([str, int, float, bool, list, tuple, dict]))
+    allow_classes: Tuple[type] = field(default_factory=lambda: (Path,))
 
     def is_allowed_type(self, value: Any) -> bool:
-        if isinstance(value, tuple) or \
-           isinstance(value, list) or \
-           isinstance(value, set):
+        if isinstance(value, (tuple, list, set)):
             for i in value:
                 if not self.is_allowed_type(i):
                     return False
@@ -73,7 +72,8 @@ class Serializer(object):
                 if not self.is_allowed_type(i):
                     return False
             return True
-        return value.__class__ in self.allow_types
+        return value.__class__ in self.allow_types or \
+            isinstance(value, self.allow_classes)
 
     def _parse_eval(self, pconfig: str, evalstr: str = None) -> str:
         if pconfig is not None:

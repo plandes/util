@@ -9,7 +9,6 @@ from zensols.config import (
     RedefinedInjectionError,
 )
 
-#logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 

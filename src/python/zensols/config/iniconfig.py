@@ -96,6 +96,10 @@ class IniConfig(Configurable):
                 raise OSError(f'unknown file type: {cpath}')
         return self._conf
 
+    def reload(self):
+        if hasattr(self, '_conf'):
+            del self._conf
+
     def has_option(self, name: str, section: str = None) -> bool:
         section = self.default_section if section is None else section
         conf = self.parser
@@ -137,12 +141,18 @@ class IniConfig(Configurable):
         if secs:
             return set(secs)
 
-    def set_option(self, name, value, section=None):
+    def _format_option(self, name: str, value: str, section: str) -> str:
         try:
             value = self.serializer.format_option(value)
         except TypeError as e:
-            raise TypeError(f'can not serialize {name}:{section}: {e}')
-        logger.debug(f'setting option {name}: {value} in section {section}')
+            raise TypeError(f'can not serialize {section}:{name}: {e}')
+        return value
+
+    def set_option(self, name, value, section=None):
+        section = self.default_section if section is None else section
+        value = self._format_option(name, value, section)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'setting option {name}: {section}:{value}')
         if not self.parser.has_section(section):
             self.parser.add_section(section)
         self.parser.set(section, name, value)
@@ -208,9 +218,8 @@ class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
         parser.add_section(sec)
         for k, v in self.env.items():
             logger.debug(f'adding env section {sec}: {k} -> {v}')
+            v = self._format_option(k, v, sec)
             parser.set(sec, k, v)
-        # purify for pickle
-        del self.env
         return parser
 
 
