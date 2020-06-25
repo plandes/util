@@ -85,9 +85,10 @@ class IniConfig(Configurable):
                 self._conf.read(cpath)
             elif cpath.is_dir():
                 agg = StringIO()
-                for fname in cpath.iterdir():
-                    with open(fname) as f:
-                        agg.write(f.read())
+                for fpath in cpath.iterdir():
+                    if fpath.is_file():
+                        with open(fpath) as f:
+                            agg.write(f.read())
                 self._conf = self._create_config_parser()
                 agg.seek(0)
                 self._conf.read_file(agg)
