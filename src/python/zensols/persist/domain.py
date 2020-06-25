@@ -207,20 +207,21 @@ class DelegateDefaults(object):
 class DelegateStash(CloseableStash, metaclass=ABCMeta):
     """Delegate pattern.  It can also be used as a no-op if no delegate is given.
 
-    A minimum functioning implementation needs the ``load`` and ``keys``
-    methods overriden.  Inheriting and implementing a ``Stash`` such as this is
-    usually used as the ``factory`` in a ``FactoryStash``.
+    A minimum functioning implementation needs the :py:meth:`load` and
+    :py:meth:`keys` methods overriden.  Inheriting and implementing a
+    :class:`.Stash` such as this is usually used as the ``factory`` in a
+    :class:`FactoryStash`.
 
     This class delegates attribute fetches to the delegate for the
     unimplemented methods and attributes using a decorator pattern when
-    attribute ``delegate_attr`` is set to ``True``.
+    attribute :py:attrib:~`delegate_attr` is set to ``True``.
 
-    *Note:* Delegate attribute fetching can cause strange and unexpected
+    **Note:** Delegate attribute fetching can cause strange and unexpected
     behavior, so use this funcationlity with care.  It is advised to leave it
-    off if unexpected ``AttributeError`` are raised due to incorrect
-    attribute is access or method dispatching.
+    off if unexpected ``AttributeError`` are raised due to incorrect attribute
+    is access or method dispatching.
 
-    :py:meth:`DelegateStash.delegate_attr`
+    :see: :py:attrib:~`delegate_attr`
 
     """
     delegate: Stash
