@@ -5,11 +5,18 @@ __author__ = 'Paul Landes'
 
 import logging
 from typing import Any, Set, Tuple
+from functools import reduce
 import collections
 from pathlib import Path
 from . import DirectoryStash
 
 logger = logging.getLogger(__name__)
+
+
+class MissingDataKeys(ValueError):
+    def __init__(self, keys: set):
+        super().__init__(f'missing data keys: {keys}')
+        self.keys = keys
 
 
 class DirectoryCompositeStash(DirectoryStash):
@@ -51,7 +58,10 @@ class DirectoryCompositeStash(DirectoryStash):
                         respective directory
 
         :param attribute_name: the name of the attribute in each item to split
-                               across groups/directories
+                               across groups/directories; the instance data to
+                               persist has the composite attribute of type
+                               ``dict``
+
 
         :param load_keys: the keys used to load the data from the composite
                           stashs in to the attribute ``dict`` instance; only
@@ -67,6 +77,7 @@ class DirectoryCompositeStash(DirectoryStash):
         self.stash_by_attribute = stashes
         self.path = self.path / self.INSTANCE_DIRECTORY_NAME
         self.groups = groups
+        self.all_keys = reduce(lambda a, b: a | b, groups)
         self.load_keys = load_keys
         self.attribute_name = attribute_name
         comps: Set[str]
@@ -89,22 +100,27 @@ class DirectoryCompositeStash(DirectoryStash):
                 stashes[k] = comp_stash
                 self.stash_by_group[name] = comp_stash
 
-    def _to_composite(self, inst: Any, data: dict) -> \
-            Tuple[str, Any, Tuple[str, Any]]:
+    def _to_composite(self, data: dict) -> Tuple[str, Any, Tuple[str, Any]]:
         """Create the composite data used to by the composite stashes to persist.
 
-        :param inst: the instance data to persist having the composite
-                     attribute of type ``dict``
+        :param data: the data item stored as the attribute in ``inst`` to
+                     persist
 
         :return: a tuple with the following:
                  * attribute name
                  * original attriubte value to be repopulated after pickling
                  * context used when loading, which is the ordered keys for now
                  * list of tuples each having (stash name, data dict)
+
         """
         data_group = collections.defaultdict(lambda: {})
         is_ordered = isinstance(data, collections.OrderedDict)
         context = tuple(data.keys()) if is_ordered else None
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'keys: {data.keys()}, groups: {self.all_keys}')
+        missing_keys = self.all_keys - set(data.keys())
+        if len(missing_keys) > 0:
+            raise MissingDataKeys(missing_keys)
         for k, v in data.items():
             if k not in self.stash_by_attribute:
                 raise ValueError(
@@ -120,7 +136,7 @@ class DirectoryCompositeStash(DirectoryStash):
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'dump {name}({self.attribute_name}) -> {inst.__class__}')
         org_attr_val = getattr(inst, self.attribute_name)
-        context, composite = self._to_composite(inst, org_attr_val)
+        context, composite = self._to_composite(org_attr_val)
         try:
             setattr(inst, self.attribute_name, None)
             for group_name, composite_inst in composite:

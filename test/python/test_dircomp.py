@@ -5,7 +5,11 @@ import logging
 import shutil
 from pathlib import Path
 import unittest
-from zensols.persist import DelegateDefaults, DirectoryCompositeStash
+from zensols.persist import (
+    DelegateDefaults,
+    DirectoryCompositeStash,
+    MissingDataKeys,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +65,7 @@ class TestDirectoryCompStash(unittest.TestCase):
         stash = DcsTestStash(path, self.groups)
         self.assertFalse(path.exists())
         di = DataItem(1, 2, 'rover', 'fuzzy')
-        composite = stash._to_composite(di, di.agg)[1]
+        composite = stash._to_composite(di.agg)[1]
         composite = dict(composite)
         self.assertEqual(set(composite.keys()), set('apple-orange cat-dog'.split()))
         s1 = composite['apple-orange']
@@ -134,3 +138,10 @@ class TestDirectoryCompStash(unittest.TestCase):
         dat_path.unlink()
         di2 = stash.load('1')
         self.assertEqual({'apple': 1}, di2.agg)
+
+    def test_dump_missing(self):
+        path = self.targdir / 'dump_missing'
+        stash = DcsTestStash(path, self.groups)
+        di = DataItem(1, 2, 'rover', 'fuzzy')
+        del di.agg['dog']
+        self.assertRaises(MissingDataKeys, lambda: stash.dump('1', di))
