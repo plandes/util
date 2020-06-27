@@ -23,8 +23,9 @@ class Writable(ABC):
     WRITABLE_INDENT_SPACE = 4
     WRITABLE_MAX_COL = 80
 
-    def _trunc(self, s: str, max_len: int = None) -> str:
-        max_len = self.WRITABLE_MAX_COL if max_len is None else max_len
+    @classmethod
+    def _trunc(cls, s: str, max_len: int = None) -> str:
+        max_len = cls.WRITABLE_MAX_COL if max_len is None else max_len
         sl = len(s)
         if sl >= max_len:
             ml = max_len - 3
