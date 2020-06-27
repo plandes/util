@@ -1,3 +1,10 @@
+"""A class that allows human readable information (sometimes debugging) output
+with a hierarchical structure.
+
+"""
+__author__ = 'Paul Landes'
+
+from typing import Union
 from abc import ABC, abstractmethod
 import sys
 from io import TextIOWrapper
@@ -14,6 +21,15 @@ class Writable(ABC):
 
     """
     WRITABLE_INDENT_SPACE = 4
+    WRITABLE_MAX_COL = 80
+
+    def _trunc(self, s: str, max_len: int = None) -> str:
+        max_len = self.WRITABLE_MAX_COL if max_len is None else max_len
+        sl = len(s)
+        if sl >= max_len:
+            ml = max_len - 3
+            s = s[:ml] + '...'
+        return s
 
     def _sp(self, depth: int):
         """Utility method to create a space string.
@@ -34,12 +50,22 @@ class Writable(ABC):
         _get_str_space.cache_clear()
 
     def _write_line(self, line: str, depth: int = 0,
-                    writer: TextIOWrapper = sys.stdout):
+                    writer: TextIOWrapper = sys.stdout,
+                    max_len: Union[bool, int] = False):
         """Write a line of text ``line`` with the correct indentation per ``depth`` to
         ``writer``.
 
         """
-        writer.write(f'{self._sp(depth)}{line}\n')
+        s = f'{self._sp(depth)}{line}'
+        if max_len is True:
+            s = self._trunc(s)
+        elif max_len is False:
+            pass
+        elif isinstance(max_len, int):
+            s = self._trunc(s, max_len)
+        else:
+            raise ValueError('max_len must either be a boolean or integer')
+        writer.write(s + '\n')
 
     def _write_dict(self, data: dict, depth: int = 0,
                     writer: TextIOWrapper = sys.stdout):
