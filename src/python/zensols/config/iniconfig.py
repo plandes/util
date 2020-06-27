@@ -89,6 +89,7 @@ class IniConfig(Configurable):
                     if fpath.is_file():
                         with open(fpath) as f:
                             agg.write(f.read())
+                        agg.write('\n')
                 self._conf = self._create_config_parser()
                 agg.seek(0)
                 self._conf.read_file(agg)
