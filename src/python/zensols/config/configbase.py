@@ -8,7 +8,7 @@ from abc import ABCMeta, abstractmethod
 import logging
 from pathlib import Path
 import sys
-from io import TextIOWrapper
+from io import TextIOBase
 import inspect
 import pkg_resources
 from . import Serializer, Writable
@@ -216,7 +216,7 @@ class Configurable(Writable, metaclass=ABCMeta):
         """
         to_populate.copy_sections(self, to_populate.sections)
 
-    def write(self, depth: int = 0, writer: TextIOWrapper = sys.stdout):
+    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         """Print a human readable list of sections and options.
 
         """

@@ -7,7 +7,7 @@ __author__ = 'Paul Landes'
 from typing import Union
 from abc import ABC, abstractmethod
 import sys
-from io import TextIOWrapper
+from io import TextIOBase
 from functools import lru_cache
 
 
@@ -51,7 +51,7 @@ class Writable(ABC):
         _get_str_space.cache_clear()
 
     def _write_line(self, line: str, depth: int = 0,
-                    writer: TextIOWrapper = sys.stdout,
+                    writer: TextIOBase = sys.stdout,
                     max_len: Union[bool, int] = False):
         """Write a line of text ``line`` with the correct indentation per ``depth`` to
         ``writer``.
@@ -69,7 +69,7 @@ class Writable(ABC):
         writer.write(s + '\n')
 
     def _write_dict(self, data: dict, depth: int = 0,
-                    writer: TextIOWrapper = sys.stdout):
+                    writer: TextIOBase = sys.stdout):
         """Write dictionary ``data`` with the correct indentation per ``depth`` to
         ``writer``.
 
@@ -84,7 +84,7 @@ class Writable(ABC):
                 writer.write(f'{sp}{k}: {v}\n')
 
     @abstractmethod
-    def write(self, depth: int = 0, writer: TextIOWrapper = sys.stdout):
+    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         """Write the contents of this instance to ``writer`` using indention ``depth``.
 
         """

@@ -9,7 +9,7 @@ from typing import Set, Type, Any
 import logging
 import sys
 import collections
-from io import TextIOWrapper
+from io import TextIOBase
 from zensols.config import ClassResolver, Writable
 
 logger = logging.getLogger(__name__)
@@ -129,12 +129,12 @@ class ClassExplorer(Writable):
         return dat
 
     def write(self, inst: Any, depth: int = 0,
-              writer: TextIOWrapper = sys.stdout):
+              writer: TextIOBase = sys.stdout):
         meta = self.get_metadata(inst)
         self._write(meta, depth, None, writer)
 
     def write_metadata(self, depth: int = 0,
-                       writer: TextIOWrapper = sys.stdout,
+                       writer: TextIOBase = sys.stdout,
                        metadata: dict = None):
         self._write(metadata, depth, None, writer)
         
