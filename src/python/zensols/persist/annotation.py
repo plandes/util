@@ -229,7 +229,7 @@ class PersistedWork(Deallocatable):
         return self.__str__()
 
 
-class PersistableContainerMetadata(Deallocatable):
+class PersistableContainerMetadata(object):
     def __init__(self, container):
         super().__init__()
         self.container = container
@@ -267,11 +267,6 @@ class PersistableContainerMetadata(Deallocatable):
         """
         for pw in self.persisted.values():
             pw.clear()
-
-    def deallocate(self):
-        super().deallocate()
-        for pw in self.persisted.values():
-            pw.deallocate()
 
 
 class PersistableContainer(Deallocatable):
@@ -312,7 +307,8 @@ class PersistableContainer(Deallocatable):
 
     def deallocate(self):
         super().deallocate()
-        self._get_persistable_metadata().deallocate()
+        for pw in self._get_persistable_metadata().persisted.values():
+            pw.deallocate()
 
 
 class persisted(object):
