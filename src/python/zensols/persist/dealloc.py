@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any
+from typing import Any, Union, Callable
 from abc import ABC
 import logging
 import traceback
@@ -73,13 +73,36 @@ class Deallocatable(ABC):
 
 class dealloc(object):
     """Object used with a ``with`` scope for deallocating any subclass of
-    :class:`Deallocatable``.
+    :class:`Deallocatable``.  The first argument can also be a function, which
+    is useful when tracking deallocations when ``track`` is ``True``.
 
-    with dealloc(ImportClassFactory('some/path')) as fac:
-        return fac.instance('stash')
+    Example:
+        with dealloc(lambda: ImportClassFactory('some/path')) as fac:
+            return fac.instance('stash')
 
     """
-    def __init__(self, inst: Deallocatable):
+    def __init__(self, inst: Union[Callable, Deallocatable],
+                 track: bool = False, include_stack: bool = False):
+        """Initialize.
+
+        :param inst: either an object instance to deallocate or a callable that
+                     creates the instance to deallocate
+
+        :param track: when ``True``, set
+                      :py:attrib:~`.Deallocatable.ALLOCATION_TRACKING` to
+                      ``True`` to start tracking allocations
+
+        :param include_stack: adds stack traces in the call to
+                              :py:meth:`.Deallocatable._print_undeallocated`
+
+        """
+        self.track = track
+        self.include_stack = include_stack
+        self.org_track = Deallocatable.ALLOCATION_TRACKING
+        if track:
+            Deallocatable.ALLOCATION_TRACKING = True
+        if callable(inst):
+            inst = inst()
         self.inst = inst
 
     def __enter__(self):
@@ -87,3 +110,6 @@ class dealloc(object):
 
     def __exit__(self, type, value, traceback):
         self.inst.deallocate()
+        if self.track:
+            Deallocatable._print_undeallocated(self.include_stack)
+        Deallocatable.ALLOCATION_TRACKING = self.org_track
