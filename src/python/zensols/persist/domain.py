@@ -358,7 +358,7 @@ class PreemptiveStash(DelegateStash):
 class PrimeableStash(Stash):
     def prime(self):
         if isinstance(self, DelegateStash) and \
-           isinstance(self.delete, PrimeableStash):
+           isinstance(self.delegate, PrimeableStash):
             self.delegate.prime()
 
 
