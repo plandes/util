@@ -133,8 +133,9 @@ class DirectoryCompositeStash(DirectoryStash):
         return context, data_group
 
     def dump(self, name: str, inst: Any):
-        if logger.isEnabledFor(logging.INFO):
-            logger.info(f'dump {name}({self.attribute_name}) -> {inst.__class__}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'dump {name}({self.attribute_name}) ' +
+                         f'-> {inst.__class__}')
         org_attr_val = getattr(inst, self.attribute_name)
         context, composite = self._to_composite(org_attr_val)
         try:
@@ -191,7 +192,7 @@ class DirectoryCompositeStash(DirectoryStash):
     def load(self, name: str) -> Any:
         inst, context = super().load(name)
         attr_val = self._from_composite(name, context)
-        if logger.isEnabledFor(logging.INFO):
-            logger.info(f'loaded {name}({self.attribute_name})')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'loaded {name}({self.attribute_name})')
         setattr(inst, self.attribute_name, attr_val)
         return inst

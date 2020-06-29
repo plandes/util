@@ -222,6 +222,9 @@ class PersistedWork(Deallocatable):
         if include_content:
             writer.write(f'{sp}content: {self()}\n')
 
+    def _deallocate_str(self) -> str:
+        return f'{self.varname} => {type(self.owner)}'
+
     def __str__(self):
         return self.varname
 

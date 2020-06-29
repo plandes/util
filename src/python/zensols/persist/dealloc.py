@@ -30,7 +30,7 @@ class Deallocatable(ABC):
             sio = StringIO()
             traceback.print_stack(file=sio)
             if self.logger.isEnabledFor(logging.DEBUG):
-                self.logger.debug(f'adding allocated key: {k} = {type(self)}')
+                self.logger.debug(f'adding allocated key: {k} -> {type(self)}')
             self.ALLOCATIONS[k] = (self, sio.getvalue())
 
     def deallocate(self):
@@ -41,17 +41,25 @@ class Deallocatable(ABC):
         if self.PRINT_TRACE:
             traceback.print_stack()
         if self.logger.isEnabledFor(logging.DEBUG):
-            self.logger.debug(f'deallocating {k}: {self.__class__}')
+            self.logger.debug(f'deallocating {k}: {self._deallocate_str()}')
         if self.ALLOCATION_TRACKING:
             if k in self.ALLOCATIONS:
                 if self.logger.isEnabledFor(logging.DEBUG):
                     self.logger.debug(f'removing allocated key: {k}')
                 del self.ALLOCATIONS[k]
             else:
-                self.logger.info(f'no key to deallocate: {k} ({type(self)})')
+                if self.logger.isEnabledFor(logging.DEBUG):
+                    self.logger.debug(f'no key to deallocate: {k} ' +
+                                      f'({self._deallocate_str()})')
 
-    def _try_deallocate(self, obj: Any):
+    def _deallocate_str(self) -> str:
+        return str(self.__class__)
+
+    @staticmethod
+    def _try_deallocate(obj: Any):
         cls = globals()['Deallocatable']
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'trying to deallocate: {type(obj)}')
         if isinstance(obj, cls):
             obj.deallocate()
             return True

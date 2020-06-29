@@ -196,7 +196,8 @@ class DirectoryStash(Stash):
 
         """
         fname = self.pattern.format(**{'name': name})
-        logger.debug(f'path {self.path}: {self.path.exists()}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'path {self.path}: {self.path.exists()}')
         self.assert_path_dir()
         return Path(self.path, fname)
 
@@ -204,10 +205,12 @@ class DirectoryStash(Stash):
         path = self.key_to_path(name)
         inst = None
         if path.exists():
-            logger.info(f'loading instance from {path}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'loading instance from {path}')
             with open(path, 'rb') as f:
                 inst = pickle.load(f)
-        logger.debug(f'loaded instance: {inst}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'loaded instance: {inst}')
         return inst
 
     def exists(self, name) -> bool:
@@ -223,7 +226,8 @@ class DirectoryStash(Stash):
                 if 'name' in p:
                     return p['name']
 
-        logger.debug(f'checking path {self.path} ({type(self.path)})')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'checking path {self.path} ({type(self.path)})')
         if not self.path.is_dir():
             keys = ()
         else:
@@ -232,13 +236,15 @@ class DirectoryStash(Stash):
         return keys
 
     def dump(self, name: str, inst: Any):
-        logger.info(f'saving instance: {inst}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'saving instance: {name} -> {type(inst)}')
         path = self.key_to_path(name)
         with open(path, 'wb') as f:
             pickle.dump(inst, f)
 
     def delete(self, name: str):
-        logger.info(f'deleting instance: {name}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'deleting instance: {name}')
         path = self.key_to_path(name)
         if path.exists():
             path.unlink()
@@ -296,7 +302,8 @@ class IncrementKeyDirectoryStash(DirectoryStash):
         else:
             key = name_or_inst
         path = self.key_to_path(key)
-        logger.debug(f'dumping result {self.name} to {path}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'dumping result {self.name} to {path}')
         super().dump(key, inst)
 
     def load(self, name: str = None) -> Any:
