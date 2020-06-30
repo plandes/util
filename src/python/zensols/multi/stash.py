@@ -65,12 +65,6 @@ class ChunkProcessor(object):
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'dumping {id} -> {inst.__class__}')
                 stash.delegate.dump(id, inst)
-                # if i == 0:
-                #     Deallocatable.ALLOCATION_TRACKING = True
-                # elif i == 1:
-                #     Deallocatable._try_deallocate(inst)
-                #     Deallocatable._print_undeallocated(True)
-                #     raise ValueError('HERE')
                 del inst
                 cnt += 1
         Deallocatable._try_deallocate(stash)
