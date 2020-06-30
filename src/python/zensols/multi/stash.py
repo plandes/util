@@ -7,6 +7,7 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from typing import Iterable, List, Any, Tuple, Callable, Union
 import os
+import gc
 import logging
 import math
 from multiprocessing import Pool
@@ -19,6 +20,7 @@ from zensols.persist import (
     PreemptiveStash,
     PrimeableStash,
     chunks,
+    Deallocatable,
 )
 
 logger = logging.getLogger(__name__)
@@ -43,23 +45,37 @@ class ChunkProcessor(object):
 
     def _create_stash(self):
         fac = ImportConfigFactory(self.config)
-        with time(f'constructed instance of {self.name}', logging.DEBUG):
+        with time(f'factory inst {self.name} for chunk {self.chunk_id}',
+                  logging.INFO):
             inst = fac.instance(self.name)
             inst.is_child = True
-            return inst
+            return fac, inst
 
     def process(self):
         """Create the stash used to process the data, then persisted in the stash.
 
         """
-        stash = self._create_stash()
+        factory, stash = self._create_stash()
         cnt = 0
-        logger.debug(f'processing chunk with stash {stash.__class__}')
-        for id, inst in stash._process(self.data):
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'dumping {id} -> {inst.__class__}')
-            stash.delegate.dump(id, inst)
-            cnt += 1
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'processing chunk {self.chunk_id} ' +
+                        f'with stash {stash.__class__}')
+        with time('processed {cnt} items for chunk {self.chunk_id}'):
+            for i, (id, inst) in enumerate(stash._process(self.data)):
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'dumping {id} -> {inst.__class__}')
+                stash.delegate.dump(id, inst)
+                # if i == 0:
+                #     Deallocatable.ALLOCATION_TRACKING = True
+                # elif i == 1:
+                #     Deallocatable._try_deallocate(inst)
+                #     Deallocatable._print_undeallocated(True)
+                #     raise ValueError('HERE')
+                del inst
+                cnt += 1
+        Deallocatable._try_deallocate(stash)
+        Deallocatable._try_deallocate(factory)
+        gc.collect()
         return cnt
 
     def __str__(self):
@@ -120,6 +136,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
             self.workers = os.cpu_count() + self.workers
         self.is_child = False
 
+
     @abstractmethod
     def _create_data(self) -> Union[List[Any], Iterable[Any]]:
         """Create data in the parent process to be processed in the child process(es)
@@ -141,7 +158,8 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         process.
 
         """
-        logger.info(f'processing chunk {chunk}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.info(f'processing chunk {chunk}')
         with time(f'processed chunk {chunk}'):
             return chunk.process()
 
@@ -149,7 +167,8 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         """Factory method to create the ``ChunkProcessor`` instance.
 
         """
-        logger.debug(f'creating chunk processor for id {chunk_id}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'creating chunk processor for id {chunk_id}')
         return ChunkProcessor(self.config, self.name, chunk_id, data)
 
     def _invoke_pool(self, pool: Pool, fn: Callable, data: iter) -> int:
@@ -169,8 +188,9 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
             chunk_size = math.ceil(len(data) / workers)
         data = map(lambda x: self._create_chunk_processor(*x),
                    enumerate(chunks(data, chunk_size)))
-        logger.info(f'spawning work with chunk size {chunk_size} ' +
-                    f'across {workers} workers')
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'spawning work with chunk size {chunk_size} ' +
+                        f'across {workers} workers')
         with Pool(workers) as p:
             with time('processed chunks'):
                 cnt = self._invoke_pool(p, self.__class__._process_work, data)
@@ -181,9 +201,11 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         generate the data and process in children processes.
 
         """
-        logger.debug(f'multi prime, is child: {self.is_child}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'multi prime, is child: {self.is_child}')
         has_data = self.has_data
-        logger.debug(f'asserting data: {has_data}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'asserting data: {has_data}')
         if not has_data:
             with time('completed work in {self.__class__.__name__}'):
                 self._spawn_work()
