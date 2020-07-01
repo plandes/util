@@ -7,7 +7,7 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from typing import Iterable, List, Any, Tuple, Callable, Union
 import os
-import gc
+#import gc
 import logging
 import math
 from multiprocessing import Pool
@@ -69,7 +69,7 @@ class ChunkProcessor(object):
                 cnt += 1
         Deallocatable._try_deallocate(stash)
         Deallocatable._try_deallocate(factory)
-        gc.collect()
+        #gc.collect()
         return cnt
 
     def __str__(self):
@@ -106,10 +106,10 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
                        minimize the number of chunks (in this case the data is
                        tupleized)
     :param workers: the number of processes spawned to accomplish the work; if
-                     this is a negative number, add the number of CPU
-                     processors with this number, so -1 would result in one
-                     fewer works utilized than the number of CPUs, which is a
-                     good policy for a busy server.
+                    this is a negative number, add the number of CPU
+                    processors with this number, so -1 would result in one
+                    fewer works utilized than the number of CPUs, which is a
+                    good policy for a busy server.
 
     .. document private functions
     .. automethod:: _create_data
