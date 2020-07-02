@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Union, Callable
+from typing import Any, Union, Callable, Tuple
 from abc import ABC
 import logging
 import traceback
@@ -21,7 +21,6 @@ class Deallocatable(ABC):
     PRINT_TRACE = False
     ALLOCATION_TRACKING = False
     ALLOCATIONS = {}
-    logger = logging.getLogger(__name__)
 
     def __init__(self):
         super().__init__()
@@ -29,8 +28,8 @@ class Deallocatable(ABC):
             k = id(self)
             sio = StringIO()
             traceback.print_stack(file=sio)
-            if self.logger.isEnabledFor(logging.DEBUG):
-                self.logger.debug(f'adding allocated key: {k} -> {type(self)}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'adding allocated key: {k} -> {type(self)}')
             self.ALLOCATIONS[k] = (self, sio.getvalue())
 
     def deallocate(self):
@@ -40,23 +39,35 @@ class Deallocatable(ABC):
         k = id(self)
         if self.PRINT_TRACE:
             traceback.print_stack()
-        if self.logger.isEnabledFor(logging.DEBUG):
-            self.logger.debug(f'deallocating {k}: {self._deallocate_str()}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'deallocating {k}: {self._deallocate_str()}')
+        self._mark_deallocated(k)
+
+    def _mark_deallocated(self, obj: Any = None):
+        """Mark ``obj`` as deallocated regardless if it is, or ever will be
+        deallocated.  After this is called, it will not be reported in such
+        methods as :py:meth:`.Deallocatable._print_undeallocated`.
+
+        """
+        if obj is None:
+            k = id(self)
+        else:
+            k = obj
         if self.ALLOCATION_TRACKING:
             if k in self.ALLOCATIONS:
-                if self.logger.isEnabledFor(logging.DEBUG):
-                    self.logger.debug(f'removing allocated key: {k}')
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'removing allocated key: {k}')
                 del self.ALLOCATIONS[k]
             else:
-                if self.logger.isEnabledFor(logging.DEBUG):
-                    self.logger.debug(f'no key to deallocate: {k} ' +
-                                      f'({self._deallocate_str()})')
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'no key to deallocate: {k} ' +
+                                 f'({self._deallocate_str()})')
 
     def _deallocate_str(self) -> str:
         return str(self.__class__)
 
     @staticmethod
-    def _try_deallocate(obj: Any):
+    def _try_deallocate(obj: Any) -> bool:
         cls = globals()['Deallocatable']
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'trying to deallocate: {type(obj)}')
@@ -64,6 +75,29 @@ class Deallocatable(ABC):
             obj.deallocate()
             return True
         return False
+
+    def _deallocate_attribute(self, attrib: str) -> bool:
+        """Deallocate attribute ``attrib`` if possible, which means it both exists and
+        extends from this class.
+
+        """
+        deallocd = False
+        if hasattr(self, attrib):
+            inst = getattr(self, attrib)
+            deallocd = self._try_deallocate(inst)
+            delattr(self, attrib)
+        return deallocd
+
+    def _deallocate_attributes(self, attribs: Tuple[str]) -> int:
+        """Deallocates all attributes in ``attribs`` using
+        :py:meth:`.Deallocatable._deallocate_attribute`.
+
+        """
+        cnt = 0
+        for attrib in attribs:
+            if self._deallocate_attribute(attrib):
+                cnt += 1
+        return cnt
 
     @classmethod
     def _print_undeallocated(self, include_stack: bool = False):
