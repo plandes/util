@@ -8,6 +8,7 @@ from abc import ABC
 import logging
 import traceback
 from io import StringIO
+from zensols.util import time
 
 logger = logging.getLogger(__name__)
 
@@ -63,9 +64,6 @@ class Deallocatable(ABC):
                     logger.debug(f'no key to deallocate: {k} ' +
                                  f'({self._deallocate_str()})')
 
-    def _deallocate_str(self) -> str:
-        return str(self.__class__)
-
     @staticmethod
     def _try_deallocate(obj: Any) -> bool:
         cls = globals()['Deallocatable']
@@ -85,7 +83,8 @@ class Deallocatable(ABC):
         if hasattr(self, attrib):
             inst = getattr(self, attrib)
             deallocd = self._try_deallocate(inst)
-            delattr(self, attrib)
+            with time(f'deallocated {type(self)}.{attrib}', logging.DEUBG):
+                delattr(self, attrib)
         return deallocd
 
     def _deallocate_attributes(self, attribs: Tuple[str]) -> int:
@@ -111,6 +110,9 @@ class Deallocatable(ABC):
             print(f'{k} -> {vstr}')
             if include_stack:
                 print(stack)
+
+    def _deallocate_str(self) -> str:
+        return str(self.__class__)
 
 
 class dealloc(object):
