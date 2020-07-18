@@ -83,8 +83,9 @@ class Deallocatable(ABC):
         if hasattr(self, attrib):
             inst = getattr(self, attrib)
             deallocd = self._try_deallocate(inst)
-            with time(f'deallocated {type(self)}.{attrib}', logging.DEUBG):
-                delattr(self, attrib)
+            if logger.isEnabledFor(logging.DEBUG):
+                logging.debug(f'deallocated {type(self)}.{attrib}')
+            delattr(self, attrib)
         return deallocd
 
     def _deallocate_attributes(self, attribs: Tuple[str]) -> int:

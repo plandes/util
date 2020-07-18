@@ -331,21 +331,24 @@ class persisted(object):
     def __init__(self, name, path=None, cache_global=False,
                  transient=False):
         super().__init__()
-        logger.debug('persisted decorator on attr: {}, global={}'.format(
-            name, cache_global))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'persisted decorator on attr: {name}, ' +
+                         f'global={cache_global}')
         self.attr_name = name
         self.path = path
         self.cache_global = cache_global
         self.transient = transient
 
     def __call__(self, fn):
-        logger.debug(f'call: {fn}:{self.attr_name}:{self.path}:' +
-                     f'{self.cache_global}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'call: {fn}:{self.attr_name}:{self.path}:' +
+                         f'{self.cache_global}')
 
         def wrapped(*argv, **kwargs):
             inst = argv[0]
-            logger.debug(f'wrap: {fn}:{self.attr_name}:{self.path}:' +
-                         f'{self.cache_global}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'wrap: {fn}:{self.attr_name}:{self.path}:' +
+                             f'{self.cache_global}')
             if hasattr(inst, self.attr_name):
                 pwork = getattr(inst, self.attr_name)
             else:
@@ -390,16 +393,19 @@ class resource(object):
         :param create_method_name: the name of the method that allocates
         :param destroy_method_name: the name of the method that deallocates
         """
-        logger.debug(f'connection decorator {create_method_name} ' +
-                     f'destructor method name: {destroy_method_name}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'connection decorator {create_method_name} ' +
+                         f'destructor method name: {destroy_method_name}')
         self.create_method_name = create_method_name
         self.destroy_method_name = destroy_method_name
 
     def __call__(self, fn):
-        logger.debug(f'connection call with fn: {fn}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'connection call with fn: {fn}')
 
         def wrapped(*argv, **kwargs):
-            logger.debug(f'in wrapped {self.create_method_name}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'in wrapped {self.create_method_name}')
             inst = argv[0]
             resource = getattr(inst, self.create_method_name)()
             try:
