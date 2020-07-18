@@ -357,8 +357,23 @@ class PreemptiveStash(DelegateStash):
         self._reset_has_data()
 
 
+class Primeable(ABC):
+    """Any subclass that has the ability (and need) to do preprocessing.  For
+    stashes, this means processing before an CRUD method is invoked.  For all
+    other classes it usually is some processing that must be done in a single
+    process.
+
+    """
+    def prime(self):
+        pass
+
+
 @dataclass
-class PrimeableStash(Stash):
+class PrimeableStash(Stash, Primeable):
+    """Any subclass that has the ability to do processing before any CRUD method is
+    invoked.
+
+    """
     def prime(self):
         if isinstance(self, DelegateStash) and \
            isinstance(self.delegate, PrimeableStash):
