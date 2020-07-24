@@ -36,7 +36,7 @@ class PersistedWork(Deallocatable):
     """
     def __init__(self, path: Union[str, Path], owner: object,
                  cache_global: bool = False, transient: bool = False,
-                 initial_value: Any = None):
+                 initial_value: Any = None, mkdir: bool = False):
         """Create an instance of the class.
 
         :param path: if type of ``pathlib.Path`` then use disk storage to cache
@@ -51,7 +51,7 @@ class PersistedWork(Deallocatable):
         """
         super().__init__()
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('pw inst: path={}, global={}'.format(path, cache_global))
+            logger.debug(f'pw inst: path={path}, global={cache_global}')
         self.owner = owner
         self.cache_global = cache_global
         self.transient = transient
@@ -68,6 +68,7 @@ class PersistedWork(Deallocatable):
         self.varname = f'_{cstr}_{fname}_pwvinst'
         if initial_value is not None:
             self.set(initial_value)
+        self.mkdir = mkdir
 
     def _info(self, msg, *args):
         if logger.isEnabledFor(logging.DEBUG):
@@ -135,6 +136,8 @@ class PersistedWork(Deallocatable):
                 obj = pickle.load(f)
         else:
             self._info('saving work to {}'.format(self.path))
+            if self.mkdir:
+                self.path.parent.mkdir(parents=True, exist_ok=True)
             with open(self.path, 'wb') as f:
                 obj = self._do_work(*argv, **kwargs)
                 pickle.dump(obj, f)
