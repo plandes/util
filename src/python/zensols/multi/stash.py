@@ -7,7 +7,6 @@ from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
 from typing import Iterable, List, Any, Tuple, Callable, Union
 import os
-#import gc
 import logging
 import math
 from multiprocessing import Pool
@@ -80,7 +79,7 @@ class ChunkProcessor(object):
             dtype = data.__class__.__name__
         else:
             dtype = 'None'
-        return f'{self.chunk_id}: {self.name}: data: {dtype}'
+        return f'{self.name} ({self.chunk_id}): data: {dtype}'
 
 
 @dataclass
@@ -121,6 +120,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
 
     """
     ATTR_EXP_META = ('chunk_size', 'workers')
+    name: str
     chunk_size: int
     workers: int
 
@@ -129,7 +129,6 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         if self.workers < 1:
             self.workers = os.cpu_count() + self.workers
         self.is_child = False
-
 
     @abstractmethod
     def _create_data(self) -> Union[List[Any], Iterable[Any]]:
@@ -183,8 +182,8 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         data = map(lambda x: self._create_chunk_processor(*x),
                    enumerate(chunks(data, chunk_size)))
         if logger.isEnabledFor(logging.INFO):
-            logger.info(f'spawning work with chunk size {chunk_size} ' +
-                        f'across {workers} workers')
+            logger.info(f'{self.name}: spawning work with ' +
+                        f'chunk size {chunk_size} across {workers} workers')
         with Pool(workers) as p:
             with time('processed chunks'):
                 cnt = self._invoke_pool(p, self.__class__._process_work, data)
