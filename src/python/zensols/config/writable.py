@@ -4,7 +4,7 @@ with a hierarchical structure.
 """
 __author__ = 'Paul Landes'
 
-from typing import Union
+from typing import Union, Any, Iterable
 from abc import ABC, abstractmethod
 import sys
 from io import TextIOBase
@@ -68,6 +68,34 @@ class Writable(ABC):
             raise ValueError('max_len must either be a boolean or integer')
         writer.write(s + '\n')
 
+    def _write_block(self, lines: str, depth: int = 0,
+                     writer: TextIOBase = sys.stdout):
+        sp = self._sp(depth)
+        for line in lines.split('\n'):
+            writer.write(sp)
+            writer.write(line)
+            writer.write('\n')
+
+    def _write_object(self, obj: Any, depth: int = 0,
+                      writer: TextIOBase = sys.stdout):
+        if isinstance(obj, dict):
+            self._write_dict(obj, depth, writer)
+        elif isinstance(obj, (list, tuple, set)):
+            self._write_iterable(obj, depth, writer)
+        elif isinstance(obj, WRITABLE_CLASS):
+            obj.write(depth, writer)
+        else:
+            self._write_line(str(obj), depth, writer)
+
+    def _write_iterable(self, data: Iterable[Any], depth: int = 0,
+                        writer: TextIOBase = sys.stdout):
+        """Write list ``data`` with the correct indentation per ``depth`` to
+        ``writer``.
+
+        """
+        for v in data:
+            self._write_object(v, depth, writer)
+
     def _write_dict(self, data: dict, depth: int = 0,
                     writer: TextIOBase = sys.stdout):
         """Write dictionary ``data`` with the correct indentation per ``depth`` to
@@ -77,9 +105,9 @@ class Writable(ABC):
         sp = self._sp(depth)
         for k in sorted(data.keys()):
             v = data[k]
-            if isinstance(v, dict):
+            if isinstance(v, (dict, list, tuple, WRITABLE_CLASS)):
                 writer.write(f'{sp}{k}:\n')
-                self._write_dict(v, depth + 1, writer)
+                self._write_object(v, depth + 1, writer)
             else:
                 writer.write(f'{sp}{k}: {v}\n')
 
@@ -89,3 +117,6 @@ class Writable(ABC):
 
         """
         pass
+
+
+WRITABLE_CLASS = Writable
