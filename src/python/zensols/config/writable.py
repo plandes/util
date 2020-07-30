@@ -50,8 +50,7 @@ class Writable(ABC):
         self._indent = indent
         _get_str_space.cache_clear()
 
-    def _write_line(self, line: str, depth: int = 0,
-                    writer: TextIOBase = sys.stdout,
+    def _write_line(self, line: str, depth: int, writer: TextIOBase,
                     max_len: Union[bool, int] = False):
         """Write a line of text ``line`` with the correct indentation per ``depth`` to
         ``writer``.
@@ -68,16 +67,14 @@ class Writable(ABC):
             raise ValueError('max_len must either be a boolean or integer')
         writer.write(s + '\n')
 
-    def _write_block(self, lines: str, depth: int = 0,
-                     writer: TextIOBase = sys.stdout):
+    def _write_block(self, lines: str, depth: int, writer: TextIOBase):
         sp = self._sp(depth)
         for line in lines.split('\n'):
             writer.write(sp)
             writer.write(line)
             writer.write('\n')
 
-    def _write_object(self, obj: Any, depth: int = 0,
-                      writer: TextIOBase = sys.stdout):
+    def _write_object(self, obj: Any, depth: int, writer: TextIOBase):
         if isinstance(obj, dict):
             self._write_dict(obj, depth, writer)
         elif isinstance(obj, (list, tuple, set)):
@@ -87,8 +84,8 @@ class Writable(ABC):
         else:
             self._write_line(str(obj), depth, writer)
 
-    def _write_iterable(self, data: Iterable[Any], depth: int = 0,
-                        writer: TextIOBase = sys.stdout):
+    def _write_iterable(self, data: Iterable[Any], depth: int,
+                        writer: TextIOBase):
         """Write list ``data`` with the correct indentation per ``depth`` to
         ``writer``.
 
@@ -96,8 +93,7 @@ class Writable(ABC):
         for v in data:
             self._write_object(v, depth, writer)
 
-    def _write_dict(self, data: dict, depth: int = 0,
-                    writer: TextIOBase = sys.stdout):
+    def _write_dict(self, data: dict, depth: int, writer: TextIOBase):
         """Write dictionary ``data`` with the correct indentation per ``depth`` to
         ``writer``.
 

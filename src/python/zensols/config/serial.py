@@ -109,7 +109,7 @@ class Serializer(object):
             parsed = None
             m = self.PATH_REGEXP.match(v)
             if m:
-                parsed = Path(m.group(1))
+                parsed = Path(m.group(1)).expanduser()
             if parsed is None:
                 m = self.EVAL_REGEXP.match(v)
                 if m:
