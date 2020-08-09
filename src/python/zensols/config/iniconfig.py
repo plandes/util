@@ -30,12 +30,12 @@ class IniConfig(Configurable):
 
         Keyword arguments:
 
-        :param str config_file: the configuration file path to read from
+        :param config_file: the configuration file path to read from
 
-        :param str default_section: default section (defaults to `default`)
+        :param default_section: default section (defaults to `default`)
 
-        :param bool robust: if `True`, then don't raise an error when the
-                            configuration file is missing
+        :param robust: if `True`, then don't raise an error when the
+                       configuration file is missing
 
         :param default_expect: if ``True``, raise exceptions when keys and/or
                                sections are not found in the configuration
