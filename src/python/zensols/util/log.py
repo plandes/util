@@ -1,4 +1,5 @@
 import logging
+from logging import Logger
 import sys
 import threading
 from io import StringIO
@@ -50,8 +51,8 @@ class StreamLogDumper(threading.Thread):
                 line = line.rstrip()
                 self.logger.log(self.level, line)
 
-    @classmethod
-    def dump(clz, stdout, stderr, logger):
+    @staticmethod
+    def dump(stdout, stderr, logger: Logger):
         StreamLogDumper(stdout, logger, logging.INFO).start()
         StreamLogDumper(stderr, logger, logging.ERROR).start()
 

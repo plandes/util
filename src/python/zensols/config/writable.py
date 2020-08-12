@@ -7,7 +7,9 @@ __author__ = 'Paul Landes'
 from typing import Union, Any, Iterable
 from abc import ABC, abstractmethod
 import sys
-from io import TextIOBase
+import logging
+from logging import Logger
+from io import TextIOBase, StringIO
 from functools import lru_cache
 
 
@@ -111,8 +113,34 @@ class Writable(ABC):
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         """Write the contents of this instance to ``writer`` using indention ``depth``.
 
+        :param depth: the starting indentation depth
+
+        :param writer: the writer to dump the content of this writable
+
         """
         pass
+
+    def write_to_log(self, logger: Logger, level: int = logging.INFO,
+                     depth: int = 0, split_lines: bool = True):
+        """Just like :meth:`write` but write the content to a log message.
+
+        :param logger: the logger to write the message containing content of
+                       this writable
+
+        :param level: the logging level given in the :module:`logging` module
+
+        :param depth: the starting indentation depth
+
+        :param split_lines: if ``True`` each line is logged separately
+
+        """
+        sio = StringIO()
+        self.write(depth, sio)
+        lines = (sio.getvalue(),)
+        if split_lines:
+            lines = lines[0].strip().split('\n')
+        for line in lines:
+            logger.log(level, line)
 
 
 WRITABLE_CLASS = Writable
