@@ -70,6 +70,9 @@ class Writable(ABC):
         writer.write(s + '\n')
 
     def _write_block(self, lines: str, depth: int, writer: TextIOBase):
+        """Write a block of text with indentation.
+
+        """
         sp = self._sp(depth)
         for line in lines.split('\n'):
             writer.write(sp)
@@ -77,6 +80,9 @@ class Writable(ABC):
             writer.write('\n')
 
     def _write_object(self, obj: Any, depth: int, writer: TextIOBase):
+        """Write an object based on the class of the instance.
+
+        """
         if isinstance(obj, dict):
             self._write_dict(obj, depth, writer)
         elif isinstance(obj, (list, tuple, set)):
