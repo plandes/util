@@ -41,6 +41,7 @@ class TestDictable(unittest.TestCase):
         self.paul = Person(Name('paul', 'smith'), 23, '000-341-1057')
         self.emp_paul = Employee(Name('paul', 'smith'), 23, '000-341-1057', 10.23)
         self.emp_jan = Employee(Name('jan', 'doe'), 21, '999-341-1057', 15.56)
+        self.paulco = Company([self.emp_paul, self.emp_jan])
         self.maxDiff = sys.maxsize
 
     def test_fields(self):
@@ -65,11 +66,10 @@ class TestDictable(unittest.TestCase):
         self.assertEqual(shd, self.emp_paul._get_description())
 
     def test_composite(self):
-        paulco = Company([self.emp_paul, self.emp_jan])
         shd = ("Company(staff=[Employee(name=Name(first='paul', last='smith'), age=23, salary=10.23), " +
                "Employee(name=Name(first='jan', last='doe'), age=21, salary=15.56)])")
-        self.assertEqual(shd, str(paulco))
-        dct = paulco.asdict()
+        self.assertEqual(shd, str(self.paulco))
+        dct = self.paulco.asdict()
         shd = {'staff': [{'age': 23,
                           'name': {'first': 'paul', 'last': 'smith'},
                           'salary': '10.230'},
@@ -79,19 +79,43 @@ class TestDictable(unittest.TestCase):
         self.assertEqual(shd, dct)
 
     def test_write(self):
-        paulco = Company([self.emp_paul, self.emp_jan])
         sio = StringIO()
-        paulco.write(writer=sio)
+        self.paulco.write(writer=sio)
         shd = """\
 staff:
-    age: 23
     name:
         first: paul
         last: smith
+    age: 23
     salary: 10.230
-    age: 21
     name:
         first: jan
         last: doe
+    age: 21
     salary: 15.560\n"""
         self.assertEqual(shd, sio.getvalue())
+
+    def test_json(self):
+        shd = """\
+{
+    "staff": [
+        {
+            "name": {
+                "first": "paul",
+                "last": "smith"
+            },
+            "age": 23,
+            "salary": "10.230"
+        },
+        {
+            "name": {
+                "first": "jan",
+                "last": "doe"
+            },
+            "age": 21,
+            "salary": "15.560"
+        }
+    ]
+}"""
+        json = self.paulco.asjson(indent=4)
+        self.assertEqual(shd, json)

@@ -3,21 +3,21 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Set, Any
+from typing import Set, Any, Dict
 from dataclasses import dataclass, field
 import logging
-from zensols.config import (
-    ClassResolver,
+from . import (
     ConfigFactory,
     FactoryState,
     FactoryStateObserver,
+    Dictable,
 )
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
-class Writeback(FactoryStateObserver):
+class Writeback(FactoryStateObserver, Dictable):
     """Subclass for classes that want to write attribute changes back to a
     :class:`.Configurable`.  This uses an observer pattern that write updates
     back to the configuration.
@@ -161,15 +161,16 @@ class Writeback(FactoryStateObserver):
                 logger.debug(f'settings option {name} = {value}')
             self._set_option(name, value)
 
-    def asdict(self, class_name_param: str = None):
-        wcls = globals()['Writeback']
-        ret = {}
-        if class_name_param is not None:
-            cls = self.__class__
-            ret[class_name_param] = ClassResolver.full_classname(cls)
+    def _from_dictable(self, obj, recurse: bool, readable: bool,
+                       class_name_param: str = None) -> Dict[str, Any]:
+        dct = {}
+        self._add_class_name_param(class_name_param, dct)
         for k, v in self.__dict__.items():
-            if isinstance(v, wcls):
-                ret[k] = v.asdict()
+            if isinstance(v, WRITEBACK_CLASS):
+                dct[k] = v.asdict()
             elif self._is_allowed_type(v):
-                ret[k] = v
-        return ret
+                dct[k] = v
+        return dct
+
+
+WRITEBACK_CLASS = Writeback

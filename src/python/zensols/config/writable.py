@@ -8,6 +8,7 @@ from typing import Union, Any, Iterable
 from abc import ABC, abstractmethod
 import sys
 import logging
+from collections import OrderedDict
 from logging import Logger
 from io import TextIOBase, StringIO
 from functools import lru_cache
@@ -107,7 +108,10 @@ class Writable(ABC):
 
         """
         sp = self._sp(depth)
-        for k in sorted(data.keys()):
+        keys = data.keys()
+        if not isinstance(data, OrderedDict):
+            keys = sorted(keys)
+        for k in keys:
             v = data[k]
             if isinstance(v, (dict, list, tuple, WRITABLE_CLASS)):
                 writer.write(f'{sp}{k}:\n')

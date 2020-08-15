@@ -4,12 +4,14 @@ primitives handy for creating JSON.
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Any, Set, Union
+from typing import Dict, Any, Iterable, Union, Tuple
 import dataclasses
-from dataclasses import dataclass, fields, Field, asdict
+from dataclasses import dataclass, fields, asdict
+from collections import OrderedDict
 import sys
+import json
 from io import TextIOBase
-from . import Writable
+from . import Writable, ClassResolver
 
 
 @dataclass
@@ -18,29 +20,47 @@ class Dictable(Writable):
     primitive data structures.
 
     """
-    @property
-    def _fields(self) -> Set[Field]:
-        """Keys to omit from the dictionary.
+    def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
+        """Return human readable and attribute names.
+
+        :return: tuples of (<human readable name>, <attribute name>)
 
         """
-        return filter(lambda f: f.repr, fields(self))
+        return map(lambda f: (f.name, f.name),
+                   filter(lambda f: f.repr, fields(self)))
 
-    def _from_dictable(self, obj, recurse: bool) -> Dict[str, Any]:
-        dct = {}
-        for f in obj._fields:
-            name = f.name
+    def _split_str_to_attributes(self, attrs: str)-> Iterable[Tuple[str, str]]:
+        return map(lambda s: (s, s), attrs.split())
+
+    def _add_class_name_param(self, class_name_param: str,
+                              dct: Dict[str, Any]):
+        if class_name_param is not None:
+            cls = self.__class__
+            dct[class_name_param] = ClassResolver.full_classname(cls)
+
+    def _from_dictable(self, obj, recurse: bool, readable: bool,
+                       class_name_param: str = None) -> Dict[str, Any]:
+        dct = OrderedDict()
+        self._add_class_name_param(class_name_param, dct)
+        for readable_name, name in obj._get_dictable_attributes():
+            if readable:
+                k = readable_name
+            else:
+                k = name
             v = getattr(obj, name)
-            dct[name] = obj._from_object(v, recurse)
+            dct[k] = obj._from_object(v, recurse, readable)
         return dct
 
-    def _from_dict(self, obj: dict, recurse: bool) -> Dict[str, Any]:
+    def _from_dict(self, obj: dict, recurse: bool, readable: bool) -> \
+            Dict[str, Any]:
         dct = {}
         for k, v in obj.items():
-            dct[str(k)] = self._from_object(v, recurse)
+            dct[str(k)] = self._from_object(v, recurse, readable)
         return dct
 
-    def _from_dataclass(self, obj: Any, recurse: bool) -> Dict[str, Any]:
-        return self._from_dict(asdict(obj), recurse)
+    def _from_dataclass(self, obj: Any, recurse: bool, readable: bool) -> \
+            Dict[str, Any]:
+        return self._from_dict(asdict(obj), recurse, readable)
 
     def _format_dictable(self, obj: Any) -> Union[str, None]:
         v = None
@@ -64,41 +84,54 @@ class Dictable(Writable):
                     v = str(obj)
         return v
 
-    def _from_object(self, obj: Any, recurse: bool) -> Any:
+    def _from_object(self, obj: Any, recurse: bool, readable: bool) -> Any:
         if recurse:
             if isinstance(obj, DICTABLE_CLASS):
-                ret = self._from_dictable(obj, recurse)
+                ret = self._from_dictable(obj, recurse, readable)
             elif dataclasses.is_dataclass(obj):
-                ret = self._from_dataclass(obj, recurse)
+                ret = self._from_dataclass(obj, recurse, readable)
             elif isinstance(obj, dict):
-                ret = self._from_dict(obj, recurse)
+                ret = self._from_dict(obj, recurse, readable)
             elif isinstance(obj, (tuple, list, set)):
-                ret = list(map(lambda o: self._from_object(o, recurse), obj))
+                ret = map(lambda o: self._from_object(o, recurse, readable),
+                          obj)
+                ret = list(ret)
             else:
                 ret = self._format(obj)
             return ret
 
-    def asdict(self, recurse: bool = True) -> Dict[str, Any]:
+    def asdict(self, recurse: bool = True, readable: bool = False,
+               class_name_param: str = None) -> Dict[str, Any]:
         """Return the content of the object as a dictionary.
 
         """
-        return self._from_dictable(self, recurse=recurse)
+        return self._from_dictable(
+            self,
+            recurse=recurse,
+            readable=readable,
+            class_name_param=class_name_param)
+
+    def asjson(self, recurse: bool = True, readable: bool = False,
+               **kwargs) -> str:
+        dct = self.asdict(recurse=recurse, readable=readable)
+        return json.dumps(dct, **kwargs)
 
     def _get_description(self, include_type: bool = False) -> str:
-        def fmap(f: Field) -> str:
-            v = getattr(self, f.name)
+        def fmap(desc: str, name: str) -> str:
+            v = getattr(self, name)
             if isinstance(v, str):
                 v = "'" + v + "'"
             else:
                 v = self._format(v)
-            return f'{f.name}={v}'
-        v = ', '.join(map(fmap, self._fields))
+            return f'{desc}={v}'
+        v = ', '.join(map(lambda x: fmap(*x), self._get_dictable_attributes()))
         if include_type:
             v = f'{type(self).__name__}({v})'
         return v
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
-        super()._write_dict(self.asdict(), depth, writer)
+        super()._write_dict(self.asdict(recurse=True, readable=True),
+                            depth, writer)
 
     def __str__(self) -> str:
         return self._get_description(True)
