@@ -62,3 +62,7 @@ testmulti:
 .PHONY:		testdircomp
 testdircomp:
 		make PY_SRC_TEST_PAT=test_dircomp.py test
+
+.PHONY:		testdictable
+testdictable:
+		make PY_SRC_TEST_PAT=test_dictable.py test
