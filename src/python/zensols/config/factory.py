@@ -540,7 +540,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 inst = super()._instance(sec_name, cls, *args, **kwargs)
         finally:
             self._set_reload(initial_reload)
-            
+
         cls = inst.__class__
 
         logger.debug(f'adding injects: {len(pw_injects)}')
