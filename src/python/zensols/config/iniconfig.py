@@ -4,20 +4,21 @@ parsed from files.
 """
 __author__ = 'Paul Landes'
 
+from typing import Set, Dict, List, Any
 from abc import ABCMeta, abstractmethod
-from typing import Set, Dict, List
+import logging
 import os
 from io import StringIO
+from collections import OrderedDict
 from pathlib import Path
-import logging
 from copy import deepcopy
 from configparser import ConfigParser, ExtendedInterpolation
-from . import Configurable
+from . import Configurable, Dictable
 
 logger = logging.getLogger(__name__)
 
 
-class IniConfig(Configurable):
+class IniConfig(Configurable, Dictable):
     """Application configuration utility.  This reads from a configuration and
     returns sets or subsets of options.
 
@@ -171,6 +172,14 @@ class IniConfig(Configurable):
         conf = self.__class__(**kwargs)
         self.copy_sections(conf, copy_sections)
         return conf
+
+    def _from_dictable(self, recurse: bool, readable: bool,
+                       class_name_param: str = None) -> Dict[str, Any]:
+        dct = OrderedDict()
+        for sec in sorted(self.sections):
+            dct[sec] = self.get_options(sec)
+        return {'file': str(self.config_file),
+                'section': self._from_dict(dct, recurse, readable)}
 
     def __str__(self):
         return f'file: {self.config_file}, section: {self.sections}'

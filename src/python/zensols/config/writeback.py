@@ -162,7 +162,7 @@ class Writeback(FactoryStateObserver, Dictable):
                 logger.debug(f'settings option {name} = {value}')
             self._set_option(name, value)
 
-    def _from_dictable(self, obj, recurse: bool, readable: bool,
+    def _from_dictable(self, recurse: bool, readable: bool,
                        class_name_param: str = None) -> Dict[str, Any]:
         """This is overridden because this class operates on a per attribute basis very
         close at the class/interpreter level.  Instead of using
@@ -175,7 +175,8 @@ class Writeback(FactoryStateObserver, Dictable):
         self._add_class_name_param(class_name_param, dct)
         for k, v in self.__dict__.items():
             if isinstance(v, Dictable):
-                dct[k] = v._from_dictable(recurse, readable, class_name_param)
+                dct[k] = v._from_dictable(
+                    recurse, readable, class_name_param)
             elif self._is_allowed_type(v):
                 dct[k] = v
         return dct

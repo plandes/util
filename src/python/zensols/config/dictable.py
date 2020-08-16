@@ -38,17 +38,17 @@ class Dictable(Writable):
             cls = self.__class__
             dct[class_name_param] = ClassResolver.full_classname(cls)
 
-    def _from_dictable(self, obj, recurse: bool, readable: bool,
+    def _from_dictable(self, recurse: bool, readable: bool,
                        class_name_param: str = None) -> Dict[str, Any]:
         dct = OrderedDict()
-        obj._add_class_name_param(class_name_param, dct)
-        for readable_name, name in obj._get_dictable_attributes():
+        self._add_class_name_param(class_name_param, dct)
+        for readable_name, name in self._get_dictable_attributes():
+            v = getattr(self, name)
             if readable:
                 k = readable_name
             else:
                 k = name
-            v = getattr(obj, name)
-            dct[k] = obj._from_object(v, recurse, readable)
+            dct[k] = self._from_object(v, recurse, readable)
         return dct
 
     def _from_dict(self, obj: dict, recurse: bool, readable: bool) -> \
@@ -87,7 +87,7 @@ class Dictable(Writable):
     def _from_object(self, obj: Any, recurse: bool, readable: bool) -> Any:
         if recurse:
             if isinstance(obj, DICTABLE_CLASS):
-                ret = self._from_dictable(obj, recurse, readable)
+                ret = obj._from_dictable(recurse, readable)
             elif dataclasses.is_dataclass(obj):
                 ret = self._from_dataclass(obj, recurse, readable)
             elif isinstance(obj, dict):
@@ -100,19 +100,15 @@ class Dictable(Writable):
                 ret = self._format(obj)
             return ret
 
-    def asdict(self, recurse: bool = True, readable: bool = False,
+    def asdict(self, recurse: bool = True, readable: bool = True,
                class_name_param: str = None) -> Dict[str, Any]:
         """Return the content of the object as a dictionary.
 
         """
-        return self._from_dictable(
-            self,
-            recurse=recurse,
-            readable=readable,
-            class_name_param=class_name_param)
+        return self._from_dictable(recurse, readable, class_name_param)
 
     def asjson(self, writer: TextIOBase = None,
-               recurse: bool = True, readable: bool = False, **kwargs) -> str:
+               recurse: bool = True, readable: bool = True, **kwargs) -> str:
         dct = self.asdict(recurse=recurse, readable=readable)
         if writer is None:
             return json.dumps(dct, **kwargs)
