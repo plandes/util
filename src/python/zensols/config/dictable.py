@@ -29,7 +29,7 @@ class Dictable(Writable):
         return map(lambda f: (f.name, f.name),
                    filter(lambda f: f.repr, fields(self)))
 
-    def _split_str_to_attributes(self, attrs: str)-> Iterable[Tuple[str, str]]:
+    def _split_str_to_attributes(self, attrs: str) -> Iterable[Tuple[str, str]]:
         return map(lambda s: (s, s), attrs.split())
 
     def _add_class_name_param(self, class_name_param: str,
@@ -41,7 +41,7 @@ class Dictable(Writable):
     def _from_dictable(self, obj, recurse: bool, readable: bool,
                        class_name_param: str = None) -> Dict[str, Any]:
         dct = OrderedDict()
-        self._add_class_name_param(class_name_param, dct)
+        obj._add_class_name_param(class_name_param, dct)
         for readable_name, name in obj._get_dictable_attributes():
             if readable:
                 k = readable_name
@@ -111,10 +111,13 @@ class Dictable(Writable):
             readable=readable,
             class_name_param=class_name_param)
 
-    def asjson(self, recurse: bool = True, readable: bool = False,
-               **kwargs) -> str:
+    def asjson(self, writer: TextIOBase = None,
+               recurse: bool = True, readable: bool = False, **kwargs) -> str:
         dct = self.asdict(recurse=recurse, readable=readable)
-        return json.dumps(dct, **kwargs)
+        if writer is None:
+            return json.dumps(dct, **kwargs)
+        else:
+            return json.dump(dct, writer, **kwargs)
 
     def _get_description(self, include_type: bool = False) -> str:
         def fmap(desc: str, name: str) -> str:

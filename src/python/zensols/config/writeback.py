@@ -6,6 +6,7 @@ __author__ = 'Paul Landes'
 from typing import Set, Any, Dict
 from dataclasses import dataclass, field
 import logging
+from collections import OrderedDict
 from . import (
     ConfigFactory,
     FactoryState,
@@ -163,14 +164,18 @@ class Writeback(FactoryStateObserver, Dictable):
 
     def _from_dictable(self, obj, recurse: bool, readable: bool,
                        class_name_param: str = None) -> Dict[str, Any]:
-        dct = {}
+        """This is overridden because this class operates on a per attribute basis very
+        close at the class/interpreter level.  Instead of using
+        :class:`dataclasses.dataclass` mechanisms to inform of how to create
+        the dictionary, it introspects the attributes and types of those
+        attributes of the object.
+
+        """
+        dct = OrderedDict()
         self._add_class_name_param(class_name_param, dct)
         for k, v in self.__dict__.items():
-            if isinstance(v, WRITEBACK_CLASS):
-                dct[k] = v.asdict()
+            if isinstance(v, Dictable):
+                dct[k] = v._from_dictable(recurse, readable, class_name_param)
             elif self._is_allowed_type(v):
                 dct[k] = v
         return dct
-
-
-WRITEBACK_CLASS = Writeback
