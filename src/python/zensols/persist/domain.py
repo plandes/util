@@ -167,11 +167,39 @@ class Stash(ABC):
 @dataclass
 class ReadOnlyStash(Stash):
     """An abstract base class for subclasses that do not support write methods
-    (i.e. :meth:`load`).
+    (i.e. :meth:`load`).  This class is useful to extend for factory type
+    classes that generate data.  Paired with container classes such as
+    :class:`.DictionaryStash` provide persistence in a reusable way.
 
     The only method that needs to be implemented is :meth:`load` and
     :meth:`keys`.  However, it is recommended to implement :meth:`exists` to
     speed things up.
+
+    Example::
+        class RangeStash(ReadOnlyStash):
+            def __init__(self, n, end: int = None):
+                super().__init__()
+                self.n = n
+                self.end = end
+
+            def load(self, name: str) -> Any:
+                if self.exists(name):
+                    return name
+
+            def keys(self) -> Iterable[str]:
+                if self.end is not None:
+                    return map(str, range(self.n, self.end))
+                else:
+                    return map(str, range(self.n))
+
+            def exists(self, name: str) -> bool:
+                n = int(name)
+                if self.end is None:
+                    if (n >= self.n):
+                        return False
+                elif (n < self.n) or (n >= self.end):
+                    return False
+                return True
 
     """
     def __post_init__(self):

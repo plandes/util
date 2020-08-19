@@ -1,3 +1,4 @@
+from typing import Any, Iterable
 import logging
 import unittest
 from zensols.persist import (
@@ -6,6 +7,7 @@ from zensols.persist import (
     DictionaryStash,
     CacheStash,
     ReadOnlyStash,
+    UnionStash,
 )
 
 logger = logging.getLogger(__name__)
@@ -20,23 +22,34 @@ class IncStash(ReadOnlyStash):
         self.c += 1
         return f'{name}-{self.c}'
 
-    def keys(self):
+    def keys(self) -> Iterable[str]:
         return ()
 
 
 class RangeStash(ReadOnlyStash):
-    def __init__(self, n):
+    def __init__(self, n, end: int = None):
         super().__init__()
         self.n = n
+        self.end = end
 
-    def load(self, name: str):
+    def load(self, name: str) -> Any:
+        if self.exists(name):
+            return name
+
+    def keys(self) -> Iterable[str]:
+        if self.end is not None:
+            return range(self.n, self.end)
+        else:
+            return range(self.n)
+
+    def exists(self, name: str) -> bool:
         n = int(name)
-        if n >= self.n:
-            return None
-        return name
-
-    def keys(self):
-        return range(self.n)
+        if self.end is None:
+            if (n >= self.n):
+                return False
+        elif (n < self.n) or (n >= self.end):
+            return False
+        return True
 
 
 class TestStash(unittest.TestCase):
@@ -77,6 +90,7 @@ class TestStash(unittest.TestCase):
         self.assertEqual(([0, 1, 2, 3], [4,]), tuple(stash.key_groups(4)))
         self.assertEqual(([0, 1, 2, 3, 4,],), tuple(stash.key_groups(5)))
         self.assertEqual(([0, 1, 2, 3, 4,],), tuple(stash.key_groups(6)))
+        self.assertEqual(0, stash[0])
 
     def test_not_exist(self):
         stash = RangeStash(5)
@@ -99,13 +113,29 @@ class TestStash(unittest.TestCase):
         self.assertEqual(((0, 0), (1, 1), (2, 2), (3, 3), (4, 4)),
                          tuple(sorted(stash.cache_stash, key=lambda x: x[0])))
         stash.clear()
-        # disabled since a caching stash is read only
-        #self.assertEqual(0, len(stash))
-        #self.assertEqual((), tuple(stash.keys()))
+        # still has all the members since a caching stash is a read only stash
+        self.assertEqual(5, len(stash))
 
     def test_delegate_to_delegate(self):
-        stash = CacheStash(delegate=RangeStash(5))
-        self.assertEqual(((0, 0), (1, 1), (2, 2), (3, 3), (4, 4)), tuple(stash))
-        self.assertRaises(AttributeError, lambda: stash.n)
-        stash.delegate_attr = True
-        stash.n
+        stash1 = RangeStash(3)
+        stash2 = RangeStash(3, 5)
+        stash3 = UnionStash((stash1, stash2))
+        self.assertEqual(3, len(stash1))
+        self.assertEqual(2, len(stash2))
+        self.assertEqual(5, len(stash3))
+        self.assertEqual(((0, 0), (1, 1), (2, 2)), tuple(stash1))
+        self.assertEqual(((3, 3), (4, 4)), tuple(stash2))
+        self.assertEqual(((0, 0), (1, 1), (2, 2), (3, 3), (4, 4)), tuple(stash3))
+        self.assertEqual(([0, 1, 2], [3, 4]), tuple(stash3.key_groups(3)))
+        self.assertEqual(([0, 1], [2, 3], [4,]), tuple(stash3.key_groups(2)))
+        self.assertEqual(([0, 1, 2, 3], [4,]), tuple(stash3.key_groups(4)))
+        self.assertEqual(([0, 1, 2, 3, 4,],), tuple(stash3.key_groups(5)))
+        self.assertEqual(([0, 1, 2, 3, 4,],), tuple(stash3.key_groups(6)))
+        self.assertTrue(stash1.exists(0))
+        self.assertTrue(stash1.exists(1))
+        self.assertTrue(stash1.exists(2))
+        self.assertFalse(stash1.exists(3))
+        self.assertFalse(stash2.exists(2))
+        self.assertTrue(stash2.exists(3))
+        self.assertTrue(stash2.exists(4))
+        self.assertFalse(stash2.exists(5))
