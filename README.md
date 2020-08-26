@@ -15,7 +15,7 @@ dependencies, and helpful across many applications.  Some features include:
   handler that is integrated with a the configuration API.  This supports long
   and short GNU style options as provided by [optparse].
 * Streamline in memory and on disk [persistence](doc/persist.md).
-* Multi-processing work with a persistence layer.
+* Multi-processing work with a [persistence layer](doc/persist.md).
 
 A secondary goal of the API is to make prototyping Python code quick and easy
 using the REPL.  Examples include reloading modules in the [configuration

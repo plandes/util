@@ -5,7 +5,7 @@ This package provides two main APIs:
 * A `dict` like data structure that CRUDs data called [stashes](#stashes).
 
 
-# Persisted
+## Class Method Level
 
 A [PersistedWork] defines a cached location any data returned by a method of a
 class.  It always caches data at the instance level.  However, it can also

@@ -23,10 +23,10 @@ class.  See the [YAML Format][#yaml-format] section for more information.
 
 The INI format is preferred because it is simple and has broad support as a
 configuration parsing library in Python.  This format uses the syntax
-`${section:name}` where `section` is the section name and `name` is the
-variable settings.  For example `${default:temporary_dir}` refers to the root
-directory's `target` directory.  The `root_dir` entry in the `default` section
-is taken from an environment `dict` given in the initializer of the
+`${section:name}` where `section` is the section name and `name` is the option
+(variable name) settings.  For example `${default:temporary_dir}` refers to the
+root directory's `target` directory.  The `root_dir` entry in the `default`
+section is taken from an environment `dict` given in the initializer of the
 [ExtendedInterpolationEnvConfig] class.
 
 ```ini
@@ -100,7 +100,7 @@ class AppConfig(ExtendedInterpolationEnvConfig):
 
 The [Configurable] class defines access methods to the configuration data,
 including how to get primitives (`get_option_*` methods) or populate a hash or
-class from a section's data (`populate`).  The latter method is sophisticated
+class from a section's data ([populate]).  The latter method is sophisticated
 in how it reads data, which uses the following rules:
 * Any string of numbers (i.e. `5839202`) as an integer
 * A string of numbers with a single decimal point (i.e. `3.123`) as a float.
@@ -119,7 +119,12 @@ configuration is parsed and given to an [ImportConfigFactory] to create
 instances of objects.  Each instance is, by default, configured to create a
 single instance of each object instance per section.  Once a class is
 *referred* by name, the instance is looked up by the [ImportConfigFactory] and
-created if it does not exist already per the [Parsing](#parsing) rules.
+created if it does not exist already per the [parsing](#parsing) rules.
+
+Each section contains the data for an instance along with a option (variable)
+entry `class_name`, which is the fully qualified class name (`<module>.<class
+name>`).  Each option value contained in the respective section is set as an
+attribute on the instantiated object instance.
 
 For example, say you have the classes defined in a module called `domain`:
 ```python
@@ -196,3 +201,4 @@ Python REPL.
 [ExtendedInterpolationEnvConfig]: ../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig
 [YamlConfig]: ../api/zensols.config.html#zensols.config.yaml.YamlConfig
 [ImportConfigFactory]: ../api/zensols.config.html#zensols.config.factory.ImportConfigFactory
+[populate]: ../api/zensols.config.html#zensols.config.configbase.Configurable.populate
