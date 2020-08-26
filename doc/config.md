@@ -172,6 +172,11 @@ Organization(boss=Person(age=45))
 True
 ```
 
+Parameters to the initialization method of the configuration factory indicate
+whether to reload the module or not, which is the default.  This is
+particularly hand when prototyping your code from a different module in the
+Python REPL.
+
 
 <!-- links -->
 

@@ -9,13 +9,17 @@ more than basic application.  This general purpose library is small, has few
 dependencies, and helpful across many applications.  Some features include:
 
 * Better application level support for [configuration] than [configparser].
-  Specifically, optional configuration and configuration groups.
-* Construct objects using configuration files (both INI and YAML).
+  * Construct objects using configuration files (both INI and YAML).
+  * Parse primitives, dictionaries, file system objects, instances of classes.
 * A [command action library] using an action mnemonic to invocation of a
   handler that is integrated with a the configuration API.  This supports long
   and short GNU style options as provided by [optparse].
-* Streamline in memory and on disk persistence.
+* Streamline in memory and on disk [persistence](doc/persistence.md).
 * Multi-processing work with a persistence layer.
+
+A secondary goal of the API is to make prototyping Python code quick and easy
+using the REPL.  Examples include reloading modules in the [configuration
+factory](doc/config.md#configuration-factory).
 
 
 ## Obtaining
