@@ -104,11 +104,27 @@ class Dictable(Writable):
                class_name_param: str = None) -> Dict[str, Any]:
         """Return the content of the object as a dictionary.
 
+        :param recurse: if ``True``, recursively create dictionary so some
+                        values might be dictionaries themselves
+
+        :param readable: use human readable and attribute keys when available
+
+        :param class_name_param: if set, add a ``class_name_param`` key with
+                                 the class's fully qualified name (includes
+                                 module name)
+
+        :return: a JSON'able tree of dictionaries with primitive data
+
+        :see: :meth:`asjson`
+
         """
         return self._from_dictable(recurse, readable, class_name_param)
 
     def asjson(self, writer: TextIOBase = None,
                recurse: bool = True, readable: bool = True, **kwargs) -> str:
+        """Return a JSON string representing the data in this instance.
+
+        """
         dct = self.asdict(recurse=recurse, readable=readable)
         if writer is None:
             return json.dumps(dct, **kwargs)
