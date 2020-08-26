@@ -31,7 +31,7 @@ pip3 install zensols.util
 
 ## Documentation
 
-Framework documentation [API Reference](https://plandes.github.io/util/)
+[Framework documentation](https://plandes.github.io/util/)
 
 
 ## Template
