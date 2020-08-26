@@ -19,7 +19,9 @@ logger = logging.getLogger(__name__)
 
 # class level persistance
 class PersistedWork(Deallocatable):
-    """This class automatically caches work that's serialized to the disk.
+    """This class caches data in the instance of the contained class and/or global
+    level.  In addition, the data is also pickled to disk to avoid any
+    expensive recomputation of the data.
 
     In order, it first looks for the data in ``owner``, then in globals (if
     ``cache_global`` is True), then it looks for the data on the file system.
@@ -47,6 +49,16 @@ class PersistedWork(Deallocatable):
 
         :param cache_global: cache the data globals; this shares data across
                              instances but not classes
+
+        :param transient: the data not persisted to disk after invoking the
+                          method
+
+        :param initial_value: if provided, the method is never called and this
+                              value returned for all invocations
+
+        :param mkdir: if ``path`` is a :class`.Path` object, then recursively
+                      create all directories needed to be able to persist the
+                      file without missing directory IO errors
 
         """
         super().__init__()
@@ -236,6 +248,9 @@ class PersistedWork(Deallocatable):
 
 
 class PersistableContainerMetadata(object):
+    """Provides metadata about :class:`.PersistedWork` definitions in the class.
+
+    """
     def __init__(self, container):
         super().__init__()
         self.container = container
@@ -320,15 +335,12 @@ class PersistableContainer(Deallocatable):
 class persisted(object):
     """Class level annotation to further simplify usage with PersistedWork.
 
-    For example:
-
-    .. highlight:: python
-    .. code-block:: python
+    For example::
 
         class SomeClass(object):
             @property
-            @persisted('counter', 'tmp.dat')
-            def someprop(self):
+            @persisted('_counter', 'tmp.dat')
+            def counter(self):
                 return tuple(range(5))
     """
     def __init__(self, name, path=None, cache_global=False,
@@ -375,8 +387,7 @@ class resource(object):
     example, you can declare class methods to create database connections and
     then close them.  This example looks like this:
 
-    .. highlight:: python
-    .. code-block:: python
+    For example::
 
         class CrudManager(object):
             def _create_connection(self):

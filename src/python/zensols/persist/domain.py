@@ -54,10 +54,10 @@ class Stash(ABC):
     Instance can be used as iterables or dicsts.  If the former, each item is
     returned as a key/value tuple.
 
-    Note that while the functionality might appear similar to a dict when used
-    as such, there are subtle differences.  For example, when indexing
-    obtaining the value is sometimes *forced* by using some mechanism to create
-    the item.  When using ``get`` it relaxes this creation mechanism for some
+    Note that there are subtle differences a [Stash] and a ``dict`` when
+    generating or accessing data.  For example, when indexing obtaining the
+    value is sometimes *forced* by using some mechanism to create the item.
+    When using ``get`` it relaxes this creation mechanism for some
     implementations.
 
     """

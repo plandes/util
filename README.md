@@ -14,12 +14,12 @@ dependencies, and helpful across many applications.  Some features include:
 * A [command action library] using an action mnemonic to invocation of a
   handler that is integrated with a the configuration API.  This supports long
   and short GNU style options as provided by [optparse].
-* Streamline in memory and on disk [persistence](doc/persistence.md).
+* Streamline in memory and on disk [persistence](doc/persist.md).
 * Multi-processing work with a persistence layer.
 
 A secondary goal of the API is to make prototyping Python code quick and easy
 using the REPL.  Examples include reloading modules in the [configuration
-factory](doc/config.md#configuration-factory).
+factory](doc/config.md).
 
 
 ## Obtaining

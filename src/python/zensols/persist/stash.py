@@ -141,7 +141,7 @@ class CacheStash(DelegateStash):
 
     :param delegate: the underlying persistence stash
     :param cache_stash: a stash used for caching (defaults to
-                        ``DictionaryStash``)
+                        :class:`.DictionaryStash`)
 
 
     """
@@ -172,7 +172,7 @@ class CacheStash(DelegateStash):
 
 @dataclass
 class DirectoryStash(Stash):
-    """Creates a pickeled data file with a file name in a directory with a given
+    """Creates a pickled data file with a file name in a directory with a given
     pattern across all instances.
 
     :param path: the directory of where to store the files

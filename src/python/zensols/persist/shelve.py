@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ShelveStash(CloseableStash):
-    """Stash that uses Python's shelve library to store key/value pairs in dbm
-    (like) databases.
+    """Stash that uses Python's shelve library to store key/value pairs in DBM
+    databases.
 
     :param path: a file to be created to store and/or load for the
                  data storage
