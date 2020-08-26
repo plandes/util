@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [Unreleased]
+### Added
+- In depth top level documentation, including sphinx/API linked docs.
+
 ### Changed
 - Default for `zensols.config.ImportConfigFactory.shared` is `True`.
   **Important:** this is a big change, so it would be prudent to retest your
