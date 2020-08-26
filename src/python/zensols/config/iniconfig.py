@@ -173,14 +173,6 @@ class IniConfig(Configurable):
         self.copy_sections(conf, copy_sections)
         return conf
 
-    # def _from_dictable(self, recurse: bool, readable: bool,
-    #                    class_name_param: str = None) -> Dict[str, Any]:
-    #     dct = OrderedDict()
-    #     for sec in sorted(self.sections):
-    #         dct[sec] = self.get_options(sec)
-    #     return {'file': str(self.config_file),
-    #             'section': self._from_dict(dct, recurse, readable)}
-
     def __str__(self):
         return f'file: {self.config_file}, section: {self.sections}'
 
