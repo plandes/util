@@ -106,6 +106,7 @@ in how it reads data, which uses the following rules:
 * A string of numbers with a single decimal point (i.e. `3.123`) as a float.
 * Either `True` or `False` parsed as a boolean.
 * A string starting with `path:` parsed as a [pathlib.Path] instance.
+* A string starting with `json:` parsed as standard JSON.
 * A string staring with `eval:` parsed by the Python code reader (see the
   [Evaluation Parameters](#evaluation-parameters) section).
 * A string starting with `instance:` an object instance (see the [Configuration
