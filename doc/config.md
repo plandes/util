@@ -106,9 +106,10 @@ in how it reads data, which uses the following rules:
 * A string of numbers with a single decimal point (i.e. `3.123`) as a float.
 * Either `True` or `False` parsed as a boolean.
 * A string starting with `path:` parsed as a [pathlib.Path] instance.
-* A string staring with `eval:` parsed by the Python code reader.
+* A string staring with `eval:` parsed by the Python code reader (see the
+  [Evaluation Parameters](#evaluation-parameters) section).
 * A string starting with `instance:` an object instance (see the [Configuration
-  Factory] section).
+  Factory] and [Instance Parameters](#instance-parameters) sections).
 * Anything else as a string.
 
 
@@ -183,6 +184,53 @@ particularly hand when prototyping your code from a different module in the
 Python REPL.
 
 
+## Evaluation Parameters
+
+Instance options (or any configuration section's options) can be created with
+an evaluation that allows for importing modules.  For example, if we want to
+use the `itertools` package by providing a counting for an alias, we could
+have:
+```ini
+[bart]
+class_name = domain.Person
+age = 16
+aliases = eval({'import': ['itertools as it']}):
+    list(map(lambda x: f'{x[0]} dude ({x[1]})',
+         zip('cool bad'.split(), it.count())))
+```
+Note that the Python code in the `eval` is multi-line.
+
+We then create the new *company* object and print with:
+```python
+school_clique: domain.Organization = factory('school_clique')
+
+>>> school_clique
+Organization(boss=Person(age=16, aliases=['cool dude (0)', 'bad dude (1)']))
+```
+
+
+## Instance Parameters
+
+Instances can take parameters to substitute values.  This is useful when you
+want to define the values of an instance in the parent.  Extending from the
+example given in the [configuration factory] section, we can define a person's
+age in the company object with:
+```ini
+[bobs_senior_center]
+class_name = domain.Organization
+boss = instance({'param': {'age': 69}}): homer
+```
+
+We then create the new *company* object and print with:
+```python
+senior_company: domain.Organization = factory('bobs_senior_center')
+
+>>> senior_company
+Organization(boss=Person(age=69, aliases=['Homer', 'Homer Simpson']))
+```
+
+
+
 <!-- links -->
 
 [INI]: https://en.wikipedia.org/wiki/INI_file
@@ -196,6 +244,7 @@ Python REPL.
 [test_yaml.py]: https://github.com/plandes/util/blob/master/test/python/test_yaml.py
 [INI formatted]: ini-format
 [Configuration Factory]: configuration-factory
+[configuration factory]: configuration-factory
 
 [Configurable]: ../api/zensols.config.html#zensols.config.configbase.Configurable
 [ExtendedInterpolationEnvConfig]: ../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig
