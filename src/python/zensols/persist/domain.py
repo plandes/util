@@ -49,7 +49,7 @@ class chunks(object):
 
 
 class Stash(ABC):
-    """Pure virtual classes that represents CRUDing data that uses ``dict``
+    """This is a pure virtual class that represents CRUDing data that uses ``dict``
     semantics.  The data is usually CRUDed to the file system but need not be.
     Instance can be used as iterables or dicsts.  If the former, each item is
     returned as a key/value tuple.

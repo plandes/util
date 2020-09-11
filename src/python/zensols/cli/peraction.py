@@ -147,8 +147,9 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
     all in the configuration pased to the init method.
 
     :param opt_config: the option configuration (see project documentation)
+
     :param config_type: the class used for the configuration and defaults to
-                        ``zensols.actioncli.Config``.
+                        :class:`zensols.util.configbase.Configurable`.
 
     """
     def __init__(self, opt_config, config_type=IniConfig, **kwargs):
@@ -271,12 +272,16 @@ class OneConfPerActionOptionsCliEnv(OneConfPerActionOptionsCli):
         """Initialize.
 
         :param opt_config: the option configuration (see project documentation)
-        :param config_env_name: the name of the environment variable that holds
-            the resource like name (i.e. ~/.<program name>rc); this will be used as
-            the configuration file if it is given and found; otherwise a
+
+        :param config_env_name:
+            the name of the environment variable that holds the resource like
+            name (i.e. ~/.<program name>rc); this will be used as the
+            configuration file if it is given and found; otherwise a
             ``ValueError`` is rasied if not found
-        :param no_os_environ: if ``True`` do not add environment variables to
-            the configuration environment
+
+        :param no_os_environ:
+            if ``True`` do not add environment variables to the configuration
+            environment
 
         """
         super().__init__(opt_config, *args, **kwargs)
@@ -301,8 +306,7 @@ class OneConfPerActionOptionsCliEnv(OneConfPerActionOptionsCli):
             logger.debug(f'adding environment to config: {os.environ}')
             defs.update(os.environ)
         logger.debug('creating with conf_file: {}'.format(conf_file))
-        return super()._create_config(
-            conf_file, defs)
+        return super()._create_config(conf_file, defs)
 
     def _find_conf_file(self, conf, params):
         if logger.isEnabledFor(logging.DEBUG):

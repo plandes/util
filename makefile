@@ -4,7 +4,6 @@
 PROJ_TYPE=	python
 PROJ_MODULES=	git python-doc
 
-
 include ./zenbuild/main.mk
 
 .PHONY:		testall

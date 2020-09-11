@@ -136,6 +136,12 @@ descriptions are given below (see the [persist submodule] API docs):
 	distributed fashion.
 
 
+## Complete Examples
+
+See the [examples](../example) directory the complete code used to create the
+examples in this documentation.
+
+
 <!-- links -->
 
 [@persisted]: ../api/zensols.persist.html#zensols.persist.annotation.persisted

@@ -231,6 +231,11 @@ Organization(boss=Person(age=69, aliases=['Homer', 'Homer Simpson']))
 ```
 
 
+## Complete Examples
+
+See the [examples](../example) directory the complete code used to create the
+examples in this documentation.
+
 
 <!-- links -->
 
