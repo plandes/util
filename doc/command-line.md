@@ -13,12 +13,12 @@ In this example, the `Cli` class is instantiated with `print_message` method
 called with the `doit` command line action (given as the first parameter on the
 command line).
 
-This uses the [OneConfPerActionOptionsCli] class, which provides a data
-driven way of configuring the action based command line.  An extention of this
-class is the [OneConfPerActionOptionsCliEnv] class, which imports environment
+This uses the [OneConfPerActionOptionsCli] class, which provides a data driven
+way of configuring the action based command line.  An extention of this class
+is the [OneConfPerActionOptionsCliEnv] class, which imports environment
 variables and allows adding to the configuration via adding a resource like
 file (i.e. `~/.<program name>rc`) type file.  See the
-[configuration](config.md) section for more information.
+[configuration](config.md) documentation for more information.
 
 Note that access to your program through this API is easily callable by other
 programs by populating the `sys.argv` array and calling `main`.
@@ -79,13 +79,13 @@ def main():
     cl.invoke()
 ```
 
-See the [command line test cases](../test/python/test_cli_env.py) for more
-examples.
+See the [command line test cases] for more examples.
 
 
 <!-- links -->
 
 [template]: https://github.com/plandes/template
 
-[OneConfPerActionOptionsEnv]: ../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsEnv
+[OneConfPerActionOptionsCli]: ../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCli
 [OneConfPerActionOptionsCliEnv]: ../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCliEnv
+[command line test cases]: ../test/python/test_cli_env.py

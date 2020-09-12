@@ -31,9 +31,12 @@ class ChunkProcessor(object):
 
     :param config: the application context configuration used to create the
                    parent stash
+
     :param name: the name of the parent stash used to create the chunk, and
                  subsequently process this chunk
+
     :param chunk_id: the nth chunk
+
     :param data: the data created by the parent to be processed
 
     """
@@ -104,6 +107,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
                        so that each worker takes the largets amount of work to
                        minimize the number of chunks (in this case the data is
                        tupleized)
+
     :param workers: the number of processes spawned to accomplish the work; if
                     this is a negative number, add the number of CPU
                     processors with this number, so -1 would result in one

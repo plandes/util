@@ -16,7 +16,7 @@ example.
 
 While the [INI] format is preferred, the [YAML] format is also supported.
 Other formats (i.e. JSON) are easy to add by extending the [Configurable]
-class.  See the [YAML Format][#yaml-format] section for more information.
+class.  See the [YAML Format](#yaml-format) section for more information.
 
 
 ## INI Format
@@ -248,9 +248,8 @@ examples in this documentation.
 [Java Spring]: https://spring.io
 
 [test_yaml.py]: https://github.com/plandes/util/blob/master/test/python/test_yaml.py
-[INI formatted]: ini-format
-[Configuration Factory]: configuration-factory
-[configuration factory]: configuration-factory
+[Configuration Factory]: #configuration-factory
+[configuration factory]: #configuration-factory
 
 [Configurable]: ../api/zensols.config.html#zensols.config.configbase.Configurable
 [ExtendedInterpolationEnvConfig]: ../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig

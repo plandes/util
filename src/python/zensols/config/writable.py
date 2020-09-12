@@ -22,6 +22,16 @@ def _get_str_space(n_spaces: int) -> str:
 class Writable(ABC):
     """An interface for classes that have multi-line debuging capability.
 
+    .. document private functions
+    .. automethod:: _trunc
+    .. automethod:: _sp
+    .. automethod:: _set_indent
+    .. automethod:: _write_line
+    .. automethod:: _write_block
+    .. automethod:: _write_object
+    .. automethod:: _write_iterable
+    .. automethod:: _write_dict
+
     """
     WRITABLE_INDENT_SPACE = 4
     WRITABLE_MAX_COL = 80
@@ -137,7 +147,7 @@ class Writable(ABC):
         :param logger: the logger to write the message containing content of
                        this writable
 
-        :param level: the logging level given in the :module:`logging` module
+        :param level: the logging level given in the :mod:`logging` module
 
         :param depth: the starting indentation depth
 

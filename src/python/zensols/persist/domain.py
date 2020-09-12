@@ -176,6 +176,7 @@ class ReadOnlyStash(Stash):
     speed things up.
 
     Example::
+
         class RangeStash(ReadOnlyStash):
             def __init__(self, n, end: int = None):
                 super().__init__()
@@ -226,6 +227,9 @@ class CloseableStash(Stash):
 
 
 class DelegateDefaults(object):
+    """Defaults set in :class:`.DelegateStash`.
+
+    """
     # setting to True breaks stash reloads from ImportConfigFactory, so set to
     # True for tests etc
     CLASS_CHECK = False
@@ -243,14 +247,14 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
 
     This class delegates attribute fetches to the delegate for the
     unimplemented methods and attributes using a decorator pattern when
-    attribute :py:attrib:~`delegate_attr` is set to ``True``.
+    attribute :py:obj:`delegate_attr` is set to ``True``.
 
     **Note:** Delegate attribute fetching can cause strange and unexpected
     behavior, so use this funcationlity with care.  It is advised to leave it
     off if unexpected ``AttributeError`` are raised due to incorrect attribute
     is access or method dispatching.
 
-    :see: :py:attrib:~`delegate_attr`
+    :see: :py:obj:`delegate_attr`
 
     """
     delegate: Stash
