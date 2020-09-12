@@ -60,7 +60,14 @@ using series of dot (`.`) separated paths.  See the YAML test
 case [test_yaml.py] for an example.
 
 
-## Application Context
+## Inversion of Control
+
+This package provides a [Java Spring] like *inversion of control* system with
+one major difference: this API strives to be as simple as possible and
+integrate with all other *zensols* packages.
+
+
+### Application Context
 
 Any non-trivial application is recommended to have an *application context*
 type class that allows for specific customization and behavior with retrieving
@@ -96,7 +103,7 @@ class AppConfig(ExtendedInterpolationEnvConfig):
 ```
 
 
-## Parsing
+### Parsing
 
 The [Configurable] class defines access methods to the configuration data,
 including how to get primitives (`get_option_*` methods) or populate a hash or
@@ -114,14 +121,14 @@ in how it reads data, which uses the following rules:
 * Anything else as a string.
 
 
-## Configuration Factory
+### Configuration Factory
 
-This package provides a [Java Spring] like *inversion of control* system.  The
-configuration is parsed and given to an [ImportConfigFactory] to create
+The configuration is parsed and given to an [ImportConfigFactory] to create
 instances of objects.  Each instance is, by default, configured to create a
 single instance of each object instance per section.  Once a class is
 *referred* by name, the instance is looked up by the [ImportConfigFactory] and
 created if it does not exist already per the [parsing](#parsing) rules.
+
 
 Each section contains the data for an instance along with a option (variable)
 entry `class_name`, which is the fully qualified class name (`<module>.<class
@@ -185,7 +192,7 @@ particularly hand when prototyping your code from a different module in the
 Python REPL.
 
 
-## Evaluation Parameters
+### Evaluation Parameters
 
 Instance options (or any configuration section's options) can be created with
 an evaluation that allows for importing modules.  For example, if we want to
@@ -210,7 +217,7 @@ Organization(boss=Person(age=16, aliases=['cool dude (0)', 'bad dude (1)']))
 ```
 
 
-## Instance Parameters
+### Instance Parameters
 
 Instances can take parameters to substitute values.  This is useful when you
 want to define the values of an instance in the parent.  Extending from the
@@ -233,8 +240,8 @@ Organization(boss=Person(age=69, aliases=['Homer', 'Homer Simpson']))
 
 ## Complete Examples
 
-See the [examples](../example) directory the complete code used to create the
-examples in this documentation.
+See the [examples] directory the complete code used to create the examples in
+this documentation.
 
 
 <!-- links -->
@@ -256,3 +263,4 @@ examples in this documentation.
 [YamlConfig]: ../api/zensols.config.html#zensols.config.yaml.YamlConfig
 [ImportConfigFactory]: ../api/zensols.config.html#zensols.config.factory.ImportConfigFactory
 [populate]: ../api/zensols.config.html#zensols.config.configbase.Configurable.populate
+[examples]: https://github.com/plandes/util/tree/master/example

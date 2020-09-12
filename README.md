@@ -8,7 +8,8 @@ Command line, configuration and persistence utilities generally used for any
 more than basic application.  This general purpose library is small, has few
 dependencies, and helpful across many applications.  Some features include:
 
-* Better application level support for [configuration] than [configparser].
+* A [Java Spring] like application level support for [configuration] than
+  [configparser].
   * Construct objects using configuration files (both INI and YAML).
   * Parse primitives, dictionaries, file system objects, instances of classes.
 * A [command action library] using an action mnemonic to invocation of a

@@ -73,11 +73,10 @@ returning unsaved value
 30
 ```
 
-See the test case [test_persist.py](../test/python/test_persist.py) for more
-examples.
+See the test case [test_persist.py] for more examples.
 
 
-# Stashes
+## Stashes
 
 Stashes are dictionary like classes that create, read, update and delete (CRUD)
 data.  All stashes inherit from the [Stash] abstract base class and implement
@@ -138,11 +137,13 @@ descriptions are given below (see the [persist submodule] API docs):
 
 ## Complete Examples
 
-See the [examples](../example) directory the complete code used to create the
-examples in this documentation.
+See the [examples] directory the complete code used to create the examples in
+this documentation.
 
 
 <!-- links -->
+[examples]: https://github.com/plandes/util/tree/master/example
+[test_persist.py]: https://github.com/plandes/util/tree/master/test/python/test_persist.py
 
 [@persisted]: ../api/zensols.persist.html#zensols.persist.annotation.persisted
 [Deallocatable]: ../api/zensols.persist.html?#zensols.persist.dealloc.Deallocatable

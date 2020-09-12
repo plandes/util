@@ -79,7 +79,7 @@ def main():
     cl.invoke()
 ```
 
-See the [command line test cases] for more examples.
+See the command line test case [test_cli_env.py] for more examples.
 
 
 <!-- links -->
@@ -88,4 +88,4 @@ See the [command line test cases] for more examples.
 
 [OneConfPerActionOptionsCli]: ../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCli
 [OneConfPerActionOptionsCliEnv]: ../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCliEnv
-[command line test cases]: ../test/python/test_cli_env.py
+[test_cli_env.py]: https://github.com/plandes/util/tree/master/test/python/test_cli_env.py
