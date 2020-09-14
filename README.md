@@ -83,11 +83,13 @@ Copyright (c) 2020 Paul Landes
 [python37-badge]: https://img.shields.io/badge/python-3.7-blue.svg
 [python37-link]: https://www.python.org/downloads/release/python-370
 
+[Java Spring]: https://spring.io
+[Java installation]: https://java.com/en/download/
+
 [full documentation]: https://plandes.github.io/util/
 [template]: https://github.com/plandes/template
 [GNU make]: https://www.gnu.org/software/make/
 [configparser]: https://docs.python.org/3/library/configparser.html
-[Java installation]: https://java.com/en/download/
 [optparse]: https://docs.python.org/3/library/optparse.html
 
 [command action library]: doc/command-line.md
