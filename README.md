@@ -23,16 +23,17 @@ using the REPL.  Examples include reloading modules in the [configuration
 factory](doc/config.md).
 
 
+## Documentation
+
+See the [full documentation].
+
+
 ## Obtaining
 
 The easiest way to install the command line program is via the `pip` installer:
 ```bash
 pip3 install zensols.util
 ```
-
-## Documentation
-
-[Framework documentation](https://plandes.github.io/util/)
 
 
 ## Template
@@ -82,6 +83,7 @@ Copyright (c) 2020 Paul Landes
 [python37-badge]: https://img.shields.io/badge/python-3.7-blue.svg
 [python37-link]: https://www.python.org/downloads/release/python-370
 
+[full documentation]: https://plandes.github.io/util/
 [template]: https://github.com/plandes/template
 [GNU make]: https://www.gnu.org/software/make/
 [configparser]: https://docs.python.org/3/library/configparser.html
