@@ -19,6 +19,9 @@ class Dictable(Writable):
     """A class that that generates a dictionary recursively from data classes and
     primitive data structures.
 
+    .. document private functions
+    .. automethod:: _get_dictable_attributes
+
     """
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
         """Return human readable and attribute names.

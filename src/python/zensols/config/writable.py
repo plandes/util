@@ -104,13 +104,18 @@ class Writable(ABC):
             self._write_line(str(obj), depth, writer)
 
     def _write_iterable(self, data: Iterable[Any], depth: int,
-                        writer: TextIOBase):
+                        writer: TextIOBase, include_index: bool = False):
         """Write list ``data`` with the correct indentation per ``depth`` to
         ``writer``.
 
+        :param include_index: if ``True``, add an incrementing index for each
+                              element in the output
+
         """
-        for v in data:
-            self._write_object(v, depth, writer)
+        for i, v in enumerate(data):
+            if include_index:
+                self._write_line(f'i: {i}', depth, writer)
+            self._write_object(v, depth + (1 if include_index else 0), writer)
 
     def _write_dict(self, data: dict, depth: int, writer: TextIOBase):
         """Write dictionary ``data`` with the correct indentation per ``depth`` to
