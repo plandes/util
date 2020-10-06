@@ -80,6 +80,11 @@ class Writable(ABC):
             raise ValueError('max_len must either be a boolean or integer')
         writer.write(s + '\n')
 
+    def _write_divider(self, depth: int, writer: TextIOBase, char: str = '-'):
+        line = char * self.WRITABLE_MAX_COL
+        writer.write(line)
+        writer.write('\n')
+
     def _write_block(self, lines: str, depth: int, writer: TextIOBase):
         """Write a block of text with indentation.
 
