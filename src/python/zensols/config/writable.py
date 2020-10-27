@@ -63,6 +63,12 @@ class Writable(ABC):
         self._indent = indent
         _get_str_space.cache_clear()
 
+    def _write_empty(self, writer: TextIOBase):
+        """Write an empty line.
+
+        """
+        writer.write('\n')
+
     def _write_line(self, line: str, depth: int, writer: TextIOBase,
                     max_len: Union[bool, int] = False):
         """Write a line of text ``line`` with the correct indentation per ``depth`` to
@@ -78,12 +84,18 @@ class Writable(ABC):
             s = self._trunc(s, max_len)
         else:
             raise ValueError('max_len must either be a boolean or integer')
-        writer.write(s + '\n')
+        writer.write(s)
+        self._write_empty(writer)
 
-    def _write_divider(self, depth: int, writer: TextIOBase, char: str = '-'):
-        line = char * self.WRITABLE_MAX_COL
+    def _write_divider(self, depth: int, writer: TextIOBase, char: str = '-',
+                       width: int = None):
+        """Write a text based dividing line (like <hr></hr> in html).
+
+        """
+        width = self.WRITABLE_MAX_COL if width is None else width
+        line = char * width
         writer.write(line)
-        writer.write('\n')
+        self._write_empty(writer)
 
     def _write_block(self, lines: str, depth: int, writer: TextIOBase):
         """Write a block of text with indentation.
@@ -93,7 +105,7 @@ class Writable(ABC):
         for line in lines.split('\n'):
             writer.write(sp)
             writer.write(line)
-            writer.write('\n')
+            self._write_empty(writer)
 
     def _write_object(self, obj: Any, depth: int, writer: TextIOBase):
         """Write an object based on the class of the instance.
