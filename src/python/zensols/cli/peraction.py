@@ -13,7 +13,7 @@ from functools import reduce
 import optparse
 from optparse import OptionParser
 from zensols.config import IniConfig
-from zensols.cli import SimpleActionCli
+from . import SimpleActionCli
 
 logger = logging.getLogger(__name__)
 

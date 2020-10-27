@@ -10,7 +10,6 @@ from pathlib import Path
 import sys
 from io import TextIOBase
 import inspect
-import pkg_resources
 from . import Serializer, Writable
 
 logger = logging.getLogger(__name__)
@@ -24,7 +23,13 @@ class Configurable(Writable, metaclass=ABCMeta):
     However, they are reimplemented here for consistency among parser.
 
     """
-    def __init__(self, default_expect):
+    def __init__(self, default_expect: bool):
+        """Initialize.
+
+        :param default_expect: whether or not to raise an error when missing
+                               options for all ``get_option*`` methods
+
+        """
         self.default_expect = default_expect
         self.serializer = Serializer()
 
@@ -225,28 +230,30 @@ class Configurable(Writable, metaclass=ABCMeta):
             for k, v in self.get_options(sec).items():
                 self._write_line(f'{k}: {v}', depth + 1, writer)
 
-    def _get_calling_module(self):
+    def _get_calling_module(self, depth: int = 0):
         """Get the last module in the call stack that is not this module or ``None`` if
         the call originated from this module.
 
         """
         for frame in inspect.stack():
-            mod = inspect.getmodule(frame[0])
+            mod = inspect.getmodule(frame[depth])
             logger.debug(f'calling module: {mod}')
             if mod is not None:
                 mod_name = mod.__name__
                 if mod_name != __name__:
                     return mod
 
-    def resource_filename(self, resource_name, module_name=None):
+    def resource_filename(self, resource_name: str, module_name: str = None):
         """Return a resource based on a file name.  This uses the ``pkg_resources``
         package first to find the resources.  If it doesn't find it, it returns
         a path on the file system.
 
         :param: resource_name the file name of the resource to obtain (or name
                 if obtained from an installed module)
+
         :param module_name: the name of the module to obtain the data, which
                             defaults to ``__name__``
+
         :return: a path on the file system or resource of the installed module
 
         """
@@ -254,11 +261,5 @@ class Configurable(Writable, metaclass=ABCMeta):
             mod = self._get_calling_module()
             logger.debug(f'calling module: {mod}')
             if mod is not None:
-                mod_name = mod.__name__
-        if module_name is None:
-            module_name = __name__
-        if pkg_resources.resource_exists(mod_name, resource_name):
-            res = pkg_resources.resource_filename(mod_name, resource_name)
-        else:
-            res = resource_name
-        return Path(res)
+                module_name = mod.__name__
+        return self.serializer.resource_filename(resource_name, module_name)

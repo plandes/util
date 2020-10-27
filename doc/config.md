@@ -113,6 +113,9 @@ in how it reads data, which uses the following rules:
 * A string of numbers with a single decimal point (i.e. `3.123`) as a float.
 * Either `True` or `False` parsed as a boolean.
 * A string starting with `path:` parsed as a [pathlib.Path] instance.
+* A string starting with `resource:` parsed as `path:`, but points to a
+  resource path either locally, or from a `setuptools` installed package (see
+  the [Resources](#resources) section).
 * A string starting with `json:` parsed as standard JSON.
 * A string staring with `eval:` parsed by the Python code reader (see the
   [Evaluation Parameters](#evaluation-parameters) section).
@@ -216,6 +219,36 @@ school_clique: domain.Organization = factory('school_clique')
 Organization(boss=Person(age=16, aliases=['cool dude (0)', 'bad dude (1)']))
 ```
 
+### Resources
+
+Resources are paths that exist either in a local project, or point to a
+directory from a Python [setuptools] module.  This uses the [resource_filename]
+method, which in turn, uses the [pkg_resources] API to base the path from an
+installation.
+
+This mechanism needs the package metadata information to find the correct
+module in the install path.  This is set automatically when using CLI classes
+such as [OneConfPerActionOptionsCliEnv].  However, there are additional
+[setuptools] resources needed, which include:
+* `python-resources` added in `PROJ_MODULES` in the makefile using the
+  `zenbuild` build environment
+* `package_data` in `src/python/setup.py` to include the globs for the
+  resources you want to include (`package_data={'': ['*.txt']}` for the example
+  below).
+
+An example of a resource path, which finds the file `fake.txt` in the local
+project's directory `resources` is:
+```ini
+fake_path = resource: resources/fake.txt
+```
+
+In case the program isn't automatically configured with the module to find the
+resource, you may add it in the configuration declaration itself.  For example,
+if our [setuputils] name is `zensols.someproj`, configure the resource as:
+```ini
+fake_path = resource(zensols.someproj): resources/fake.txt
+```
+
 
 ### Instance Parameters
 
@@ -253,6 +286,8 @@ this documentation.
 [grsync YAML]: https://github.com/plandes/grsync/blob/master/test-resources/small-test.yml
 [pathlib.Path]: https://docs.python.org/3/library/pathlib.html
 [Java Spring]: https://spring.io
+[setuptools]: https://setuptools.readthedocs.io/en/latest/
+[pkg_resources]: https://setuptools.readthedocs.io/en/latest/pkg_resources.html
 
 [test_yaml.py]: https://github.com/plandes/util/blob/master/test/python/test_yaml.py
 [Configuration Factory]: #configuration-factory
@@ -263,4 +298,6 @@ this documentation.
 [YamlConfig]: ../api/zensols.config.html#zensols.config.yaml.YamlConfig
 [ImportConfigFactory]: ../api/zensols.config.html#zensols.config.factory.ImportConfigFactory
 [populate]: ../api/zensols.config.html#zensols.config.configbase.Configurable.populate
+[resource_filename]: ../api/zensols.config.html#zensols.config.configbase.Configurable.resource_filename
 [examples]: https://github.com/plandes/util/tree/master/example
+[OneConfPerActionOptionsCliEnv]: ../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCliEnv

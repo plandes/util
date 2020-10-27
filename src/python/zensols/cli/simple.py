@@ -10,6 +10,7 @@ import sys
 import os
 from optparse import OptionParser
 from pkg_resources import get_distribution, DistributionNotFound
+from zensols.config import Serializer
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +65,7 @@ class SimpleActionCli(object):
             try:
                 self.pkg = get_distribution(pkg_dist)
                 self.version = self.pkg.version
+                Serializer.DEFAULT_RESOURCE_MODULE = pkg_dist
             except DistributionNotFound:
                 pass
         if config is not None:

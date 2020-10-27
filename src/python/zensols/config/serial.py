@@ -12,6 +12,7 @@ from json import JSONEncoder
 from itertools import chain
 import logging
 import re
+import pkg_resources
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -52,9 +53,11 @@ class Serializer(object):
     INT_REGEXP = re.compile(r'^[-+]?[0-9]+$')
     BOOL_REGEXP = re.compile(r'^True|False')
     PATH_REGEXP = re.compile(r'^path:\s*(.+)$')
+    RESOURCE_REGEXP = re.compile(r'^resource(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     EVAL_REGEXP = re.compile(r'^eval(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     JSON_REGEXP = re.compile(r'^json:\s*(.+)$', re.DOTALL)
     PRIMITIVES = set([bool, float, int, None.__class__])
+    DEFAULT_RESOURCE_MODULE = None
 
     allow_types: Set[type] = field(
         default_factory=lambda:
@@ -80,9 +83,11 @@ class Serializer(object):
             pconfig = eval(pconfig)
             if 'import' in pconfig:
                 imports = pconfig['import']
-                logger.debug(f'imports: {imports}')
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'imports: {imports}')
                 for i in imports:
-                    logger.debug(f'importing: {i}')
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug(f'importing: {i}')
                     exec(f'import {i}')
         if evalstr is not None:
             return eval(evalstr)
@@ -110,6 +115,20 @@ class Serializer(object):
             m = self.PATH_REGEXP.match(v)
             if m:
                 parsed = Path(m.group(1)).expanduser()
+            if parsed is None:
+                m = self.RESOURCE_REGEXP.match(v)
+                if m:
+                    mod, pathstr = m.groups()
+                    if mod is None:
+                        if self.DEFAULT_RESOURCE_MODULE is None:
+                            if logger.isEnabledFor(logging.ERROR):
+                                logger.error(f'no module path: {pathstr}')
+                            parsed = Path(pathstr)
+                    if parsed is None:
+                        parsed = self.resource_filename(pathstr, mod)
+                        if logger.isEnabledFor(logging.ERROR):
+                            logger.error(f'found resource path: {parsed}')
+                        parsed = Path(parsed)
             if parsed is None:
                 m = self.EVAL_REGEXP.match(v)
                 if m:
@@ -173,3 +192,27 @@ class Serializer(object):
         else:
             v = 'json: ' + self._json_dump(obj)
         return v
+
+    def resource_filename(self, resource_name: str, module_name: str = None):
+        """Return a resource based on a file name.  This uses the ``pkg_resources``
+        package first to find the resources.  If it doesn't find it, it returns
+        a path on the file system.
+
+        :param: resource_name the file name of the resource to obtain (or name
+                if obtained from an installed module)
+
+        :param module_name: the name of the module to obtain the data, which
+                            defaults to :obj:`DEFAULT_RESOURCE_MODULE`, which
+                            is set by
+                            :class:`zensols.cli.simple.SimpleActionCli`
+
+        :return: a path on the file system or resource of the installed module
+
+        """
+        if module_name is None:
+            module_name = self.DEFAULT_RESOURCE_MODULE
+        if pkg_resources.resource_exists(module_name, resource_name):
+            res = pkg_resources.resource_filename(module_name, resource_name)
+        else:
+            res = resource_name
+        return Path(res)
