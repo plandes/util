@@ -121,13 +121,13 @@ class Serializer(object):
                     mod, pathstr = m.groups()
                     if mod is None:
                         if self.DEFAULT_RESOURCE_MODULE is None:
-                            if logger.isEnabledFor(logging.ERROR):
-                                logger.error(f'no module path: {pathstr}')
+                            if logger.isEnabledFor(logging.DEBUG):
+                                logger.debug(f'no module path: {pathstr}')
                             parsed = Path(pathstr)
                     if parsed is None:
                         parsed = self.resource_filename(pathstr, mod)
-                        if logger.isEnabledFor(logging.ERROR):
-                            logger.error(f'found resource path: {parsed}')
+                        if logger.isEnabledFor(logging.DEBUG):
+                            logger.debug(f'found resource path: {parsed}')
                         parsed = Path(parsed)
             if parsed is None:
                 m = self.EVAL_REGEXP.match(v)
