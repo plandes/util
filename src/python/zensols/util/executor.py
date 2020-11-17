@@ -7,6 +7,7 @@ from typing import Union
 from dataclasses import dataclass, field
 import logging
 from logging import Logger
+from pathlib import Path
 import subprocess
 from subprocess import Popen
 from zensols.util import StreamLogDumper
@@ -40,13 +41,18 @@ class Executor(object):
     check_exit_value: int = field(default=0)
     timeout: int = field(default=None)
     async_proc: bool = field(default=False)
+    working_dir: Path = field(default=None)
 
     def run(self, cmd) -> Union[Popen, int, type(None)]:
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'system <{cmd}>')
         if not self.dry_run:
-            proc = Popen(cmd, shell=True, stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE)
+            params = {'shell': True,
+                      'stdout': subprocess.PIPE,
+                      'stderr': subprocess.PIPE}
+            if self.working_dir is not None:
+                params['cwd'] = str(self.working_dir)
+            proc = Popen(cmd, **params)
             StreamLogDumper.dump(proc.stdout, proc.stderr, self.logger)
             if self.async_proc:
                 return proc
