@@ -174,6 +174,11 @@ class Dictable(Writable):
         super()._write_dict(self.asdict(recurse=True, readable=True),
                             depth, writer)
 
+    def _write_key_value(self, k: Any, v: Any, depth: int, writer: TextIOBase):
+        sp = self._sp(depth)
+        v = self._format(v)
+        writer.write(f'{sp}{k}: {v}\n')
+
     def __str__(self) -> str:
         return self._get_description(True)
 

@@ -120,6 +120,13 @@ class Writable(ABC):
         else:
             self._write_line(str(obj), depth, writer)
 
+    def _write_key_value(self, k: Any, v: Any, depth: int, writer: TextIOBase):
+        """Write a key value pair from a dictionary.
+
+        """
+        sp = self._sp(depth)
+        writer.write(f'{sp}{k}: {v}\n')
+
     def _write_iterable(self, data: Iterable[Any], depth: int,
                         writer: TextIOBase, include_index: bool = False):
         """Write list ``data`` with the correct indentation per ``depth`` to
@@ -149,7 +156,7 @@ class Writable(ABC):
                 writer.write(f'{sp}{k}:\n')
                 self._write_object(v, depth + 1, writer)
             else:
-                writer.write(f'{sp}{k}: {v}\n')
+                self._write_key_value(k, v, depth, writer)
 
     @abstractmethod
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
