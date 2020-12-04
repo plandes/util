@@ -19,8 +19,12 @@ class Dictable(Writable):
     """A class that that generates a dictionary recursively from data classes and
     primitive data structures.
 
+    To override the default behavior of creating a dict from a
+    :class:`dataclass`, override the :meth:`_from_dictable` method.
+
     .. document private functions
     .. automethod:: _get_dictable_attributes
+    .. automethod:: _from_dictable
 
     """
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
@@ -43,6 +47,24 @@ class Dictable(Writable):
 
     def _from_dictable(self, recurse: bool, readable: bool,
                        class_name_param: str = None) -> Dict[str, Any]:
+        """A subclass can override this method to give create a custom specific
+        dictionary to be returned from the :meth:`asjson` client access method.
+
+        :param recurse: if ``True``, recursively create dictionary so some
+                        values might be dictionaries themselves
+
+        :param readable: use human readable and attribute keys when available
+
+        :param class_name_param: if set, add a ``class_name_param`` key with
+                                 the class's fully qualified name (includes
+                                 module name)
+
+        :return: a JSON'able tree of dictionaries with primitive data
+
+        :see: :meth:`asjson`
+        :see: :meth:`asdict`
+
+        """
         dct = OrderedDict()
         self._add_class_name_param(class_name_param, dct)
         for readable_name, name in self._get_dictable_attributes():
@@ -119,6 +141,7 @@ class Dictable(Writable):
         :return: a JSON'able tree of dictionaries with primitive data
 
         :see: :meth:`asjson`
+        :see: :meth:`_from_dictable`
 
         """
         return self._from_dictable(recurse, readable, class_name_param)

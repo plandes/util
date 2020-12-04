@@ -16,12 +16,16 @@ logger = logging.getLogger(__name__)
 
 
 class ActionCliError(Exception):
-    def __init__(self, *args, **kwargs):
-        Exception.__init__(self, *args, **kwargs)
+    pass
 
 
 class SimpleActionCli(object):
     """A simple action based command line interface.
+
+    .. document private functions
+    .. automethod:: _config_logging
+    .. automethod:: _config_log_level
+
     """
     def __init__(self, executors, invokes, config=None, version='none',
                  pkg_dist=None, opts=None, manditory_opts=None,
@@ -71,7 +75,11 @@ class SimpleActionCli(object):
         if config is not None:
             config.pkg = self.pkg
 
-    def _config_logging(self, level):
+    def _config_logging(self, level: int):
+        """Configure logging by calling :meth:`_config_log_level`, which in turns
+        invokes :meth:`logging.basicConfig`.
+
+        """
         if level == 0:
             levelno = logging.WARNING
         elif level == 1:
@@ -84,7 +92,13 @@ class SimpleActionCli(object):
             fmt = '%(levelname)s:%(asctime)-15s %(name)s: %(message)s'
         self._config_log_level(fmt, levelno)
 
-    def _config_log_level(self, fmt, levelno):
+    def _config_log_level(self, fmt: str, levelno: int):
+        """Configure logging by calling :meth:`logging.basicConfig` with the base
+        package set at ``levelno`` if available.  In this case, the default
+        logging level is set to :obj:`logging.WARNING`.  Otherwise,
+        reconfigure logging using a ``levelno`` across all loggers.
+
+        """
         if self.pkg is not None:
             logging.basicConfig(format=fmt, level=logging.WARNING)
             logging.getLogger(self.pkg.project_name).setLevel(level=levelno)
