@@ -65,6 +65,7 @@ class SimpleActionCli(object):
         self.config = config
         self.default_action = default_action
         self.pkg = None
+        self.pkg_dist = pkg_dist
         if pkg_dist is not None:
             try:
                 self.pkg = get_distribution(pkg_dist)
@@ -102,6 +103,9 @@ class SimpleActionCli(object):
         if self.pkg is not None:
             logging.basicConfig(format=fmt, level=logging.WARNING)
             logging.getLogger(self.pkg.project_name).setLevel(level=levelno)
+        elif self.pkg_dist is not None:
+            logging.basicConfig(format=fmt, level=logging.WARNING)
+            logging.getLogger(self.pkg_dist).setLevel(level=levelno)
         else:
             root = logging.getLogger()
             map(root.removeHandler, root.handlers[:])
