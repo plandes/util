@@ -77,7 +77,7 @@ class SimpleActionCli(object):
 
     def _config_logging(self, level: int):
         """Configure logging by calling :meth:`_config_log_level`, which in turns
-        invokes :meth:`logging.basicConfig`.
+        invokes :meth:`.logging.basicConfig`.
 
         """
         if level == 0:
@@ -93,10 +93,10 @@ class SimpleActionCli(object):
         self._config_log_level(fmt, levelno)
 
     def _config_log_level(self, fmt: str, levelno: int):
-        """Configure logging by calling :meth:`logging.basicConfig` with the base
+        """Configure logging by calling :meth:`.logging.basicConfig` with the base
         package set at ``levelno`` if available.  In this case, the default
-        logging level is set to :obj:`logging.WARNING`.  Otherwise,
-        reconfigure logging using a ``levelno`` across all loggers.
+        logging level is set to :obj:`logging.WARNING`.  Otherwise, reconfigure
+        logging using a ``levelno`` across all loggers.
 
         """
         if self.pkg is not None:
