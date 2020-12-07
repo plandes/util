@@ -18,7 +18,7 @@ way of configuring the action based command line.  An extention of this class
 is the [OneConfPerActionOptionsCliEnv] class, which imports environment
 variables and allows adding to the configuration via adding a resource like
 file (i.e. `~/.<program name>rc`) type file.  See the
-[configuration](config.md) documentation for more information.
+[configuration](./config.md) documentation for more information.
 
 Note that access to your program through this API is easily callable by other
 programs by populating the `sys.argv` array and calling `main`.

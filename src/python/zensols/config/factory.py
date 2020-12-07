@@ -108,7 +108,7 @@ class ClassImporter(object):
         :param class_name: the fully qualifed name of the class (including the
                            module portion of the class name)
         :param reload: if ``True`` then reload the module before returning the
-        class
+                       class
         """
         self.class_name = class_name
         self.reload = reload

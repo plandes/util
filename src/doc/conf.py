@@ -56,6 +56,13 @@ extensions = [
     'rst2pdf.pdfbuilder',
 ]
 
+# autodoc extension configuration
+autodoc_default_options = {
+# uncomment to enable class level members
+#    'members': True,
+    'special-members': '__init__',
+}
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
