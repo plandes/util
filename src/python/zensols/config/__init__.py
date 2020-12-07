@@ -1,3 +1,8 @@
+"""Contains modules that provide configuration utility.
+
+"""
+__author__ = 'Paul Landes'
+
 from .serial import *
 from .writable import *
 from .configbase import *
