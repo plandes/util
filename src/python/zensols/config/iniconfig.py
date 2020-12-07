@@ -4,12 +4,11 @@ parsed from files.
 """
 __author__ = 'Paul Landes'
 
-from typing import Set, Dict, List, Any
+from typing import Set, Dict, List
 from abc import ABCMeta, abstractmethod
 import logging
 import os
 from io import StringIO
-from collections import OrderedDict
 from pathlib import Path
 from copy import deepcopy
 from configparser import ConfigParser, ExtendedInterpolation
@@ -28,8 +27,6 @@ class IniConfig(Configurable):
                  default_vars: dict = None, default_expect: bool = False,
                  create_defaults: bool = None):
         """Create with a configuration file path.
-
-        Keyword arguments:
 
         :param config_file: the configuration file path to read from
 
