@@ -31,7 +31,7 @@ class FactoryState(Enum):
     """The state updated from an instance of :class:`.ConfigFactory`.  Currently
     the only state is that an object has finished being created.
 
-    Future states might inlude when a :class:`ImportConfigFactory` has created
+    Future states might inlude when a :class:`.ImportConfigFactory` has created
     all objects from a configuration shared session.
 
     """
