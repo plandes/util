@@ -6,13 +6,34 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [Unreleased]
+
+
+## [1.3.0] - 2020-12-09
+Major release.
+
 ### Added
 - In depth top level documentation, including sphinx/API linked docs.
+- New `Dictable` creates dictionaries working with `dataclasses` and
+  automatically human (more or less) readable using `Writable`.
+- Much more documentation, both at the API level and top level `README.md` and
+  in `./doc`, which now gets compiled in to sphinx docs.
+- Support for creation of `pathlib.Path` from configuration.
+- Support for resources from configuration with transparent `pathlib.Path`
+  creation as either installed or run from source tree.
+- Configuration environment section.
+- More test cases for existing and new classes.
+- Add class metadata "explorer".
 
 ### Changed
 - Default for `zensols.config.ImportConfigFactory.shared` is `True`.
   **Important:** this is a big change, so it would be prudent to retest your
   dependent code.
+- Finalize `Writable` interface and change dependent code.
+- Fixes to deallocation and resource clean up.
+- Refactored configuration files by purpose and class with better class
+  hierarchy.
+- Refactored stash files by purpose and classes.
+- Better more stable `DelegateStash` attribute resolution handling.
 
 
 ## [1.2.5] - 2020-05-23
@@ -75,7 +96,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.2.5...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/plandes/util/compare/v1.2.5...v1.3.0
 [1.2.5]: https://github.com/plandes/util/compare/v1.2.4...v1.2.5
 [1.2.4]: https://github.com/plandes/util/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/plandes/util/compare/v1.2.2...v1.2.3
