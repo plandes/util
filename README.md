@@ -1,8 +1,9 @@
 # Zensols Utilities
 
-[![Travis CI Build Status][travis-badge]][travis-link]
 [![PyPI][pypi-badge]][pypi-link]
 [![Python 3.7][python37-badge]][python37-link]
+[![Python 3.8][python38-badge]][python38-link]
+[![Build Status][build-badge]][build-link]
 
 Command line, configuration and persistence utilities generally used for any
 more than basic application.  This general purpose library is small, has few
@@ -75,13 +76,14 @@ Copyright (c) 2020 Paul Landes
 
 
 <!-- links -->
-[travis-link]: https://travis-ci.org/plandes/util
-[travis-badge]: https://travis-ci.org/plandes/util.svg?branch=master
 [pypi]: https://pypi.org/project/zensols.util/
 [pypi-link]: https://pypi.python.org/pypi/zensols.util
 [pypi-badge]: https://img.shields.io/pypi/v/zensols.util.svg
 [python37-badge]: https://img.shields.io/badge/python-3.7-blue.svg
 [python37-link]: https://www.python.org/downloads/release/python-370
+[python38-link]: https://www.python.org/downloads/release/python-380
+[build-badge]: https://github.com/plandes/util/workflows/CI/badge.svg
+[build-link]: https://github.com/plandes/util/actions
 
 [Java Spring]: https://spring.io
 [Java installation]: https://java.com/en/download/
