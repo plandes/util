@@ -3,8 +3,10 @@
 """
 __author__ = 'Paul Landes'
 
+from typing import Dict, Tuple, Set, Any
 import logging
 import sys
+from pathlib import Path
 from pprint import pprint
 import copy
 import yaml
@@ -24,20 +26,37 @@ class YamlConfig(Configurable):
     """
     CLASS_VER = 0
 
-    def __init__(self, config_file=None, default_vars=None, delimiter='$',
-                 default_expect=False):
-        super().__init__(default_expect)
+    def __init__(self, config_file: Path = None,
+                 default_section: str = 'default', default_vars: str = None,
+                 delimiter: str = '$', default_expect: bool = False,
+                 sections_name: str = 'sections'):
+        """Initialize this instance.
+
+        :param config_file: the ``.yml`` configuration file path to read from
+
+        :param default_section: default section (defaults to `default`)
+
+        :param default_vars: used use with existing configuration is not found
+
+        
+
+        :param default_expect: if ``True``, raise exceptions when keys and/or
+                               sections are not found in the configuration
+
+        """
+        super().__init__(default_expect, default_section)
         self.config_file = config_file
         self.default_vars = default_vars if default_vars else {}
         self.delimiter = delimiter
+        self.sections_name = sections_name
 
     @classmethod
-    def _is_primitive(cls, obj):
+    def _is_primitive(cls, obj) -> bool:
         return isinstance(obj, str) or \
            isinstance(obj, list) or \
            isinstance(obj, bool)
 
-    def _parse(self):
+    def _parse(self) -> Tuple[str, Dict[str, str], Dict[str, str]]:
         with open(self.config_file) as f:
             content = f.read()
         struct = yaml.load(content, yaml.FullLoader)
@@ -62,7 +81,7 @@ class YamlConfig(Configurable):
         self._all_keys = copy.copy(list(context.keys()))
         return content, struct, context
 
-    def _make_class(self):
+    def _make_class(self) -> type:
         class_name = 'YamlTemplate{}'.format(self.CLASS_VER)
         self.CLASS_VER += 1
         # why couldn't they have made idpattern and delimiter instance members?
@@ -78,7 +97,7 @@ class """ + class_name + """(Template):
         cls = eval(class_name)
         return cls
 
-    def _compile(self):
+    def _compile(self) -> Dict[str, str]:
         content, struct, context = self._parse()
         prev = None
         cls = self._make_class()
@@ -90,7 +109,7 @@ class """ + class_name + """(Template):
         return yaml.load(content, yaml.FullLoader)
 
     @property
-    def config(self):
+    def config(self) -> Dict[str, Any]:
         if not hasattr(self, '_config'):
             self._config = self._compile()
         return self._config
@@ -142,7 +161,7 @@ class """ + class_name + """(Template):
         opts = self.options
         return name in opts
 
-    def get_option(self, name, section=None, vars=None, expect=None):
+    def get_option(self, name, section=None, vars=None, expect=None) -> str:
         """Return an option using a dot encoded path.
 
         """
@@ -156,7 +175,7 @@ class """ + class_name + """(Template):
                 raise ValueError('no such option: {}'.format(name))
 
     def get_options(self, name='default', opt_keys=None, vars=None,
-                    expect=None):
+                    expect=None) -> Dict[str, str]:
         if self.default_vars and name in self.default_vars:
             return self.default_vars[name]
         else:
@@ -167,3 +186,23 @@ class """ + class_name + """(Template):
                 return self.default_vars[name]
             elif self._narrow_expect(expect):
                 raise ValueError('no such option: {}'.format(name))
+
+    @property
+    def root(self) -> str:
+        """Return the (first) root name of the Yaml configuration file.
+
+        """
+        if not hasattr(self, '_root'):
+            root_keys = self.config.keys()
+            self._root = next(iter(root_keys))
+        return self._root
+
+    @property
+    def sections(self) -> Set[str]:
+        """Return the sections by finding the :obj:`section_name` based from the
+        :obj:`root`.
+
+        """
+        sec_key = f'{self.root}.{self.sections_name}'
+        if self.has_option(sec_key):
+            return tuple(self.get_option_list(sec_key))

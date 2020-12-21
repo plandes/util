@@ -24,13 +24,15 @@ class IniConfig(Configurable):
     """
     def __init__(self, config_file: Path = None,
                  default_section: str = 'default', robust: bool = False,
-                 default_vars: dict = None, default_expect: bool = False,
-                 create_defaults: bool = None):
+                 default_vars: Dict[any, any] = None,
+                 default_expect: bool = False, create_defaults: bool = None):
         """Create with a configuration file path.
 
         :param config_file: the configuration file path to read from
 
         :param default_section: default section (defaults to `default`)
+
+        :param default_vars: used use with existing configuration is not found
 
         :param robust: if `True`, then don't raise an error when the
                        configuration file is missing
@@ -43,12 +45,11 @@ class IniConfig(Configurable):
                                 baked in to the configuration file
         """
 
-        super().__init__(default_expect)
+        super().__init__(default_expect, default_section)
         if isinstance(config_file, str):
             self.config_file = Path(config_file).expanduser()
         else:
             self.config_file = config_file
-        self.default_section = default_section
         self.robust = robust
         self.default_vars = self._munge_default_vars(default_vars)
         self.create_defaults = self._munge_create_defaults(create_defaults)

@@ -129,4 +129,4 @@ class TestConfigWriteBack(TestConfigWriteBase):
         self.assertTrue(isinstance(t1, Temp1))
         self.assertTrue(self.config.has_option('aval', 'temp1'))
         t1.aval = 'instance: temp2'
-        self.assertEquals(Temp2, type(t1.aval))
+        self.assertEqual(Temp2, type(t1.aval))

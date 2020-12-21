@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Add sections support to `zensols.config.YamlConfig` and other compatibility
+  with super class.
+
+
 ## [1.3.0] - 2020-12-09
 Major release.
 

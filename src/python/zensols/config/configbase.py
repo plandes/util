@@ -23,7 +23,7 @@ class Configurable(Writable, metaclass=ABCMeta):
     However, they are reimplemented here for consistency among parser.
 
     """
-    def __init__(self, default_expect: bool):
+    def __init__(self, default_expect: bool, default_section: str = 'default'):
         """Initialize.
 
         :param default_expect: whether or not to raise an error when missing
@@ -31,6 +31,7 @@ class Configurable(Writable, metaclass=ABCMeta):
 
         """
         self.default_expect = default_expect
+        self.default_section = default_section
         self.serializer = Serializer()
 
     def _narrow_expect(self, expect):
