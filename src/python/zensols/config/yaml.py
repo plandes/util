@@ -88,6 +88,12 @@ class YamlConfig(Configurable):
         # note we have to give the option of different delimiters since the
         # default '$$' (use case=OS env vars) is always resolved to '$' given
         # the iterative variable substitution method
+        #
+        # Yes, this really is necessary.  From the string.Template
+        # documentation: Advanced usage: you can derive subclasses of Template
+        # to customize the placeholder syntax, delimiter character, or the
+        # entire regular expression used to parse template strings. To do this,
+        # you can override these class attributes:
         code = """\
 from string import Template
 class """ + class_name + """(Template):
