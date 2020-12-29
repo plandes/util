@@ -244,7 +244,7 @@ fake_path = resource: resources/fake.txt
 
 In case the program isn't automatically configured with the module to find the
 resource, you may add it in the configuration declaration itself.  For example,
-if our [setuputils] name is `zensols.someproj`, configure the resource as:
+if our [setuptools] name is `zensols.someproj`, configure the resource as:
 ```ini
 fake_path = resource(zensols.someproj): resources/fake.txt
 ```
