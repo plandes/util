@@ -190,6 +190,9 @@ class Configurable(Writable, metaclass=ABCMeta):
         """
         section = self.default_section if section is None else section
         sec = self.get_options(section)
+        if sec is None:
+            # needed for the YamlConfig class
+            raise ValueError(f"no section from which to populate: '{section}'")
         return self.serializer.populate_state(sec, obj, parse_types)
 
     @property

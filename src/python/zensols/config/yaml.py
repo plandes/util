@@ -5,17 +5,15 @@ __author__ = 'Paul Landes'
 
 from typing import Dict, Tuple, Set, Any
 import logging
-import sys
 from pathlib import Path
-from pprint import pprint
 import copy
 import yaml
-from zensols.config import Configurable
+from zensols.config import Configurable, Dictable
 
 logger = logging.getLogger(__name__)
 
 
-class YamlConfig(Configurable):
+class YamlConfig(Configurable, Dictable):
     """Just like zensols.actioncli.Config but parse configuration from YAML files.
     Variable substitution works just like ini files, but you can set what
     delimiter to use and keys are the paths of the data in the hierarchy
@@ -57,26 +55,26 @@ class YamlConfig(Configurable):
            isinstance(obj, bool)
 
     def _parse(self) -> Tuple[str, Dict[str, str], Dict[str, str]]:
+        def flatten(path, n):
+            logger.debug('path: {}, n: <{}>'.format(path, n))
+            logger.debug('context: <{}>'.format(context))
+            if n is None:
+                context[path] = None
+            elif self._is_primitive(n):
+                context[path] = n
+            elif isinstance(n, dict):
+                for k, v in n.items():
+                    k = path + '.' + k if len(path) else k
+                    flatten(k, v)
+            else:
+                raise ValueError('unknown yaml type {}: {}'.
+                                 format(type(n), n))
+
         with open(self.config_file) as f:
             content = f.read()
         struct = yaml.load(content, yaml.FullLoader)
         context = {}
         context.update(self.default_vars)
-
-        def flatten(path, n):
-            logger.debug('path: {}, n: <{}>'.format(path, n))
-            logger.debug('context: <{}>'.format(context))
-            if self._is_primitive(n):
-                context[path] = n
-            else:
-                if isinstance(n, dict):
-                    for k, v in n.items():
-                        k = path + '.' + k if len(path) else k
-                        flatten(k, v)
-                else:
-                    raise ValueError('unknown yaml type {}: {}'.
-                                     format(type(n), n))
-
         flatten('', struct)
         self._all_keys = copy.copy(list(context.keys()))
         return content, struct, context
@@ -120,28 +118,30 @@ class """ + class_name + """(Template):
             self._config = self._compile()
         return self._config
 
-    def write(self, writer=sys.stdout):
-        pprint(self.config, writer)
+    def _from_dictable(self, recurse: bool, readable: bool,
+                       class_name_param: str = None) -> Dict[str, Any]:
+        return self.config
 
-    def _option(self, name):
+    def get_tree(self, name) -> Dict[str, Any]:
         def find(n, path, name):
-            logger.debug(
-                'search: n={}, path={}, name={}'.format(n, path, name))
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'search: n={n}, path={path}, name={name}')
             if path == name:
-                logger.debug('found: <{}>'.format(n))
+                logger.debug(f'found: <{n}>')
                 return n
             elif isinstance(n, dict):
                 for k, v in n.items():
                     k = path + '.' + k if len(path) else k
                     v = find(v, k, name)
                     if v is not None:
-                        logger.debug('found {} -> {}'.format(name, v))
+                        if logger.isEnabledFor(logging.DEBUG):
+                            logger.debug(f'found {name} -> {v}')
                         return v
                 logger.debug('not found: {}'.format(name))
         return find(self.config, '', name)
 
-    def _get_option(self, name, expect=None):
-        node = self._option(name)
+    def _get_option(self, name: str, expect: bool = None) -> str:
+        node = self.get_tree(name)
         if self._is_primitive(node):
             return node
         elif self.default_vars is not None and name in self.default_vars:
@@ -150,7 +150,7 @@ class """ + class_name + """(Template):
             raise ValueError('no such option: {}'.format(name))
 
     @property
-    def options(self):
+    def options(self) -> Dict[str, Any]:
         if not hasattr(self, '_options'):
             self.config
             self._options = {}
@@ -185,7 +185,7 @@ class """ + class_name + """(Template):
         if self.default_vars and name in self.default_vars:
             return self.default_vars[name]
         else:
-            node = self._option(name)
+            node = self.get_tree(name)
             if not isinstance(node, str) or isinstance(node, list):
                 return node
             elif name in self.default_vars:
