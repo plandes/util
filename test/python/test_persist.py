@@ -3,6 +3,7 @@ from sys import platform
 from pathlib import Path
 import shutil
 import pickle
+import sys
 from io import BytesIO
 import unittest
 from zensols.persist import (
@@ -358,7 +359,9 @@ class TestPersistWork(unittest.TestCase):
     def paths(self, name):
         path = self.targdir
         file_path = path / f'{name}.db'
-        if platform == "linux" or platform == "linux2":
+        # linux and versions of Python on macOS don't add the `.db` extension
+        is_py_higher_38 = sys.version_info[0] >= 3 and sys.version_info[1] >= 8
+        if (platform == "linux" or platform == "linux2") or is_py_higher_38:
             path = file_path
         else:
             path = path / name
