@@ -3,6 +3,7 @@
 [![PyPI][pypi-badge]][pypi-link]
 [![Python 3.7][python37-badge]][python37-link]
 [![Python 3.8][python38-badge]][python38-link]
+[![Python 3.9][python39-badge]][python39-link]
 [![Build Status][build-badge]][build-link]
 
 Command line, configuration and persistence utilities generally used for any
@@ -80,9 +81,11 @@ Copyright (c) 2020 Paul Landes
 [pypi-link]: https://pypi.python.org/pypi/zensols.util
 [pypi-badge]: https://img.shields.io/pypi/v/zensols.util.svg
 [python37-badge]: https://img.shields.io/badge/python-3.7-blue.svg
-[python38-badge]: https://img.shields.io/badge/python-3.8-blue.svg
 [python37-link]: https://www.python.org/downloads/release/python-370
+[python38-badge]: https://img.shields.io/badge/python-3.8-blue.svg
 [python38-link]: https://www.python.org/downloads/release/python-380
+[python39-badge]: https://img.shields.io/badge/python-3.9-blue.svg
+[python39-link]: https://www.python.org/downloads/release/python-390
 [build-badge]: https://github.com/plandes/util/workflows/CI/badge.svg
 [build-link]: https://github.com/plandes/util/actions
 

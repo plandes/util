@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Add sections support to `zensols.config.YamlConfig` and other compatibility
   with super class.
+- Fix tests for Python 3.9.
 
 
 ## [1.3.0] - 2020-12-09
