@@ -8,10 +8,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.3.1] - 2021-01-12
 ### Changed
 - Add sections support to `zensols.config.YamlConfig` and other compatibility
   with super class.
 - Fix tests for Python 3.9.
+- Copy forward documentation from decorators, so `@persisted` (for example)
+  fields generate Sphinx documentation.
 
 
 ## [1.3.0] - 2020-12-09
@@ -102,7 +105,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/plandes/util/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/plandes/util/compare/v1.2.5...v1.3.0
 [1.2.5]: https://github.com/plandes/util/compare/v1.2.4...v1.2.5
 [1.2.4]: https://github.com/plandes/util/compare/v1.2.3...v1.2.4
