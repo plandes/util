@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zensols.persist.composite &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>zensols.persist.composite</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for zensols.persist.composite</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Stash implementations.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Paul Landes&#39;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">DirectoryStash</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MissingDataKeys"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.composite.MissingDataKeys">[docs]</a><span class="k">class</span> <span class="nc">MissingDataKeys</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+<div class="viewcode-block" id="MissingDataKeys.__init__"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.composite.MissingDataKeys.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keys</span><span class="p">:</span> <span class="nb">set</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;missing data keys: </span><span class="si">{</span><span class="n">keys</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="n">keys</span></div></div>
+
+
+<div class="viewcode-block" id="DirectoryCompositeStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.composite.DirectoryCompositeStash">[docs]</a><span class="k">class</span> <span class="nc">DirectoryCompositeStash</span><span class="p">(</span><span class="n">DirectoryStash</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A stash distributes the data of each item out over several directories.  On</span>
+<span class="sd">    dumping, an attribute holding a ``dict`` is removed from the item, it&#39;s</span>
+<span class="sd">    data is persisted over multiple directories, then the attribute is restored</span>
+<span class="sd">    after pickling.</span>
+
+<span class="sd">    The data is split up amoung groups of keys in the attribute ``dict`` of the</span>
+<span class="sd">    item.  Persistence works similar to the parent :class:`DirectoryStash`,</span>
+<span class="sd">    except the path points a directory that has an instance of each item</span>
+<span class="sd">    without the attribute (called the item instance directory), and the split</span>
+<span class="sd">    data (called the composite data directory).</span>
+
+<span class="sd">    The composite data is grouped across keys from the composite attribute.</span>
+<span class="sd">    When the data is loaded, if no ``load_keys`` are requested from a group,</span>
+<span class="sd">    the data is not accessed.  In this way, loading data becomes *much* faster</span>
+<span class="sd">    for very large objects (i.e. matrix/tensor) data.</span>
+
+<span class="sd">    For this reason, it is important to properly group your load keys so the</span>
+<span class="sd">    most related data goes together.  This is because if only one key is from</span>
+<span class="sd">    the data is needed, the entire composite item is loaded.</span>
+
+<span class="sd">    *Note:* If order of the data is important, use an instance of</span>
+<span class="sd">     :class:`collections.OrderedDict` as the attribute data.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">INSTANCE_DIRECTORY_NAME</span> <span class="o">=</span> <span class="s1">&#39;inst&#39;</span>
+    <span class="n">COMPOSITE_DIRECTORY_NAME</span> <span class="o">=</span> <span class="s1">&#39;comp&#39;</span>
+
+<div class="viewcode-block" id="DirectoryCompositeStash.__init__"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.composite.DirectoryCompositeStash.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">groups</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+                 <span class="n">attribute_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">load_keys</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize using the parent class&#39;s default pattern.</span>
+
+<span class="sd">        :param path: the directory of where to store the files</span>
+
+<span class="sd">        :param groups: the groups of the ``dict`` composite attribute, which</span>
+<span class="sd">                        are sets of keys, each of which are persisted to their</span>
+<span class="sd">                        respective directory</span>
+
+<span class="sd">        :param attribute_name: the name of the attribute in each item to split</span>
+<span class="sd">                               across groups/directories; the instance data to</span>
+<span class="sd">                               persist has the composite attribute of type</span>
+<span class="sd">                               ``dict``</span>
+
+
+<span class="sd">        :param load_keys: the keys used to load the data from the composite</span>
+<span class="sd">                          stashs in to the attribute ``dict`` instance; only</span>
+<span class="sd">                          these keys will exist in the loaded data, or ``None``</span>
+<span class="sd">                          for all keys; this can be set after the creation of</span>
+<span class="sd">                          the instance as well</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">stashes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">comp_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">COMPOSITE_DIRECTORY_NAME</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stash_by_group</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stash_by_attribute</span> <span class="o">=</span> <span class="n">stashes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">INSTANCE_DIRECTORY_NAME</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_keys</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span> <span class="o">|</span> <span class="n">b</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_keys</span> <span class="o">=</span> <span class="n">load_keys</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attribute_name</span> <span class="o">=</span> <span class="n">attribute_name</span>
+        <span class="n">comps</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">load_keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">load_keys</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;expecting set but got </span><span class="si">{</span><span class="n">load_keys</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">load_keys</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">group</span><span class="p">,</span> <span class="nb">set</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;composition not set: </span><span class="si">{</span><span class="n">group</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">group</span><span class="p">)</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">group</span><span class="p">))</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">comp_path</span> <span class="o">/</span> <span class="n">name</span>
+            <span class="n">comp_stash</span> <span class="o">=</span> <span class="n">DirectoryStash</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">comp_stash</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span>
+            <span class="n">comp_stash</span><span class="o">.</span><span class="n">group_name</span> <span class="o">=</span> <span class="n">name</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">group</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">stashes</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;duplicate name </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1"> in </span><span class="si">{</span><span class="n">groups</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">stashes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp_stash</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stash_by_group</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp_stash</span></div>
+
+    <span class="k">def</span> <span class="nf">_to_composite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Create the composite data used to by the composite stashes to persist.</span>
+
+<span class="sd">        :param data: the data item stored as the attribute in ``inst`` to</span>
+<span class="sd">                     persist</span>
+
+<span class="sd">        :return: a tuple with the following:</span>
+<span class="sd">                 * attribute name</span>
+<span class="sd">                 * original attriubte value to be repopulated after pickling</span>
+<span class="sd">                 * context used when loading, which is the ordered keys for now</span>
+<span class="sd">                 * list of tuples each having (stash name, data dict)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data_group</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{})</span>
+        <span class="n">is_ordered</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="k">if</span> <span class="n">is_ordered</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;keys: </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s1">, groups: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">all_keys</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">missing_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_keys</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_keys</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingDataKeys</span><span class="p">(</span><span class="n">missing_keys</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stash_by_attribute</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;unmapping/grouped attribute: </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">stash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stash_by_attribute</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">data_group</span><span class="p">[</span><span class="n">stash</span><span class="o">.</span><span class="n">group_name</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="n">data_group</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data_group</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;create group </span><span class="si">{</span><span class="n">data_group</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">context</span><span class="p">,</span> <span class="n">data_group</span>
+
+<div class="viewcode-block" id="DirectoryCompositeStash.dump"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.composite.DirectoryCompositeStash.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inst</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;dump </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">attribute_name</span><span class="si">}</span><span class="s1">) &#39;</span> <span class="o">+</span>
+                         <span class="sa">f</span><span class="s1">&#39;-&gt; </span><span class="si">{</span><span class="n">inst</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">org_attr_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute_name</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">,</span> <span class="n">composite</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_to_composite</span><span class="p">(</span><span class="n">org_attr_val</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">group_name</span><span class="p">,</span> <span class="n">composite_inst</span> <span class="ow">in</span> <span class="n">composite</span><span class="p">:</span>
+                <span class="n">stash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stash_by_group</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
+                <span class="n">stash</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">composite_inst</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;dump composite </span><span class="si">{</span><span class="n">group_name</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: &#39;</span> <span class="o">+</span>
+                                 <span class="sa">f</span><span class="s1">&#39;context=</span><span class="si">{</span><span class="n">context</span><span class="si">}</span><span class="s1">, inst=</span><span class="si">{</span><span class="n">composite_inst</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="n">context</span><span class="p">))</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute_name</span><span class="p">,</span> <span class="n">org_attr_val</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_from_composite</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Restore the item&#39;s attribute ``dict`` values on load.</span>
+
+<span class="sd">        :param name: the ID key of the data item used in the composite stashes</span>
+
+<span class="sd">        :param context: the load context (see :meth:`_to_composite`)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">attr_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute_name</span>
+        <span class="n">comp_data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">attribs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stash_by_attribute</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_keys</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">attribs</span> <span class="o">=</span> <span class="n">attribs</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_keys</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;load attribs: </span><span class="si">{</span><span class="n">attribs</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">stash</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stash_by_group</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stash</span><span class="o">.</span><span class="n">group</span> <span class="o">&amp;</span> <span class="n">attribs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">stash</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;loaded: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;missing composite data for id: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">, &#39;</span> <span class="o">+</span>
+                        <span class="sa">f</span><span class="s1">&#39;stash: </span><span class="si">{</span><span class="n">stash</span><span class="o">.</span><span class="n">group</span><span class="si">}</span><span class="s1">, path: </span><span class="si">{</span><span class="n">stash</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">, &#39;</span> <span class="o">+</span>
+                        <span class="sa">f</span><span class="s1">&#39;attribute: </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">attr_name</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">comp_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">&amp;</span> <span class="n">attribs</span><span class="p">:</span>
+                        <span class="n">comp_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ordered_data</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">context</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">comp_data</span><span class="p">:</span>
+                    <span class="n">ordered_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">comp_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">comp_data</span> <span class="o">=</span> <span class="n">ordered_data</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;comp_data: </span><span class="si">{</span><span class="n">comp_data</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">comp_data</span>
+
+<div class="viewcode-block" id="DirectoryCompositeStash.load"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.composite.DirectoryCompositeStash.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">inst</span><span class="p">,</span> <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">attr_val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_from_composite</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;loaded </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">attribute_name</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attribute_name</span><span class="p">,</span> <span class="n">attr_val</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inst</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

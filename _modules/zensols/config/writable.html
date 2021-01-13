@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zensols.config.writable &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>zensols.config.writable</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for zensols.config.writable</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A class that allows human readable information (sometimes debugging) output</span>
+<span class="sd">with a hierarchical structure.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Paul Landes&#39;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">Logger</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">TextIOBase</span><span class="p">,</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
+
+
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_get_str_space</span><span class="p">(</span><span class="n">n_spaces</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">n_spaces</span>
+
+
+<div class="viewcode-block" id="Writable"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.writable.Writable">[docs]</a><span class="k">class</span> <span class="nc">Writable</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An interface for classes that have multi-line debuging capability.</span>
+
+<span class="sd">    .. document private functions</span>
+<span class="sd">    .. automethod:: _trunc</span>
+<span class="sd">    .. automethod:: _sp</span>
+<span class="sd">    .. automethod:: _set_indent</span>
+<span class="sd">    .. automethod:: _write_line</span>
+<span class="sd">    .. automethod:: _write_block</span>
+<span class="sd">    .. automethod:: _write_object</span>
+<span class="sd">    .. automethod:: _write_iterable</span>
+<span class="sd">    .. automethod:: _write_dict</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">WRITABLE_INDENT_SPACE</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">WRITABLE_MAX_COL</span> <span class="o">=</span> <span class="mi">80</span>
+
+<div class="viewcode-block" id="Writable._trunc"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.writable.Writable._trunc">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_trunc</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">max_len</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">WRITABLE_MAX_COL</span> <span class="k">if</span> <span class="n">max_len</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">max_len</span>
+        <span class="n">sl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sl</span> <span class="o">&gt;=</span> <span class="n">max_len</span><span class="p">:</span>
+            <span class="n">ml</span> <span class="o">=</span> <span class="n">max_len</span> <span class="o">-</span> <span class="mi">3</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[:</span><span class="n">ml</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;...&#39;</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+<div class="viewcode-block" id="Writable._sp"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.writable.Writable._sp">[docs]</a>    <span class="k">def</span> <span class="nf">_sp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Utility method to create a space string.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_indent&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">WRITABLE_INDENT_SPACE</span> <span class="k">if</span> <span class="n">indent</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">indent</span>
+        <span class="k">return</span> <span class="n">_get_str_space</span><span class="p">(</span><span class="n">depth</span> <span class="o">*</span> <span class="n">indent</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Writable._set_indent"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.writable.Writable._set_indent">[docs]</a>    <span class="k">def</span> <span class="nf">_set_indent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the indentation for the instance.  By default, this value is 4.</span>
+
+<span class="sd">        :param indent: the value to set as the indent for this instance, or</span>
+<span class="sd">                       ``None`` to unset it</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_indent</span> <span class="o">=</span> <span class="n">indent</span>
+        <span class="n">_get_str_space</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_write_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">writer</span><span class="p">:</span> <span class="n">TextIOBase</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write an empty line.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Writable._write_line"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.writable.Writable._write_line">[docs]</a>    <span class="k">def</span> <span class="nf">_write_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">writer</span><span class="p">:</span> <span class="n">TextIOBase</span><span class="p">,</span>
+                    <span class="n">max_len</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write a line of text ``line`` with the correct indentation per ``depth`` to</span>
+<span class="sd">        ``writer``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span><span class="si">}{</span><span class="n">line</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="n">max_len</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trunc</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">max_len</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_len</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trunc</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">max_len</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;max_len must either be a boolean or integer&#39;</span><span class="p">)</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_empty</span><span class="p">(</span><span class="n">writer</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_write_divider</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">writer</span><span class="p">:</span> <span class="n">TextIOBase</span><span class="p">,</span> <span class="n">char</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span>
+                       <span class="n">width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write a text based dividing line (like &lt;hr&gt;&lt;/hr&gt; in html).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">WRITABLE_MAX_COL</span> <span class="k">if</span> <span class="n">width</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">width</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">char</span> <span class="o">*</span> <span class="n">width</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_empty</span><span class="p">(</span><span class="n">writer</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Writable._write_block"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.writable.Writable._write_block">[docs]</a>    <span class="k">def</span> <span class="nf">_write_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lines</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">writer</span><span class="p">:</span> <span class="n">TextIOBase</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write a block of text with indentation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">sp</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_empty</span><span class="p">(</span><span class="n">writer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Writable._write_object"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.writable.Writable._write_object">[docs]</a>    <span class="k">def</span> <span class="nf">_write_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">writer</span><span class="p">:</span> <span class="n">TextIOBase</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write an object based on the class of the instance.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_dict</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">writer</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">set</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_iterable</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">writer</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">WRITABLE_CLASS</span><span class="p">):</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">writer</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_line</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="n">depth</span><span class="p">,</span> <span class="n">writer</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_write_key_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">writer</span><span class="p">:</span> <span class="n">TextIOBase</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write a key value pair from a dictionary.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sp</span><span class="si">}{</span><span class="n">k</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Writable._write_iterable"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.writable.Writable._write_iterable">[docs]</a>    <span class="k">def</span> <span class="nf">_write_iterable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                        <span class="n">writer</span><span class="p">:</span> <span class="n">TextIOBase</span><span class="p">,</span> <span class="n">include_index</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write list ``data`` with the correct indentation per ``depth`` to</span>
+<span class="sd">        ``writer``.</span>
+
+<span class="sd">        :param include_index: if ``True``, add an incrementing index for each</span>
+<span class="sd">                              element in the output</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">include_index</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_line</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;i: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">writer</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_object</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">include_index</span> <span class="k">else</span> <span class="mi">0</span><span class="p">),</span> <span class="n">writer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Writable._write_dict"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.writable.Writable._write_dict">[docs]</a>    <span class="k">def</span> <span class="nf">_write_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">writer</span><span class="p">:</span> <span class="n">TextIOBase</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write dictionary ``data`` with the correct indentation per ``depth`` to</span>
+<span class="sd">        ``writer``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sp</span><span class="p">(</span><span class="n">depth</span><span class="p">)</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">):</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">WRITABLE_CLASS</span><span class="p">)):</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sp</span><span class="si">}{</span><span class="n">k</span><span class="si">}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_object</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">writer</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_key_value</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">writer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Writable.write"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.writable.Writable.write">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">writer</span><span class="p">:</span> <span class="n">TextIOBase</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write the contents of this instance to ``writer`` using indention ``depth``.</span>
+
+<span class="sd">        :param depth: the starting indentation depth</span>
+
+<span class="sd">        :param writer: the writer to dump the content of this writable</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Writable.write_to_log"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.writable.Writable.write_to_log">[docs]</a>    <span class="k">def</span> <span class="nf">write_to_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+                     <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">split_lines</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Just like :meth:`write` but write the content to a log message.</span>
+
+<span class="sd">        :param logger: the logger to write the message containing content of</span>
+<span class="sd">                       this writable</span>
+
+<span class="sd">        :param level: the logging level given in the :mod:`logging` module</span>
+
+<span class="sd">        :param depth: the starting indentation depth</span>
+
+<span class="sd">        :param split_lines: if ``True`` each line is logged separately</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sio</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">sio</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="p">(</span><span class="n">sio</span><span class="o">.</span><span class="n">getvalue</span><span class="p">(),)</span>
+        <span class="k">if</span> <span class="n">split_lines</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span></div></div>
+
+
+<span class="n">WRITABLE_CLASS</span> <span class="o">=</span> <span class="n">Writable</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

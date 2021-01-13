@@ -1,0 +1,364 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Persistence &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API Reference" href="../api.html" />
+    <link rel="prev" title="Configuration" href="config.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Persistence</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#class-method-level">Class Method Level</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stashes">Stashes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#complete-examples">Complete Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Persistence</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/doc/persist.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="persistence">
+<h1>Persistence<a class="headerlink" href="#persistence" title="Permalink to this headline">¶</a></h1>
+<p>This package provides two main APIs:</p>
+<ul class="simple">
+<li><p>A method level <a class="reference external" href="#persisted">persistence framework</a>.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">dict</span></code> like data structure that CRUDs data called <a class="reference external" href="#stashes">stashes</a>.</p></li>
+</ul>
+<div class="section" id="class-method-level">
+<h2>Class Method Level<a class="headerlink" href="#class-method-level" title="Permalink to this headline">¶</a></h2>
+<p>A <a class="reference external" href="../api/zensols.persist.html#zensols.persist.annotation.PersistedWork">PersistedWork</a> defines a cached location any data returned by a method of a
+class.  It always caches data at the instance level.  However, it can also
+cache at the global level (across all instances of the class) and also pickle
+as binary data files on to the file system.</p>
+<p>An instance of a <a class="reference external" href="../api/zensols.persist.html#zensols.persist.annotation.PersistedWork">PersistedWork</a> for every <a class="reference external" href="../api/zensols.persist.html#zensols.persist.annotation.persisted">&#64;persisted</a> annotation given on a
+method.  When the class is created, the annotation creates a new
+<a class="reference external" href="../api/zensols.persist.html#zensols.persist.annotation.PersistedWork">PersistedWork</a> for the method if it doesn’t already exist (i.e. defined in the
+class’s initializer).  The first time the method is called, the method is run
+to get the return value, which is then cached via the <a class="reference external" href="../api/zensols.persist.html#zensols.persist.annotation.PersistedWork">PersistedWork</a> at
+whatever level(s) configured, which without a definition is only class level.</p>
+<p>Since the all subsequent calls to the method use the cached value, the method
+should take no arguments.  The annotation should be used <em>right</em> before the
+method definition, so it should be added after any <code class="docutils literal notranslate"><span class="pre">&#64;property</span></code> annotation.</p>
+<p>A class can optionally extend [PersistedContainer] to automate the process of
+(de)serializing all <a class="reference external" href="../api/zensols.persist.html#zensols.persist.annotation.PersistedWork">PersistedWork</a> instances safely.  This class also safely
+deallocates all persisted work data that extend <a class="reference external" href="../api/zensols.persist.html?#zensols.persist.dealloc.Deallocatable">Deallocatable</a>.</p>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">zensols.persist</span> <span class="kn">import</span> <span class="n">PersistableContainer</span><span class="p">,</span> <span class="n">PersistedWork</span><span class="p">,</span> <span class="n">persisted</span>
+
+<span class="k">class</span> <span class="nc">SomeClass</span><span class="p">(</span><span class="n">PersistableContainer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_counter</span> <span class="o">=</span> <span class="n">PersistedWork</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;counter.dat&#39;</span><span class="p">),</span> <span class="bp">self</span><span class="p">,</span> <span class="n">mkdir</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@persisted</span><span class="p">(</span><span class="s1">&#39;_counter&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;returning count value&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span class="mi">2</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@persisted</span><span class="p">(</span><span class="s1">&#39;_notsaved&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">notsaved</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;returning unsaved value&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span class="mi">3</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">inst</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">())</span>
+<span class="p">(</span><span class="n">PosixPath</span><span class="p">(</span><span class="s1">&#39;example.py&#39;</span><span class="p">),)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">inst</span><span class="o">.</span><span class="n">count</span>
+<span class="n">returning</span> <span class="n">count</span> <span class="n">value</span>
+<span class="mi">10</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">print</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">())</span>
+<span class="p">(</span><span class="n">PosixPath</span><span class="p">(</span><span class="s1">&#39;example.py&#39;</span><span class="p">),</span> <span class="n">PosixPath</span><span class="p">(</span><span class="s1">&#39;counter.dat&#39;</span><span class="p">),)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">inst</span><span class="o">.</span><span class="n">count</span>
+<span class="mi">10</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">inst</span><span class="o">.</span><span class="n">notsaved</span>
+<span class="n">returning</span> <span class="n">unsaved</span> <span class="n">value</span>
+<span class="mi">15</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">inst</span><span class="o">.</span><span class="n">notsaved</span>
+<span class="mi">15</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">inst</span> <span class="o">=</span> <span class="n">SomeClass</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">inst</span><span class="o">.</span><span class="n">count</span>
+<span class="mi">10</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">inst</span><span class="o">.</span><span class="n">notsaved</span>
+<span class="n">returning</span> <span class="n">unsaved</span> <span class="n">value</span>
+<span class="mi">30</span>
+</pre></div>
+</div>
+<p>See the test case <a class="reference external" href="https://github.com/plandes/util/tree/master/test/python/test_persist.py">test_persist.py</a> for more examples.</p>
+</div>
+<div class="section" id="stashes">
+<h2>Stashes<a class="headerlink" href="#stashes" title="Permalink to this headline">¶</a></h2>
+<p>Stashes are dictionary like classes that create, read, update and delete (CRUD)
+data.  All stashes inherit from the <a class="reference external" href="../api/zensols.persist.html#zensols.persist.domain.Stash">Stash</a> abstract base class and implement
+four basic operations:</p>
+<ul class="simple">
+<li><p><strong>load</strong>: creates or retries data by a key,</p></li>
+<li><p><strong>dump</strong>: stores data by key and Python object instance or primitive,</p></li>
+<li><p><strong>delete</strong>: create the data object by key,</p></li>
+<li><p><strong>keys</strong>: returns all keys defined in the stash.</p></li>
+</ul>
+<p>Every data item uses a string key, and therefore, is an associative data
+structure.  However, there are iteration methods to get all values, keys (just
+like <code class="docutils literal notranslate"><span class="pre">dict</span></code>) and key/value pair if used as an iterator or as items.  All
+stashes are index accessible with <code class="docutils literal notranslate"><span class="pre">[]</span></code>, can be used with <code class="docutils literal notranslate"><span class="pre">len</span></code> and can
+determine containment with the <code class="docutils literal notranslate"><span class="pre">in</span></code> keyword like <code class="docutils literal notranslate"><span class="pre">dict</span></code> instances.</p>
+<p>Note that there are subtle differences a <a class="reference external" href="../api/zensols.persist.html#zensols.persist.domain.Stash">Stash</a> and a <code class="docutils literal notranslate"><span class="pre">dict</span></code> when generating
+or accessing data.  For example, when indexing obtaining the value is sometimes
+<em>forced</em> by using some mechanism to create the item.  When using <code class="docutils literal notranslate"><span class="pre">get</span></code> it
+relaxes this creation mechanism for some implementations.</p>
+<p>Stashes are meant be implemented to do a particular task well, and then to be
+<em>stacked</em> to create more complex useful data structures.  For example, you
+might create a factory stash that generates data with a <a class="reference external" href="../api/zensols.persist.html#zensols.persist.stash.DirectoryStash">DirectoryStash</a>.</p>
+<p>All stashes are document in the API reference, but a short list with
+descriptions are given below (see the <a class="reference external" href="../api/zensols.persist.html#submodules">persist submodule</a> API docs):</p>
+<ul class="simple">
+<li><p>Framework Stashes:</p>
+<ul>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.domain.Stash">Stash</a>: The abstract base class for all stash implementations.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.domain.ReadOnlyStash">ReadOnlyStash</a>: An abstract base class for subclasses that do not support
+write methods.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.domain.CloseableStash">CloseableStash</a>: Any stash that has a resource that needs to be closed.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.domain.DelegateStash">DelegateStash</a>: Delegate pattern.  It can also be used as a no-op if no
+delegate is given.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.domain.KeyLimitStash">KeyLimitStash</a>: A stash that limits the number of generated keys useful
+for debugging.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.domain.PreemptiveStash">PreemptiveStash</a>: Provide support for preemptively creating data in a
+stash.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.domain.PrimeableStash">PrimeableStash</a>: Any subclass that has the ability to do processing before
+any CRUD method is invoked.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.domain.FactoryStash">FactoryStash</a>: A stash that defers to creation of new items to another
+<code class="docutils literal notranslate"><span class="pre">factory</span></code> stash.</p></li>
+</ul>
+</li>
+<li><p>Implementation Stashes:</p>
+<ul>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.stash.OneShotFactoryStash">OneShotFactoryStash</a>: A stash that is populated by a callable or an
+iterable ‘worker’.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.stash.SortedStash">SortedStash</a>: Specify an sorting to how keys in a stash are returned.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.stash.DictionaryStash">DictionaryStash</a>: Use a dictionary as a backing store to the stash.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.stash.CacheStash">CacheStash</a>: Provide a dictionary based caching based stash.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.stash.DirectoryStash">DirectoryStash</a>: Creates a pickled data file with a file name in a
+directory with a given pattern across all instances.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.stash.IncrementKeyDirectoryStash">IncrementKeyDirectoryStash</a>: A stash that increments integer value keys in
+a stash and dumps/loads using the last key available in the stash.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.stash.UnionStash">UnionStash</a>: A stash joins the data of many other stashes.</p></li>
+<li><p><a class="reference external" href="../api/zensols.persist.html#zensols.persist.shelve.ShelveStash">ShelveStash</a>: Stash that uses Python’s shelve library to store key/value
+pairs in DBM databases.</p></li>
+<li><p><a class="reference external" href="../api/zensols.multi.html#zensols.multi.stash.MultiProcessStash">MultiProcessStash</a>: A stash that forks processes to process data in a
+distributed fashion.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="complete-examples">
+<h2>Complete Examples<a class="headerlink" href="#complete-examples" title="Permalink to this headline">¶</a></h2>
+<p>See the <a class="reference external" href="https://github.com/plandes/util/tree/master/example">examples</a> directory the complete code used to create the examples in
+this documentation.</p>
+<!-- links --></div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../api.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="config.html" class="btn btn-neutral float-left" title="Configuration" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

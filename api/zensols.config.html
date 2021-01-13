@@ -1,0 +1,1860 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zensols.config package &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="zensols.multi package" href="zensols.multi.html" />
+    <link rel="prev" title="zensols.cli package" href="zensols.cli.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="zensols.cli.html">zensols.cli package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">zensols.config package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.config.configbase">zensols.config.configbase module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.config.dictable">zensols.config.dictable module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.config.factory">zensols.config.factory module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.config.iniconfig">zensols.config.iniconfig module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.config.meta">zensols.config.meta module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.config.serial">zensols.config.serial module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.config.strconfig">zensols.config.strconfig module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.config.writable">zensols.config.writable module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.config.writeback">zensols.config.writeback module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.config.yaml">zensols.config.yaml module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.config">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.multi.html">zensols.multi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.persist.html">zensols.persist package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.util.html">zensols.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+      <li>zensols.config package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/zensols.config.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="zensols-config-package">
+<h1>zensols.config package<a class="headerlink" href="#zensols-config-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-zensols.config.configbase">
+<span id="zensols-config-configbase-module"></span><h2>zensols.config.configbase module<a class="headerlink" href="#module-zensols.config.configbase" title="Permalink to this headline">¶</a></h2>
+<p>Abstract base class for a configuration read from a file.</p>
+<dl class="py class">
+<dt id="zensols.config.configbase.Configurable">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.configbase.</code><code class="sig-name descname">Configurable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">default_expect</span></em>, <em class="sig-param"><span class="n">default_section</span><span class="o">=</span><span class="default_value">'default'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.writable.Writable" title="zensols.config.writable.Writable"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.writable.Writable</span></code></a></p>
+<p>An abstract base class that represents an application specific
+configuration.</p>
+<p>Note that many of the getters are implemented in <code class="docutils literal notranslate"><span class="pre">configparser</span></code>.
+However, they are reimplemented here for consistency among parser.</p>
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">default_expect</span></em>, <em class="sig-param"><span class="n">default_section</span><span class="o">=</span><span class="default_value">'default'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>default_expect</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – whether or not to raise an error when missing
+options for all <code class="docutils literal notranslate"><span class="pre">get_option*</span></code> methods</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.copy_sections">
+<code class="sig-name descname">copy_sections</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">to_populate</span></em>, <em class="sig-param"><span class="n">sections</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.copy_sections"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.copy_sections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy all sections from this configuruable to <code class="docutils literal notranslate"><span class="pre">to_populate</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>to_populate</strong> (<a class="reference internal" href="#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><em>Configurable</em></a>) – the target configuration object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.get_option">
+<code class="sig-name descname">get_option</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expect</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.get_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.get_option" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an option from <code class="docutils literal notranslate"><span class="pre">section</span></code> with <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>section</strong> – section in the ini file to fetch the value; defaults to
+constructor’s <code class="docutils literal notranslate"><span class="pre">default_section</span></code></p></li>
+<li><p><strong>vars</strong> – contains the defaults for missing values of <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><strong>expect</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code> raise an exception if the value does not
+exist</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.get_option_boolean">
+<code class="sig-name descname">get_option_boolean</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expect</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.get_option_boolean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.get_option_boolean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like <a class="reference internal" href="#zensols.config.configbase.Configurable.get_option" title="zensols.config.configbase.Configurable.get_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_option()</span></code></a> but parse as a boolean (any case <cite>true</cite>).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>section</strong> – section in the ini file to fetch the value; defaults to
+constructor’s <code class="docutils literal notranslate"><span class="pre">default_section</span></code></p></li>
+<li><p><strong>vars</strong> – contains the defaults for missing values of <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><strong>expect</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code> raise an exception if the value does not
+exist</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.get_option_float">
+<code class="sig-name descname">get_option_float</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expect</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.get_option_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.get_option_float" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like <a class="reference internal" href="#zensols.config.configbase.Configurable.get_option" title="zensols.config.configbase.Configurable.get_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_option()</span></code></a> but parse as a float.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.get_option_int">
+<code class="sig-name descname">get_option_int</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expect</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.get_option_int"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.get_option_int" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like <a class="reference internal" href="#zensols.config.configbase.Configurable.get_option" title="zensols.config.configbase.Configurable.get_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_option()</span></code></a> but parse as an integer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>section</strong> – section in the ini file to fetch the value; defaults to
+constructor’s <code class="docutils literal notranslate"><span class="pre">default_section</span></code></p></li>
+<li><p><strong>vars</strong> – contains the defaults for missing values of <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><strong>expect</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code> raise an exception if the value does not
+exist</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.get_option_list">
+<code class="sig-name descname">get_option_list</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expect</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">separator</span><span class="o">=</span><span class="default_value">','</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.get_option_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.get_option_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like <a class="reference internal" href="#zensols.config.configbase.Configurable.get_option" title="zensols.config.configbase.Configurable.get_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_option()</span></code></a> but parse as a list using <code class="docutils literal notranslate"><span class="pre">split</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>section</strong> – section in the ini file to fetch the value; defaults to
+constructor’s <code class="docutils literal notranslate"><span class="pre">default_section</span></code></p></li>
+<li><p><strong>vars</strong> – contains the defaults for missing values of <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><strong>expect</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code> raise an exception if the value does not
+exist</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.get_option_object">
+<code class="sig-name descname">get_option_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expect</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.get_option_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.get_option_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like <a class="reference internal" href="#zensols.config.configbase.Configurable.get_option" title="zensols.config.configbase.Configurable.get_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_option()</span></code></a> but parse as an object per object syntax
+rules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">See</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#zensols.config.serial.Serializer.parse_object" title="zensols.config.serial.Serializer.parse_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">parse_object()</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.get_option_path">
+<code class="sig-name descname">get_option_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expect</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">create</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.get_option_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.get_option_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like <a class="reference internal" href="#zensols.config.configbase.Configurable.get_option" title="zensols.config.configbase.Configurable.get_option"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_option()</span></code></a> but return a <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> object of the
+string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>create</strong> – if <code class="docutils literal notranslate"><span class="pre">parent</span></code> then create the path and all parents not
+including the file; if <code class="docutils literal notranslate"><span class="pre">dir</span></code>, then create all parents;
+otherwise do not create anything</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.get_options">
+<em class="property">abstract </em><code class="sig-name descname">get_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">opt_keys</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vars</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.get_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.get_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all options for a section.  If <code class="docutils literal notranslate"><span class="pre">opt_keys</span></code> is given return only
+options with those keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>section</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – section in the ini file to fetch the value; defaults to
+constructor’s <code class="docutils literal notranslate"><span class="pre">default_section</span></code></p></li>
+<li><p><strong>vars</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – contains the defaults for missing values of <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><strong>expect</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code> raise an exception if the value does not
+exist</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.has_option">
+<em class="property">abstract </em><code class="sig-name descname">has_option</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.has_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.has_option" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.merge">
+<code class="sig-name descname">merge</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">to_populate</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.merge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copy all data from this configuruable to <code class="docutils literal notranslate"><span class="pre">to_populate</span></code>, and clobber any
+overlapping properties in the process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>to_populate</strong> (<a class="reference internal" href="#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><em>Configurable</em></a>) – the target configuration object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.options">
+<em class="property">property </em><code class="sig-name descname">options</code><a class="headerlink" href="#zensols.config.configbase.Configurable.options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all options from the default section.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.populate">
+<code class="sig-name descname">populate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parse_types</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.populate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.populate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set attributes in <code class="docutils literal notranslate"><span class="pre">obj</span></code> with <code class="docutils literal notranslate"><span class="pre">setattr</span></code> from the all values in
+<code class="docutils literal notranslate"><span class="pre">section</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.reload">
+<code class="sig-name descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload the configuration from the backing store.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.resource_filename">
+<code class="sig-name descname">resource_filename</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource_name</span></em>, <em class="sig-param"><span class="n">module_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.resource_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.resource_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a resource based on a file name.  This uses the <code class="docutils literal notranslate"><span class="pre">pkg_resources</span></code>
+package first to find the resources.  If it doesn’t find it, it returns
+a path on the file system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>resource_name the file name of the resource to obtain (or name
+if obtained from an installed module)</p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>module_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – the name of the module to obtain the data, which
+defaults to <code class="docutils literal notranslate"><span class="pre">__name__</span></code></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a path on the file system or resource of the installed module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.sections">
+<em class="property">property </em><code class="sig-name descname">sections</code><a class="headerlink" href="#zensols.config.configbase.Configurable.sections" title="Permalink to this definition">¶</a></dt>
+<dd><p>All sections of the configuration file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Set" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.configbase.Configurable.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">depth=0</em>, <em class="sig-param">writer=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='utf-8'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/configbase.html#Configurable.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.configbase.Configurable.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a human readable list of sections and options.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.config.dictable">
+<span id="zensols-config-dictable-module"></span><h2>zensols.config.dictable module<a class="headerlink" href="#module-zensols.config.dictable" title="Permalink to this headline">¶</a></h2>
+<p>Contains a class used to create a tree of dictionaries with only Python
+primitives handy for creating JSON.</p>
+<dl class="py attribute">
+<dt id="zensols.config.dictable.DICTABLE_CLASS">
+<code class="sig-prename descclassname">zensols.config.dictable.</code><code class="sig-name descname">DICTABLE_CLASS</code><a class="headerlink" href="#zensols.config.dictable.DICTABLE_CLASS" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#zensols.config.dictable.Dictable" title="zensols.config.dictable.Dictable"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.dictable.Dictable</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.dictable.Dictable">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.dictable.</code><code class="sig-name descname">Dictable</code><a class="reference internal" href="../_modules/zensols/config/dictable.html#Dictable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.dictable.Dictable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.writable.Writable" title="zensols.config.writable.Writable"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.writable.Writable</span></code></a></p>
+<p>A class that that generates a dictionary recursively from data classes and
+primitive data structures.</p>
+<p>To override the default behavior of creating a dict from a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">dataclass</span></code>, override the <a class="reference internal" href="#zensols.config.dictable.Dictable._from_dictable" title="zensols.config.dictable.Dictable._from_dictable"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_from_dictable()</span></code></a> method.</p>
+<dl class="py method">
+<dt id="zensols.config.dictable.Dictable._get_dictable_attributes">
+<code class="sig-name descname">_get_dictable_attributes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/dictable.html#Dictable._get_dictable_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.dictable.Dictable._get_dictable_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return human readable and attribute names.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tuples of (&lt;human readable name&gt;, &lt;attribute name&gt;)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.dictable.Dictable._from_dictable">
+<code class="sig-name descname">_from_dictable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">recurse</span></em>, <em class="sig-param"><span class="n">readable</span></em>, <em class="sig-param"><span class="n">class_name_param</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/dictable.html#Dictable._from_dictable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.dictable.Dictable._from_dictable" title="Permalink to this definition">¶</a></dt>
+<dd><p>A subclass can override this method to give create a custom specific
+dictionary to be returned from the <a class="reference internal" href="#zensols.config.dictable.Dictable.asjson" title="zensols.config.dictable.Dictable.asjson"><code class="xref py py-meth docutils literal notranslate"><span class="pre">asjson()</span></code></a> client access method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>recurse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, recursively create dictionary so some
+values might be dictionaries themselves</p></li>
+<li><p><strong>readable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – use human readable and attribute keys when available</p></li>
+<li><p><strong>class_name_param</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – if set, add a <code class="docutils literal notranslate"><span class="pre">class_name_param</span></code> key with
+the class’s fully qualified name (includes
+module name)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a JSON’able tree of dictionaries with primitive data</p>
+</dd>
+<dt class="field-even">See</dt>
+<dd class="field-even"><p><a class="reference internal" href="#zensols.config.dictable.Dictable.asjson" title="zensols.config.dictable.Dictable.asjson"><code class="xref py py-meth docutils literal notranslate"><span class="pre">asjson()</span></code></a></p>
+</dd>
+<dt class="field-odd">See</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#zensols.config.dictable.Dictable.asdict" title="zensols.config.dictable.Dictable.asdict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">asdict()</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.dictable.Dictable.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#zensols.config.dictable.Dictable.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.dictable.Dictable.asdict">
+<code class="sig-name descname">asdict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">recurse</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">readable</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">class_name_param</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/dictable.html#Dictable.asdict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.dictable.Dictable.asdict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the content of the object as a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>recurse</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, recursively create dictionary so some
+values might be dictionaries themselves</p></li>
+<li><p><strong>readable</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – use human readable and attribute keys when available</p></li>
+<li><p><strong>class_name_param</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – if set, add a <code class="docutils literal notranslate"><span class="pre">class_name_param</span></code> key with
+the class’s fully qualified name (includes
+module name)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a JSON’able tree of dictionaries with primitive data</p>
+</dd>
+<dt class="field-even">See</dt>
+<dd class="field-even"><p><a class="reference internal" href="#zensols.config.dictable.Dictable.asjson" title="zensols.config.dictable.Dictable.asjson"><code class="xref py py-meth docutils literal notranslate"><span class="pre">asjson()</span></code></a></p>
+</dd>
+<dt class="field-odd">See</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#zensols.config.dictable.Dictable._from_dictable" title="zensols.config.dictable.Dictable._from_dictable"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_from_dictable()</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.dictable.Dictable.asjson">
+<code class="sig-name descname">asjson</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">writer</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">recurse</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">readable</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/dictable.html#Dictable.asjson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.dictable.Dictable.asjson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a JSON string representing the data in this instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.dictable.Dictable.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">depth=0</em>, <em class="sig-param">writer=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='utf-8'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/dictable.html#Dictable.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.dictable.Dictable.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the contents of this instance to <code class="docutils literal notranslate"><span class="pre">writer</span></code> using indention <code class="docutils literal notranslate"><span class="pre">depth</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – the starting indentation depth</p></li>
+<li><p><strong>writer</strong> (<a class="reference external" href="https://docs.python.org/3/library/io.html#io.TextIOBase" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a>) – the writer to dump the content of this writable</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.config.factory">
+<span id="zensols-config-factory-module"></span><h2>zensols.config.factory module<a class="headerlink" href="#module-zensols.config.factory" title="Permalink to this headline">¶</a></h2>
+<p>Classes that create new instances of classes from application configuration
+objects and files.</p>
+<dl class="py class">
+<dt id="zensols.config.factory.ClassImporter">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.factory.</code><code class="sig-name descname">ClassImporter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">class_name</span></em>, <em class="sig-param"><span class="n">reload</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ClassImporter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ClassImporter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Utility class that reloads a module and instantiates a class from a string
+class name.  This is handy for prototyping code in a Python REPL.</p>
+<dl class="py attribute">
+<dt id="zensols.config.factory.ClassImporter.CLASS_REGEX">
+<code class="sig-name descname">CLASS_REGEX</code><em class="property"> = re.compile('^(.+)\\.(.+?)$')</em><a class="headerlink" href="#zensols.config.factory.ClassImporter.CLASS_REGEX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ClassImporter.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">class_name</span></em>, <em class="sig-param"><span class="n">reload</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ClassImporter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ClassImporter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize with the class name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>class_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – the fully qualifed name of the class (including the
+module portion of the class name)</p></li>
+<li><p><strong>reload</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code> then reload the module before returning the
+class</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ClassImporter.get_module_class">
+<code class="sig-name descname">get_module_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ClassImporter.get_module_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ClassImporter.get_module_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the module and class as a tuple of the given class in the
+initializer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>reload</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code> then reload the module before returning the
+class</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ClassImporter.instance">
+<code class="sig-name descname">instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ClassImporter.instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ClassImporter.instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an instance of the specified class in the initializer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – the arguments given to the initializer of the new class</p></li>
+<li><p><strong>kwargs</strong> – the keyword arguments given to the initializer of the
+new class</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ClassImporter.parse_module_class">
+<code class="sig-name descname">parse_module_class</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ClassImporter.parse_module_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ClassImporter.parse_module_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse the module and class name part of the fully qualifed class name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ClassImporter.set_log_level">
+<code class="sig-name descname">set_log_level</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">level</span><span class="o">=</span><span class="default_value">20</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ClassImporter.set_log_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ClassImporter.set_log_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenciene method to set the log level of the module given in the
+initializer of this class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>level</strong> – and instance of <code class="docutils literal notranslate"><span class="pre">logging.&lt;level&gt;</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.factory.ClassResolver">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.factory.</code><code class="sig-name descname">ClassResolver</code><a class="reference internal" href="../_modules/zensols/config/factory.html#ClassResolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ClassResolver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<p>Used to resolve a class from a string.</p>
+<dl class="py method">
+<dt id="zensols.config.factory.ClassResolver.find_class">
+<code class="sig-name descname">find_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">class_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ClassResolver.find_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ClassResolver.find_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a class given the name of the class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>class_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – represents the class name, which might or might not
+have the module as part of that name</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ClassResolver.full_classname">
+<em class="property">static </em><code class="sig-name descname">full_classname</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cls</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ClassResolver.full_classname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ClassResolver.full_classname" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.factory.ConfigFactory">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.factory.</code><code class="sig-name descname">ConfigFactory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="n">pattern</span><span class="o">=</span><span class="default_value">'{name}'</span></em>, <em class="sig-param"><span class="n">default_name</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">class_resolver</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ConfigFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ConfigFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Creates new instances of classes and configures them given data in a
+configuration <code class="docutils literal notranslate"><span class="pre">Configurable</span></code> instance.</p>
+<dl class="py attribute">
+<dt id="zensols.config.factory.ConfigFactory.CONFIG_ATTRIBUTE">
+<code class="sig-name descname">CONFIG_ATTRIBUTE</code><em class="property"> = 'config'</em><a class="headerlink" href="#zensols.config.factory.ConfigFactory.CONFIG_ATTRIBUTE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.factory.ConfigFactory.CONIFG_FACTORY_ATTRIBUTE">
+<code class="sig-name descname">CONIFG_FACTORY_ATTRIBUTE</code><em class="property"> = 'config_factory'</em><a class="headerlink" href="#zensols.config.factory.ConfigFactory.CONIFG_FACTORY_ATTRIBUTE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.factory.ConfigFactory.NAME_ATTRIBUTE">
+<code class="sig-name descname">NAME_ATTRIBUTE</code><em class="property"> = 'name'</em><a class="headerlink" href="#zensols.config.factory.ConfigFactory.NAME_ATTRIBUTE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ConfigFactory.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="n">pattern</span><span class="o">=</span><span class="default_value">'{name}'</span></em>, <em class="sig-param"><span class="n">default_name</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">class_resolver</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ConfigFactory.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ConfigFactory.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize a new factory instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a>) – the configuration used to create the instance; all data
+from the corresponding section is given to the
+<code class="docutils literal notranslate"><span class="pre">__init__</span></code> method</p></li>
+<li><p><strong>pattern</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – section pattern used to find the values given to the
+<code class="docutils literal notranslate"><span class="pre">__init__</span></code> method</p></li>
+<li><p><strong>config_param_name</strong> – the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> parameter name used for the
+configuration object given to the factory’s
+<code class="docutils literal notranslate"><span class="pre">instance</span></code> method; defaults to <code class="docutils literal notranslate"><span class="pre">config</span></code></p></li>
+<li><p><strong>config_param_name</strong> – the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> parameter name used for the
+instance name given to the factory’s
+<code class="docutils literal notranslate"><span class="pre">instance</span></code> method; defaults to <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ConfigFactory.clone">
+<code class="sig-name descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ConfigFactory.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ConfigFactory.clone" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ConfigFactory.from_config_string">
+<code class="sig-name descname">from_config_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ConfigFactory.from_config_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ConfigFactory.from_config_string" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ConfigFactory.instance">
+<code class="sig-name descname">instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ConfigFactory.instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ConfigFactory.instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new instance using key <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>]) – the name of the class (by default) or the key name of the
+class used to find the class</p></li>
+<li><p><strong>args</strong> – given to the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method</p></li>
+<li><p><strong>kwargs</strong> – given to the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ConfigFactory.register">
+<em class="property">classmethod </em><code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance_class</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ConfigFactory.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ConfigFactory.register" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a class with the factory.  This method assumes the factory instance
+was created with a (default) <code class="docutils literal notranslate"><span class="pre">DictionaryClassResolver</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instance_class</strong> – the class to register with the factory (not a
+string)</p></li>
+<li><p><strong>name</strong> – the name to use as the key for instance class lookups;
+defaults to the name of the class</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.factory.DictionaryClassResolver">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.factory.</code><code class="sig-name descname">DictionaryClassResolver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance_classes</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#DictionaryClassResolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.DictionaryClassResolver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.factory.ClassResolver" title="zensols.config.factory.ClassResolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.factory.ClassResolver</span></code></a></p>
+<p>Resolve a class name from a list of registered class names without the
+module part.  This is used with the <code class="docutils literal notranslate"><span class="pre">register</span></code> method on
+<code class="docutils literal notranslate"><span class="pre">ConfigFactory</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">See</dt>
+<dd class="field-odd"><p>ConfigFactory.register</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="zensols.config.factory.DictionaryClassResolver.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance_classes</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#DictionaryClassResolver.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.DictionaryClassResolver.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.DictionaryClassResolver.find_class">
+<code class="sig-name descname">find_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">class_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#DictionaryClassResolver.find_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.DictionaryClassResolver.find_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a class given the name of the class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>class_name</strong> – represents the class name, which might or might not
+have the module as part of that name</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.factory.FactoryState">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.factory.</code><code class="sig-name descname">FactoryState</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#FactoryState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.FactoryState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>The state updated from an instance of <a class="reference internal" href="#zensols.config.factory.ConfigFactory" title="zensols.config.factory.ConfigFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigFactory</span></code></a>.  Currently
+the only state is that an object has finished being created.</p>
+<p>Future states might inlude when a <a class="reference internal" href="#zensols.config.factory.ImportConfigFactory" title="zensols.config.factory.ImportConfigFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImportConfigFactory</span></code></a> has created
+all objects from a configuration shared session.</p>
+<dl class="py attribute">
+<dt id="zensols.config.factory.FactoryState.CREATED">
+<code class="sig-name descname">CREATED</code><em class="property"> = 1</em><a class="headerlink" href="#zensols.config.factory.FactoryState.CREATED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.factory.FactoryStateObserver">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.factory.</code><code class="sig-name descname">FactoryStateObserver</code><a class="reference internal" href="../_modules/zensols/config/factory.html#FactoryStateObserver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.FactoryStateObserver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<p>An interface that recieves notifications that the factory has created this
+instance.  This is useful for classes such as <a class="reference internal" href="#zensols.config.writeback.Writeback" title="zensols.config.writeback.Writeback"><code class="xref py py-class docutils literal notranslate"><span class="pre">Writeback</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">See</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#zensols.config.writeback.Writeback" title="zensols.config.writeback.Writeback"><code class="xref py py-class docutils literal notranslate"><span class="pre">Writeback</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.factory.ImportClassResolver">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.factory.</code><code class="sig-name descname">ImportClassResolver</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reload</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ImportClassResolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ImportClassResolver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.factory.ClassResolver" title="zensols.config.factory.ClassResolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.factory.ClassResolver</span></code></a></p>
+<p>Resolve a class name from a list of registered class names without the
+module part.  This is used with the <code class="docutils literal notranslate"><span class="pre">register</span></code> method on
+<code class="docutils literal notranslate"><span class="pre">ConfigFactory</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">See</dt>
+<dd class="field-odd"><p>ConfigFactory.register</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="zensols.config.factory.ImportClassResolver.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reload</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ImportClassResolver.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ImportClassResolver.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ImportClassResolver.create_class_importer">
+<code class="sig-name descname">create_class_importer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">class_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ImportClassResolver.create_class_importer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ImportClassResolver.create_class_importer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ImportClassResolver.find_class">
+<code class="sig-name descname">find_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">class_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ImportClassResolver.find_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ImportClassResolver.find_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a class given the name of the class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>class_name</strong> – represents the class name, which might or might not
+have the module as part of that name</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.factory.ImportConfigFactory">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.factory.</code><code class="sig-name descname">ImportConfigFactory</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">reload</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">shared</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">reload_root</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ImportConfigFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ImportConfigFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.factory.ConfigFactory" title="zensols.config.factory.ConfigFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.factory.ConfigFactory</span></code></a>, <a class="reference internal" href="zensols.persist.html#zensols.persist.dealloc.Deallocatable" title="zensols.persist.dealloc.Deallocatable"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.persist.dealloc.Deallocatable</span></code></a></p>
+<p>Import a class by the fully qualified class name (includes the module).</p>
+<p>This is a convenience class for setting the parent class <code class="docutils literal notranslate"><span class="pre">class_resolver</span></code>
+parameter.</p>
+<dl class="py attribute">
+<dt id="zensols.config.factory.ImportConfigFactory.CHILD_REGEXP">
+<code class="sig-name descname">CHILD_REGEXP</code><em class="property"> = re.compile('^instance(?:\\((.+)\\))?:\\s*(.+)$', re.DOTALL)</em><a class="headerlink" href="#zensols.config.factory.ImportConfigFactory.CHILD_REGEXP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.factory.ImportConfigFactory.INJECTS">
+<code class="sig-name descname">INJECTS</code><em class="property"> = {}</em><a class="headerlink" href="#zensols.config.factory.ImportConfigFactory.INJECTS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ImportConfigFactory.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">reload</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">shared</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">reload_root</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ImportConfigFactory.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ImportConfigFactory.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the configuration factory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reload</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – whether or not to reload the module when resolving the
+class, which is useful for debugging in a REPL</p></li>
+<li><p><strong>shared</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – when <code class="docutils literal notranslate"><span class="pre">True</span></code> instances are shared and only created
+once across sections for the life of this
+<code class="docutils literal notranslate"><span class="pre">ImportConfigFactory</span></code> instance</p></li>
+<li><p><strong>reload_root</strong> – when <code class="docutils literal notranslate"><span class="pre">True</span></code>, only reload the module of the class
+from the configuration indicated in
+<a class="reference internal" href="#zensols.config.factory.ImportConfigFactory.instance" title="zensols.config.factory.ImportConfigFactory.instance"><code class="xref py py-meth docutils literal notranslate"><span class="pre">instance()</span></code></a> rather than following the instance
+dependency tree</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ImportConfigFactory.clear">
+<code class="sig-name descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ImportConfigFactory.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ImportConfigFactory.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear any shared instances.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ImportConfigFactory.clear_instance">
+<code class="sig-name descname">clear_instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ImportConfigFactory.clear_instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ImportConfigFactory.clear_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a shared (cached) object instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ImportConfigFactory.clone">
+<code class="sig-name descname">clone</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ImportConfigFactory.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ImportConfigFactory.clone" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ImportConfigFactory.deallocate">
+<code class="sig-name descname">deallocate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ImportConfigFactory.deallocate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ImportConfigFactory.deallocate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deallocate all resources for this instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ImportConfigFactory.from_config_string">
+<code class="sig-name descname">from_config_string</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ImportConfigFactory.from_config_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ImportConfigFactory.from_config_string" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.factory.ImportConfigFactory.instance">
+<code class="sig-name descname">instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/factory.html#ImportConfigFactory.instance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.ImportConfigFactory.instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new instance using key <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – the name of the class (by default) or the key name of the
+class used to find the class</p></li>
+<li><p><strong>args</strong> – given to the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method</p></li>
+<li><p><strong>kwargs</strong> – given to the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt id="zensols.config.factory.RedefinedInjectionError">
+<em class="property">exception </em><code class="sig-prename descclassname">zensols.config.factory.</code><code class="sig-name descname">RedefinedInjectionError</code><a class="reference internal" href="../_modules/zensols/config/factory.html#RedefinedInjectionError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.factory.RedefinedInjectionError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a></p>
+<p>Raised when any attempt to redefine or reuse injections for a class</p>
+<dl class="py attribute">
+<dt id="zensols.config.factory.RedefinedInjectionError.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'zensols.config.factory'</em><a class="headerlink" href="#zensols.config.factory.RedefinedInjectionError.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.factory.RedefinedInjectionError.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#zensols.config.factory.RedefinedInjectionError.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.config.iniconfig">
+<span id="zensols-config-iniconfig-module"></span><h2>zensols.config.iniconfig module<a class="headerlink" href="#module-zensols.config.iniconfig" title="Permalink to this headline">¶</a></h2>
+<p>Implementation classes that are used as application configuration containers
+parsed from files.</p>
+<dl class="py class">
+<dt id="zensols.config.iniconfig.CommandLineConfig">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.iniconfig.</code><code class="sig-name descname">CommandLineConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_section</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">robust</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">default_vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_expect</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">create_defaults</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#CommandLineConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.CommandLineConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.iniconfig.IniConfig" title="zensols.config.iniconfig.IniConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.iniconfig.IniConfig</span></code></a></p>
+<p>A configuration object that allows creation by using command line arguments
+as defaults when the configuration file is missing.</p>
+<p>Sub classes must implement the <code class="docutils literal notranslate"><span class="pre">set_defaults</span></code> method.  All defaults set
+in this method are then created in the default section of the configuration
+when created with the static method <code class="docutils literal notranslate"><span class="pre">from_args</span></code>, which is called with the
+parsed command line arguments (usually from some instance or instance of
+subclass <code class="docutils literal notranslate"><span class="pre">SimpleActionCli</span></code>.</p>
+<dl class="py method">
+<dt id="zensols.config.iniconfig.CommandLineConfig.from_args">
+<em class="property">classmethod </em><code class="sig-name descname">from_args</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#CommandLineConfig.from_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.CommandLineConfig.from_args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.iniconfig.CommandLineConfig.set_default">
+<code class="sig-name descname">set_default</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">clobber</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#CommandLineConfig.set_default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.CommandLineConfig.set_default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a default value in the <code class="docutils literal notranslate"><span class="pre">default</span></code> section of the configuration.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.iniconfig.CommandLineConfig.set_defaults">
+<em class="property">abstract </em><code class="sig-name descname">set_defaults</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#CommandLineConfig.set_defaults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.CommandLineConfig.set_defaults" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.iniconfig.ExtendedInterpolationConfig">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.iniconfig.</code><code class="sig-name descname">ExtendedInterpolationConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_section</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">robust</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">default_vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_expect</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">create_defaults</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#ExtendedInterpolationConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.ExtendedInterpolationConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.iniconfig.IniConfig" title="zensols.config.iniconfig.IniConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.iniconfig.IniConfig</span></code></a></p>
+<p>Configuration class extends using advanced interpolation with
+<code class="docutils literal notranslate"><span class="pre">configparser.ExtendedInterpolation</span></code>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.iniconfig.ExtendedInterpolationEnvConfig">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.iniconfig.</code><code class="sig-name descname">ExtendedInterpolationEnvConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">remove_vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">env</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">env_sec</span><span class="o">=</span><span class="default_value">'env'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#ExtendedInterpolationEnvConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.ExtendedInterpolationEnvConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.iniconfig.ExtendedInterpolationConfig" title="zensols.config.iniconfig.ExtendedInterpolationConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.iniconfig.ExtendedInterpolationConfig</span></code></a></p>
+<p>An <a class="reference internal" href="#zensols.config.iniconfig.IniConfig" title="zensols.config.iniconfig.IniConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">IniConfig</span></code></a> implementation that creates a section called <code class="docutils literal notranslate"><span class="pre">env</span></code>
+with environment variables passed.</p>
+<dl class="py method">
+<dt id="zensols.config.iniconfig.ExtendedInterpolationEnvConfig.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="n">remove_vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">env</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">env_sec</span><span class="o">=</span><span class="default_value">'env'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#ExtendedInterpolationEnvConfig.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.ExtendedInterpolationEnvConfig.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create with a configuration file path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_file</strong> – the configuration file path to read from</p></li>
+<li><p><strong>default_section</strong> – default section (defaults to <cite>default</cite>)</p></li>
+<li><p><strong>default_vars</strong> – used use with existing configuration is not found</p></li>
+<li><p><strong>robust</strong> – if <cite>True</cite>, then don’t raise an error when the
+configuration file is missing</p></li>
+<li><p><strong>default_expect</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, raise exceptions when keys and/or
+sections are not found in the configuration</p></li>
+<li><p><strong>create_defaults</strong> – used to initialize the configuration parser,
+and useful for when substitution values are
+baked in to the configuration file</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.iniconfig.IniConfig">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.iniconfig.</code><code class="sig-name descname">IniConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_section</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">robust</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">default_vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_expect</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">create_defaults</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#IniConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.IniConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.configbase.Configurable</span></code></a></p>
+<p>Application configuration utility.  This reads from a configuration and
+returns sets or subsets of options.</p>
+<dl class="py method">
+<dt id="zensols.config.iniconfig.IniConfig.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_section</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">robust</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">default_vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_expect</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">create_defaults</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#IniConfig.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.IniConfig.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create with a configuration file path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>]) – the configuration file path to read from</p></li>
+<li><p><strong>default_section</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – default section (defaults to <cite>default</cite>)</p></li>
+<li><p><strong>default_vars</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">any</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">any</span></code>]]) – used use with existing configuration is not found</p></li>
+<li><p><strong>robust</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <cite>True</cite>, then don’t raise an error when the
+configuration file is missing</p></li>
+<li><p><strong>default_expect</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, raise exceptions when keys and/or
+sections are not found in the configuration</p></li>
+<li><p><strong>create_defaults</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>]) – used to initialize the configuration parser,
+and useful for when substitution values are
+baked in to the configuration file</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.iniconfig.IniConfig.derive_from_resource">
+<code class="sig-name descname">derive_from_resource</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span></em>, <em class="sig-param"><span class="n">copy_sections</span><span class="o">=</span><span class="default_value">()</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#IniConfig.derive_from_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.IniConfig.derive_from_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Derive a new configuration from the resource file name <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – a resource file (i.e. <code class="docutils literal notranslate"><span class="pre">resources/app.conf</span></code>)</p>
+</dd>
+<dt class="field-even">Pram copy_sections</dt>
+<dd class="field-even"><p>a list of sections to copy from this to the
+derived configuration</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.iniconfig.IniConfig.get_options">
+<code class="sig-name descname">get_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">opt_keys</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vars</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#IniConfig.get_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.IniConfig.get_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all options for a section.  If <code class="docutils literal notranslate"><span class="pre">opt_keys</span></code> is given return only
+options with those keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>section</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – section in the ini file to fetch the value; defaults to
+constructor’s <code class="docutils literal notranslate"><span class="pre">default_section</span></code></p></li>
+<li><p><strong>vars</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – contains the defaults for missing values of <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><strong>expect</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code> raise an exception if the value does not
+exist</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.iniconfig.IniConfig.has_option">
+<code class="sig-name descname">has_option</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#IniConfig.has_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.IniConfig.has_option" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.iniconfig.IniConfig.parser">
+<em class="property">property </em><code class="sig-name descname">parser</code><a class="headerlink" href="#zensols.config.iniconfig.IniConfig.parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the configuration file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.iniconfig.IniConfig.reload">
+<code class="sig-name descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#IniConfig.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.IniConfig.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload the configuration from the backing store.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.iniconfig.IniConfig.sections">
+<em class="property">property </em><code class="sig-name descname">sections</code><a class="headerlink" href="#zensols.config.iniconfig.IniConfig.sections" title="Permalink to this definition">¶</a></dt>
+<dd><p>All sections of the INI file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Set" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.iniconfig.IniConfig.set_option">
+<code class="sig-name descname">set_option</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">value</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/iniconfig.html#IniConfig.set_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.iniconfig.IniConfig.set_option" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.config.meta">
+<span id="zensols-config-meta-module"></span><h2>zensols.config.meta module<a class="headerlink" href="#module-zensols.config.meta" title="Permalink to this headline">¶</a></h2>
+<p>This file contains utility classes for exploring complex instance graphs.
+This is handy for deeply nested <code class="docutils literal notranslate"><span class="pre">Stash</span></code> instances.</p>
+<dl class="py class">
+<dt id="zensols.config.meta.ClassExplorer">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.meta.</code><code class="sig-name descname">ClassExplorer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">include_classes</span></em>, <em class="sig-param"><span class="n">exclude_classes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">attr_truncate_len</span><span class="o">=</span><span class="default_value">80</span></em>, <em class="sig-param"><span class="n">include_dicts</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">include_private</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">dictify_dataclasses</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/meta.html#ClassExplorer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.meta.ClassExplorer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.writable.Writable" title="zensols.config.writable.Writable"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.writable.Writable</span></code></a></p>
+<dl class="py attribute">
+<dt id="zensols.config.meta.ClassExplorer.ATTR_META_NAME">
+<code class="sig-name descname">ATTR_META_NAME</code><em class="property"> = 'ATTR_EXP_META'</em><a class="headerlink" href="#zensols.config.meta.ClassExplorer.ATTR_META_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.meta.ClassExplorer.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">include_classes</span></em>, <em class="sig-param"><span class="n">exclude_classes</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">4</span></em>, <em class="sig-param"><span class="n">attr_truncate_len</span><span class="o">=</span><span class="default_value">80</span></em>, <em class="sig-param"><span class="n">include_dicts</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">include_private</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">dictify_dataclasses</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/meta.html#ClassExplorer.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.meta.ClassExplorer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.meta.ClassExplorer.get_metadata">
+<code class="sig-name descname">get_metadata</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inst</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/meta.html#ClassExplorer.get_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.meta.ClassExplorer.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.meta.ClassExplorer.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">inst</em>, <em class="sig-param">depth=0</em>, <em class="sig-param">writer=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='utf-8'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/meta.html#ClassExplorer.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.meta.ClassExplorer.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the contents of this instance to <code class="docutils literal notranslate"><span class="pre">writer</span></code> using indention <code class="docutils literal notranslate"><span class="pre">depth</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – the starting indentation depth</p></li>
+<li><p><strong>writer</strong> (<a class="reference external" href="https://docs.python.org/3/library/io.html#io.TextIOBase" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a>) – the writer to dump the content of this writable</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.meta.ClassExplorer.write_metadata">
+<code class="sig-name descname">write_metadata</code><span class="sig-paren">(</span><em class="sig-param">depth=0</em>, <em class="sig-param">writer=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='utf-8'&gt;</em>, <em class="sig-param">metadata=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/meta.html#ClassExplorer.write_metadata"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.meta.ClassExplorer.write_metadata" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.config.serial">
+<span id="zensols-config-serial-module"></span><h2>zensols.config.serial module<a class="headerlink" href="#module-zensols.config.serial" title="Permalink to this headline">¶</a></h2>
+<p>Simple string based serialization.</p>
+<dl class="py class">
+<dt id="zensols.config.serial.PythonObjectEncoder">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.serial.</code><code class="sig-name descname">PythonObjectEncoder</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">skipkeys</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ensure_ascii</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">check_circular</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">allow_nan</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sort_keys</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">separators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/serial.html#PythonObjectEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.serial.PythonObjectEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">json.encoder.JSONEncoder</span></code></p>
+<dl class="py method">
+<dt id="zensols.config.serial.PythonObjectEncoder.default">
+<code class="sig-name descname">default</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/serial.html#PythonObjectEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.serial.PythonObjectEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this method in a subclass such that it returns
+a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
+(to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
+<p>For example, to support arbitrary iterators, you could
+implement default like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="c1"># Let the base class default method raise the TypeError</span>
+    <span class="k">return</span> <span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.serial.Serializer">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.serial.</code><code class="sig-name descname">Serializer</code><span class="sig-paren">(</span><em class="sig-param">allow_types=&lt;factory&gt;</em>, <em class="sig-param">allow_classes=&lt;factory&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/serial.html#Serializer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.serial.Serializer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py attribute">
+<dt id="zensols.config.serial.Serializer.BOOL_REGEXP">
+<code class="sig-name descname">BOOL_REGEXP</code><em class="property"> = re.compile('^True|False')</em><a class="headerlink" href="#zensols.config.serial.Serializer.BOOL_REGEXP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.serial.Serializer.DEFAULT_RESOURCE_MODULE">
+<code class="sig-name descname">DEFAULT_RESOURCE_MODULE</code><em class="property"> = None</em><a class="headerlink" href="#zensols.config.serial.Serializer.DEFAULT_RESOURCE_MODULE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.serial.Serializer.EVAL_REGEXP">
+<code class="sig-name descname">EVAL_REGEXP</code><em class="property"> = re.compile('^eval(?:\\((.+)\\))?:\\s*(.+)$', re.DOTALL)</em><a class="headerlink" href="#zensols.config.serial.Serializer.EVAL_REGEXP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.serial.Serializer.FLOAT_REGEXP">
+<code class="sig-name descname">FLOAT_REGEXP</code><em class="property"> = re.compile('^[-+]?\\d*\\.\\d+$')</em><a class="headerlink" href="#zensols.config.serial.Serializer.FLOAT_REGEXP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.serial.Serializer.INT_REGEXP">
+<code class="sig-name descname">INT_REGEXP</code><em class="property"> = re.compile('^[-+]?[0-9]+$')</em><a class="headerlink" href="#zensols.config.serial.Serializer.INT_REGEXP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.serial.Serializer.JSON_REGEXP">
+<code class="sig-name descname">JSON_REGEXP</code><em class="property"> = re.compile('^json:\\s*(.+)$', re.DOTALL)</em><a class="headerlink" href="#zensols.config.serial.Serializer.JSON_REGEXP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.serial.Serializer.PATH_REGEXP">
+<code class="sig-name descname">PATH_REGEXP</code><em class="property"> = re.compile('^path:\\s*(.+)$')</em><a class="headerlink" href="#zensols.config.serial.Serializer.PATH_REGEXP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.serial.Serializer.PRIMITIVES">
+<code class="sig-name descname">PRIMITIVES</code><em class="property"> = {&lt;class 'float'&gt;, &lt;class 'int'&gt;, &lt;class 'NoneType'&gt;, &lt;class 'bool'&gt;}</em><a class="headerlink" href="#zensols.config.serial.Serializer.PRIMITIVES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.serial.Serializer.RESOURCE_REGEXP">
+<code class="sig-name descname">RESOURCE_REGEXP</code><em class="property"> = re.compile('^resource(?:\\((.+)\\))?:\\s*(.+)$', re.DOTALL)</em><a class="headerlink" href="#zensols.config.serial.Serializer.RESOURCE_REGEXP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.serial.Serializer.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">allow_types=&lt;factory&gt;</em>, <em class="sig-param">allow_classes=&lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.config.serial.Serializer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.serial.Serializer.allow_classes">
+<code class="sig-name descname">allow_classes</code><em class="property">: Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.9)">type</a><span class="p">]</span></em><a class="headerlink" href="#zensols.config.serial.Serializer.allow_classes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.serial.Serializer.allow_types">
+<code class="sig-name descname">allow_types</code><em class="property">: Set<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.9)">type</a><span class="p">]</span></em><a class="headerlink" href="#zensols.config.serial.Serializer.allow_types" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.serial.Serializer.format_option">
+<code class="sig-name descname">format_option</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/serial.html#Serializer.format_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.serial.Serializer.format_option" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format a Python object in to the string represetation per object syntax
+rules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">See</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#zensols.config.serial.Serializer.parse_object" title="zensols.config.serial.Serializer.parse_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">parse_object()</span></code></a></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.serial.Serializer.is_allowed_type">
+<code class="sig-name descname">is_allowed_type</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/serial.html#Serializer.is_allowed_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.serial.Serializer.is_allowed_type" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.serial.Serializer.parse_object">
+<code class="sig-name descname">parse_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">v</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/serial.html#Serializer.parse_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.serial.Serializer.parse_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse as a string in to a Python object.  The following is done to parse the
+string in order:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Primitive (i.e. <code class="docutils literal notranslate"><span class="pre">1.23</span></code> is a float, <code class="docutils literal notranslate"><span class="pre">True</span></code> is a boolean)</p></li>
+<li><p>A <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> object when prefixed with <code class="docutils literal notranslate"><span class="pre">path:</span></code>.</p></li>
+<li><p>Evaluate using the Python parser when prefixed <code class="docutils literal notranslate"><span class="pre">eval:</span></code>.</p></li>
+<li><p>Evaluate as JSON when prefixed with <code class="docutils literal notranslate"><span class="pre">json:</span></code>.</p></li>
+</ol>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.serial.Serializer.populate_state">
+<code class="sig-name descname">populate_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span></em>, <em class="sig-param"><span class="n">obj</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">parse_types</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/serial.html#Serializer.populate_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.serial.Serializer.populate_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populate an object with at string dictionary.  The keys are used for the
+output, and the values are parsed in to Python objects using
+<a class="reference internal" href="#zensols.config.serial.Serializer.parse_object" title="zensols.config.serial.Serializer.parse_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">parse_object()</span></code></a>.  The keys in the input are used as the same
+keys if <code class="docutils literal notranslate"><span class="pre">obj</span></code> is a <code class="docutils literal notranslate"><span class="pre">dict</span></code>.  Otherwise, set data as attributes on
+the object with <a class="reference external" href="https://docs.python.org/3/library/functions.html#setattr" title="(in Python v3.9)"><code class="xref py py-func docutils literal notranslate"><span class="pre">setattr()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – the data to parse</p></li>
+<li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]) – the object to populate</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.serial.Serializer.resource_filename">
+<code class="sig-name descname">resource_filename</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">resource_name</span></em>, <em class="sig-param"><span class="n">module_name</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/serial.html#Serializer.resource_filename"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.serial.Serializer.resource_filename" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a resource based on a file name.  This uses the <code class="docutils literal notranslate"><span class="pre">pkg_resources</span></code>
+package first to find the resources.  If it doesn’t find it, it returns
+a path on the file system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>resource_name the file name of the resource to obtain (or name
+if obtained from an installed module)</p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>module_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – the name of the module to obtain the data, which
+defaults to <a class="reference internal" href="#zensols.config.serial.Serializer.DEFAULT_RESOURCE_MODULE" title="zensols.config.serial.Serializer.DEFAULT_RESOURCE_MODULE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_RESOURCE_MODULE</span></code></a>, which
+is set by
+<a class="reference internal" href="zensols.cli.html#zensols.cli.simple.SimpleActionCli" title="zensols.cli.simple.SimpleActionCli"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.cli.simple.SimpleActionCli</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>a path on the file system or resource of the installed module</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.serial.Settings">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.serial.</code><code class="sig-name descname">Settings</code><a class="reference internal" href="../_modules/zensols/config/serial.html#Settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.serial.Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A default object used to populate in <code class="docutils literal notranslate"><span class="pre">Configurable.populate</span></code>.</p>
+<dl class="py method">
+<dt id="zensols.config.serial.Settings.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">writer=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='utf-8'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/serial.html#Settings.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.serial.Settings.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="zensols.config.serial.as_python_object">
+<code class="sig-prename descclassname">zensols.config.serial.</code><code class="sig-name descname">as_python_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dct</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/serial.html#as_python_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.serial.as_python_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-zensols.config.strconfig">
+<span id="zensols-config-strconfig-module"></span><h2>zensols.config.strconfig module<a class="headerlink" href="#module-zensols.config.strconfig" title="Permalink to this headline">¶</a></h2>
+<p>Implementation classes that are used as application configuration containers
+parsed from files.</p>
+<dl class="py class">
+<dt id="zensols.config.strconfig.StringConfig">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.strconfig.</code><code class="sig-name descname">StringConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_str</span></em>, <em class="sig-param"><span class="n">option_sep</span><span class="o">=</span><span class="default_value">','</span></em>, <em class="sig-param"><span class="n">default_section</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">default_expect</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/strconfig.html#StringConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.strconfig.StringConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.configbase.Configurable</span></code></a></p>
+<p>A simple string based configuration.  This takes a single comma delimited
+key/value pair string in the format:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">&lt;section&gt;.&lt;name&gt;=&lt;value&gt;[,&lt;section&gt;.&lt;name&gt;=&lt;value&gt;,...]</span></code></p>
+</div></blockquote>
+<dl class="py attribute">
+<dt id="zensols.config.strconfig.StringConfig.KEY_VAL_REGEX">
+<code class="sig-name descname">KEY_VAL_REGEX</code><em class="property"> = re.compile('^(?:([^.]+?)\\.)?([^=]+?)=(.+)$')</em><a class="headerlink" href="#zensols.config.strconfig.StringConfig.KEY_VAL_REGEX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.strconfig.StringConfig.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_str</span></em>, <em class="sig-param"><span class="n">option_sep</span><span class="o">=</span><span class="default_value">','</span></em>, <em class="sig-param"><span class="n">default_section</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">default_expect</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/strconfig.html#StringConfig.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.strconfig.StringConfig.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize with a string given as described in the class docs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_str</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – the configuration</p></li>
+<li><p><strong>option_sep</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – the string used to delimit the section</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.strconfig.StringConfig.get_options">
+<code class="sig-name descname">get_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">opt_keys</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vars</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/strconfig.html#StringConfig.get_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.strconfig.StringConfig.get_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all options for a section.  If <code class="docutils literal notranslate"><span class="pre">opt_keys</span></code> is given return only
+options with those keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>section</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – section in the ini file to fetch the value; defaults to
+constructor’s <code class="docutils literal notranslate"><span class="pre">default_section</span></code></p></li>
+<li><p><strong>vars</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]) – contains the defaults for missing values of <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><strong>expect</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code> raise an exception if the value does not
+exist</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.strconfig.StringConfig.has_option">
+<code class="sig-name descname">has_option</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/strconfig.html#StringConfig.has_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.strconfig.StringConfig.has_option" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.strconfig.StringConfig.sections">
+<em class="property">property </em><code class="sig-name descname">sections</code><a class="headerlink" href="#zensols.config.strconfig.StringConfig.sections" title="Permalink to this definition">¶</a></dt>
+<dd><p>All sections of the configuration file.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.config.writable">
+<span id="zensols-config-writable-module"></span><h2>zensols.config.writable module<a class="headerlink" href="#module-zensols.config.writable" title="Permalink to this headline">¶</a></h2>
+<p>A class that allows human readable information (sometimes debugging) output
+with a hierarchical structure.</p>
+<dl class="py attribute">
+<dt id="zensols.config.writable.WRITABLE_CLASS">
+<code class="sig-prename descclassname">zensols.config.writable.</code><code class="sig-name descname">WRITABLE_CLASS</code><a class="headerlink" href="#zensols.config.writable.WRITABLE_CLASS" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#zensols.config.writable.Writable" title="zensols.config.writable.Writable"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.writable.Writable</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.config.writable.Writable">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.writable.</code><code class="sig-name descname">Writable</code><a class="reference internal" href="../_modules/zensols/config/writable.html#Writable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.writable.Writable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<p>An interface for classes that have multi-line debuging capability.</p>
+<dl class="py method">
+<dt id="zensols.config.writable.Writable._trunc">
+<em class="property">classmethod </em><code class="sig-name descname">_trunc</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">max_len</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/writable.html#Writable._trunc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.writable.Writable._trunc" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.writable.Writable._sp">
+<code class="sig-name descname">_sp</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">depth</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/writable.html#Writable._sp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.writable.Writable._sp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility method to create a space string.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.writable.Writable._set_indent">
+<code class="sig-name descname">_set_indent</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/writable.html#Writable._set_indent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.writable.Writable._set_indent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the indentation for the instance.  By default, this value is 4.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>indent</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – the value to set as the indent for this instance, or
+<code class="docutils literal notranslate"><span class="pre">None</span></code> to unset it</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.writable.Writable._write_line">
+<code class="sig-name descname">_write_line</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">line</span></em>, <em class="sig-param"><span class="n">depth</span></em>, <em class="sig-param"><span class="n">writer</span></em>, <em class="sig-param"><span class="n">max_len</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/writable.html#Writable._write_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.writable.Writable._write_line" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a line of text <code class="docutils literal notranslate"><span class="pre">line</span></code> with the correct indentation per <code class="docutils literal notranslate"><span class="pre">depth</span></code> to
+<code class="docutils literal notranslate"><span class="pre">writer</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.writable.Writable._write_block">
+<code class="sig-name descname">_write_block</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">lines</span></em>, <em class="sig-param"><span class="n">depth</span></em>, <em class="sig-param"><span class="n">writer</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/writable.html#Writable._write_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.writable.Writable._write_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write a block of text with indentation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.writable.Writable._write_object">
+<code class="sig-name descname">_write_object</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em>, <em class="sig-param"><span class="n">depth</span></em>, <em class="sig-param"><span class="n">writer</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/writable.html#Writable._write_object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.writable.Writable._write_object" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write an object based on the class of the instance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.writable.Writable._write_iterable">
+<code class="sig-name descname">_write_iterable</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">depth</span></em>, <em class="sig-param"><span class="n">writer</span></em>, <em class="sig-param"><span class="n">include_index</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/writable.html#Writable._write_iterable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.writable.Writable._write_iterable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write list <code class="docutils literal notranslate"><span class="pre">data</span></code> with the correct indentation per <code class="docutils literal notranslate"><span class="pre">depth</span></code> to
+<code class="docutils literal notranslate"><span class="pre">writer</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>include_index</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, add an incrementing index for each
+element in the output</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.writable.Writable._write_dict">
+<code class="sig-name descname">_write_dict</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">depth</span></em>, <em class="sig-param"><span class="n">writer</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/writable.html#Writable._write_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.writable.Writable._write_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write dictionary <code class="docutils literal notranslate"><span class="pre">data</span></code> with the correct indentation per <code class="docutils literal notranslate"><span class="pre">depth</span></code> to
+<code class="docutils literal notranslate"><span class="pre">writer</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.writable.Writable.WRITABLE_INDENT_SPACE">
+<code class="sig-name descname">WRITABLE_INDENT_SPACE</code><em class="property"> = 4</em><a class="headerlink" href="#zensols.config.writable.Writable.WRITABLE_INDENT_SPACE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.writable.Writable.WRITABLE_MAX_COL">
+<code class="sig-name descname">WRITABLE_MAX_COL</code><em class="property"> = 80</em><a class="headerlink" href="#zensols.config.writable.Writable.WRITABLE_MAX_COL" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.writable.Writable.write">
+<em class="property">abstract </em><code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">depth=0</em>, <em class="sig-param">writer=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='utf-8'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/writable.html#Writable.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.writable.Writable.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the contents of this instance to <code class="docutils literal notranslate"><span class="pre">writer</span></code> using indention <code class="docutils literal notranslate"><span class="pre">depth</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – the starting indentation depth</p></li>
+<li><p><strong>writer</strong> (<a class="reference external" href="https://docs.python.org/3/library/io.html#io.TextIOBase" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextIOBase</span></code></a>) – the writer to dump the content of this writable</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.writable.Writable.write_to_log">
+<code class="sig-name descname">write_to_log</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">logger</span></em>, <em class="sig-param"><span class="n">level</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">depth</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">split_lines</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/writable.html#Writable.write_to_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.writable.Writable.write_to_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like <a class="reference internal" href="#zensols.config.writable.Writable.write" title="zensols.config.writable.Writable.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write()</span></code></a> but write the content to a log message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code></a>) – the logger to write the message containing content of
+this writable</p></li>
+<li><p><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – the logging level given in the <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.9)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> module</p></li>
+<li><p><strong>depth</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – the starting indentation depth</p></li>
+<li><p><strong>split_lines</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code> each line is logged separately</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.config.writeback">
+<span id="zensols-config-writeback-module"></span><h2>zensols.config.writeback module<a class="headerlink" href="#module-zensols.config.writeback" title="Permalink to this headline">¶</a></h2>
+<p>Observer pattern that write updates back to the configuration.</p>
+<dl class="py class">
+<dt id="zensols.config.writeback.Writeback">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.writeback.</code><code class="sig-name descname">Writeback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">config_factory</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/writeback.html#Writeback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.writeback.Writeback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.factory.FactoryStateObserver" title="zensols.config.factory.FactoryStateObserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.factory.FactoryStateObserver</span></code></a>, <a class="reference internal" href="#zensols.config.dictable.Dictable" title="zensols.config.dictable.Dictable"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.dictable.Dictable</span></code></a></p>
+<p>Subclass for classes that want to write attribute changes back to a
+<a class="reference internal" href="#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a>.  This uses an observer pattern that write updates
+back to the configuration.</p>
+<p>When an attribute is set on an instance of this class, it is first set
+using the normal Python attribute setting.  After that, based on a set of
+criteria, the attribute and value are set on the backing configuration
+<code class="docutils literal notranslate"><span class="pre">config</span></code>.  The value is clobbered with a string version based on the
+<code class="docutils literal notranslate"><span class="pre">config</span></code>’s <a class="reference internal" href="#zensols.config.serial.Serializer" title="zensols.config.serial.Serializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Serializer</span></code></a> instance (either a primitive value string
+or JSON string).</p>
+<p><strong>Implementation Note:</strong> During initialization, the <code class="xref py py-meth docutils literal notranslate"><span class="pre">__setattr__()</span></code>
+is called by the Python interpreter, and before the instance is completely
+being populated.</p>
+<p><strong>Important:</strong> The <code class="xref py py-meth docutils literal notranslate"><span class="pre">_is_settable()</span></code> implementation checks for a
+state (any such as <code class="docutils literal notranslate"><span class="pre">CREATED</span></code>) to be set on the instance.  To change
+this behavior, you will need to overide this method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – the name of the section given in the configuration</p></li>
+<li><p><strong>config</strong> – the <em>backing configuration</em>, which is the configuration from
+whince this object instance was defined</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="zensols.config.writeback.Writeback.DEFAULT_SKIP_ATTRIBUTES">
+<code class="sig-name descname">DEFAULT_SKIP_ATTRIBUTES</code><em class="property"> = {'config', 'config_factory', 'name'}</em><a class="headerlink" href="#zensols.config.writeback.Writeback.DEFAULT_SKIP_ATTRIBUTES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.writeback.Writeback.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">config_factory</span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.config.writeback.Writeback.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.writeback.Writeback.config_factory">
+<code class="sig-name descname">config_factory</code><em class="property">: <a class="reference internal" href="#zensols.config.factory.ConfigFactory" title="zensols.config.factory.ConfigFactory">zensols.config.factory.ConfigFactory</a></em><a class="headerlink" href="#zensols.config.writeback.Writeback.config_factory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.config.writeback.Writeback.name">
+<code class="sig-name descname">name</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#zensols.config.writeback.Writeback.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.config.yaml">
+<span id="zensols-config-yaml-module"></span><h2>zensols.config.yaml module<a class="headerlink" href="#module-zensols.config.yaml" title="Permalink to this headline">¶</a></h2>
+<p>Application configuration classes parsed from YAML files.</p>
+<dl class="py class">
+<dt id="zensols.config.yaml.YamlConfig">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.config.yaml.</code><code class="sig-name descname">YamlConfig</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_section</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">default_vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value">'$'</span></em>, <em class="sig-param"><span class="n">default_expect</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sections_name</span><span class="o">=</span><span class="default_value">'sections'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/yaml.html#YamlConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.yaml.YamlConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.configbase.Configurable</span></code></a>, <a class="reference internal" href="#zensols.config.dictable.Dictable" title="zensols.config.dictable.Dictable"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.dictable.Dictable</span></code></a></p>
+<p>Just like zensols.actioncli.Config but parse configuration from YAML files.
+Variable substitution works just like ini files, but you can set what
+delimiter to use and keys are the paths of the data in the hierarchy
+separated by dots.</p>
+<p>See the test cases for example.</p>
+<dl class="py attribute">
+<dt id="zensols.config.yaml.YamlConfig.CLASS_VER">
+<code class="sig-name descname">CLASS_VER</code><em class="property"> = 0</em><a class="headerlink" href="#zensols.config.yaml.YamlConfig.CLASS_VER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.yaml.YamlConfig.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config_file</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_section</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">default_vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="o">=</span><span class="default_value">'$'</span></em>, <em class="sig-param"><span class="n">default_expect</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sections_name</span><span class="o">=</span><span class="default_value">'sections'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/yaml.html#YamlConfig.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.yaml.YamlConfig.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize this instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_file</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a>]) – the <code class="docutils literal notranslate"><span class="pre">.yml</span></code> configuration file path to read from</p></li>
+<li><p><strong>default_section</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – default section (defaults to <cite>default</cite>)</p></li>
+<li><p><strong>default_vars</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – used use with existing configuration is not found</p></li>
+<li><p><strong>default_expect</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, raise exceptions when keys and/or
+sections are not found in the configuration</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.yaml.YamlConfig.config">
+<em class="property">property </em><code class="sig-name descname">config</code><a class="headerlink" href="#zensols.config.yaml.YamlConfig.config" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>rtype</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.yaml.YamlConfig.get_option">
+<code class="sig-name descname">get_option</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">section</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expect</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/yaml.html#YamlConfig.get_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.yaml.YamlConfig.get_option" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an option using a dot encoded path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.yaml.YamlConfig.get_options">
+<code class="sig-name descname">get_options</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'default'</span></em>, <em class="sig-param"><span class="n">opt_keys</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">vars</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">expect</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/yaml.html#YamlConfig.get_options"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.yaml.YamlConfig.get_options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all options for a section.  If <code class="docutils literal notranslate"><span class="pre">opt_keys</span></code> is given return only
+options with those keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>section</strong> – section in the ini file to fetch the value; defaults to
+constructor’s <code class="docutils literal notranslate"><span class="pre">default_section</span></code></p></li>
+<li><p><strong>vars</strong> – contains the defaults for missing values of <code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><strong>expect</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code> raise an exception if the value does not
+exist</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.yaml.YamlConfig.get_tree">
+<code class="sig-name descname">get_tree</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/yaml.html#YamlConfig.get_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.yaml.YamlConfig.get_tree" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.yaml.YamlConfig.has_option">
+<code class="sig-name descname">has_option</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/yaml.html#YamlConfig.has_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.yaml.YamlConfig.has_option" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.yaml.YamlConfig.options">
+<em class="property">property </em><code class="sig-name descname">options</code><a class="headerlink" href="#zensols.config.yaml.YamlConfig.options" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all options from the default section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.yaml.YamlConfig.reload">
+<code class="sig-name descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/config/yaml.html#YamlConfig.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.config.yaml.YamlConfig.reload" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload the configuration from the backing store.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.yaml.YamlConfig.root">
+<em class="property">property </em><code class="sig-name descname">root</code><a class="headerlink" href="#zensols.config.yaml.YamlConfig.root" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the (first) root name of the Yaml configuration file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.config.yaml.YamlConfig.sections">
+<em class="property">property </em><code class="sig-name descname">sections</code><a class="headerlink" href="#zensols.config.yaml.YamlConfig.sections" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the sections by finding the <code class="xref py py-obj docutils literal notranslate"><span class="pre">section_name</span></code> based from the
+<a class="reference internal" href="#zensols.config.yaml.YamlConfig.root" title="zensols.config.yaml.YamlConfig.root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">root</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Set" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.config">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-zensols.config" title="Permalink to this headline">¶</a></h2>
+<p>Contains modules that provide configuration utility.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="zensols.multi.html" class="btn btn-neutral float-right" title="zensols.multi package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="zensols.cli.html" class="btn btn-neutral float-left" title="zensols.cli package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

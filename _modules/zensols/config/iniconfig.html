@@ -1,0 +1,464 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zensols.config.iniconfig &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>zensols.config.iniconfig</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for zensols.config.iniconfig</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implementation classes that are used as application configuration containers</span>
+<span class="sd">parsed from files.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Paul Landes&#39;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span><span class="p">,</span> <span class="n">ExtendedInterpolation</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">Configurable</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="IniConfig"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.IniConfig">[docs]</a><span class="k">class</span> <span class="nc">IniConfig</span><span class="p">(</span><span class="n">Configurable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Application configuration utility.  This reads from a configuration and</span>
+<span class="sd">    returns sets or subsets of options.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="IniConfig.__init__"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.IniConfig.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">default_section</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">robust</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">default_vars</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">any</span><span class="p">,</span> <span class="nb">any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">default_expect</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">create_defaults</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create with a configuration file path.</span>
+
+<span class="sd">        :param config_file: the configuration file path to read from</span>
+
+<span class="sd">        :param default_section: default section (defaults to `default`)</span>
+
+<span class="sd">        :param default_vars: used use with existing configuration is not found</span>
+
+<span class="sd">        :param robust: if `True`, then don&#39;t raise an error when the</span>
+<span class="sd">                       configuration file is missing</span>
+
+<span class="sd">        :param default_expect: if ``True``, raise exceptions when keys and/or</span>
+<span class="sd">                               sections are not found in the configuration</span>
+
+<span class="sd">        :param create_defaults: used to initialize the configuration parser,</span>
+<span class="sd">                                and useful for when substitution values are</span>
+<span class="sd">                                baked in to the configuration file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">default_expect</span><span class="p">,</span> <span class="n">default_section</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">config_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">robust</span> <span class="o">=</span> <span class="n">robust</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_munge_default_vars</span><span class="p">(</span><span class="n">default_vars</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_defaults</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_munge_create_defaults</span><span class="p">(</span><span class="n">create_defaults</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nascent</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_munge_default_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">vars</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">vars</span>
+
+    <span class="k">def</span> <span class="nf">_munge_create_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">vars</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">vars</span>
+
+    <span class="k">def</span> <span class="nf">_create_config_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigParser</span><span class="p">:</span>
+        <span class="s2">&quot;Factory method to create the ConfigParser.&quot;</span>
+        <span class="k">return</span> <span class="n">ConfigParser</span><span class="p">(</span><span class="n">defaults</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">create_defaults</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">parser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Load the configuration file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_conf&#39;</span><span class="p">):</span>
+            <span class="n">cpath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;loading config </span><span class="si">{</span><span class="n">cpath</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cpath</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">robust</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;no default config file </span><span class="si">{</span><span class="n">cpath</span><span class="si">}</span><span class="s1">--skipping&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;no such file: </span><span class="si">{</span><span class="n">cpath</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_conf</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="n">cpath</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_config_parser</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_conf</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">cpath</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">cpath</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="n">agg</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">fpath</span> <span class="ow">in</span> <span class="n">cpath</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">fpath</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fpath</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                            <span class="n">agg</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+                        <span class="n">agg</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_config_parser</span><span class="p">()</span>
+                <span class="n">agg</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_conf</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">agg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;unknown file type: </span><span class="si">{</span><span class="n">cpath</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conf</span>
+
+<div class="viewcode-block" id="IniConfig.reload"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.IniConfig.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_conf&#39;</span><span class="p">):</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_conf</span></div>
+
+<div class="viewcode-block" id="IniConfig.has_option"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.IniConfig.has_option">[docs]</a>    <span class="k">def</span> <span class="nf">has_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">section</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_section</span> <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">section</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span>
+        <span class="k">if</span> <span class="n">conf</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">section</span><span class="p">):</span>
+            <span class="n">opts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">opt_keys</span><span class="o">=</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">opts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">opts</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="IniConfig.get_options"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.IniConfig.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">opt_keys</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="nb">vars</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_section</span> <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">section</span>
+        <span class="nb">vars</span> <span class="o">=</span> <span class="nb">vars</span> <span class="k">if</span> <span class="nb">vars</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span>
+        <span class="n">opts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">opt_keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">conf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">opt_keys</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">robust</span> <span class="ow">or</span> <span class="n">conf</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">section</span><span class="p">):</span>
+                    <span class="n">opt_keys</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">opt_keys</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;conf: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">conf</span><span class="p">)</span>
+            <span class="n">copts</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="n">section</span><span class="p">)</span> <span class="k">if</span> <span class="n">conf</span> <span class="k">else</span> <span class="p">{}</span>
+            <span class="n">opt_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">opt_keys</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">copts</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">opt_keys</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;option: </span><span class="si">{</span><span class="n">option</span><span class="si">}</span><span class="s1">, vars: </span><span class="si">{</span><span class="nb">vars</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">opts</span><span class="p">[</span><span class="n">option</span><span class="p">]</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="nb">vars</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">opts</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;All sections of the INI file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">secs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">sections</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">secs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">secs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_format_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">section</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">format_option</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;can not serialize </span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="IniConfig.set_option"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.IniConfig.set_option">[docs]</a>    <span class="k">def</span> <span class="nf">set_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">section</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_section</span> <span class="k">if</span> <span class="n">section</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">section</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_option</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;setting option </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="n">section</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IniConfig.derive_from_resource"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.IniConfig.derive_from_resource">[docs]</a>    <span class="k">def</span> <span class="nf">derive_from_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">copy_sections</span><span class="o">=</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="n">Configurable</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Derive a new configuration from the resource file name ``path``.</span>
+
+<span class="sd">        :param path: a resource file (i.e. ``resources/app.conf``)</span>
+<span class="sd">        :pram copy_sections: a list of sections to copy from this to the</span>
+<span class="sd">                             derived configuration</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nascent</span><span class="p">)</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;config_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">copy_sections</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">copy_sections</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">conf</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;file: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="si">}</span><span class="s1">, section: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ExtendedInterpolationConfig"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationConfig">[docs]</a><span class="k">class</span> <span class="nc">ExtendedInterpolationConfig</span><span class="p">(</span><span class="n">IniConfig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Configuration class extends using advanced interpolation with</span>
+<span class="sd">    ``configparser.ExtendedInterpolation``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_create_config_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigParser</span><span class="p">:</span>
+        <span class="n">inter</span> <span class="o">=</span> <span class="n">ExtendedInterpolation</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">ConfigParser</span><span class="p">(</span><span class="n">defaults</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">create_defaults</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">inter</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ExtendedInterpolationEnvConfig"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig">[docs]</a><span class="k">class</span> <span class="nc">ExtendedInterpolationEnvConfig</span><span class="p">(</span><span class="n">ExtendedInterpolationConfig</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An :class:`.IniConfig` implementation that creates a section called ``env``</span>
+<span class="sd">    with environment variables passed.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ExtendedInterpolationEnvConfig.__init__"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">remove_vars</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">env</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">env_sec</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;env&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;default_expect&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;default_expect&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_vars</span> <span class="o">=</span> <span class="n">remove_vars</span>
+        <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env_sec</span> <span class="o">=</span> <span class="n">env_sec</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_munge_default_vars</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">vars</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">vars</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_vars</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_vars</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="nb">vars</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">vars</span>
+
+    <span class="k">def</span> <span class="nf">_create_config_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConfigParser</span><span class="p">:</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_config_parser</span><span class="p">()</span>
+        <span class="n">sec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_sec</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="n">sec</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;adding env section </span><span class="si">{</span><span class="n">sec</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_option</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">sec</span><span class="p">)</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parser</span></div>
+
+
+<div class="viewcode-block" id="CommandLineConfig"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.CommandLineConfig">[docs]</a><span class="k">class</span> <span class="nc">CommandLineConfig</span><span class="p">(</span><span class="n">IniConfig</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A configuration object that allows creation by using command line arguments</span>
+<span class="sd">    as defaults when the configuration file is missing.</span>
+
+<span class="sd">    Sub classes must implement the ``set_defaults`` method.  All defaults set</span>
+<span class="sd">    in this method are then created in the default section of the configuration</span>
+<span class="sd">    when created with the static method ``from_args``, which is called with the</span>
+<span class="sd">    parsed command line arguments (usually from some instance or instance of</span>
+<span class="sd">    subclass ``SimpleActionCli``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CommandLineConfig.set_default"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.CommandLineConfig.set_default">[docs]</a>    <span class="k">def</span> <span class="nf">set_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">clobber</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set a default value in the ``default`` section of the configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">clobber</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">clobber</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_section</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_section</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CommandLineConfig.set_defaults"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.CommandLineConfig.set_defaults">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">set_defaults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="CommandLineConfig.from_args"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.iniconfig.CommandLineConfig.from_args">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_config_parser</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">add_section</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_section</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

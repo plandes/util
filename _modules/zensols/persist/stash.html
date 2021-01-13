@@ -1,0 +1,557 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zensols.persist.stash &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>zensols.persist.stash</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for zensols.persist.stash</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Stash implementations.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Paul Landes&#39;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">InitVar</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABCMeta</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">import</span> <span class="nn">parse</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">zensols.util.time</span> <span class="k">as</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Stash</span><span class="p">,</span>
+    <span class="n">ReadOnlyStash</span><span class="p">,</span>
+    <span class="n">DelegateStash</span><span class="p">,</span>
+    <span class="n">PreemptiveStash</span><span class="p">,</span>
+    <span class="n">PrimeableStash</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="OneShotFactoryStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.OneShotFactoryStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">OneShotFactoryStash</span><span class="p">(</span><span class="n">PreemptiveStash</span><span class="p">,</span> <span class="n">PrimeableStash</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A stash that is populated by a callable or an iterable &#39;worker&#39;.  The data</span>
+<span class="sd">    is generated by the worker and dumped to the delegate.  This worker is</span>
+<span class="sd">    either a callable (i.e. function) or an interable that return tuples or</span>
+<span class="sd">    lists of (key, object)</span>
+
+<span class="sd">    To use this class, this worker must be set as an attribute or this class</span>
+<span class="sd">    extended and worker be made a property.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_process_work</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Invoke the worker to generate the data and dump it to the delegate.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;processing with </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="p">):</span>
+            <span class="n">itr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">itr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker</span>
+        <span class="k">for</span> <span class="nb">id</span><span class="p">,</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">itr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OneShotFactoryStash.prime"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.OneShotFactoryStash.prime">[docs]</a>    <span class="k">def</span> <span class="nf">prime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">has_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_data</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;asserting data: </span><span class="si">{</span><span class="n">has_data</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_data</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">time</span><span class="p">(</span><span class="s1">&#39;processing work in OneShotFactoryStash&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_process_work</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reset_has_data</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="OneShotFactoryStash.get"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.OneShotFactoryStash.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prime</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneShotFactoryStash.load"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.OneShotFactoryStash.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prime</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OneShotFactoryStash.keys"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.OneShotFactoryStash.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prime</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="SortedStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.SortedStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SortedStash</span><span class="p">(</span><span class="n">DelegateStash</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Specify an sorting to how keys in a stash are returned.  This usually also</span>
+<span class="sd">    has an impact on the sort in which values are iterated since a call to get</span>
+<span class="sd">    the keys determins it.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ATTR_EXP_META</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;sort_function&#39;</span><span class="p">,)</span>
+    <span class="n">sort_function</span><span class="p">:</span> <span class="n">Callable</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">x</span><span class="p">),),</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+<div class="viewcode-block" id="SortedStash.values"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.SortedStash.values">[docs]</a>    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="SortedStash.items"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.SortedStash.items">[docs]</a>    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">k</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="SortedStash.keys"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.SortedStash.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sort_function</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sort_function</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">keys</span></div></div>
+
+
+<div class="viewcode-block" id="DictionaryStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DictionaryStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DictionaryStash</span><span class="p">(</span><span class="n">Stash</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Use a dictionary as a backing store to the stash.  If one is not provided in</span>
+<span class="sd">    the initializer a new ``dict`` is created.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
+
+<div class="viewcode-block" id="DictionaryStash.load"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DictionaryStash.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DictionaryStash.get"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DictionaryStash.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DictionaryStash.exists"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DictionaryStash.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span></div>
+
+<div class="viewcode-block" id="DictionaryStash.dump"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DictionaryStash.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">inst</span></div>
+
+<div class="viewcode-block" id="DictionaryStash.delete"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DictionaryStash.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="DictionaryStash.keys"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DictionaryStash.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DictionaryStash.clear"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DictionaryStash.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="CacheStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.CacheStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">CacheStash</span><span class="p">(</span><span class="n">DelegateStash</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provide a dictionary based caching based stash.</span>
+
+<span class="sd">    :param delegate: the underlying persistence stash</span>
+<span class="sd">    :param cache_stash: a stash used for caching (defaults to</span>
+<span class="sd">                        :class:`.DictionaryStash`)</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cache_stash</span><span class="p">:</span> <span class="n">Stash</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">DictionaryStash</span><span class="p">())</span>
+
+<div class="viewcode-block" id="CacheStash.load"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.CacheStash.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_stash</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_stash</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_stash</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">obj</span></div>
+
+<div class="viewcode-block" id="CacheStash.exists"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.CacheStash.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_stash</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CacheStash.delete"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.CacheStash.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_stash</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache_stash</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="p">,</span> <span class="n">ReadOnlyStash</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CacheStash.clear"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.CacheStash.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="p">,</span> <span class="n">ReadOnlyStash</span><span class="p">):</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_stash</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="DirectoryStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DirectoryStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DirectoryStash</span><span class="p">(</span><span class="n">Stash</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a pickled data file with a file name in a directory with a given</span>
+<span class="sd">    pattern across all instances.</span>
+
+<span class="sd">    :param path: the directory of where to store the files</span>
+
+<span class="sd">    :param pattern: the file name portion with ``name`` populating to the</span>
+<span class="sd">                    key of the data value</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ATTR_EXP_META</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="s1">&#39;pattern&#39;</span><span class="p">)</span>
+
+    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{name}</span><span class="s1">.dat&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;expecting pathlib.Path but got: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DirectoryStash.assert_path_dir"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DirectoryStash.assert_path_dir">[docs]</a>    <span class="k">def</span> <span class="nf">assert_path_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DirectoryStash.key_to_path"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DirectoryStash.key_to_path">[docs]</a>    <span class="k">def</span> <span class="nf">key_to_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return a path to the pickled data with key ``name``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">name</span><span class="p">})</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;path </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assert_path_dir</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DirectoryStash.load"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DirectoryStash.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_to_path</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;loading instance from </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">inst</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;loaded instance: </span><span class="si">{</span><span class="n">inst</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inst</span></div>
+
+<div class="viewcode-block" id="DirectoryStash.exists"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DirectoryStash.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_to_path</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DirectoryStash.keys"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DirectoryStash.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">def</span> <span class="nf">path_to_key</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">parse</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pattern</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="c1"># avoid files that don&#39;t match the pattern</span>
+            <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">named</span>
+                <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">in</span> <span class="n">p</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;checking path </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                          <span class="nb">map</span><span class="p">(</span><span class="n">path_to_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">keys</span></div>
+
+<div class="viewcode-block" id="DirectoryStash.dump"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DirectoryStash.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inst</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;saving instance: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_to_path</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DirectoryStash.delete"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DirectoryStash.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;deleting instance: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_to_path</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DirectoryStash.close"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.DirectoryStash.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="IncrementKeyDirectoryStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.IncrementKeyDirectoryStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">IncrementKeyDirectoryStash</span><span class="p">(</span><span class="n">DirectoryStash</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A stash that increments integer value keys in a stash and dumps/loads using</span>
+<span class="sd">    the last key available in the stash.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;data&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__post_init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pattern</span> <span class="o">=</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;-</span><span class="si">{name}</span><span class="s1">.dat&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_key</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="IncrementKeyDirectoryStash.get_last_key"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.IncrementKeyDirectoryStash.get_last_key">[docs]</a>    <span class="k">def</span> <span class="nf">get_last_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get the last available (highest number) keys in the stash.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="k">if</span> <span class="n">inc</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_key</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_last_key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IncrementKeyDirectoryStash.keys"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.IncrementKeyDirectoryStash.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">def</span> <span class="nf">is_good_key</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="nb">filter</span><span class="p">(</span><span class="n">is_good_key</span><span class="p">,</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="IncrementKeyDirectoryStash.dump"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.IncrementKeyDirectoryStash.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_or_inst</span><span class="p">,</span> <span class="n">inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;If only one argument is given, it is used as the data and the key name is</span>
+<span class="sd">        derived from ``get_last_key``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">inst</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_key</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">inst</span> <span class="o">=</span> <span class="n">name_or_inst</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">name_or_inst</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_to_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;dumping result </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> to </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">inst</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="IncrementKeyDirectoryStash.load"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.IncrementKeyDirectoryStash.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Just like ``Stash.load``, but if the key is omitted, return the value of the</span>
+<span class="sd">        last key in the stash.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_last_key</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="UnionStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.UnionStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">UnionStash</span><span class="p">(</span><span class="n">ReadOnlyStash</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A stash joins the data of many other stashes.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">stashes</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Stash</span><span class="p">]</span>
+
+<div class="viewcode-block" id="UnionStash.load"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.UnionStash.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">stash</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stashes</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">stash</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="UnionStash.get"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.UnionStash.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UnionStash.values"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.UnionStash.values">[docs]</a>    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">stashes</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="UnionStash.keys"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.UnionStash.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">stashes</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="UnionStash.exists"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.stash.UnionStash.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">stash</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stashes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">stash</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

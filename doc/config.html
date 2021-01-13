@@ -1,0 +1,489 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Configuration &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Persistence" href="persist.html" />
+    <link rel="prev" title="Command Line Interface" href="command-line.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#ini-format">INI Format</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#directory-based-path">Directory Based Path</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#yaml-format">YAML Format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inversion-of-control">Inversion of Control</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#application-context">Application Context</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parsing">Parsing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#configuration-factory">Configuration Factory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#evaluation-parameters">Evaluation Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#resources">Resources</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instance-parameters">Instance Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#complete-examples">Complete Examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="persist.html">Persistence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Configuration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/doc/config.md.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>This package provides advanced parsing of INI and YAML files that provide Java
+Spring like mechanism to create in memory Python object instance graphs.  This
+API also works with the <a class="reference internal" href="command-line.html"><span class="doc">command action library</span></a> to easily
+configure command line applications.</p>
+<p>There are many configuration options and classes to choose from.  However, the
+best place to start with the most functionality is the
+<a class="reference external" href="../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig">ExtendedInterpolationEnvConfig</a> class, which reads an <a class="reference external" href="https://en.wikipedia.org/wiki/INI_file">INI</a> substitution based
+file.</p>
+<p>This will read an <a class="reference external" href="https://en.wikipedia.org/wiki/INI_file">INI</a> format uses the <code class="docutils literal notranslate"><span class="pre">configparser.ExtendedInterpolation</span></code>
+for <a class="reference external" href="https://docs.python.org/3.3/library/configparser.html#configparser.ExtendedInterpolation">variable substitution</a>.  See the <a class="reference external" href="#ini-format">INI Format</a> section for an
+example.</p>
+<p>While the <a class="reference external" href="https://en.wikipedia.org/wiki/INI_file">INI</a> format is preferred, the <a class="reference external" href="https://yaml.org">YAML</a> format is also supported.
+Other formats (i.e. JSON) are easy to add by extending the <a class="reference external" href="../api/zensols.config.html#zensols.config.configbase.Configurable">Configurable</a>
+class.  See the <a class="reference external" href="#yaml-format">YAML Format</a> section for more information.</p>
+<div class="section" id="ini-format">
+<h2>INI Format<a class="headerlink" href="#ini-format" title="Permalink to this headline">¶</a></h2>
+<p>The INI format is preferred because it is simple and has broad support as a
+configuration parsing library in Python.  This format uses the syntax
+<code class="docutils literal notranslate"><span class="pre">${section:name}</span></code> where <code class="docutils literal notranslate"><span class="pre">section</span></code> is the section name and <code class="docutils literal notranslate"><span class="pre">name</span></code> is the option
+(variable name) settings.  For example <code class="docutils literal notranslate"><span class="pre">${default:temporary_dir}</span></code> refers to the
+root directory’s <code class="docutils literal notranslate"><span class="pre">target</span></code> directory.  The <code class="docutils literal notranslate"><span class="pre">root_dir</span></code> entry in the <code class="docutils literal notranslate"><span class="pre">default</span></code>
+section is taken from an environment <code class="docutils literal notranslate"><span class="pre">dict</span></code> given in the initializer of the
+<a class="reference external" href="../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig">ExtendedInterpolationEnvConfig</a> class.</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[default]</span>
+<span class="na">root_dir</span> <span class="o">=</span> <span class="s">${env:app_root}</span>
+<span class="na">temporary_dir</span> <span class="o">=</span> <span class="s">${root_dir}/target</span>
+<span class="na">resources_dir</span> <span class="o">=</span> <span class="s">${root_dir}/resources</span>
+<span class="na">results_dir</span> <span class="o">=</span> <span class="s">${root_dir}/results</span>
+
+<span class="k">[app]</span>
+<span class="na">class_name</span> <span class="o">=</span> <span class="s">zensols.someproj.app.MainApplication</span>
+<span class="na">path</span> <span class="o">=</span> <span class="s">path: ${default:temporary_dir}/app.dat</span>
+</pre></div>
+</div>
+<div class="section" id="directory-based-path">
+<h3>Directory Based Path<a class="headerlink" href="#directory-based-path" title="Permalink to this headline">¶</a></h3>
+<p>The first parameter to all <a class="reference external" href="https://en.wikipedia.org/wiki/INI_file">INI</a> based configuration parser is either a file or
+a directory.  If a file is given, only that file is read as configuration.  If
+a directory is given, all files in the directory are read and parsed as if it
+were one large configuration file and variable substitution works by cross
+referencing between files with the same syntax as would be used in a single
+file.</p>
+</div>
+</div>
+<div class="section" id="yaml-format">
+<h2>YAML Format<a class="headerlink" href="#yaml-format" title="Permalink to this headline">¶</a></h2>
+<p>This format is implemented by the <a class="reference external" href="../api/zensols.config.html#zensols.config.yaml.YamlConfig">YamlConfig</a> class.  The <a class="reference external" href="https://github.com/plandes/grsync">grsync</a> utility
+provides an example <a class="reference external" href="https://github.com/plandes/grsync/blob/master/test-resources/small-test.yml">grsync YAML</a> configuration file.  The first level of all
+properties are defined as sections.  However, all variables are accessible
+using series of dot (<code class="docutils literal notranslate"><span class="pre">.</span></code>) separated paths.  See the YAML test
+case <a class="reference external" href="https://github.com/plandes/util/blob/master/test/python/test_yaml.py">test_yaml.py</a> for an example.</p>
+</div>
+<div class="section" id="inversion-of-control">
+<h2>Inversion of Control<a class="headerlink" href="#inversion-of-control" title="Permalink to this headline">¶</a></h2>
+<p>This package provides a <a class="reference external" href="https://spring.io">Java Spring</a> like <em>inversion of control</em> system with
+one major difference: this API strives to be as simple as possible and
+integrate with all other <em>zensols</em> packages.</p>
+<div class="section" id="application-context">
+<h3>Application Context<a class="headerlink" href="#application-context" title="Permalink to this headline">¶</a></h3>
+<p>Any non-trivial application is recommended to have an <em>application context</em>
+type class that allows for specific customization and behavior with retrieving
+(or storing) configuration.  Another reason for an application specific
+configuration class is that the configuration is typically passed around the
+application, and calling it by name can help the readability of your code.</p>
+<p>The Python boilerplate generates this configuration class that defines faux
+section called <code class="docutils literal notranslate"><span class="pre">env</span></code> as see in the <code class="docutils literal notranslate"><span class="pre">${env:app_root}</span></code> variable given in the
+example from the [INI formatted] example.  This example shows how this default
+environment is given (if not provided to the initializer).  The
+<code class="docutils literal notranslate"><span class="pre">default_expect</span></code> parameter tells the parser to raise an error when a particular
+parameter is not provided.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">zensols.config</span> <span class="kn">import</span> <span class="n">ExtendedInterpolationEnvConfig</span>
+
+<span class="k">class</span> <span class="nc">AppConfig</span><span class="p">(</span><span class="n">ExtendedInterpolationEnvConfig</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s1">&#39;config_file&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;config_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;resources/someproj.conf&#39;</span>
+        <span class="k">if</span> <span class="s1">&#39;env&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">env</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;env&#39;</span><span class="p">]</span>
+        <span class="n">defs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;app_root&#39;</span><span class="p">:</span> <span class="s1">&#39;.&#39;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">defs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">env</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;using default </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">env</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">default_expect</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="parsing">
+<h3>Parsing<a class="headerlink" href="#parsing" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="../api/zensols.config.html#zensols.config.configbase.Configurable">Configurable</a> class defines access methods to the configuration data,
+including how to get primitives (<code class="docutils literal notranslate"><span class="pre">get_option_*</span></code> methods) or populate a hash or
+class from a section’s data (<a class="reference external" href="../api/zensols.config.html#zensols.config.configbase.Configurable.populate">populate</a>).  The latter method is sophisticated
+in how it reads data, which uses the following rules:</p>
+<ul class="simple">
+<li><p>Any string of numbers (i.e. <code class="docutils literal notranslate"><span class="pre">5839202</span></code>) as an integer</p></li>
+<li><p>A string of numbers with a single decimal point (i.e. <code class="docutils literal notranslate"><span class="pre">3.123</span></code>) as a float.</p></li>
+<li><p>Either <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> parsed as a boolean.</p></li>
+<li><p>A string starting with <code class="docutils literal notranslate"><span class="pre">path:</span></code> parsed as a <a class="reference external" href="https://docs.python.org/3/library/pathlib.html">pathlib.Path</a> instance.</p></li>
+<li><p>A string starting with <code class="docutils literal notranslate"><span class="pre">resource:</span></code> parsed as <code class="docutils literal notranslate"><span class="pre">path:</span></code>, but points to a
+resource path either locally, or from a <code class="docutils literal notranslate"><span class="pre">setuptools</span></code> installed package (see
+the <a class="reference external" href="#resources">Resources</a> section).</p></li>
+<li><p>A string starting with <code class="docutils literal notranslate"><span class="pre">json:</span></code> parsed as standard JSON.</p></li>
+<li><p>A string staring with <code class="docutils literal notranslate"><span class="pre">eval:</span></code> parsed by the Python code reader (see the
+<a class="reference external" href="#evaluation-parameters">Evaluation Parameters</a> section).</p></li>
+<li><p>A string starting with <code class="docutils literal notranslate"><span class="pre">instance:</span></code> an object instance (see the <a class="reference external" href="#configuration-factory">Configuration
+Factory</a> and <a class="reference external" href="#instance-parameters">Instance Parameters</a> sections).</p></li>
+<li><p>Anything else as a string.</p></li>
+</ul>
+</div>
+<div class="section" id="configuration-factory">
+<h3>Configuration Factory<a class="headerlink" href="#configuration-factory" title="Permalink to this headline">¶</a></h3>
+<p>The configuration is parsed and given to an <a class="reference external" href="../api/zensols.config.html#zensols.config.factory.ImportConfigFactory">ImportConfigFactory</a> to create
+instances of objects.  Each instance is, by default, configured to create a
+single instance of each object instance per section.  Once a class is
+<em>referred</em> by name, the instance is looked up by the <a class="reference external" href="../api/zensols.config.html#zensols.config.factory.ImportConfigFactory">ImportConfigFactory</a> and
+created if it does not exist already per the <a class="reference external" href="#parsing">parsing</a> rules.</p>
+<p>Each section contains the data for an instance along with a option (variable)
+entry <code class="docutils literal notranslate"><span class="pre">class_name</span></code>, which is the fully qualified class name (<code class="docutils literal notranslate"><span class="pre">&lt;module&gt;.&lt;class</span> <span class="pre">name&gt;</span></code>).  Each option value contained in the respective section is set as an
+attribute on the instantiated object instance.</p>
+<p>For example, say you have the classes defined in a module called <code class="docutils literal notranslate"><span class="pre">domain</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Person</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">age</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">aliases</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Organization</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">boss</span><span class="p">:</span> <span class="n">Person</span>
+</pre></div>
+</div>
+<p>We can define instances of these objects in an [INI formatted] file
+<code class="docutils literal notranslate"><span class="pre">domain.conf</span></code> as such:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[default]</span>
+<span class="na">age</span> <span class="o">=</span> <span class="s">56</span>
+
+<span class="k">[bob]</span>
+<span class="na">class_name</span> <span class="o">=</span> <span class="s">domain.Person</span>
+<span class="na">age</span> <span class="o">=</span> <span class="s">${default:age}</span>
+<span class="na">aliases</span> <span class="o">=</span> <span class="s">eval: [&#39;sideshow bob&#39;, &#39;Robert Underdunk Terwilliger Jr&#39;]</span>
+
+<span class="k">[bob_co]</span>
+<span class="na">class_name</span> <span class="o">=</span> <span class="s">domain.Organization</span>
+<span class="na">boss</span> <span class="o">=</span> <span class="s">instance: bob</span>
+</pre></div>
+</div>
+<p>Next, we can create and access by creating the configuration with the file
+name, and using the configuration from an <a class="reference external" href="../api/zensols.config.html#zensols.config.factory.ImportConfigFactory">ImportConfigFactory</a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">zensols.config</span> <span class="kn">import</span> <span class="n">ExtendedInterpolationEnvConfig</span><span class="p">,</span> <span class="n">ImportConfigFactory</span>
+<span class="kn">import</span> <span class="nn">domain</span>
+
+<span class="n">factory</span> <span class="o">=</span> <span class="n">ImportConfigFactory</span><span class="p">(</span><span class="n">ExtendedInterpolationEnvConfig</span><span class="p">(</span><span class="s1">&#39;obj.conf&#39;</span><span class="p">))</span>
+<span class="n">bob</span><span class="p">:</span> <span class="n">domain</span><span class="o">.</span><span class="n">Person</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="s1">&#39;bob&#39;</span><span class="p">)</span>
+<span class="n">company</span><span class="p">:</span> <span class="n">domain</span><span class="o">.</span><span class="n">Organization</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="s1">&#39;bob_co&#39;</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">bob</span>
+<span class="n">Person</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="mi">56</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;sideshow bob&#39;</span><span class="p">,</span> <span class="s1">&#39;Robert Underdunk Terwilliger Jr&#39;</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">company</span>
+<span class="n">Organization</span><span class="p">(</span><span class="n">boss</span><span class="o">=</span><span class="n">Person</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="mi">45</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">id</span><span class="p">(</span><span class="n">company</span><span class="o">.</span><span class="n">boss</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">bob</span><span class="p">)</span>
+<span class="kc">True</span>
+</pre></div>
+</div>
+<p>Parameters to the initialization method of the configuration factory indicate
+whether to reload the module or not, which is the default.  This is
+particularly hand when prototyping your code from a different module in the
+Python REPL.</p>
+</div>
+<div class="section" id="evaluation-parameters">
+<h3>Evaluation Parameters<a class="headerlink" href="#evaluation-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Instance options (or any configuration section’s options) can be created with
+an evaluation that allows for importing modules.  For example, if we want to
+use the <code class="docutils literal notranslate"><span class="pre">itertools</span></code> package by providing a counting for an alias, we could
+have:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[bart]</span>
+<span class="na">class_name</span> <span class="o">=</span> <span class="s">domain.Person</span>
+<span class="na">age</span> <span class="o">=</span> <span class="s">16</span>
+<span class="na">aliases</span> <span class="o">=</span> <span class="s">eval({&#39;import&#39;: [&#39;itertools as it&#39;]}):</span>
+<span class="s">    list(map(lambda x: f&#39;{x[0]} dude ({x[1]})&#39;,</span>
+<span class="s">         zip(&#39;cool bad&#39;.split(), it.count())))</span>
+</pre></div>
+</div>
+<p>Note that the Python code in the <code class="docutils literal notranslate"><span class="pre">eval</span></code> is multi-line.</p>
+<p>We then create the new <em>company</em> object and print with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">school_clique</span><span class="p">:</span> <span class="n">domain</span><span class="o">.</span><span class="n">Organization</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="s1">&#39;school_clique&#39;</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">school_clique</span>
+<span class="n">Organization</span><span class="p">(</span><span class="n">boss</span><span class="o">=</span><span class="n">Person</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cool dude (0)&#39;</span><span class="p">,</span> <span class="s1">&#39;bad dude (1)&#39;</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="resources">
+<h3>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h3>
+<p>Resources are paths that exist either in a local project, or point to a
+directory from a Python <a class="reference external" href="https://setuptools.readthedocs.io/en/latest/">setuptools</a> module.  This uses the <a class="reference external" href="../api/zensols.config.html#zensols.config.configbase.Configurable.resource_filename">resource_filename</a>
+method, which in turn, uses the <a class="reference external" href="https://setuptools.readthedocs.io/en/latest/pkg_resources.html">pkg_resources</a> API to base the path from an
+installation.</p>
+<p>This mechanism needs the package metadata information to find the correct
+module in the install path.  This is set automatically when using CLI classes
+such as <a class="reference external" href="../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCliEnv">OneConfPerActionOptionsCliEnv</a>.  However, there are additional
+<a class="reference external" href="https://setuptools.readthedocs.io/en/latest/">setuptools</a> resources needed, which include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">python-resources</span></code> added in <code class="docutils literal notranslate"><span class="pre">PROJ_MODULES</span></code> in the makefile using the
+<code class="docutils literal notranslate"><span class="pre">zenbuild</span></code> build environment</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">package_data</span></code> in <code class="docutils literal notranslate"><span class="pre">src/python/setup.py</span></code> to include the globs for the
+resources you want to include (<code class="docutils literal notranslate"><span class="pre">package_data={'':</span> <span class="pre">['*.txt']}</span></code> for the example
+below).</p></li>
+</ul>
+<p>An example of a resource path, which finds the file <code class="docutils literal notranslate"><span class="pre">fake.txt</span></code> in the local
+project’s directory <code class="docutils literal notranslate"><span class="pre">resources</span></code> is:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">fake_path</span> <span class="o">=</span> <span class="s">resource: resources/fake.txt</span>
+</pre></div>
+</div>
+<p>In case the program isn’t automatically configured with the module to find the
+resource, you may add it in the configuration declaration itself.  For example,
+if our <a class="reference external" href="https://setuptools.readthedocs.io/en/latest/">setuptools</a> name is <code class="docutils literal notranslate"><span class="pre">zensols.someproj</span></code>, configure the resource as:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">fake_path</span> <span class="o">=</span> <span class="s">resource(zensols.someproj): resources/fake.txt</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="instance-parameters">
+<h3>Instance Parameters<a class="headerlink" href="#instance-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Instances can take parameters to substitute values.  This is useful when you
+want to define the values of an instance in the parent.  Extending from the
+example given in the <a class="reference external" href="#configuration-factory">configuration factory</a> section, we can define a person’s
+age in the company object with:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[bobs_senior_center]</span>
+<span class="na">class_name</span> <span class="o">=</span> <span class="s">domain.Organization</span>
+<span class="na">boss</span> <span class="o">=</span> <span class="s">instance({&#39;param&#39;: {&#39;age&#39;: 69}}): homer</span>
+</pre></div>
+</div>
+<p>We then create the new <em>company</em> object and print with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">senior_company</span><span class="p">:</span> <span class="n">domain</span><span class="o">.</span><span class="n">Organization</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="s1">&#39;bobs_senior_center&#39;</span><span class="p">)</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">senior_company</span>
+<span class="n">Organization</span><span class="p">(</span><span class="n">boss</span><span class="o">=</span><span class="n">Person</span><span class="p">(</span><span class="n">age</span><span class="o">=</span><span class="mi">69</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Homer&#39;</span><span class="p">,</span> <span class="s1">&#39;Homer Simpson&#39;</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="complete-examples">
+<h2>Complete Examples<a class="headerlink" href="#complete-examples" title="Permalink to this headline">¶</a></h2>
+<p>See the <a class="reference external" href="https://github.com/plandes/util/tree/master/example">examples</a> directory the complete code used to create the examples in
+this documentation.</p>
+<!-- links --></div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="persist.html" class="btn btn-neutral float-right" title="Persistence" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="command-line.html" class="btn btn-neutral float-left" title="Command Line Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

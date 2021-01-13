@@ -1,0 +1,538 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zensols.cli.peraction &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>zensols.cli.peraction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for zensols.cli.peraction</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;More advanced implementation of an action based command line.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Paul Landes&#39;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">import</span> <span class="nn">optparse</span>
+<span class="kn">from</span> <span class="nn">optparse</span> <span class="kn">import</span> <span class="n">OptionParser</span>
+<span class="kn">from</span> <span class="nn">zensols.config</span> <span class="kn">import</span> <span class="n">IniConfig</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">SimpleActionCli</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="PrintActionsOptionParser"><a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.peraction.PrintActionsOptionParser">[docs]</a><span class="k">class</span> <span class="nc">PrintActionsOptionParser</span><span class="p">(</span><span class="n">OptionParser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Implements a human readable implementation of print_help for action based</span>
+<span class="sd">    command line handlers (i.e. OneConfPerActionOptionsCli).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PrintActionsOptionParser.__init__"><a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.peraction.PrintActionsOptionParser.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">action_options</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_action_options</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">action_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action_options</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="nd">@action_options</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">action_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opts</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_action_options</span> <span class="o">=</span> <span class="n">opts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">usage</span> <span class="o">=</span> <span class="s1">&#39;%prog &lt;list|</span><span class="si">{}</span><span class="s1">&gt; [options]&#39;</span><span class="o">.</span>\
+                     <span class="nb">format</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action_names</span><span class="p">))</span>
+
+<div class="viewcode-block" id="PrintActionsOptionParser.print_help"><a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.peraction.PrintActionsOptionParser.print_help">[docs]</a>    <span class="k">def</span> <span class="nf">print_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;print help: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">invokes</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;action options: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_options</span><span class="p">)</span>
+        <span class="n">OptionParser</span><span class="o">.</span><span class="n">print_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+
+        <span class="n">action_name_len</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
+                                 <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_names</span><span class="p">))</span>
+        <span class="n">action_fmt_str</span> <span class="o">=</span> <span class="s1">&#39;  {:&lt;&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">action_name_len</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;}  </span><span class="si">{}</span><span class="s1">&#39;</span>
+        <span class="n">action_help</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">opt_str_len</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">def_str_len</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># format text for each action and respective options</span>
+        <span class="k">for</span> <span class="n">action_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_names</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">action_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">invokes</span><span class="p">:</span>
+                <span class="n">action_doc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">invokes</span><span class="p">[</span><span class="n">action_name</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span>
+                <span class="n">opts</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s1">&#39;opt_obj&#39;</span><span class="p">],</span>
+                           <span class="bp">self</span><span class="o">.</span><span class="n">action_options</span><span class="p">[</span><span class="n">action_name</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">action_name</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">action_doc</span><span class="si">}</span><span class="s1">, </span><span class="si">{</span><span class="n">opts</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">opt_strs</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">opts</span><span class="p">:</span>
+                    <span class="n">short_opt</span><span class="p">,</span> <span class="n">long_opt</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span>
+                    <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">_short_opts</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">_short_opts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">short_opt</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">_short_opts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">_long_opts</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">_long_opts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">long_opt</span> <span class="o">=</span> <span class="n">opt</span><span class="o">.</span><span class="n">_long_opts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">metavar</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">otype</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39; &lt;</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">metavar</span><span class="si">}</span><span class="s1">&gt;&#39;</span>
+                    <span class="k">elif</span> <span class="n">opt</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">otype</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39; &lt;</span><span class="si">{</span><span class="n">opt</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">&gt;&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">otype</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">short_opt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">long_opt</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span>
+                    <span class="n">opt_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;  </span><span class="si">{</span><span class="n">short_opt</span><span class="si">}{</span><span class="n">sep</span><span class="si">}{</span><span class="n">long_opt</span><span class="si">}{</span><span class="n">otype</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="k">if</span> <span class="n">opt</span><span class="o">.</span><span class="n">default</span> <span class="ow">and</span> <span class="n">opt</span><span class="o">.</span><span class="n">default</span> <span class="o">!=</span> <span class="p">(</span><span class="s1">&#39;NO&#39;</span><span class="p">,</span> <span class="s1">&#39;DEFAULT&#39;</span><span class="p">):</span>
+                        <span class="n">default</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">opt</span><span class="o">.</span><span class="n">default</span><span class="p">)</span>
+                    <span class="n">opt_strs</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;str&#39;</span><span class="p">:</span> <span class="n">opt_str</span><span class="p">,</span>
+                                     <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">default</span><span class="p">,</span>
+                                     <span class="s1">&#39;help&#39;</span><span class="p">:</span> <span class="n">opt</span><span class="o">.</span><span class="n">help</span><span class="p">})</span>
+                    <span class="n">opt_str_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">opt_str_len</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">opt_str</span><span class="p">))</span>
+                    <span class="n">def_str_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">def_str_len</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">default</span><span class="p">))</span>
+                <span class="n">action_help</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s1">&#39;doc&#39;</span><span class="p">:</span> <span class="n">action_fmt_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">action_name</span><span class="p">,</span> <span class="n">action_doc</span><span class="p">),</span>
+                     <span class="s1">&#39;opts&#39;</span><span class="p">:</span> <span class="n">opt_strs</span><span class="p">})</span>
+
+        <span class="n">opt_str_fmt</span> <span class="o">=</span> <span class="s1">&#39;{:&lt;&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">opt_str_len</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;}  {:&lt;&#39;</span> <span class="o">+</span>\
+                      <span class="nb">str</span><span class="p">(</span><span class="n">def_str_len</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;}  </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+        <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;Actions:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ah</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">action_help</span><span class="p">):</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">ah</span><span class="p">[</span><span class="s1">&#39;doc&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">ah</span><span class="p">[</span><span class="s1">&#39;opts&#39;</span><span class="p">]:</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">opt_str_fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">op</span><span class="p">[</span><span class="s1">&#39;str&#39;</span><span class="p">],</span> <span class="n">op</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">],</span> <span class="n">op</span><span class="p">[</span><span class="s1">&#39;help&#39;</span><span class="p">]))</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">action_help</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PerActionOptionsCli"><a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.peraction.PerActionOptionsCli">[docs]</a><span class="k">class</span> <span class="nc">PerActionOptionsCli</span><span class="p">(</span><span class="n">SimpleActionCli</span><span class="p">):</span>
+<div class="viewcode-block" id="PerActionOptionsCli.__init__"><a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.peraction.PerActionOptionsCli.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_options</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_init_executor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executor</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="n">mems</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getmembers</span><span class="p">(</span><span class="n">executor</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">ismethod</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;set_args&#39;</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mems</span><span class="p">))):</span>
+            <span class="n">executor</span><span class="o">.</span><span class="n">set_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_log_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;executors: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">executors</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;invokes: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">invokes</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;action options: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_options</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;opts: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;manditory opts: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">manditory_opts</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PerActionOptionsCli.make_option"><a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.peraction.PerActionOptionsCli.make_option">[docs]</a>    <span class="k">def</span> <span class="nf">make_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">optparse</span><span class="o">.</span><span class="n">make_option</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_create_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usage</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">PrintActionsOptionParser</span><span class="p">(</span>
+            <span class="n">usage</span><span class="o">=</span><span class="n">usage</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;%prog &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_config_parser_for_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;config parser for action: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">args</span><span class="p">)</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_options</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">opt_cfg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_options</span><span class="p">[</span><span class="n">action</span><span class="p">]:</span>
+                <span class="n">opt_obj</span> <span class="o">=</span> <span class="n">opt_cfg</span><span class="p">[</span><span class="s1">&#39;opt_obj&#39;</span><span class="p">]</span>
+                <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="n">opt_obj</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">opt_obj</span><span class="o">.</span><span class="n">dest</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;manditory: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">opt_cfg</span><span class="p">[</span><span class="s1">&#39;manditory&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">opt_cfg</span><span class="p">[</span><span class="s1">&#39;manditory&#39;</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">manditory_opts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">opt_obj</span><span class="o">.</span><span class="n">dest</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_config</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="OneConfPerActionOptionsCli"><a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCli">[docs]</a><span class="k">class</span> <span class="nc">OneConfPerActionOptionsCli</span><span class="p">(</span><span class="n">PerActionOptionsCli</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convenience action handler that allows a definition on a per action</span>
+<span class="sd">    basis.  See the test cases for examples of how to use this as the detail is</span>
+<span class="sd">    all in the configuration pased to the init method.</span>
+
+<span class="sd">    :param opt_config: the option configuration (see project documentation)</span>
+
+<span class="sd">    :param config_type: the class used for the configuration and defaults to</span>
+<span class="sd">                        :class:`zensols.util.configbase.Configurable`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="OneConfPerActionOptionsCli.__init__"><a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCli.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt_config</span><span class="p">,</span> <span class="n">config_type</span><span class="o">=</span><span class="n">IniConfig</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opt_config</span> <span class="o">=</span> <span class="n">opt_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_type</span> <span class="o">=</span> <span class="n">config_type</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">({},</span> <span class="p">{},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_config_global</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oc</span><span class="p">):</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;global opt config: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">oc</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;whine&#39;</span> <span class="ow">in</span> <span class="n">oc</span> <span class="ow">and</span> <span class="n">oc</span><span class="p">[</span><span class="s1">&#39;whine&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;configuring whine option&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_whine_option</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">oc</span><span class="p">[</span><span class="s1">&#39;whine&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s1">&#39;short&#39;</span> <span class="ow">in</span> <span class="n">oc</span> <span class="ow">and</span> <span class="n">oc</span><span class="p">[</span><span class="s1">&#39;short&#39;</span><span class="p">]:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;configuring short option&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_short_option</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;config_option&#39;</span> <span class="ow">in</span> <span class="n">oc</span><span class="p">:</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">oc</span><span class="p">[</span><span class="s1">&#39;config_option&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config_opt_conf</span> <span class="o">=</span> <span class="n">conf</span>
+            <span class="n">opt</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;opt&#39;</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;config opt: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span>
+            <span class="n">opt_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_option</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">opt</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+            <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="n">opt_obj</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">manditory_opts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">opt_obj</span><span class="o">.</span><span class="n">dest</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;global_options&#39;</span> <span class="ow">in</span> <span class="n">oc</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">oc</span><span class="p">[</span><span class="s1">&#39;global_options&#39;</span><span class="p">]:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;global opt: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">opt</span><span class="p">)</span>
+                <span class="n">opt_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_option</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">opt</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;parser opt: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">opt_obj</span><span class="p">)</span>
+                <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="n">opt_obj</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">opt_obj</span><span class="o">.</span><span class="n">dest</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">opt</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">manditory_opts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">opt_obj</span><span class="o">.</span><span class="n">dest</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_config_executor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oc</span><span class="p">):</span>
+        <span class="n">exec_name</span> <span class="o">=</span> <span class="n">oc</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="n">gaopts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_options</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;config opt config: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">oc</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">oc</span><span class="p">[</span><span class="s1">&#39;actions&#39;</span><span class="p">]:</span>
+            <span class="n">action_name</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">meth</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="s1">&#39;meth&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;meth&#39;</span> <span class="ow">in</span> <span class="n">action</span> <span class="k">else</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[- ]&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="n">action_name</span><span class="p">)</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="s1">&#39;doc&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s1">&#39;doc&#39;</span> <span class="ow">in</span> <span class="n">action</span> <span class="k">else</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[-_]&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">meth</span><span class="p">)</span>
+            <span class="n">inv</span> <span class="o">=</span> <span class="p">[</span><span class="n">exec_name</span><span class="p">,</span> <span class="n">meth</span><span class="p">,</span> <span class="n">doc</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;inferred action: </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">inv</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">invokes</span><span class="p">[</span><span class="n">action_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">inv</span>
+            <span class="k">if</span> <span class="s1">&#39;opts&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">action</span><span class="p">:</span>
+                <span class="n">action</span><span class="p">[</span><span class="s1">&#39;opts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">()</span>
+            <span class="n">aopts</span> <span class="o">=</span> <span class="n">gaopts</span><span class="p">[</span><span class="n">action_name</span><span class="p">]</span> <span class="k">if</span> <span class="n">action_name</span> <span class="ow">in</span> <span class="n">gaopts</span> <span class="k">else</span> <span class="p">[]</span>
+            <span class="n">gaopts</span><span class="p">[</span><span class="n">action_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">aopts</span>
+            <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s1">&#39;opts&#39;</span><span class="p">]:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;action opt: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">opt</span><span class="p">)</span>
+                <span class="n">opt_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_option</span><span class="p">(</span><span class="n">opt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">opt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">opt</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;action opt obj: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">opt_obj</span><span class="p">)</span>
+                <span class="n">aopts</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;opt_obj&#39;</span><span class="p">:</span> <span class="n">opt_obj</span><span class="p">,</span> <span class="s1">&#39;manditory&#39;</span><span class="p">:</span> <span class="n">opt</span><span class="p">[</span><span class="mi">2</span><span class="p">]})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">executors</span><span class="p">[</span><span class="n">exec_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">oc</span><span class="p">[</span><span class="s1">&#39;executor&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="OneConfPerActionOptionsCli.config_parser"><a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCli.config_parser">[docs]</a>    <span class="k">def</span> <span class="nf">config_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">config_parser</span><span class="p">()</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config_global</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opt_config</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">oc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">opt_config</span><span class="p">[</span><span class="s1">&#39;executors&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config_executor</span><span class="p">(</span><span class="n">oc</span><span class="p">)</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">action_options</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_options</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">invokes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">invokes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log_config</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;finished config parser&#39;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_create_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conf_file</span><span class="p">,</span> <span class="n">default_vars</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_type</span><span class="p">(</span>
+            <span class="n">config_file</span><span class="o">=</span><span class="n">conf_file</span><span class="p">,</span> <span class="n">default_vars</span><span class="o">=</span><span class="n">default_vars</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_default_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_find_conf_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="n">conf_name</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="n">conf_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">conf_name</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;config configuration: </span><span class="si">{</span><span class="n">conf</span><span class="si">}</span><span class="s1">, name: </span><span class="si">{</span><span class="n">conf_name</span><span class="si">}</span><span class="s1">, &#39;</span> <span class="o">+</span>
+                         <span class="sa">f</span><span class="s1">&#39;params: </span><span class="si">{</span><span class="n">params</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">conf_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">conf_file</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> \
+               <span class="p">(</span><span class="s1">&#39;expect&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">conf</span> <span class="ow">or</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;expect&#39;</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;no such configuration file: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">conf_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">conf_file</span>
+
+<div class="viewcode-block" id="OneConfPerActionOptionsCli.get_config"><a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCli.get_config">[docs]</a>    <span class="k">def</span> <span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;config_opt_conf&#39;</span><span class="p">):</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_config</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">conf_def</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_opt_conf</span>
+            <span class="n">conf_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_conf_file</span><span class="p">(</span><span class="n">conf_def</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">conf_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">conf</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">good_keys</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                                   <span class="n">params</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">good_keys</span><span class="p">}</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;defaults: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">defaults</span><span class="p">)</span>
+                <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_config</span><span class="p">(</span><span class="n">conf_file</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;created config: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">conf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">conf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_config</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;returning config: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">conf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">conf</span></div></div>
+
+
+<div class="viewcode-block" id="OneConfPerActionOptionsCliEnv"><a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCliEnv">[docs]</a><span class="k">class</span> <span class="nc">OneConfPerActionOptionsCliEnv</span><span class="p">(</span><span class="n">OneConfPerActionOptionsCli</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A command line option parser that first parses an ini file and passes that</span>
+<span class="sd">    configuration on to the rest of the CLI action processing in the super</span>
+<span class="sd">    class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="OneConfPerActionOptionsCliEnv.__init__"><a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCliEnv.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opt_config</span><span class="p">,</span> <span class="n">config_env_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">no_os_environ</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize.</span>
+
+<span class="sd">        :param opt_config: the option configuration (see project documentation)</span>
+
+<span class="sd">        :param config_env_name:</span>
+<span class="sd">            the name of the environment variable that holds the resource like</span>
+<span class="sd">            name (i.e. ~/.&lt;program name&gt;rc); this will be used as the</span>
+<span class="sd">            configuration file if it is given and found; otherwise a</span>
+<span class="sd">            ``ValueError`` is rasied if not found</span>
+
+<span class="sd">        :param no_os_environ:</span>
+<span class="sd">            if ``True`` do not add environment variables to the configuration</span>
+<span class="sd">            environment</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">opt_config</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">config_env_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">default_config_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">conf_env_var</span> <span class="o">=</span> <span class="n">config_env_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">conf_env_var</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                <span class="n">cfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">conf_env_var</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cfile</span> <span class="o">=</span> <span class="s1">&#39;~/.</span><span class="si">{config_env_name}</span><span class="s1">&#39;</span>
+            <span class="n">cfile</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cfile</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;configured default config file: </span><span class="si">{</span><span class="n">cfile</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">default_config_file</span> <span class="o">=</span> <span class="n">cfile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_os_environ</span> <span class="o">=</span> <span class="n">no_os_environ</span></div>
+
+    <span class="k">def</span> <span class="nf">_create_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conf_file</span><span class="p">,</span> <span class="n">default_vars</span><span class="p">):</span>
+        <span class="n">defs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">defs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">default_vars</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_os_environ</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;adding environment to config: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">defs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;creating with conf_file: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">conf_file</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_config</span><span class="p">(</span><span class="n">conf_file</span><span class="p">,</span> <span class="n">defs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_find_conf_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;finding config: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_config_file</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_config_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">conf_file</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span>\
+                <span class="n">_find_conf_file</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">conf_name</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">conf_file</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">conf_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;config: </span><span class="si">{</span><span class="n">conf</span><span class="si">}</span><span class="s1">, name: </span><span class="si">{</span><span class="n">conf_name</span><span class="si">}</span><span class="s1">, &#39;</span> <span class="o">+</span>
+                             <span class="sa">f</span><span class="s1">&#39;params: </span><span class="si">{</span><span class="n">params</span><span class="si">}</span><span class="s1">, default_config_file: &#39;</span> <span class="o">+</span>
+                             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">default_config_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">conf_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_config_file</span><span class="p">):</span>
+                    <span class="n">conf_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_config_file</span>
+                <span class="k">elif</span> <span class="s1">&#39;expect&#39;</span> <span class="ow">in</span> <span class="n">conf</span> <span class="ow">and</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;expect&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">conf_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;no configuration file defined in: </span><span class="si">%s</span><span class="s1"> or </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                      <span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_config_file</span><span class="p">))</span>
+                    <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;no such configuration file: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">conf_file</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">conf_file</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

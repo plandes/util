@@ -1,0 +1,499 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zensols.cli package &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="zensols.config package" href="zensols.config.html" />
+    <link rel="prev" title="API Reference" href="../api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">zensols.cli package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.cli.peraction">zensols.cli.peraction module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.cli.simple">zensols.cli.simple module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.cli">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.config.html">zensols.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.multi.html">zensols.multi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.persist.html">zensols.persist package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.util.html">zensols.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+      <li>zensols.cli package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/zensols.cli.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="zensols-cli-package">
+<h1>zensols.cli package<a class="headerlink" href="#zensols-cli-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-zensols.cli.peraction">
+<span id="zensols-cli-peraction-module"></span><h2>zensols.cli.peraction module<a class="headerlink" href="#module-zensols.cli.peraction" title="Permalink to this headline">¶</a></h2>
+<p>More advanced implementation of an action based command line.</p>
+<dl class="py class">
+<dt id="zensols.cli.peraction.OneConfPerActionOptionsCli">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.cli.peraction.</code><code class="sig-name descname">OneConfPerActionOptionsCli</code><span class="sig-paren">(</span><em class="sig-param">opt_config</em>, <em class="sig-param">config_type=&lt;class 'zensols.config.iniconfig.IniConfig'&gt;</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/peraction.html#OneConfPerActionOptionsCli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.peraction.OneConfPerActionOptionsCli" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.cli.peraction.PerActionOptionsCli" title="zensols.cli.peraction.PerActionOptionsCli"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.cli.peraction.PerActionOptionsCli</span></code></a></p>
+<p>Convenience action handler that allows a definition on a per action
+basis.  See the test cases for examples of how to use this as the detail is
+all in the configuration pased to the init method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opt_config</strong> – the option configuration (see project documentation)</p></li>
+<li><p><strong>config_type</strong> – the class used for the configuration and defaults to
+<code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.util.configbase.Configurable</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="zensols.cli.peraction.OneConfPerActionOptionsCli.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">opt_config</em>, <em class="sig-param">config_type=&lt;class 'zensols.config.iniconfig.IniConfig'&gt;</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/peraction.html#OneConfPerActionOptionsCli.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.peraction.OneConfPerActionOptionsCli.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>executors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – keys are executor names and values are
+function that create the executor handler instance</p></li>
+<li><p><strong>invokes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – keys are names of in executors and values are
+arrays with the form: [&lt;option name&gt;, &lt;method name&gt;, &lt;usage doc&gt;]</p></li>
+<li><p><strong>config</strong> – an instance of <cite>zensols.config.Config</cite></p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the default version of this command line module,
+which is overrided by the package’s version if it exists</p></li>
+<li><p><strong>pkg_dist</strong> – the name of the module (i.e. zensols.actioncli)</p></li>
+<li><p><strong>opts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.9)"><em>set</em></a>) – options to be parsed</p></li>
+<li><p><strong>manditory_opts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.9)"><em>set</em></a>) – options that must be supplied in the command</p></li>
+<li><p><strong>environ_opts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.9)"><em>set</em></a>) – options to add from environment variables; each are upcased to
+be match and retrieved from the environment but are lowercased in
+the results param set</p></li>
+<li><p><strong>default_action</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the action to use if non is
+specified (if any)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.peraction.OneConfPerActionOptionsCli.config_parser">
+<code class="sig-name descname">config_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/peraction.html#OneConfPerActionOptionsCli.config_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.peraction.OneConfPerActionOptionsCli.config_parser" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.peraction.OneConfPerActionOptionsCli.get_config">
+<code class="sig-name descname">get_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/peraction.html#OneConfPerActionOptionsCli.get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.peraction.OneConfPerActionOptionsCli.get_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.cli.peraction.OneConfPerActionOptionsCliEnv">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.cli.peraction.</code><code class="sig-name descname">OneConfPerActionOptionsCliEnv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">opt_config</span></em>, <em class="sig-param"><span class="n">config_env_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">no_os_environ</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/peraction.html#OneConfPerActionOptionsCliEnv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.peraction.OneConfPerActionOptionsCliEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.cli.peraction.OneConfPerActionOptionsCli" title="zensols.cli.peraction.OneConfPerActionOptionsCli"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.cli.peraction.OneConfPerActionOptionsCli</span></code></a></p>
+<p>A command line option parser that first parses an ini file and passes that
+configuration on to the rest of the CLI action processing in the super
+class.</p>
+<dl class="py method">
+<dt id="zensols.cli.peraction.OneConfPerActionOptionsCliEnv.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">opt_config</span></em>, <em class="sig-param"><span class="n">config_env_name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">no_os_environ</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/peraction.html#OneConfPerActionOptionsCliEnv.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.peraction.OneConfPerActionOptionsCliEnv.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>opt_config</strong> – the option configuration (see project documentation)</p></li>
+<li><p><strong>config_env_name</strong> – the name of the environment variable that holds the resource like
+name (i.e. ~/.&lt;program name&gt;rc); this will be used as the
+configuration file if it is given and found; otherwise a
+<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> is rasied if not found</p></li>
+<li><p><strong>no_os_environ</strong> – if <code class="docutils literal notranslate"><span class="pre">True</span></code> do not add environment variables to the configuration
+environment</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.cli.peraction.PerActionOptionsCli">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.cli.peraction.</code><code class="sig-name descname">PerActionOptionsCli</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/peraction.html#PerActionOptionsCli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.peraction.PerActionOptionsCli" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.cli.simple.SimpleActionCli" title="zensols.cli.simple.SimpleActionCli"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.cli.simple.SimpleActionCli</span></code></a></p>
+<dl class="py method">
+<dt id="zensols.cli.peraction.PerActionOptionsCli.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/peraction.html#PerActionOptionsCli.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.peraction.PerActionOptionsCli.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>executors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – keys are executor names and values are
+function that create the executor handler instance</p></li>
+<li><p><strong>invokes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – keys are names of in executors and values are
+arrays with the form: [&lt;option name&gt;, &lt;method name&gt;, &lt;usage doc&gt;]</p></li>
+<li><p><strong>config</strong> – an instance of <cite>zensols.config.Config</cite></p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the default version of this command line module,
+which is overrided by the package’s version if it exists</p></li>
+<li><p><strong>pkg_dist</strong> – the name of the module (i.e. zensols.actioncli)</p></li>
+<li><p><strong>opts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.9)"><em>set</em></a>) – options to be parsed</p></li>
+<li><p><strong>manditory_opts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.9)"><em>set</em></a>) – options that must be supplied in the command</p></li>
+<li><p><strong>environ_opts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.9)"><em>set</em></a>) – options to add from environment variables; each are upcased to
+be match and retrieved from the environment but are lowercased in
+the results param set</p></li>
+<li><p><strong>default_action</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the action to use if non is
+specified (if any)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.peraction.PerActionOptionsCli.make_option">
+<code class="sig-name descname">make_option</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/peraction.html#PerActionOptionsCli.make_option"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.peraction.PerActionOptionsCli.make_option" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.cli.peraction.PrintActionsOptionParser">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.cli.peraction.</code><code class="sig-name descname">PrintActionsOptionParser</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/peraction.html#PrintActionsOptionParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.peraction.PrintActionsOptionParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/optparse.html#optparse.OptionParser" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">optparse.OptionParser</span></code></a></p>
+<p>Implements a human readable implementation of print_help for action based
+command line handlers (i.e. OneConfPerActionOptionsCli).</p>
+<dl class="py method">
+<dt id="zensols.cli.peraction.PrintActionsOptionParser.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/peraction.html#PrintActionsOptionParser.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.peraction.PrintActionsOptionParser.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.peraction.PrintActionsOptionParser.action_names">
+<em class="property">property </em><code class="sig-name descname">action_names</code><a class="headerlink" href="#zensols.cli.peraction.PrintActionsOptionParser.action_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.peraction.PrintActionsOptionParser.action_options">
+<em class="property">property </em><code class="sig-name descname">action_options</code><a class="headerlink" href="#zensols.cli.peraction.PrintActionsOptionParser.action_options" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.peraction.PrintActionsOptionParser.print_help">
+<code class="sig-name descname">print_help</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n">file</span> <span class="o">=</span> <span class="default_value">stdout</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/peraction.html#PrintActionsOptionParser.print_help"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.peraction.PrintActionsOptionParser.print_help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print an extended help message, listing all options and any
+help text provided with them, to ‘file’ (default stdout).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.cli.simple">
+<span id="zensols-cli-simple-module"></span><h2>zensols.cli.simple module<a class="headerlink" href="#module-zensols.cli.simple" title="Permalink to this headline">¶</a></h2>
+<p>A simple straight forward CLI implementation used for the first phase
+command line parsing.  More advanced INI (etc) configuration is optionally, and
+usually used down stream.</p>
+<dl class="py exception">
+<dt id="zensols.cli.simple.ActionCliError">
+<em class="property">exception </em><code class="sig-prename descclassname">zensols.cli.simple.</code><code class="sig-name descname">ActionCliError</code><a class="reference internal" href="../_modules/zensols/cli/simple.html#ActionCliError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.simple.ActionCliError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dl class="py attribute">
+<dt id="zensols.cli.simple.ActionCliError.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'zensols.cli.simple'</em><a class="headerlink" href="#zensols.cli.simple.ActionCliError.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.cli.simple.ActionCliError.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#zensols.cli.simple.ActionCliError.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.cli.simple.SimpleActionCli">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.cli.simple.</code><code class="sig-name descname">SimpleActionCli</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">executors</span></em>, <em class="sig-param"><span class="n">invokes</span></em>, <em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">'none'</span></em>, <em class="sig-param"><span class="n">pkg_dist</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">opts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">manditory_opts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">environ_opts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_action</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/simple.html#SimpleActionCli"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.simple.SimpleActionCli" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A simple action based command line interface.</p>
+<dl class="py method">
+<dt id="zensols.cli.simple.SimpleActionCli._config_logging">
+<code class="sig-name descname">_config_logging</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">level</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/simple.html#SimpleActionCli._config_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.simple.SimpleActionCli._config_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure logging by calling <a class="reference internal" href="#zensols.cli.simple.SimpleActionCli._config_log_level" title="zensols.cli.simple.SimpleActionCli._config_log_level"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_config_log_level()</span></code></a>, which in turns
+invokes <code class="xref py py-meth docutils literal notranslate"><span class="pre">logging.basicConfig()</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.simple.SimpleActionCli._config_log_level">
+<code class="sig-name descname">_config_log_level</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fmt</span></em>, <em class="sig-param"><span class="n">levelno</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/simple.html#SimpleActionCli._config_log_level"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.simple.SimpleActionCli._config_log_level" title="Permalink to this definition">¶</a></dt>
+<dd><p>Configure logging by calling <code class="xref py py-meth docutils literal notranslate"><span class="pre">logging.basicConfig()</span></code> with the base
+package set at <code class="docutils literal notranslate"><span class="pre">levelno</span></code> if available.  In this case, the default
+logging level is set to <code class="xref py py-obj docutils literal notranslate"><span class="pre">logging.WARNING</span></code>.  Otherwise, reconfigure
+logging using a <code class="docutils literal notranslate"><span class="pre">levelno</span></code> across all loggers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.simple.SimpleActionCli.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">executors</span></em>, <em class="sig-param"><span class="n">invokes</span></em>, <em class="sig-param"><span class="n">config</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">version</span><span class="o">=</span><span class="default_value">'none'</span></em>, <em class="sig-param"><span class="n">pkg_dist</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">opts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">manditory_opts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">environ_opts</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_action</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/simple.html#SimpleActionCli.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.simple.SimpleActionCli.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>executors</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – keys are executor names and values are
+function that create the executor handler instance</p></li>
+<li><p><strong>invokes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a>) – keys are names of in executors and values are
+arrays with the form: [&lt;option name&gt;, &lt;method name&gt;, &lt;usage doc&gt;]</p></li>
+<li><p><strong>config</strong> – an instance of <cite>zensols.config.Config</cite></p></li>
+<li><p><strong>version</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the default version of this command line module,
+which is overrided by the package’s version if it exists</p></li>
+<li><p><strong>pkg_dist</strong> – the name of the module (i.e. zensols.actioncli)</p></li>
+<li><p><strong>opts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.9)"><em>set</em></a>) – options to be parsed</p></li>
+<li><p><strong>manditory_opts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.9)"><em>set</em></a>) – options that must be supplied in the command</p></li>
+<li><p><strong>environ_opts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.9)"><em>set</em></a>) – options to add from environment variables; each are upcased to
+be match and retrieved from the environment but are lowercased in
+the results param set</p></li>
+<li><p><strong>default_action</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – the action to use if non is
+specified (if any)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.simple.SimpleActionCli.config_parser">
+<code class="sig-name descname">config_parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/simple.html#SimpleActionCli.config_parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.simple.SimpleActionCli.config_parser" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.simple.SimpleActionCli.create_executor">
+<code class="sig-name descname">create_executor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span><span class="o">=</span><span class="default_value">['-M', 'html', '/Users/landes/view/pygh/util/target/doc/src', '/Users/landes/view/pygh/util/target/doc/build']</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/simple.html#SimpleActionCli.create_executor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.simple.SimpleActionCli.create_executor" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.simple.SimpleActionCli.get_config">
+<code class="sig-name descname">get_config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">params</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/simple.html#SimpleActionCli.get_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.simple.SimpleActionCli.get_config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.simple.SimpleActionCli.invoke">
+<code class="sig-name descname">invoke</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span><span class="o">=</span><span class="default_value">['-M', 'html', '/Users/landes/view/pygh/util/target/doc/src', '/Users/landes/view/pygh/util/target/doc/build']</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/simple.html#SimpleActionCli.invoke"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.simple.SimpleActionCli.invoke" title="Permalink to this definition">¶</a></dt>
+<dd><p>Entry point invoked, usually called from <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.cli.simple.SimpleActionCli.print_actions">
+<code class="sig-name descname">print_actions</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">short</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/simple.html#SimpleActionCli.print_actions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.cli.simple.SimpleActionCli.print_actions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.cli">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-zensols.cli" title="Permalink to this headline">¶</a></h2>
+<p>Modules include a tight coupling between the command line and configure
+driven applications.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="zensols.config.html" class="btn btn-neutral float-right" title="zensols.config package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../api.html" class="btn btn-neutral float-left" title="API Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

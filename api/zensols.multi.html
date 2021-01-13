@@ -1,0 +1,473 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zensols.multi package &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="zensols.persist package" href="zensols.persist.html" />
+    <link rel="prev" title="zensols.config package" href="zensols.config.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="zensols.cli.html">zensols.cli package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.config.html">zensols.config package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">zensols.multi package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.multi.reducer">zensols.multi.reducer module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.multi.stash">zensols.multi.stash module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.multi">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.persist.html">zensols.persist package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.util.html">zensols.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+      <li>zensols.multi package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/zensols.multi.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="zensols-multi-package">
+<h1>zensols.multi package<a class="headerlink" href="#zensols-multi-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-zensols.multi.reducer">
+<span id="zensols-multi-reducer-module"></span><h2>zensols.multi.reducer module<a class="headerlink" href="#module-zensols.multi.reducer" title="Permalink to this headline">¶</a></h2>
+<p>Stash extensions to distribute item creation over multiple processes.</p>
+<dl class="py class">
+<dt id="zensols.multi.reducer.FunctionStashMapReducer">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.multi.reducer.</code><code class="sig-name descname">FunctionStashMapReducer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stash</span></em>, <em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="n">n_workers</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/reducer.html#FunctionStashMapReducer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.reducer.FunctionStashMapReducer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.multi.reducer.StashMapReducer" title="zensols.multi.reducer.StashMapReducer"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.multi.reducer.StashMapReducer</span></code></a></p>
+<dl class="py method">
+<dt id="zensols.multi.reducer.FunctionStashMapReducer.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stash</span></em>, <em class="sig-param"><span class="n">func</span></em>, <em class="sig-param"><span class="n">n_workers</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/reducer.html#FunctionStashMapReducer.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.reducer.FunctionStashMapReducer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.multi.reducer.FunctionStashMapReducer.map_func">
+<em class="property">static </em><code class="sig-name descname">map_func</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/reducer.html#FunctionStashMapReducer.map_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.reducer.FunctionStashMapReducer.map_func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.multi.reducer.StashMapReducer">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.multi.reducer.</code><code class="sig-name descname">StashMapReducer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stash</span></em>, <em class="sig-param"><span class="n">n_workers</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/reducer.html#StashMapReducer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.reducer.StashMapReducer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Process work in sub processes from data in a stash.</p>
+<dl class="py method">
+<dt id="zensols.multi.reducer.StashMapReducer.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stash</span></em>, <em class="sig-param"><span class="n">n_workers</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/reducer.html#StashMapReducer.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.reducer.StashMapReducer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.multi.reducer.StashMapReducer.key_group_size">
+<em class="property">property </em><code class="sig-name descname">key_group_size</code><a class="headerlink" href="#zensols.multi.reducer.StashMapReducer.key_group_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.multi.reducer.StashMapReducer.map">
+<code class="sig-name descname">map</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/reducer.html#StashMapReducer.map"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.reducer.StashMapReducer.map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.multi.stash">
+<span id="zensols-multi-stash-module"></span><h2>zensols.multi.stash module<a class="headerlink" href="#module-zensols.multi.stash" title="Permalink to this headline">¶</a></h2>
+<p>Stash extensions to distribute item creation over multiple processes.</p>
+<dl class="py class">
+<dt id="zensols.multi.stash.ChunkProcessor">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.multi.stash.</code><code class="sig-name descname">ChunkProcessor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">chunk_id</span></em>, <em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/stash.html#ChunkProcessor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.stash.ChunkProcessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represents a chunk of work created by the parent and processed on the child.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a>) – the application context configuration used to create the
+parent stash</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – the name of the parent stash used to create the chunk, and
+subsequently process this chunk</p></li>
+<li><p><strong>chunk_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – the nth chunk</p></li>
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a>) – the data created by the parent to be processed</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="zensols.multi.stash.ChunkProcessor.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">config</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">chunk_id</span></em>, <em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.multi.stash.ChunkProcessor.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.multi.stash.ChunkProcessor.chunk_id">
+<code class="sig-name descname">chunk_id</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><a class="headerlink" href="#zensols.multi.stash.ChunkProcessor.chunk_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.multi.stash.ChunkProcessor.config">
+<code class="sig-name descname">config</code><em class="property">: <a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable">zensols.config.configbase.Configurable</a></em><a class="headerlink" href="#zensols.multi.stash.ChunkProcessor.config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.multi.stash.ChunkProcessor.data">
+<code class="sig-name descname">data</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a></em><a class="headerlink" href="#zensols.multi.stash.ChunkProcessor.data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.multi.stash.ChunkProcessor.name">
+<code class="sig-name descname">name</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#zensols.multi.stash.ChunkProcessor.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.multi.stash.ChunkProcessor.process">
+<code class="sig-name descname">process</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/stash.html#ChunkProcessor.process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.stash.ChunkProcessor.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the stash used to process the data, then persisted in the stash.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.multi.stash.MultiProcessStash">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.multi.stash.</code><code class="sig-name descname">MultiProcessStash</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delegate</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">chunk_size</span></em>, <em class="sig-param"><span class="n">workers</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/stash.html#MultiProcessStash"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="zensols.persist.html#zensols.persist.domain.PreemptiveStash" title="zensols.persist.domain.PreemptiveStash"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.persist.domain.PreemptiveStash</span></code></a>, <a class="reference internal" href="zensols.persist.html#zensols.persist.domain.PrimeableStash" title="zensols.persist.domain.PrimeableStash"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.persist.domain.PrimeableStash</span></code></a></p>
+<p>A stash that forks processes to process data in a distributed fashion.  The
+stash is typically created by a
+<a class="reference internal" href="zensols.config.html#zensols.config.factory.ImportConfigFactory" title="zensols.config.factory.ImportConfigFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.factory.ImportConfigFactory</span></code></a> in the child process.
+Work is chunked (grouped) and then sent to child processes.  In each, a new
+instance of this same stash is created using the <code class="docutils literal notranslate"><span class="pre">ImportConfigFactory</span></code>
+and then an abstract method is called to dump the data.</p>
+<p>This implemetation of <a class="reference internal" href="#zensols.multi.stash.MultiProcessStash.prime" title="zensols.multi.stash.MultiProcessStash.prime"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prime()</span></code></a> is to fork processes to accomplish the
+work.</p>
+<p>The <a class="reference internal" href="#zensols.multi.stash.MultiProcessStash._create_data" title="zensols.multi.stash.MultiProcessStash._create_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_create_data()</span></code></a> and <a class="reference internal" href="#zensols.multi.stash.MultiProcessStash._process" title="zensols.multi.stash.MultiProcessStash._process"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_process()</span></code></a> methods must be
+implemented.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chunk_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – the size of each group of data sent to the child process
+to be handled; in some cases the child process will get
+a chunk of data smaller than this (the last) but never
+more; if this number is 0, then evenly divide the work
+so that each worker takes the largets amount of work to
+minimize the number of chunks (in this case the data is
+tupleized)</p></li>
+<li><p><strong>workers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – the number of processes spawned to accomplish the work; if
+this is a negative number, add the number of CPU
+processors with this number, so -1 would result in one
+fewer works utilized than the number of CPUs, which is a
+good policy for a busy server.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="zensols.multi.stash.MultiProcessStash._create_data">
+<em class="property">abstract </em><code class="sig-name descname">_create_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/stash.html#MultiProcessStash._create_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash._create_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create data in the parent process to be processed in the child process(es)
+in chunks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.multi.stash.MultiProcessStash._process">
+<em class="property">abstract </em><code class="sig-name descname">_process</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chunk</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/stash.html#MultiProcessStash._process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash._process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a chunk of data, each created by <code class="docutils literal notranslate"><span class="pre">_create_data</span></code> and then grouped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Iterable" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterable</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.multi.stash.MultiProcessStash._process_work">
+<em class="property">static </em><code class="sig-name descname">_process_work</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chunk</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/stash.html#MultiProcessStash._process_work"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash._process_work" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a chunk of data in the child process that was created by the parent
+process.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.multi.stash.MultiProcessStash._create_chunk_processor">
+<code class="sig-name descname">_create_chunk_processor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">chunk_id</span></em>, <em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/stash.html#MultiProcessStash._create_chunk_processor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash._create_chunk_processor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Factory method to create the <code class="docutils literal notranslate"><span class="pre">ChunkProcessor</span></code> instance.</p>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">See</dt>
+<dd class="field-odd"><p><a class="reference internal" href="zensols.config.html#zensols.config.factory.ImportConfigFactory" title="zensols.config.factory.ImportConfigFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">zensols.config.factory.ImportConfigFactory</span></code></a></p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt id="zensols.multi.stash.MultiProcessStash.ATTR_EXP_META">
+<code class="sig-name descname">ATTR_EXP_META</code><em class="property"> = ('chunk_size', 'workers')</em><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash.ATTR_EXP_META" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.multi.stash.MultiProcessStash.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delegate</span></em>, <em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">chunk_size</span></em>, <em class="sig-param"><span class="n">workers</span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.multi.stash.MultiProcessStash.chunk_size">
+<code class="sig-name descname">chunk_size</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash.chunk_size" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.multi.stash.MultiProcessStash.get">
+<code class="sig-name descname">get</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/stash.html#MultiProcessStash.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load an object or a default if key <code class="docutils literal notranslate"><span class="pre">name</span></code> doesn’t exist.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.multi.stash.MultiProcessStash.keys">
+<code class="sig-name descname">keys</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/stash.html#MultiProcessStash.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash.keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an iterable of keys in the collection.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.multi.stash.MultiProcessStash.load">
+<code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/stash.html#MultiProcessStash.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a data value from the pickled data with key <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.multi.stash.MultiProcessStash.name">
+<code class="sig-name descname">name</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.multi.stash.MultiProcessStash.prime">
+<code class="sig-name descname">prime</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/multi/stash.html#MultiProcessStash.prime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash.prime" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the delegate stash data does not exist, use this implementation to
+generate the data and process in children processes.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.multi.stash.MultiProcessStash.workers">
+<code class="sig-name descname">workers</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><a class="headerlink" href="#zensols.multi.stash.MultiProcessStash.workers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.multi">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-zensols.multi" title="Permalink to this headline">¶</a></h2>
+<p>Submodules provide multithreaded convenience to parallelize work.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="zensols.persist.html" class="btn btn-neutral float-right" title="zensols.persist package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="zensols.config.html" class="btn btn-neutral float-left" title="zensols.config package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

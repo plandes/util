@@ -1,0 +1,420 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zensols.config.yaml &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>zensols.config.yaml</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for zensols.config.yaml</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Application configuration classes parsed from YAML files.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Paul Landes&#39;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">zensols.config</span> <span class="kn">import</span> <span class="n">Configurable</span><span class="p">,</span> <span class="n">Dictable</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="YamlConfig"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.yaml.YamlConfig">[docs]</a><span class="k">class</span> <span class="nc">YamlConfig</span><span class="p">(</span><span class="n">Configurable</span><span class="p">,</span> <span class="n">Dictable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Just like zensols.actioncli.Config but parse configuration from YAML files.</span>
+<span class="sd">    Variable substitution works just like ini files, but you can set what</span>
+<span class="sd">    delimiter to use and keys are the paths of the data in the hierarchy</span>
+<span class="sd">    separated by dots.</span>
+
+<span class="sd">    See the test cases for example.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">CLASS_VER</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="YamlConfig.__init__"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.yaml.YamlConfig.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">default_section</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">default_vars</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">delimiter</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;$&#39;</span><span class="p">,</span> <span class="n">default_expect</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">sections_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;sections&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize this instance.</span>
+
+<span class="sd">        :param config_file: the ``.yml`` configuration file path to read from</span>
+
+<span class="sd">        :param default_section: default section (defaults to `default`)</span>
+
+<span class="sd">        :param default_vars: used use with existing configuration is not found</span>
+
+<span class="sd">        </span>
+
+<span class="sd">        :param default_expect: if ``True``, raise exceptions when keys and/or</span>
+<span class="sd">                               sections are not found in the configuration</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">default_expect</span><span class="p">,</span> <span class="n">default_section</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config_file</span> <span class="o">=</span> <span class="n">config_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span> <span class="o">=</span> <span class="n">default_vars</span> <span class="k">if</span> <span class="n">default_vars</span> <span class="k">else</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">=</span> <span class="n">delimiter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sections_name</span> <span class="o">=</span> <span class="n">sections_name</span></div>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_is_primitive</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> \
+           <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> \
+           <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="k">def</span> <span class="nf">flatten</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;path: </span><span class="si">{}</span><span class="s1">, n: &lt;</span><span class="si">{}</span><span class="s1">&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;context: &lt;</span><span class="si">{}</span><span class="s1">&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">context</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">context</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_primitive</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">context</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="n">n</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">n</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">k</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">else</span> <span class="n">k</span>
+                    <span class="n">flatten</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown yaml type </span><span class="si">{}</span><span class="s1">: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span>
+                                 <span class="nb">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">n</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">struct</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span><span class="p">)</span>
+        <span class="n">flatten</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">struct</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_all_keys</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">content</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">context</span>
+
+    <span class="k">def</span> <span class="nf">_make_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+        <span class="n">class_name</span> <span class="o">=</span> <span class="s1">&#39;YamlTemplate</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">CLASS_VER</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">CLASS_VER</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># why couldn&#39;t they have made idpattern and delimiter instance members?</span>
+        <span class="c1"># note we have to give the option of different delimiters since the</span>
+        <span class="c1"># default &#39;$$&#39; (use case=OS env vars) is always resolved to &#39;$&#39; given</span>
+        <span class="c1"># the iterative variable substitution method</span>
+        <span class="c1">#</span>
+        <span class="c1"># Yes, this really is necessary.  From the string.Template</span>
+        <span class="c1"># documentation: Advanced usage: you can derive subclasses of Template</span>
+        <span class="c1"># to customize the placeholder syntax, delimiter character, or the</span>
+        <span class="c1"># entire regular expression used to parse template strings. To do this,</span>
+        <span class="c1"># you can override these class attributes:</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">from string import Template</span>
+<span class="s2">class &quot;&quot;&quot;</span> <span class="o">+</span> <span class="n">class_name</span> <span class="o">+</span> <span class="s2">&quot;&quot;&quot;(Template):</span>
+<span class="s2">     idpattern = r&#39;[a-z][_a-z0-9.]*&#39;</span>
+<span class="s2">     delimiter = &#39;&quot;&quot;&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
+        <span class="n">exec</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">class_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span>
+
+    <span class="k">def</span> <span class="nf">_compile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="n">content</span><span class="p">,</span> <span class="n">struct</span><span class="p">,</span> <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span><span class="p">()</span>
+        <span class="n">prev</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_class</span><span class="p">()</span>
+        <span class="k">while</span> <span class="n">prev</span> <span class="o">!=</span> <span class="n">content</span><span class="p">:</span>
+            <span class="n">prev</span> <span class="o">=</span> <span class="n">content</span>
+            <span class="c1"># TODO: raise here for missing keys embedded in the file rather</span>
+            <span class="c1"># than KeyError</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">content</span><span class="p">)</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">FullLoader</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_config&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compile</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span>
+
+    <span class="k">def</span> <span class="nf">_from_dictable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recurse</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">readable</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                       <span class="n">class_name_param</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+
+<div class="viewcode-block" id="YamlConfig.get_tree"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.yaml.YamlConfig.get_tree">[docs]</a>    <span class="k">def</span> <span class="nf">get_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;search: n=</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s1">, path=</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">, name=</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;found: &lt;</span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s1">&gt;&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">n</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">n</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">k</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">k</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">else</span> <span class="n">k</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="n">find</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;found </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="n">v</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;not found: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">expect</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tree</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_primitive</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">node</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_narrow_expect</span><span class="p">(</span><span class="n">expect</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;no such option: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">options</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_options&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_options</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_keys</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_options</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_option</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">expect</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span>
+
+<div class="viewcode-block" id="YamlConfig.reload"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.yaml.YamlConfig.reload">[docs]</a>    <span class="k">def</span> <span class="nf">reload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_options&#39;</span><span class="p">):</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_options</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_all_keys</span></div>
+
+<div class="viewcode-block" id="YamlConfig.has_option"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.yaml.YamlConfig.has_option">[docs]</a>    <span class="k">def</span> <span class="nf">has_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">opts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span>
+        <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">opts</span></div>
+
+<div class="viewcode-block" id="YamlConfig.get_option"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.yaml.YamlConfig.get_option">[docs]</a>    <span class="k">def</span> <span class="nf">get_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expect</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return an option using a dot encoded path.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ops</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ops</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ops</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_narrow_expect</span><span class="p">(</span><span class="n">expect</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;no such option: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="YamlConfig.get_options"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.yaml.YamlConfig.get_options">[docs]</a>    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">opt_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">expect</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tree</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">node</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_vars</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_narrow_expect</span><span class="p">(</span><span class="n">expect</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;no such option: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">root</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the (first) root name of the Yaml configuration file.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_root&#39;</span><span class="p">):</span>
+            <span class="n">root_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_root</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">root_keys</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_root</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the sections by finding the :obj:`section_name` based from the</span>
+<span class="sd">        :obj:`root`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sec_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">sections_name</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">sec_key</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_option_list</span><span class="p">(</span><span class="n">sec_key</span><span class="p">))</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+zensols.cli package
+===================
+
+Submodules
+----------
+
+zensols.cli.peraction module
+----------------------------
+
+.. automodule:: zensols.cli.peraction
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.simple module
+-------------------------
+
+.. automodule:: zensols.cli.simple
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: zensols.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:

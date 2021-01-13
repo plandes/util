@@ -1,0 +1,652 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zensols.persist.domain &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>zensols.persist.domain</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for zensols.persist.domain</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Abstracts the concept of a Python ``dict`` with additional functionality.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Paul Landes&#39;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">ABCMeta</span>
+<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="chunks"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.chunks">[docs]</a><span class="k">class</span> <span class="nc">chunks</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An iterable that chunks any other iterable in to chunks.  Each element</span>
+<span class="sd">    returned is a list of elemnets of the given size or smaller.  That element</span>
+<span class="sd">    that might be smaller is the remainer of the iterable once it is exhausted.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="chunks.__init__"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.chunks.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterable</span><span class="p">:</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">enum</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the chunker.</span>
+
+<span class="sd">        :param iterable: any iterable object</span>
+<span class="sd">        :param size: the size of each chunk</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterable</span> <span class="o">=</span> <span class="n">iterable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enum</span> <span class="o">=</span> <span class="n">enum</span></div>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iterable_session</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterable</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iterable_session</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enum</span><span class="p">:</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+            <span class="n">ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">ds</span></div>
+
+
+<div class="viewcode-block" id="Stash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Stash">[docs]</a><span class="k">class</span> <span class="nc">Stash</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This is a pure virtual class that represents CRUDing data that uses ``dict``</span>
+<span class="sd">    semantics.  The data is usually CRUDed to the file system but need not be.</span>
+<span class="sd">    Instance can be used as iterables or dicsts.  If the former, each item is</span>
+<span class="sd">    returned as a key/value tuple.</span>
+
+<span class="sd">    Note that there are subtle differences a [Stash] and a ``dict`` when</span>
+<span class="sd">    generating or accessing data.  For example, when indexing obtaining the</span>
+<span class="sd">    value is sometimes *forced* by using some mechanism to create the item.</span>
+<span class="sd">    When using ``get`` it relaxes this creation mechanism for some</span>
+<span class="sd">    implementations.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Stash.load"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Stash.load">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Load a data value from the pickled data with key ``name``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Stash.get"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Stash.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Load an object or a default if key ``name`` doesn&#39;t exist.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">exists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="n">default</span>
+        <span class="k">return</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="Stash.exists"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Stash.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return ``True`` if data with key ``name`` exists.</span>
+
+<span class="sd">        *Implementation note*: This (in ``Stash``) method is very inefficient</span>
+<span class="sd">         and should be overriden.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Stash.dump"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Stash.dump">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inst</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="s2">&quot;Persist data value ``inst`` with key ``name``.&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Stash.delete"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Stash.delete">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete the resource for data pointed to by ``name`` or the entire resource</span>
+<span class="sd">        if ``name`` is not given.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Stash.clear"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Stash.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete all data from the from the stash.</span>
+
+<span class="sd">        *Important*: Exercise caution with this method, of course.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;clearing stash </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;deleting key: </span><span class="si">{k}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">k</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Stash.keys"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Stash.keys">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return an iterable of keys in the collection.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="Stash.key_groups"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Stash.key_groups">[docs]</a>    <span class="k">def</span> <span class="nf">key_groups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="s2">&quot;Return an iterable of groups of keys, each of size at least ``n``.&quot;</span>
+        <span class="k">return</span> <span class="n">chunks</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">n</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Stash.values"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Stash.values">[docs]</a>    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the values in the hash.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Stash.items"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Stash.items">[docs]</a>    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return an iterable of all stash items.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">k</span><span class="p">:</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">k</span><span class="p">)),</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">exists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">exists</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">item</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">item</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">x</span><span class="p">),),</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="ReadOnlyStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.ReadOnlyStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ReadOnlyStash</span><span class="p">(</span><span class="n">Stash</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An abstract base class for subclasses that do not support write methods</span>
+<span class="sd">    (i.e. :meth:`load`).  This class is useful to extend for factory type</span>
+<span class="sd">    classes that generate data.  Paired with container classes such as</span>
+<span class="sd">    :class:`.DictionaryStash` provide persistence in a reusable way.</span>
+
+<span class="sd">    The only method that needs to be implemented is :meth:`load` and</span>
+<span class="sd">    :meth:`keys`.  However, it is recommended to implement :meth:`exists` to</span>
+<span class="sd">    speed things up.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        class RangeStash(ReadOnlyStash):</span>
+<span class="sd">            def __init__(self, n, end: int = None):</span>
+<span class="sd">                super().__init__()</span>
+<span class="sd">                self.n = n</span>
+<span class="sd">                self.end = end</span>
+
+<span class="sd">            def load(self, name: str) -&gt; Any:</span>
+<span class="sd">                if self.exists(name):</span>
+<span class="sd">                    return name</span>
+
+<span class="sd">            def keys(self) -&gt; Iterable[str]:</span>
+<span class="sd">                if self.end is not None:</span>
+<span class="sd">                    return map(str, range(self.n, self.end))</span>
+<span class="sd">                else:</span>
+<span class="sd">                    return map(str, range(self.n))</span>
+
+<span class="sd">            def exists(self, name: str) -&gt; bool:</span>
+<span class="sd">                n = int(name)</span>
+<span class="sd">                if self.end is None:</span>
+<span class="sd">                    if (n &gt;= self.n):</span>
+<span class="sd">                        return False</span>
+<span class="sd">                elif (n &lt; self.n) or (n &gt;= self.end):</span>
+<span class="sd">                    return False</span>
+<span class="sd">                return True</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strict</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="ReadOnlyStash.dump"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.ReadOnlyStash.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strict</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;dump not implemented for read only stashes&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ReadOnlyStash.delete"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.ReadOnlyStash.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strict</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;delete not implemented for read only stashes&#39;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CloseableStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.CloseableStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">CloseableStash</span><span class="p">(</span><span class="n">Stash</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Any stash that has a resource that needs to be closed.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CloseableStash.close"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.CloseableStash.close">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Close all resources created by the stash.&quot;</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="DelegateDefaults"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.DelegateDefaults">[docs]</a><span class="k">class</span> <span class="nc">DelegateDefaults</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Defaults set in :class:`.DelegateStash`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># setting to True breaks stash reloads from ImportConfigFactory, so set to</span>
+    <span class="c1"># True for tests etc</span>
+    <span class="n">CLASS_CHECK</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">DELEGATE_ATTR</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="DelegateStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.DelegateStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DelegateStash</span><span class="p">(</span><span class="n">CloseableStash</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delegate pattern.  It can also be used as a no-op if no delegate is given.</span>
+
+<span class="sd">    A minimum functioning implementation needs the :py:meth:`load` and</span>
+<span class="sd">    :py:meth:`keys` methods overriden.  Inheriting and implementing a</span>
+<span class="sd">    :class:`.Stash` such as this is usually used as the ``factory`` in a</span>
+<span class="sd">    :class:`FactoryStash`.</span>
+
+<span class="sd">    This class delegates attribute fetches to the delegate for the</span>
+<span class="sd">    unimplemented methods and attributes using a decorator pattern when</span>
+<span class="sd">    attribute :py:obj:`delegate_attr` is set to ``True``.</span>
+
+<span class="sd">    **Note:** Delegate attribute fetching can cause strange and unexpected</span>
+<span class="sd">    behavior, so use this funcationlity with care.  It is advised to leave it</span>
+<span class="sd">    off if unexpected ``AttributeError`` are raised due to incorrect attribute</span>
+<span class="sd">    is access or method dispatching.</span>
+
+<span class="sd">    :see: :py:obj:`delegate_attr`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">delegate</span><span class="p">:</span> <span class="n">Stash</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;delegate not set&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="p">,</span> <span class="n">Stash</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;not a stash: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1"> or reloaded&#39;</span>
+            <span class="k">if</span> <span class="n">DelegateDefaults</span><span class="o">.</span><span class="n">CLASS_CHECK</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delegate_attr</span> <span class="o">=</span> <span class="n">DelegateDefaults</span><span class="o">.</span><span class="n">DELEGATE_ATTR</span>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s1">&#39;delegate_attr&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate_attr</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">delegate</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="s1">&#39;delegate&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; object has no attribute &#39;</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s2">&#39;; delegate not set&#39;&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">delegate</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DelegateStash.load"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.DelegateStash.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DelegateStash.get"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.DelegateStash.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DelegateStash.exists"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.DelegateStash.exists">[docs]</a>    <span class="k">def</span> <span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="DelegateStash.dump"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.DelegateStash.dump">[docs]</a>    <span class="k">def</span> <span class="nf">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">inst</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DelegateStash.delete"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.DelegateStash.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DelegateStash.keys"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.DelegateStash.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">()</span></div>
+
+<div class="viewcode-block" id="DelegateStash.clear"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.DelegateStash.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;delegate clear in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;calling super clear on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="DelegateStash.close"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.DelegateStash.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="KeyLimitStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.KeyLimitStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">KeyLimitStash</span><span class="p">(</span><span class="n">DelegateStash</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A stash that limits the number of generated keys useful for debugging.</span>
+
+<span class="sd">    For most stashes, this also limits the iteration output since that is based</span>
+<span class="sd">    on key mapping.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ATTR_EXP_META</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;n_limit&#39;</span><span class="p">,)</span>
+
+    <span class="n">n_limit</span><span class="p">:</span> <span class="nb">int</span>
+
+<div class="viewcode-block" id="KeyLimitStash.keys"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.KeyLimitStash.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">ks</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">it</span><span class="o">.</span><span class="n">islice</span><span class="p">(</span><span class="n">ks</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_limit</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PreemptiveStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.PreemptiveStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">PreemptiveStash</span><span class="p">(</span><span class="n">DelegateStash</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provide support for preemptively creating data in a stash.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__post_init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_data</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return whether or not the stash has any data available or not.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_has_data</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_has_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return ``True`` if the delegate has keys.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_has_data</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_has_data</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_data</span>
+
+    <span class="k">def</span> <span class="nf">_reset_has_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reset the state of whether the stash has data or not.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_data</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_set_has_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">has_data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the state of whether the stash has data or not.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_data</span> <span class="o">=</span> <span class="n">has_data</span>
+
+<div class="viewcode-block" id="PreemptiveStash.clear"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.PreemptiveStash.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_has_data</span><span class="p">():</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reset_has_data</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="Primeable"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Primeable">[docs]</a><span class="k">class</span> <span class="nc">Primeable</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Any subclass that has the ability (and need) to do preprocessing.  For</span>
+<span class="sd">    stashes, this means processing before an CRUD method is invoked.  For all</span>
+<span class="sd">    other classes it usually is some processing that must be done in a single</span>
+<span class="sd">    process.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Primeable.prime"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.Primeable.prime">[docs]</a>    <span class="k">def</span> <span class="nf">prime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="PrimeableStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.PrimeableStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">PrimeableStash</span><span class="p">(</span><span class="n">Stash</span><span class="p">,</span> <span class="n">Primeable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Any subclass that has the ability to do processing before any CRUD method is</span>
+<span class="sd">    invoked.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PrimeableStash.prime"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.PrimeableStash.prime">[docs]</a>    <span class="k">def</span> <span class="nf">prime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">DelegateStash</span><span class="p">)</span> <span class="ow">and</span> \
+           <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="p">,</span> <span class="n">PrimeableStash</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delegate</span><span class="o">.</span><span class="n">prime</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="FactoryStash"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.FactoryStash">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">FactoryStash</span><span class="p">(</span><span class="n">PreemptiveStash</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A stash that defers to creation of new items to another ``factory`` stash.</span>
+
+<span class="sd">    :param delegate: the stash used for persistence</span>
+<span class="sd">    :param factory: the stash used to create using ``load`` and ``keys``</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ATTR_EXP_META</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;enable_preemptive&#39;</span><span class="p">,)</span>
+
+    <span class="n">factory</span><span class="p">:</span> <span class="n">Stash</span>
+    <span class="n">enable_preemptive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_has_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_preemptive</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_calculate_has_data</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="FactoryStash.load"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.FactoryStash.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reset_has_data</span><span class="p">()</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">item</span></div>
+
+<div class="viewcode-block" id="FactoryStash.keys"><a class="viewcode-back" href="../../../api/zensols.persist.html#zensols.persist.domain.FactoryStash.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_data</span><span class="p">:</span>
+            <span class="n">ks</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">ks</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

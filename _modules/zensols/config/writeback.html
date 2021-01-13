@@ -1,0 +1,388 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zensols.config.writeback &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>zensols.config.writeback</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for zensols.config.writeback</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Observer pattern that write updates back to the configuration.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Paul Landes&#39;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConfigFactory</span><span class="p">,</span>
+    <span class="n">FactoryState</span><span class="p">,</span>
+    <span class="n">FactoryStateObserver</span><span class="p">,</span>
+    <span class="n">Dictable</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Writeback"><a class="viewcode-back" href="../../../api/zensols.config.html#zensols.config.writeback.Writeback">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Writeback</span><span class="p">(</span><span class="n">FactoryStateObserver</span><span class="p">,</span> <span class="n">Dictable</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Subclass for classes that want to write attribute changes back to a</span>
+<span class="sd">    :class:`.Configurable`.  This uses an observer pattern that write updates</span>
+<span class="sd">    back to the configuration.</span>
+
+<span class="sd">    When an attribute is set on an instance of this class, it is first set</span>
+<span class="sd">    using the normal Python attribute setting.  After that, based on a set of</span>
+<span class="sd">    criteria, the attribute and value are set on the backing configuration</span>
+<span class="sd">    ``config``.  The value is clobbered with a string version based on the</span>
+<span class="sd">    ``config``&#39;s :class:`.Serializer` instance (either a primitive value string</span>
+<span class="sd">    or JSON string).</span>
+
+<span class="sd">    **Implementation Note:** During initialization, the :py:meth:`__setattr__`</span>
+<span class="sd">    is called by the Python interpreter, and before the instance is completely</span>
+<span class="sd">    being populated.</span>
+
+<span class="sd">    **Important:** The :py:meth:`_is_settable` implementation checks for a</span>
+<span class="sd">    state (any such as ``CREATED``) to be set on the instance.  To change</span>
+<span class="sd">    this behavior, you will need to overide this method.</span>
+
+<span class="sd">    :param name: the name of the section given in the configuration</span>
+
+<span class="sd">    :param config: the *backing configuration*, which is the configuration from</span>
+<span class="sd">                   whince this object instance was defined</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">DEFAULT_SKIP_ATTRIBUTES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">ConfigFactory</span><span class="o">.</span><span class="n">NAME_ATTRIBUTE</span><span class="p">,</span>
+                                   <span class="n">ConfigFactory</span><span class="o">.</span><span class="n">CONFIG_ATTRIBUTE</span><span class="p">,</span>
+                                   <span class="n">ConfigFactory</span><span class="o">.</span><span class="n">CONIFG_FACTORY_ATTRIBUTE</span><span class="p">])</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">config_factory</span><span class="p">:</span> <span class="n">ConfigFactory</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_notify_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">FactoryState</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called to update the object of a new state.  This is currently only called</span>
+<span class="sd">        by instances of :class:`.ConfigFactory`.</span>
+
+<span class="sd">        This is useful when overridding :py:meth:`is_settable` to disallow</span>
+<span class="sd">        setting of the configuraiton while the object is being initialized (see</span>
+<span class="sd">        class docs).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;notify state: </span><span class="si">{</span><span class="n">state</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
+
+    <span class="k">def</span> <span class="nf">_is_created</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_state&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_skip_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return a set of attributes to not update based on attribute name.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFAULT_SKIP_ATTRIBUTES</span>
+
+    <span class="k">def</span> <span class="nf">_get_keep_attribute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of attribute names to allow update.  This is an exclusive</span>
+<span class="sd">        list, so those not in this set are not updated.  If ``None``, always</span>
+<span class="sd">        update all.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_is_allowed_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return whether or not to allow updating of the type of value.  This</span>
+<span class="sd">        implementation is delegated to the :class:`Serializer` instance in the</span>
+<span class="sd">        backing ``config``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">is_allowed_type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_allow_config_adds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Whether or not to allow new entries to be made in the configuration if they</span>
+<span class="sd">        do not already exist.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_is_settable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return whether or not to allow setting attribute ``name`` with ``value`` on</span>
+<span class="sd">        the current instance.  This also checks to make sure this instance has</span>
+<span class="sd">        completed initialization by check for the existance of the</span>
+<span class="sd">        :py:attrib:~`_state` attribute set in :py:meth:`_notify_state`.</span>
+
+<span class="sd">        :param name: the name of the attribute</span>
+
+<span class="sd">        :param value: the Python object value to be set on the configuration</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">keeps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_keep_attribute</span><span class="p">()</span>
+        <span class="n">is_created</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_created</span><span class="p">()</span>
+        <span class="n">is_skip</span> <span class="o">=</span> <span class="n">keeps</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">keeps</span>
+        <span class="n">is_skip</span> <span class="o">=</span> <span class="n">is_skip</span> <span class="ow">and</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_skip_attributes</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: is created: </span><span class="si">{</span><span class="n">is_created</span><span class="si">}</span><span class="s1">, skip: </span><span class="si">{</span><span class="n">is_skip</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">is_created</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_skip</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_allowed_type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called by :py:meth:`__setattr__` to set the value on the backing ``config``.</span>
+<span class="sd">        The backing ``config`` handles the string serialization.</span>
+
+<span class="sd">        :param name: the name of the attribute</span>
+
+<span class="sd">        :param value: the Python object value to be set on the configuration</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">has_option</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">has_option</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;set option </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> &#39;</span> <span class="o">+</span>
+                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">has_option</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allow_config_adds</span><span class="p">()</span> <span class="ow">or</span> <span class="n">has_option</span><span class="p">:</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_attribute_to_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="n">svalue</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">is_created</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_created</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;attrib to obj: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: is created: &#39;</span> <span class="o">+</span>
+                         <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">is_created</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_created</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">factory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">config</span>
+            <span class="n">svalue</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">parse_object</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">factory</span><span class="o">.</span><span class="n">from_config_string</span><span class="p">(</span><span class="n">svalue</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;attrib to obj: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1"> -&gt; &lt;</span><span class="si">{</span><span class="n">obj</span><span class="si">}</span><span class="s1">&gt;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">svalue</span><span class="p">,</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set an attribute, which is overloaded from the ``builtin object``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">value</span><span class="p">,</span> <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attribute_to_object</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;can</span><span class="se">\&#39;</span><span class="s1">t set attribute </span><span class="se">\&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="se">\&#39;</span><span class="s1"> = </span><span class="si">{</span><span class="n">value</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_settable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;settings option </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_option</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_from_dictable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recurse</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">readable</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+                       <span class="n">class_name_param</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;This is overridden because this class operates on a per attribute basis very</span>
+<span class="sd">        close at the class/interpreter level.  Instead of using</span>
+<span class="sd">        :class:`dataclasses.dataclass` mechanisms to inform of how to create</span>
+<span class="sd">        the dictionary, it introspects the attributes and types of those</span>
+<span class="sd">        attributes of the object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dct</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_class_name_param</span><span class="p">(</span><span class="n">class_name_param</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">Dictable</span><span class="p">):</span>
+                <span class="n">dct</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">_from_dictable</span><span class="p">(</span>
+                    <span class="n">recurse</span><span class="p">,</span> <span class="n">readable</span><span class="p">,</span> <span class="n">class_name_param</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_allowed_type</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                <span class="n">dct</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">dct</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

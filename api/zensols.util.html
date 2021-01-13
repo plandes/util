@@ -1,0 +1,651 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>zensols.util package &mdash; Zensols Utilities 1.3.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contributing" href="../CONTRIBUTING.html" />
+    <link rel="prev" title="zensols.persist package" href="zensols.persist.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../top.html" class="icon icon-home" alt="Documentation Home"> Zensols Utilities
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.3.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="zensols.cli.html">zensols.cli package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.config.html">zensols.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.multi.html">zensols.multi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.persist.html">zensols.persist package</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">zensols.util package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.util.executor">zensols.util.executor module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.util.log">zensols.util.log module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.util.tempfile">zensols.util.tempfile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.util.time">zensols.util.time module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-zensols.util">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../top.html">Zensols Utilities</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../top.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../api.html">API Reference</a> &raquo;</li>
+        
+      <li>zensols.util package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/api/zensols.util.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="zensols-util-package">
+<h1>zensols.util package<a class="headerlink" href="#zensols-util-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-zensols.util.executor">
+<span id="zensols-util-executor-module"></span><h2>zensols.util.executor module<a class="headerlink" href="#module-zensols.util.executor" title="Permalink to this headline">¶</a></h2>
+<p>Simplifies external process handling.</p>
+<dl class="py class">
+<dt id="zensols.util.executor.Executor">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.util.executor.</code><code class="sig-name descname">Executor</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">logger</span></em>, <em class="sig-param"><span class="n">dry_run</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">check_exit_value</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">async_proc</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">working_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/executor.html#Executor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.executor.Executor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Run a process and log output.  The process is run in the foreground by
+default, or background.  If the later, a process object is returned from
+<a class="reference internal" href="#zensols.util.executor.Executor.run" title="zensols.util.executor.Executor.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>logger</strong> (<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logger</span></code></a>) – the client logger used to log output of the process</p></li>
+<li><p><strong>dry_run</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code> do not do anything, just log as if it were to
+act/do something</p></li>
+<li><p><strong>check_exit_value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – compare and raise an exception if the exit value
+of the process is not this number, or <code class="docutils literal notranslate"><span class="pre">None</span></code> to
+not check</p></li>
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]) – the wait timeout in <a class="reference internal" href="#zensols.util.executor.Executor.wait" title="zensols.util.executor.Executor.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a></p></li>
+<li><p><strong>async_proc</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, return a process from <a class="reference internal" href="#zensols.util.executor.Executor.run" title="zensols.util.executor.Executor.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a>, which
+calls <a class="reference internal" href="#zensols.util.executor.Executor.wait" title="zensols.util.executor.Executor.wait"><code class="xref py py-meth docutils literal notranslate"><span class="pre">wait()</span></code></a></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="zensols.util.executor.Executor.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">logger</span></em>, <em class="sig-param"><span class="n">dry_run</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">check_exit_value</span><span class="o">=</span><span class="default_value">0</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">async_proc</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">working_dir</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.util.executor.Executor.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.util.executor.Executor.async_proc">
+<code class="sig-name descname">async_proc</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><em class="property"> = False</em><a class="headerlink" href="#zensols.util.executor.Executor.async_proc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.util.executor.Executor.check_exit_value">
+<code class="sig-name descname">check_exit_value</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><em class="property"> = 0</em><a class="headerlink" href="#zensols.util.executor.Executor.check_exit_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.util.executor.Executor.dry_run">
+<code class="sig-name descname">dry_run</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><em class="property"> = False</em><a class="headerlink" href="#zensols.util.executor.Executor.dry_run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.util.executor.Executor.logger">
+<code class="sig-name descname">logger</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.Logger" title="(in Python v3.9)">logging.Logger</a></em><a class="headerlink" href="#zensols.util.executor.Executor.logger" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.executor.Executor.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cmd</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/executor.html#Executor.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.executor.Executor.run" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/subprocess.html#subprocess.Popen" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Popen</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.util.executor.Executor.timeout">
+<code class="sig-name descname">timeout</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><em class="property"> = None</em><a class="headerlink" href="#zensols.util.executor.Executor.timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.executor.Executor.wait">
+<code class="sig-name descname">wait</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">proc</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/executor.html#Executor.wait"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.executor.Executor.wait" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.util.executor.Executor.working_dir">
+<code class="sig-name descname">working_dir</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.9)">pathlib.Path</a></em><em class="property"> = None</em><a class="headerlink" href="#zensols.util.executor.Executor.working_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.util.log">
+<span id="zensols-util-log-module"></span><h2>zensols.util.log module<a class="headerlink" href="#module-zensols.util.log" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="zensols.util.log.LogConfigurer">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.util.log.</code><code class="sig-name descname">LogConfigurer</code><span class="sig-paren">(</span><em class="sig-param">logger=&lt;RootLogger root (WARNING)&gt;</em>, <em class="sig-param">log_format='%(asctime)s %(levelname)s %(message)s'</em>, <em class="sig-param">level=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LogConfigurer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LogConfigurer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Configure logging to go to a file or Graylog.</p>
+<dl class="py method">
+<dt id="zensols.util.log.LogConfigurer.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">logger=&lt;RootLogger root (WARNING)&gt;</em>, <em class="sig-param">log_format='%(asctime)s %(levelname)s %(message)s'</em>, <em class="sig-param">level=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LogConfigurer.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LogConfigurer.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.log.LogConfigurer.capture">
+<code class="sig-name descname">capture</code><span class="sig-paren">(</span><em class="sig-param">stdout_logger=&lt;Logger STDOUT (WARNING)&gt;</em>, <em class="sig-param">stderr_logger=&lt;Logger STDERR (WARNING)&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LogConfigurer.capture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LogConfigurer.capture" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.log.LogConfigurer.config_basic">
+<code class="sig-name descname">config_basic</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LogConfigurer.config_basic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LogConfigurer.config_basic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.log.LogConfigurer.config_buffer">
+<code class="sig-name descname">config_buffer</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LogConfigurer.config_buffer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LogConfigurer.config_buffer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.log.LogConfigurer.config_file">
+<code class="sig-name descname">config_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file_name</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LogConfigurer.config_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LogConfigurer.config_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.log.LogConfigurer.config_handler">
+<code class="sig-name descname">config_handler</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">handler</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LogConfigurer.config_handler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LogConfigurer.config_handler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.log.LogConfigurer.config_stream">
+<code class="sig-name descname">config_stream</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stdout_stream</span></em>, <em class="sig-param"><span class="n">stderr_stream</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LogConfigurer.config_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LogConfigurer.config_stream" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.util.log.LogLevelSetFilter">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.util.log.</code><code class="sig-name descname">LogLevelSetFilter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">levels</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LogLevelSetFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LogLevelSetFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py method">
+<dt id="zensols.util.log.LogLevelSetFilter.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">levels</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LogLevelSetFilter.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LogLevelSetFilter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.log.LogLevelSetFilter.filter">
+<code class="sig-name descname">filter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">record</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LogLevelSetFilter.filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LogLevelSetFilter.filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.util.log.LoggerStream">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.util.log.</code><code class="sig-name descname">LoggerStream</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">logger</span></em>, <em class="sig-param"><span class="n">log_level</span><span class="o">=</span><span class="default_value">20</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LoggerStream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LoggerStream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Each line of standard out/error becomes a logged line</p>
+<dl class="py method">
+<dt id="zensols.util.log.LoggerStream.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">logger</span></em>, <em class="sig-param"><span class="n">log_level</span><span class="o">=</span><span class="default_value">20</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LoggerStream.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LoggerStream.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.log.LoggerStream.flush">
+<code class="sig-name descname">flush</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LoggerStream.flush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LoggerStream.flush" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.log.LoggerStream.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">c</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#LoggerStream.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.LoggerStream.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.util.log.StreamLogDumper">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.util.log.</code><code class="sig-name descname">StreamLogDumper</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stream</span></em>, <em class="sig-param"><span class="n">logger</span></em>, <em class="sig-param"><span class="n">level</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#StreamLogDumper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.StreamLogDumper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/threading.html#threading.Thread" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">threading.Thread</span></code></a></p>
+<p>Redirect stream output to a logger in a running thread.</p>
+<dl class="py method">
+<dt id="zensols.util.log.StreamLogDumper.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stream</span></em>, <em class="sig-param"><span class="n">logger</span></em>, <em class="sig-param"><span class="n">level</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#StreamLogDumper.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.StreamLogDumper.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>This constructor should always be called with keyword arguments. Arguments are:</p>
+<p><em>group</em> should be None; reserved for future extension when a ThreadGroup
+class is implemented.</p>
+<p><em>target</em> is the callable object to be invoked by the run()
+method. Defaults to None, meaning nothing is called.</p>
+<p><em>name</em> is the thread name. By default, a unique name is constructed of
+the form “Thread-N” where N is a small decimal number.</p>
+<p><em>args</em> is the argument tuple for the target invocation. Defaults to ().</p>
+<p><em>kwargs</em> is a dictionary of keyword arguments for the target
+invocation. Defaults to {}.</p>
+<p>If a subclass overrides the constructor, it must make sure to invoke
+the base class constructor (Thread.__init__()) before doing anything
+else to the thread.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.log.StreamLogDumper.dump">
+<em class="property">static </em><code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">stdout</span></em>, <em class="sig-param"><span class="n">stderr</span></em>, <em class="sig-param"><span class="n">logger</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#StreamLogDumper.dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.StreamLogDumper.dump" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.log.StreamLogDumper.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#StreamLogDumper.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.StreamLogDumper.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method representing the thread’s activity.</p>
+<p>You may override this method in a subclass. The standard run() method
+invokes the callable object passed to the object’s constructor as the
+target argument, if any, with sequential and keyword arguments taken
+from the args and kwargs arguments, respectively.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.util.log.loglevel">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.util.log.</code><code class="sig-name descname">loglevel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">level</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#loglevel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.loglevel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Object used with a <code class="docutils literal notranslate"><span class="pre">with</span></code> scope that sets the logging level temporarily
+and sets it back.  For example:</p>
+<dl class="simple">
+<dt>with loglevel(__name__):</dt><dd><p>logger.debug(‘test’)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="zensols.util.log.loglevel.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span></em>, <em class="sig-param"><span class="n">level</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/log.html#loglevel.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.log.loglevel.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.util.tempfile">
+<span id="zensols-util-tempfile-module"></span><h2>zensols.util.tempfile module<a class="headerlink" href="#module-zensols.util.tempfile" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="zensols.util.tempfile.TemporaryFileName">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.util.tempfile.</code><code class="sig-name descname">TemporaryFileName</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">directory</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_fmt</span><span class="o">=</span><span class="default_value">'{name}'</span></em>, <em class="sig-param"><span class="n">create</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">remove</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/tempfile.html#TemporaryFileName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.tempfile.TemporaryFileName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Create a temporary file names on the file system.  Note that this does not
+create the file object itself, only the file names.  In addition, the
+generated file names are tracked and allow for deletion.  Specified
+directories are also created, which is only needed for non-system temporary
+directories.</p>
+<p>The object is iterable, so usage with <code class="docutils literal notranslate"><span class="pre">itertools.islice</span></code> can be used to
+get as many temporary file names as desired.  Calling instances (no
+arguments) generate a single file name.</p>
+<dl class="py method">
+<dt id="zensols.util.tempfile.TemporaryFileName.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">directory</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">file_fmt</span><span class="o">=</span><span class="default_value">'{name}'</span></em>, <em class="sig-param"><span class="n">create</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">remove</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/tempfile.html#TemporaryFileName.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.tempfile.TemporaryFileName.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize with file system data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – the parent directory of the generated file</p></li>
+<li><p><strong>file_fmt</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – a file format that substitutes <code class="docutils literal notranslate"><span class="pre">name</span></code> for the create
+temporary file name; defaults to <code class="docutils literal notranslate"><span class="pre">{name}</span></code></p></li>
+<li><p><strong>create</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, create <code class="docutils literal notranslate"><span class="pre">directory</span></code> if it doesn’t exist</p></li>
+<li><p><strong>remove</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code>, remove tracked generated file names if they
+exist</p></li>
+</ul>
+</dd>
+<dt class="field-even">See tempfile</dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.tempfile.TemporaryFileName.clean">
+<code class="sig-name descname">clean</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/tempfile.html#TemporaryFileName.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.tempfile.TemporaryFileName.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove any files generated from this instance.  Note this only deletes the
+files, not the parent directory (if it was created).</p>
+<p>This does nothing if <code class="docutils literal notranslate"><span class="pre">remove</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code> in the initializer.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.util.tempfile.tempfile">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.util.tempfile.</code><code class="sig-name descname">tempfile</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/tempfile.html#tempfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.tempfile.tempfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Generate a temporary file name and return the name in the <code class="docutils literal notranslate"><span class="pre">with</span></code>
+statement.  Arguments to the form are the same as <code class="docutils literal notranslate"><span class="pre">TemporaryFileName</span></code>.
+The temporary file is deleted after completion (see <code class="docutils literal notranslate"><span class="pre">TemporaryFileName</span></code>).</p>
+<p>Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">tempfile</span><span class="p">(</span><span class="s1">&#39;./tmp&#39;</span><span class="p">,</span> <span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">fname</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;writing to </span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;this file will be deleted, but left with ./tmp</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="zensols.util.tempfile.tempfile.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span><span class="n">args</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/tempfile.html#tempfile.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.tempfile.tempfile.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.util.time">
+<span id="zensols-util-time-module"></span><h2>zensols.util.time module<a class="headerlink" href="#module-zensols.util.time" title="Permalink to this headline">¶</a></h2>
+<p>Peformance measure convenience utils.</p>
+<dl class="py exception">
+<dt id="zensols.util.time.TimeoutError">
+<em class="property">exception </em><code class="sig-prename descclassname">zensols.util.time.</code><code class="sig-name descname">TimeoutError</code><a class="reference internal" href="../_modules/zensols/util/time.html#TimeoutError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.time.TimeoutError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<dl class="py attribute">
+<dt id="zensols.util.time.TimeoutError.__module__">
+<code class="sig-name descname">__module__</code><em class="property"> = 'zensols.util.time'</em><a class="headerlink" href="#zensols.util.time.TimeoutError.__module__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="zensols.util.time.TimeoutError.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#zensols.util.time.TimeoutError.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.util.time.time">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.util.time.</code><code class="sig-name descname">time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span><span class="o">=</span><span class="default_value">'finished'</span></em>, <em class="sig-param"><span class="n">level</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/time.html#time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.time.time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Used in a <code class="docutils literal notranslate"><span class="pre">with</span></code> scope that executes the body and logs the elapsed time.</p>
+<p>Format f-strings are supported as the locals are taken from the calling
+frame on exit.  This means you can do things like:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>with time(‘processed {cnt} items’):</dt><dd><p>cnt = 5
+tm.sleep(1)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>which produeces: <code class="docutils literal notranslate"><span class="pre">processed</span> <span class="pre">5</span> <span class="pre">items</span></code>.</p>
+<p>See the initializer documentation about special treatment for global
+loggers.</p>
+<dl class="py method">
+<dt id="zensols.util.time.time.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span><span class="o">=</span><span class="default_value">'finished'</span></em>, <em class="sig-param"><span class="n">level</span><span class="o">=</span><span class="default_value">20</span></em>, <em class="sig-param"><span class="n">logger</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/time.html#time.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.time.time.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the time object.</p>
+<p>If a logger is not given, it is taken from the calling frame’s global
+variable named <code class="docutils literal notranslate"><span class="pre">logger</span></code>.  If this global doesn’t exit it logs to
+standard out.</p>
+<p>You can force standard out instead of a logger by using</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>msg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>) – the message log when exiting the closure</p></li>
+<li><p><strong>logger</strong> – the logger to use for logging or the string <code class="docutils literal notranslate"><span class="pre">stdout</span></code>
+for printing to standard</p></li>
+<li><p><strong>level</strong> – the level at which the message is logged</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="zensols.util.time.time.format_elapse">
+<em class="property">static </em><code class="sig-name descname">format_elapse</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">msg</span></em>, <em class="sig-param"><span class="n">seconds</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/time.html#time.format_elapse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.time.time.format_elapse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="zensols.util.time.timeout">
+<code class="sig-prename descclassname">zensols.util.time.</code><code class="sig-name descname">timeout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seconds</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">error_message</span><span class="o">=</span><span class="default_value">'STREAM ioctl timeout'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/time.html#timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.time.timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>This creates a decorator called &#64;timeout that can be applied to any long
+running functions.</p>
+<p>So, in your application code, you can use the decorator like so:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">timeout</span> <span class="kn">import</span> <span class="n">timeout</span>
+
+<span class="c1"># Timeout a long running function with the default expiry of</span>
+<span class="c1"># TIMEOUT_DEFAULT seconds.</span>
+<span class="nd">@timeout</span>
+<span class="k">def</span> <span class="nf">long_running_function1</span><span class="p">():</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>This was derived from the <a class="reference external" href="https://stackoverflow.com/questions/2281850/timeout-function-if-it-takes-too-long-to-finish">David Narayan’s</a>
+StackOverflow thread.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="zensols.util.time.timeprotect">
+<em class="property">class </em><code class="sig-prename descclassname">zensols.util.time.</code><code class="sig-name descname">timeprotect</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seconds</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">timeout_handler</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">error_message</span><span class="o">=</span><span class="default_value">'STREAM ioctl timeout'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/time.html#timeprotect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.time.timeprotect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Invokes a block and bails if not completed in a specified number of seconds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seconds</strong> – the number of seconds to wait</p></li>
+<li><p><strong>timeout_handler</strong> – function that takes a single argument, which is
+this <code class="docutils literal notranslate"><span class="pre">timeprotect</span></code> object instance; if <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+then nothing is done if the block times out</p></li>
+<li><p><strong>context</strong> – an object accessible from the <code class="docutils literal notranslate"><span class="pre">timeout_hander</span></code> via
+<code class="docutils literal notranslate"><span class="pre">self</span></code>, which defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+</ul>
+</dd>
+</dl>
+<p><a class="reference internal" href="#zensols.util.time.timeout" title="zensols.util.time.timeout"><code class="xref py py-meth docutils literal notranslate"><span class="pre">timeout()</span></code></a></p>
+<dl class="py method">
+<dt id="zensols.util.time.timeprotect.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">seconds</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">timeout_handler</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">context</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">error_message</span><span class="o">=</span><span class="default_value">'STREAM ioctl timeout'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/util/time.html#timeprotect.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#zensols.util.time.timeprotect.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-zensols.util">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-zensols.util" title="Permalink to this headline">¶</a></h2>
+<p>General utility classes to measuring time it takes to do work, to logging
+and fork/exec operations.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../CONTRIBUTING.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="zensols.persist.html" class="btn btn-neutral float-left" title="zensols.persist package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 2021, Paul Landes
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

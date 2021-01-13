@@ -1,0 +1,93 @@
+zensols.config package
+======================
+
+Submodules
+----------
+
+zensols.config.configbase module
+--------------------------------
+
+.. automodule:: zensols.config.configbase
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.config.dictable module
+------------------------------
+
+.. automodule:: zensols.config.dictable
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.config.factory module
+-----------------------------
+
+.. automodule:: zensols.config.factory
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.config.iniconfig module
+-------------------------------
+
+.. automodule:: zensols.config.iniconfig
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.config.meta module
+--------------------------
+
+.. automodule:: zensols.config.meta
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.config.serial module
+----------------------------
+
+.. automodule:: zensols.config.serial
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.config.strconfig module
+-------------------------------
+
+.. automodule:: zensols.config.strconfig
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.config.writable module
+------------------------------
+
+.. automodule:: zensols.config.writable
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.config.writeback module
+-------------------------------
+
+.. automodule:: zensols.config.writeback
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.config.yaml module
+--------------------------
+
+.. automodule:: zensols.config.yaml
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: zensols.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
