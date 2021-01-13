@@ -378,6 +378,8 @@ class persisted(object):
             pwork.worker = fn
             return pwork(*argv, **kwargs)
 
+        wrapped.__doc__ = fn.__doc__
+
         return wrapped
 
 
@@ -427,5 +429,7 @@ class resource(object):
             finally:
                 getattr(inst, self.destroy_method_name)(resource)
             return result
+
+        wrapped.__doc__ = fn.__doc__
 
         return wrapped
