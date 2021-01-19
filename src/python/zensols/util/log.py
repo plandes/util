@@ -109,13 +109,21 @@ class LogConfigurer(object):
 
 class loglevel(object):
     """Object used with a ``with`` scope that sets the logging level temporarily
-    and sets it back.  For example:
+    and sets it back.
 
-    with loglevel(__name__):
-        logger.debug('test')
+    Example::
+        with loglevel(__name__):
+            logger.debug('test')
 
     """
     def __init__(self, name: str, level: int = logging.DEBUG):
+        """Initialize.
+
+        :param name: the name of the logger to set
+
+        :param level: the logging level, which defaults to :obj:`logging.DEBUG`
+
+        """
         self.logger = logging.getLogger(name)
         self.initial_level = self.logger.level
         self.level = level
