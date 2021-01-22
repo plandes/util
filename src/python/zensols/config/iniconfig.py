@@ -8,7 +8,7 @@ from typing import Set, Dict, List
 from abc import ABCMeta, abstractmethod
 import logging
 import os
-from io import StringIO
+from io import TextIOBase, StringIO
 from pathlib import Path
 from copy import deepcopy
 from configparser import ConfigParser, ExtendedInterpolation
@@ -32,7 +32,7 @@ class IniConfig(Configurable):
 
         :param default_section: default section (defaults to `default`)
 
-        :param default_vars: used use with existing configuration is not found
+        :param default_vars: use with existing configuration is not found
 
         :param robust: if `True`, then don't raise an error when the
                        configuration file is missing
@@ -65,6 +65,20 @@ class IniConfig(Configurable):
         "Factory method to create the ConfigParser."
         return ConfigParser(defaults=self.create_defaults)
 
+    def _read_config_content(self, cpath: Path, writer: TextIOBase):
+        if cpath.is_file():
+            with open(cpath) as f:
+                writer.write(f.read())
+        elif cpath.is_dir():
+            for fpath in cpath.iterdir():
+                if fpath.is_file():
+                    with open(fpath) as f:
+                        writer.write(f.read())
+                    writer.write('\n')
+            self._conf = self._create_config_parser()
+            writer.seek(0)
+            self._conf.read_file(writer)
+
     @property
     def parser(self):
         """Load the configuration file.
@@ -79,19 +93,12 @@ class IniConfig(Configurable):
                 else:
                     raise IOError(f'no such file: {cpath}')
                 self._conf = None
-            elif cpath.is_file():
+            elif cpath.is_file() or cpath.is_dir():
+                writer = StringIO()
+                self._read_config_content(cpath, writer)
+                writer.seek(0)
                 self._conf = self._create_config_parser()
-                self._conf.read(cpath)
-            elif cpath.is_dir():
-                agg = StringIO()
-                for fpath in cpath.iterdir():
-                    if fpath.is_file():
-                        with open(fpath) as f:
-                            agg.write(f.read())
-                        agg.write('\n')
-                self._conf = self._create_config_parser()
-                agg.seek(0)
-                self._conf.read_file(agg)
+                self._conf.read_file(writer)
             else:
                 raise OSError(f'unknown file type: {cpath}')
         return self._conf
@@ -161,6 +168,7 @@ class IniConfig(Configurable):
         """Derive a new configuration from the resource file name ``path``.
 
         :param path: a resource file (i.e. ``resources/app.conf``)
+
         :pram copy_sections: a list of sections to copy from this to the
                              derived configuration
 
@@ -180,7 +188,7 @@ class IniConfig(Configurable):
 
 class ExtendedInterpolationConfig(IniConfig):
     """Configuration class extends using advanced interpolation with
-    ``configparser.ExtendedInterpolation``.
+    :class:`~configparser.ExtendedInterpolation`.
 
     """
     def _create_config_parser(self) -> ConfigParser:
@@ -231,11 +239,12 @@ class CommandLineConfig(IniConfig, metaclass=ABCMeta):
     in this method are then created in the default section of the configuration
     when created with the static method ``from_args``, which is called with the
     parsed command line arguments (usually from some instance or instance of
-    subclass ``SimpleActionCli``.
+    subclass :class:`.SimpleActionCli`.
 
     """
     def set_default(self, name: str, value: str, clobber: bool = None):
         """Set a default value in the ``default`` section of the configuration.
+
         """
         if clobber is not None:
             self.set_option(name, clobber, self.default_section)

@@ -180,7 +180,7 @@ class ClassImporter(object):
 class ImportClassResolver(ClassResolver):
     """Resolve a class name from a list of registered class names without the
     module part.  This is used with the ``register`` method on
-    ``ConfigFactory``.
+    :class:`.ConfigFactory`.
 
     :see: ConfigFactory.register
     """
@@ -197,7 +197,7 @@ class ImportClassResolver(ClassResolver):
 
 class ConfigFactory(object):
     """Creates new instances of classes and configures them given data in a
-    configuration ``Configurable`` instance.
+    configuration :class:`.Configurable` instance.
 
     """
     NAME_ATTRIBUTE = 'name'
@@ -274,8 +274,11 @@ class ConfigFactory(object):
         """Return the instance.
 
         :param cls: the class to create the instance from
+
         :param args: given to the ``__init__`` method
+
         :param kwargs: given to the ``__init__`` method
+
         """
         logger.debug(f'args: {args}, kwargs: {kwargs}')
         try:
@@ -291,7 +294,7 @@ class ConfigFactory(object):
             logger.debug(f'inst: {inst.__class__}')
         return inst
 
-    def instance(self, name: Type = None, *args, **kwargs):
+    def instance(self, name: str = None, *args, **kwargs):
         """Create a new instance using key ``name``.
 
         :param name: the name of the class (by default) or the key name of the
@@ -417,7 +420,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                     v.deallocate()
             self.shared.clear()
 
-    def instance(self, name=None, *args, **kwargs):
+    def instance(self, name: str = None, *args, **kwargs):
         if self.shared is None:
             inst = super().instance(name, *args, **kwargs)
         else:

@@ -35,21 +35,30 @@ class SimpleActionCli(object):
         :param dict executors:
             keys are executor names and values are
             function that create the executor handler instance
+
         :param dict invokes:
             keys are names of in executors and values are
             arrays with the form: [<option name>, <method name>, <usage doc>]
+
         :param config: an instance of `zensols.config.Config`
+
         :param str version: the default version of this command line module,
-            which is overrided by the package's version if it exists
+                            which is overrided by the package's version if it
+                            exists
+
         :param pkg_dist: the name of the module (i.e. zensols.actioncli)
+
         :param set opts: options to be parsed
+
         :param set manditory_opts: options that must be supplied in the command
+
         :param set environ_opts:
             options to add from environment variables; each are upcased to
             be match and retrieved from the environment but are lowercased in
             the results param set
+
         :param str default_action: the action to use if non is
-            specified (if any)
+                                   specified (if any)
 
         """
         opts = opts if opts else set([])
