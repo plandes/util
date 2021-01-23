@@ -164,7 +164,8 @@ class IniConfig(Configurable):
             self.parser.add_section(section)
         self.parser.set(section, name, value)
 
-    def derive_from_resource(self, path: str, copy_sections=()) -> Configurable:
+    def derive_from_resource(self, path: str, copy_sections=()) -> \
+            Configurable:
         """Derive a new configuration from the resource file name ``path``.
 
         :param path: a resource file (i.e. ``resources/app.conf``)
