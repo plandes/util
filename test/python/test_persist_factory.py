@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import shutil
 from zensols.config import (
+    Settings,
     IniConfig,
     ImportConfigFactory,
 )
@@ -111,3 +112,15 @@ class TestStashFactory(unittest.TestCase):
         path = stash.path
         self.assertTrue(isinstance(path, Path))
         self.assertTrue('range10_stash', path.name)
+
+    def test_no_class_name(self):
+        fac = ImportConfigFactory(self.conf)
+        inst = fac.instance('no_class_name')
+        self.assertTrue(isinstance(inst, Settings))
+        self.assertEqual(1.23, inst.afloat)
+        self.assertEqual(123, inst.anint)
+        self.assertEqual('some string', inst.astr)
+        self.assertEqual([1, 2, 3], inst.anarray)
+        sh = ("""{"afloat": 1.23, "anint": 123, "astr": "some string", """ +
+              """"anarray": [1, 2, 3]}""")
+        self.assertEqual(sh, inst.asjson())

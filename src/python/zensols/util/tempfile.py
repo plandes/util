@@ -22,16 +22,18 @@ class TemporaryFileName(object):
         """Initialize with file system data.
 
         :param directory: the parent directory of the generated file
+
         :param file_fmt: a file format that substitutes ``name`` for the create
                          temporary file name; defaults to ``{name}``
+
         :param create: if ``True``, create ``directory`` if it doesn't exist
+
         :param remove: if ``True``, remove tracked generated file names if they
                        exist
 
         :see tempfile:
 
         """
-
         if directory is None:
             self.directory = Path(tf._get_default_tempdir())
         else:

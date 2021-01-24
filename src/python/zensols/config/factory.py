@@ -5,7 +5,7 @@ objects and files.
 __author__ = 'Paul Landes'
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Type
+from typing import Dict, Any
 from enum import Enum
 import types
 import logging
@@ -262,8 +262,12 @@ class ConfigFactory(object):
             raise e
         class_name = params.get('class_name')
         if class_name is None:
-            raise ValueError(f'no class_name parameter for \'{name}\'')
-        del params['class_name']
+            if len(params) == 0:
+                raise ValueError(f'no such entry: \'{name}\'')
+            else:
+                class_name = 'zensols.config.Settings'
+        else:
+            del params['class_name']
         return class_name, params
 
     def _has_init_parameter(self, cls, param_name):

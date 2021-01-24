@@ -5,12 +5,13 @@ __author__ = 'Paul Landes'
 
 from typing import Dict, Union, Any, Set, Tuple
 from dataclasses import dataclass, field
+import logging
 from pprint import pprint
 import sys
 import json
 from json import JSONEncoder
 from itertools import chain
-import logging
+from io import TextIOBase
 import re
 import pkg_resources
 from pathlib import Path
@@ -34,21 +35,35 @@ def as_python_object(dct: Dict[str, str]):
 
 
 class Settings(object):
-    """A default object used to populate in ``Configurable.populate``.
+    """A default object used to populate in :meth:`.Configurable.populate` and
+    :meth:`.ConfigFactory.instance`.
 
     """
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+    def asdict(self) -> Dict[str, Any]:
+        return self.__dict__
+
+    def asjson(self, *args, **kwargs) -> str:
+        return json.dumps(self.__dict__, *args, **kwargs)
+
     def __str__(self):
         return str(self.__dict__)
 
     def __repr__(self):
         return self.__str__()
 
-    def write(self, writer=sys.stdout):
+    def write(self, writer: TextIOBase = sys.stdout):
         pprint(self.__dict__, writer)
 
 
 @dataclass
 class Serializer(object):
+    """This class is used to parse values in to Python literals and object
+    instances in configuration files.
+
+    """
     FLOAT_REGEXP = re.compile(r'^[-+]?\d*\.\d+$')
     INT_REGEXP = re.compile(r'^[-+]?[0-9]+$')
     BOOL_REGEXP = re.compile(r'^True|False')
