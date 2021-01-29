@@ -171,8 +171,17 @@ class Dictable(Writable):
         return v
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
-        super()._write_dict(self.asdict(recurse=True, readable=True),
-                            depth, writer)
+        for readable_name, name in self._get_dictable_attributes():
+            v = getattr(self, name)
+            if self._is_container(v):
+                self._write_line(f'{readable_name}:', depth, writer)
+                self._write_object(v, depth + 1, writer)
+            elif dataclasses.is_dataclass(v):
+                self._write_line(f'{readable_name}:', depth, writer)
+                self._write_dict(self._from_dataclass(v, True, True),
+                                 depth + 1, writer)
+            else:
+                self._write_key_value(readable_name, v, depth, writer)
 
     def _write_key_value(self, k: Any, v: Any, depth: int, writer: TextIOBase):
         sp = self._sp(depth)

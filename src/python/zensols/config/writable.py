@@ -141,6 +141,13 @@ class Writable(ABC):
                 self._write_line(f'i: {i}', depth, writer)
             self._write_object(v, depth + (1 if include_index else 0), writer)
 
+    def _is_container(self, v: Any) -> bool:
+        """Return whether or not ``v`` is a container object: ``dict``, ``list``,
+        ``tuple`` or a this class.
+
+        """
+        return isinstance(v, (dict, list, tuple, WRITABLE_CLASS))
+
     def _write_dict(self, data: dict, depth: int, writer: TextIOBase):
         """Write dictionary ``data`` with the correct indentation per ``depth`` to
         ``writer``.
@@ -152,7 +159,7 @@ class Writable(ABC):
             keys = sorted(keys)
         for k in keys:
             v = data[k]
-            if isinstance(v, (dict, list, tuple, WRITABLE_CLASS)):
+            if self._is_container(v):
                 writer.write(f'{sp}{k}:\n')
                 self._write_object(v, depth + 1, writer)
             else:
