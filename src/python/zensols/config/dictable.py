@@ -170,7 +170,12 @@ class Dictable(Writable):
             v = f'{type(self).__name__}({v})'
         return v
 
-    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
+    def _write_descendants(self, depth: int = 0,
+                           writer: TextIOBase = sys.stdout):
+        """Write this instance by using the :meth:`write` method on children instead of
+        writing the generated dictionary.
+
+        """
         for readable_name, name in self._get_dictable_attributes():
             v = getattr(self, name)
             if self._is_container(v):
@@ -182,6 +187,30 @@ class Dictable(Writable):
                                  depth + 1, writer)
             else:
                 self._write_key_value(readable_name, v, depth, writer)
+
+    def _write_asdict(self, depth: int = 0, writer: TextIOBase = sys.stdout):
+        """Write this instance by first creating a ``dict`` recursively using
+        :meth:`asdict`, then formatting the output.
+
+        """
+        self._write_dict(self.asdict(recurse=True, readable=True),
+                         depth, writer)
+
+    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
+        """Write this instance as either a :class:`Writable` or as a :class:`Dictable`.
+        If class attribute ``WRITE_DESCENDANTS`` is set as ``True``, then use
+        the :meth:`write` method on children instead of writing the generated
+        dictionary.  Otherwise, write this instance by first creating a
+        ``dict`` recursively using :meth:`asdict`, then formatting the output.
+
+        """
+        name = 'WRITE_DESCENDANTS'
+        if hasattr(self, name) and (getattr(self, name) is True):
+            self._write_descendants(depth, writer)
+        else:
+            self._write_asdict(depth, writer)
+        # super()._write_dict(self.asdict(recurse=True, readable=True),
+        #                     depth, writer)
 
     def _write_key_value(self, k: Any, v: Any, depth: int, writer: TextIOBase):
         sp = self._sp(depth)
