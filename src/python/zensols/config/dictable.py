@@ -23,7 +23,7 @@ class Dictable(Writable):
     :class:`dataclass`, override the :meth:`_from_dictable` method.
 
     See :meth:`write` for how a dictable writes itself as a sublcass of
-    :class:Writable.
+    :class:`.Writable`.
 
     .. document private functions
     .. automethod:: _get_dictable_attributes
@@ -203,10 +203,15 @@ class Dictable(Writable):
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         """Write this instance as either a :class:`Writable` or as a :class:`Dictable`.
-        If class attribute ``WRITABLE__DESCENDANTS`` is set as ``True``, then use
-        the :meth:`write` method on children instead of writing the generated
-        dictionary.  Otherwise, write this instance by first creating a
-        ``dict`` recursively using :meth:`asdict`, then formatting the output.
+        If class attribute ``WRITABLE__DESCENDANTS`` is set as ``True``, then
+        use the :meth:`write` method on children instead of writing the
+        generated dictionary.  Otherwise, write this instance by first creating
+        a ``dict`` recursively using :meth:`asdict`, then formatting the
+        output.
+
+        Note that this attribute will need to be set in all descendants in the
+        instance hierarchy since writing the object instance graph is done
+        recursively.
 
         """
         name = 'WRITABLE__DESCENDANTS'
