@@ -22,9 +22,14 @@ class Dictable(Writable):
     To override the default behavior of creating a dict from a
     :class:`dataclass`, override the :meth:`_from_dictable` method.
 
+    See :meth:`write` for how a dictable writes itself as a sublcass of
+    :class:Writable.
+
     .. document private functions
     .. automethod:: _get_dictable_attributes
     .. automethod:: _from_dictable
+    .. automethod:: _write_descendants
+    .. automethod:: _write_asdict
 
     """
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
@@ -198,13 +203,13 @@ class Dictable(Writable):
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         """Write this instance as either a :class:`Writable` or as a :class:`Dictable`.
-        If class attribute ``WRITE_DESCENDANTS`` is set as ``True``, then use
+        If class attribute ``WRITABLE__DESCENDANTS`` is set as ``True``, then use
         the :meth:`write` method on children instead of writing the generated
         dictionary.  Otherwise, write this instance by first creating a
         ``dict`` recursively using :meth:`asdict`, then formatting the output.
 
         """
-        name = 'WRITE_DESCENDANTS'
+        name = 'WRITABLE__DESCENDANTS'
         if hasattr(self, name) and (getattr(self, name) is True):
             self._write_descendants(depth, writer)
         else:
