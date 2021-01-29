@@ -209,8 +209,6 @@ class Dictable(Writable):
             self._write_descendants(depth, writer)
         else:
             self._write_asdict(depth, writer)
-        # super()._write_dict(self.asdict(recurse=True, readable=True),
-        #                     depth, writer)
 
     def _write_key_value(self, k: Any, v: Any, depth: int, writer: TextIOBase):
         sp = self._sp(depth)
