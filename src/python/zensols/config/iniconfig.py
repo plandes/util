@@ -170,8 +170,8 @@ class IniConfig(Configurable):
 
         :param path: a resource file (i.e. ``resources/app.conf``)
 
-        :pram copy_sections: a list of sections to copy from this to the
-                             derived configuration
+        :param copy_sections: a list of sections to copy from this to the
+                              derived configuration
 
         """
         kwargs = deepcopy(self.nascent)
