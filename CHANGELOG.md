@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- Type hints added to wrapped methods using `@persisted`.
+- `Writable` plays better with `Dictable` using `write`.
+- Anonymous object instances (using `Settings`) used for configuration with
+  given class (`class_name`) property.
+
+
 ## [1.3.1] - 2021-01-12
 ### Changed
 - Add sections support to `zensols.config.YamlConfig` and other compatibility
