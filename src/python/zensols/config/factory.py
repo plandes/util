@@ -311,7 +311,7 @@ class ConfigFactory(object):
         :param kwargs: given to the ``__init__`` method
 
         """
-        logger.info(f'new instance of {name}')
+        logger.debug(f'new instance of {name}')
         t0 = time()
         name = self.default_name if name is None else name
         logger.debug(f'creating instance of {name}')
@@ -331,8 +331,8 @@ class ConfigFactory(object):
             for k, v in params.items():
                 logger.debug(f'populating {k} -> {v} ({type(v)})')
         inst = self._instance(name, cls, *args, **params)
-        logger.info(f'created {name} instance of {cls.__name__} ' +
-                    f'in {(time() - t0):.2f}s')
+        logger.debug(f'created {name} instance of {cls.__name__} ' +
+                     f'in {(time() - t0):.2f}s')
         return inst
 
     def from_config_string(self, v: str) -> Any:

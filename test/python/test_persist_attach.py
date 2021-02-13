@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 import types
-import logging
 import unittest
 from zensols.persist import persisted, PersistedWork
 from zensols.config import (
@@ -8,8 +7,6 @@ from zensols.config import (
     IniConfig,
     RedefinedInjectionError,
 )
-
-logger = logging.getLogger(__name__)
 
 
 class Temp(object):
@@ -37,6 +34,7 @@ class Temp3(object):
 class Temp4:
     t2: Temp2
     t3: Temp3
+
 
 @dataclass
 class Temp7:

@@ -1,8 +1,5 @@
 import unittest
-import logging
 from zensols.config import StringConfig, IniConfig
-
-logger = logging.getLogger(__name__)
 
 
 class TestConfigStr(unittest.TestCase):
@@ -44,22 +41,22 @@ class TestConfigStr(unittest.TestCase):
         conf = IniConfig('test-resources/config-test-option.conf')
         conf_str = 'param1=newval,param2=p2'
         override = StringConfig(conf_str)
-        self.assertEquals('one,two,three', conf.get_option('param1'))
-        self.assertEquals('true', conf.get_option('param2'))
+        self.assertEqual('one,two,three', conf.get_option('param1'))
+        self.assertEqual('true', conf.get_option('param2'))
         conf.merge(override)
-        self.assertEquals('newval', conf.get_option('param1'))
-        self.assertEquals('p2', conf.get_option('param2'))
-        self.assertEquals('TRUE', conf.get_option('param3'))
+        self.assertEqual('newval', conf.get_option('param1'))
+        self.assertEqual('p2', conf.get_option('param2'))
+        self.assertEqual('TRUE', conf.get_option('param3'))
         self.assertEqual({'default'}, conf.sections)
 
     def test_sections_merge(self):
         conf = IniConfig('test-resources/config-test-option.conf')
         conf_str = 'param1=newval,sec1.param2=p2'
         override = StringConfig(conf_str)
-        self.assertEquals('one,two,three', conf.get_option('param1'))
-        self.assertEquals('true', conf.get_option('param2'))
+        self.assertEqual('one,two,three', conf.get_option('param1'))
+        self.assertEqual('true', conf.get_option('param2'))
         conf.merge(override)
-        self.assertEquals('newval', conf.get_option('param1'))
-        self.assertEquals('true', conf.get_option('param2'))
-        self.assertEquals('p2', conf.get_option('param2', 'sec1'))
+        self.assertEqual('newval', conf.get_option('param1'))
+        self.assertEqual('true', conf.get_option('param2'))
+        self.assertEqual('p2', conf.get_option('param2', 'sec1'))
         self.assertEqual({'default', 'sec1'}, conf.sections)

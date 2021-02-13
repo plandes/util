@@ -1,9 +1,6 @@
 import unittest
-import logging
 from configparser import NoSectionError, DuplicateSectionError
 from zensols.config import IniConfig
-
-logger = logging.getLogger(__name__)
 
 
 class TestConfig(unittest.TestCase):
@@ -52,11 +49,11 @@ class TestConfig(unittest.TestCase):
     def test_merge(self):
         conf = IniConfig('test-resources/config-test-option.conf')
         override = IniConfig('test-resources/config-test.conf')
-        self.assertEquals('one,two,three', conf.get_option('param1'))
-        self.assertEquals('true', conf.get_option('param2'))
+        self.assertEqual('one,two,three', conf.get_option('param1'))
+        self.assertEqual('true', conf.get_option('param2'))
         conf.merge(override)
-        self.assertEquals('3.14', conf.get_option('param1'))
-        self.assertEquals('true', conf.get_option('param2'))
+        self.assertEqual('3.14', conf.get_option('param1'))
+        self.assertEqual('true', conf.get_option('param2'))
 
     def test_reload(self):
         conf = IniConfig('test-resources/config-test.conf')

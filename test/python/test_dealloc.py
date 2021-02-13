@@ -1,8 +1,5 @@
-import logging
 import unittest
 from zensols.persist import Deallocatable, dealloc
-
-logger = logging.getLogger(__name__)
 
 
 class CorrectImpl(Deallocatable):

@@ -1,15 +1,9 @@
 from typing import List
 from dataclasses import dataclass, field
 import sys
-import logging
 from io import StringIO
 import unittest
 from zensols.config import Dictable
-
-logger = logging.getLogger(__name__)
-if 0:
-    logging.basicConfig(level=logging.WARN)
-    logger.setLevel(logging.DEBUG)
 
 
 @dataclass

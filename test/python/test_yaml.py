@@ -1,8 +1,5 @@
 import unittest
-import logging
 from zensols.config import YamlConfig
-
-logger = logging.getLogger(__name__)
 
 
 class TestYaml(unittest.TestCase):

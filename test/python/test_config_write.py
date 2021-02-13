@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import List, Dict
 import unittest
-import logging
 import collections
 from zensols.config import (
     IniConfig,
@@ -9,8 +8,6 @@ from zensols.config import (
     Writeback,
 )
 from zensols.persist import PersistableContainer, persisted
-
-logger = logging.getLogger(__name__)
 
 
 @dataclass

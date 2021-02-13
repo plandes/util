@@ -1,8 +1,5 @@
-import logging
 import unittest
 from zensols.persist import chunks
-
-logger = logging.getLogger(__name__)
 
 
 class TestChunker(unittest.TestCase):

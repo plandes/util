@@ -1,5 +1,4 @@
 from typing import Any, Iterable
-import logging
 import unittest
 from zensols.persist import (
     DelegateDefaults,
@@ -9,8 +8,6 @@ from zensols.persist import (
     ReadOnlyStash,
     UnionStash,
 )
-
-logger = logging.getLogger(__name__)
 
 
 class IncStash(ReadOnlyStash):

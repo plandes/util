@@ -1,10 +1,7 @@
-import logging
 import unittest
 import os
 from zensols.cli import SimpleActionCli
 from zensols.config import IniConfig
-
-logger = logging.getLogger(__name__)
 
 
 class AppTester(object):

@@ -1,5 +1,4 @@
 import unittest
-import logging
 from dataclasses import dataclass
 from pathlib import Path
 import shutil
@@ -14,8 +13,6 @@ from zensols.persist import (
     FactoryStash,
     ReadOnlyStash,
 )
-
-logger = logging.getLogger(__name__)
 
 
 class RangeStashThisMod(ReadOnlyStash):

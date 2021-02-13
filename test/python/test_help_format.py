@@ -1,12 +1,9 @@
-import logging
 import unittest
 from io import StringIO
 from zensols.cli import (
     OneConfPerActionOptionsCli,
     PrintActionsOptionParser,
 )
-
-logger = logging.getLogger(__name__)
 
 
 class AppTester(object):

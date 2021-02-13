@@ -1,6 +1,5 @@
 from typing import List, Tuple, Iterable, Any
 from dataclasses import dataclass
-import logging
 import unittest
 import shutil
 import os
@@ -9,8 +8,6 @@ from pathlib import Path
 from zensols.config import IniConfig, ImportConfigFactory
 from zensols.persist import ReadOnlyStash
 from zensols.multi import MultiProcessStash
-
-logger = logging.getLogger(__name__)
 
 
 class RangeStash(ReadOnlyStash):
@@ -50,7 +47,6 @@ class TestMultiProcessStash(unittest.TestCase):
         n_elems = 9
         self.assertEqual(RangeMultiProcessStash, type(stash))
         self.assertEqual(n_elems, stash.n)
-        print()
         self.assertEqual(3, len(stash))
         self.assertEqual({'0', '3', '6'}, set(stash.keys()))
         self.assertEqual(3, len(set(map(lambda x: x['pid'], stash.values()))))

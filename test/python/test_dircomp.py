@@ -1,7 +1,6 @@
 from dataclasses import dataclass, asdict, field, InitVar
 import random
 import collections
-import logging
 import shutil
 from pathlib import Path
 import unittest
@@ -10,8 +9,6 @@ from zensols.persist import (
     DirectoryCompositeStash,
     MissingDataKeys,
 )
-
-logger = logging.getLogger(__name__)
 
 
 class DcsTestStash(DirectoryCompositeStash):

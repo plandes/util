@@ -1,9 +1,6 @@
 import unittest
-import logging
 from pathlib import Path
 from zensols.config import IniConfig
-
-logger = logging.getLogger(__name__)
 
 
 class TestConfigPopulate(unittest.TestCase):

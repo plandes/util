@@ -1,10 +1,7 @@
-import logging
 import unittest
 import os
 from zensols.config import ExtendedInterpolationConfig
 from zensols.cli import OneConfPerActionOptionsCliEnv
-
-logger = logging.getLogger(__name__)
 
 
 class AppTester(object):

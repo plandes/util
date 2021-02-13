@@ -1,9 +1,6 @@
-import logging
 import unittest
 from time import sleep
 from zensols.util.time import time, timeout, timeprotect, TimeoutError
-
-logger = logging.getLogger(__name__)
 
 
 class TestTime(unittest.TestCase):
