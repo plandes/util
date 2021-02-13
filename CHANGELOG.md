@@ -8,16 +8,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.3.2] - 2021-02-13
+### Removed
+- Remove unused `StashMapReducer` and `FunctionStashMapReducer` since they are
+  obviated by `MultiProcessStash`.
+
 ### Added
 - Type hints added to wrapped methods using `@persisted`.
 - `Writable` plays better with `Dictable` using `write`.
 - Anonymous object instances (using `Settings`) used for configuration with
   given class (`class_name`) property.
 - Basic test case for `MultiProcessStash`.
+- Instance graphs in documentation.
 
-### Removed
-- Remove unused `StashMapReducer` and `FunctionStashMapReducer` since they are
-  obviated by `MultiProcessStash`.
+### Changed
+- Inline `dataclass` documentation and reference fixes.
 
 
 ## [1.3.1] - 2021-01-12
@@ -117,7 +122,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/plandes/util/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/plandes/util/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/plandes/util/compare/v1.2.5...v1.3.0
 [1.2.5]: https://github.com/plandes/util/compare/v1.2.4...v1.2.5
