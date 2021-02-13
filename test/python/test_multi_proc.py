@@ -49,6 +49,7 @@ class TestMultiProcessStash(unittest.TestCase):
         self.assertEqual(n_elems, stash.n)
         self.assertEqual(3, len(stash))
         self.assertEqual({'0', '3', '6'}, set(stash.keys()))
-        self.assertEqual(3, len(set(map(lambda x: x['pid'], stash.values()))))
+        pids = set(map(lambda x: x['pid'], stash.values()))
+        self.assertTrue(len(pids) > 1)
         vals = chain.from_iterable(map(lambda x: x['iset'], stash.values()))
         self.assertEqual(list(range(n_elems)), sorted(vals))
