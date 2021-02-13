@@ -1,14 +1,11 @@
 from io import StringIO
 import sys
-import unittest
 import logging
-from zensols.util import (
-    LogConfigurer,
-    Executor,
-)
+from zensols.util import LogConfigurer, Executor
+from logutil import LogTestCase, LogUtil
 
 
-class TestExecutor(unittest.TestCase):
+class TestExecutor(LogTestCase):
     def test_out_err(self):
         logger = logging.getLogger('zensols.test.exec')
         out = StringIO()

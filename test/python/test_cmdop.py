@@ -125,6 +125,7 @@ class TestCommandOpTest(unittest.TestCase):
 
     def test_missing_mandated_opt(self):
         logger.debug('test_missing_mandated_opt')
+
         class TestMissingOptCli(OneConfPerActionOptionsCli):
             def _config_logging(self, level):
                 pass

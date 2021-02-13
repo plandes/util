@@ -1,7 +1,7 @@
-import unittest
 import os
 from zensols.config import ExtendedInterpolationConfig
 from zensols.cli import OneConfPerActionOptionsCliEnv
+from logutil import LogTestCase
 
 
 class AppTester(object):
@@ -37,7 +37,7 @@ class ConfAppCommandLine(OneConfPerActionOptionsCliEnv):
             config_type=ExtendedInterpolationConfig)
 
 
-class TestActionCliEnvironment(unittest.TestCase):
+class TestActionCliEnvironment(LogTestCase):
     def setUp(self):
         global current_test, good_val
         current_test = self
