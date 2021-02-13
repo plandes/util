@@ -93,7 +93,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
     stash is typically created by a
     :class:`zensols.config.factory.ImportConfigFactory` in the child process.
     Work is chunked (grouped) and then sent to child processes.  In each, a new
-    instance of this same stash is created using the ``ImportConfigFactory``
+    instance of this same stash is created using :class:`.ImportConfigFactory`
     and then an abstract method is called to dump the data.
 
     This implemetation of :meth:`prime` is to fork processes to accomplish the
@@ -112,7 +112,14 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
 
     """
     ATTR_EXP_META = ('chunk_size', 'workers')
-    name: str
+
+    config: Configurable = field()
+    """The application configuration meant to be populated by
+    :class:`zensols.config.factory.ImportClassFactory`."""
+
+    name: str = field()
+    """The name of the instance in the configuration."""
+
     chunk_size: int = field()
     """The size of each group of data sent to the child process to be handled;
     in some cases the child process will get a chunk of data smaller than this
@@ -137,7 +144,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         self.is_child = False
 
     @abstractmethod
-    def _create_data(self) -> Union[List[Any], Iterable[Any]]:
+    def _create_data(self) -> Iterable[Any]:
         """Create data in the parent process to be processed in the child process(es)
         in chunks.
 

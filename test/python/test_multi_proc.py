@@ -1,7 +1,14 @@
+from typing import List, Tuple, Iterable, Any
+from dataclasses import dataclass
 import logging
 import unittest
+import shutil
+import os
+from itertools import chain
+from pathlib import Path
+from zensols.config import IniConfig, ImportConfigFactory
 from zensols.persist import ReadOnlyStash
-from zensols.multi import StashMapReducer, FunctionStashMapReducer
+from zensols.multi import MultiProcessStash
 
 logger = logging.getLogger(__name__)
 
@@ -18,43 +25,34 @@ class RangeStash(ReadOnlyStash):
         return range(self.n)
 
 
-class IncMapReducer(StashMapReducer):
-    def _map(self, id: str, val):
-        return val + 1
+@dataclass
+class RangeMultiProcessStash(MultiProcessStash):
+    n: int
+
+    def _create_data(self) -> Iterable[Any]:
+        return range(self.n)
+
+    def _process(self, chunk: List[Any]) -> Iterable[Tuple[str, Any]]:
+        iset: List[int] = chunk
+        yield (str(min(iset)), {'pid': os.getpid(), 'iset': iset})
 
 
-class IncSumMapReducer(StashMapReducer):
-    def _map(self, id: str, val):
-        return val + 1
+class TestMultiProcessStash(unittest.TestCase):
+    def setUp(self):
+        self.conf = IniConfig('test-resources/test-multi.conf')
+        self.fac = ImportConfigFactory(self.conf)
+        self.target_path = Path('target')
+        if self.target_path.exists():
+            shutil.rmtree(self.target_path)
 
-    def _reduce(self, vals):
-        return sum(vals)
-
-
-def inc2(id, val):
-    return val + 2
-
-
-class TestMultiProc(unittest.TestCase):
-    def test_key_group_size(self):
-        mp = StashMapReducer(RangeStash(10), 2)
-        self.assertEqual(5, mp.key_group_size)
-        mp = StashMapReducer(RangeStash(10), 3)
-        self.assertEqual(4, mp.key_group_size)
-        mp = StashMapReducer(RangeStash(10), 1)
-        self.assertEqual(10, mp.key_group_size)
-        mp = StashMapReducer(RangeStash(10), 20)
-        self.assertEqual(1, mp.key_group_size)
-        mp = StashMapReducer(RangeStash(10), 100)
-        self.assertEqual(1, mp.key_group_size)
-
-    def test_multi_proc(self):
-        mp = IncMapReducer(RangeStash(10), 2)
-        self.assertEqual(((1, 2, 3, 4, 5), (6, 7, 8, 9, 10)), tuple(mp()))
-        mp = IncSumMapReducer(RangeStash(10), 2)
-        self.assertEqual((15, 40), tuple(mp()))
-
-    def test_func(self):
-        stash = RangeStash(10)
-        dat = FunctionStashMapReducer.map_func(stash, func=inc2, n_workers=2)
-        self.assertEqual(((2, 3, 4, 5, 6), (7, 8, 9, 10, 11)), tuple(dat))
+    def test_range(self):
+        stash = self.fac('range_multi')
+        n_elems = 9
+        self.assertEqual(RangeMultiProcessStash, type(stash))
+        self.assertEqual(n_elems, stash.n)
+        print()
+        self.assertEqual(3, len(stash))
+        self.assertEqual({'0', '3', '6'}, set(stash.keys()))
+        self.assertEqual(3, len(set(map(lambda x: x['pid'], stash.values()))))
+        vals = chain.from_iterable(map(lambda x: x['iset'], stash.values()))
+        self.assertEqual(list(range(n_elems)), sorted(vals))

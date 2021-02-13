@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `Writable` plays better with `Dictable` using `write`.
 - Anonymous object instances (using `Settings`) used for configuration with
   given class (`class_name`) property.
+- Basic test case for `MultiProcessStash`.
+
+### Removed
+- Remove unused `StashMapReducer` and `FunctionStashMapReducer` since they are
+  obviated by `MultiProcessStash`.
 
 
 ## [1.3.1] - 2021-01-12
