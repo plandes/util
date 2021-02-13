@@ -21,27 +21,35 @@ class Executor(object):
     default, or background.  If the later, a process object is returned from
     :py:meth:`run`.
 
-    :param logger: the client logger used to log output of the process
+    """
+    logger: Logger = field()
+    """The client logger used to log output of the process."""
 
-    :param dry_run: if ``True`` do not do anything, just log as if it were to
-                    act/do something
-
-    :param check_exit_value: compare and raise an exception if the exit value
-                             of the process is not this number, or ``None`` to
-                             not check
-
-    :param timeout: the wait timeout in :meth:`wait`
-
-    :param async_proc: if ``True``, return a process from :meth:`run`, which
-                       calls :meth:`wait`
+    dry_run: bool = field(default=False)
+    """If ``True`` do not do anything, just log as if it were to act/do
+    something.
 
     """
-    logger: Logger
-    dry_run: bool = field(default=False)
+
     check_exit_value: int = field(default=0)
+    """Compare and raise an exception if the exit value of the process is not
+    this number, or ``None`` to not check.
+
+    """
+
     timeout: int = field(default=None)
+    """The wait timeout in :meth:`wait`."""
+
     async_proc: bool = field(default=False)
+    """If ``True``, return a process from :meth:`run`, which calls
+    :meth:`wait`.
+
+    """
+
     working_dir: Path = field(default=None)
+    """Used as the `cwd` when creating :class:`.Popen`.
+
+    """
 
     def run(self, cmd) -> Union[Popen, int, type(None)]:
         if logger.isEnabledFor(logging.INFO):

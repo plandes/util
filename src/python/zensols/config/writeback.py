@@ -38,17 +38,19 @@ class Writeback(FactoryStateObserver, Dictable):
     state (any such as ``CREATED``) to be set on the instance.  To change
     this behavior, you will need to overide this method.
 
-    :param name: the name of the section given in the configuration
-
-    :param config: the *backing configuration*, which is the configuration from
-                   whince this object instance was defined
-
     """
     DEFAULT_SKIP_ATTRIBUTES = set([ConfigFactory.NAME_ATTRIBUTE,
                                    ConfigFactory.CONFIG_ATTRIBUTE,
                                    ConfigFactory.CONIFG_FACTORY_ATTRIBUTE])
-    name: str
+    name: str = field()
+    """The name of the section given in the configuration.
+
+    """
     config_factory: ConfigFactory = field(repr=False)
+    """The configuration factory that created this instance and used for
+    serialization functions.
+
+    """
 
     def _notify_state(self, state: FactoryState):
         """Called to update the object of a new state.  This is currently only called

@@ -78,6 +78,7 @@ class DictionaryClassResolver(ClassResolver):
     ``ConfigFactory``.
 
     :see: ConfigFactory.register
+
     """
     def __init__(self, instance_classes: Dict[str, type]):
         self.instance_classes = instance_classes
@@ -183,6 +184,7 @@ class ImportClassResolver(ClassResolver):
     :class:`.ConfigFactory`.
 
     :see: ConfigFactory.register
+
     """
     def __init__(self, reload: bool = False):
         self.reload = reload

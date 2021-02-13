@@ -19,13 +19,12 @@ class ShelveStash(CloseableStash):
     """Stash that uses Python's shelve library to store key/value pairs in DBM
     databases.
 
-    :param path: a file to be created to store and/or load for the
-                 data storage
-    :param writeback: the writeback parameter given to ``shelve``
-
     """
-    path: Path
+    path: Path = field()
+    """A file to be created to store and/or load for the data storage."""
+
     writeback: bool = field(default=False)
+    """The writeback parameter given to ``shelve``."""
 
     def __post_init__(self):
         self.is_open = False

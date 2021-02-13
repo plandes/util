@@ -243,7 +243,7 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
     A minimum functioning implementation needs the :py:meth:`load` and
     :py:meth:`keys` methods overriden.  Inheriting and implementing a
     :class:`.Stash` such as this is usually used as the ``factory`` in a
-    :class:`FactoryStash`.
+    :class:`.FactoryStash`.
 
     This class delegates attribute fetches to the delegate for the
     unimplemented methods and attributes using a decorator pattern when
@@ -278,7 +278,8 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
                 delegate = super().__getattribute__('delegate')
             except AttributeError:
                 raise AttributeError(
-                    f"'{self.__class__.__name__}' object has no attribute '{attr}'; delegate not set'")
+                    f"'{self.__class__.__name__}' object has no attribute " +
+                    f"'{attr}'; delegate not set'")
             return delegate.__getattribute__(attr)
         else:
             return super().__getattribute__(attr)
@@ -318,7 +319,8 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
         super().clear()
         if self.delegate is not None:
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'calling super clear on {self.delegate.__class__}')
+                logger.debug(
+                    f'calling super clear on {self.delegate.__class__}')
             self.delegate.clear()
 
     def close(self):
@@ -416,14 +418,14 @@ class PrimeableStash(Stash, Primeable):
 class FactoryStash(PreemptiveStash):
     """A stash that defers to creation of new items to another ``factory`` stash.
 
-    :param delegate: the stash used for persistence
-    :param factory: the stash used to create using ``load`` and ``keys``
-
     """
     ATTR_EXP_META = ('enable_preemptive',)
 
-    factory: Stash
+    factory: Stash = field()
+    """The stash used to create using ``load`` and ``keys``."""
+
     enable_preemptive: bool = field(default=True)
+    """If ``False``, do not invoke the super class's data calculation."""
 
     def _calculate_has_data(self) -> bool:
         if self.enable_preemptive:

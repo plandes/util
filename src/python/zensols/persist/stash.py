@@ -104,6 +104,7 @@ class DictionaryStash(Stash):
 
     """
     _data: dict = field(default_factory=dict)
+    """The backing dictionary for the stash data."""
 
     @property
     def data(self):
@@ -139,13 +140,9 @@ class DictionaryStash(Stash):
 class CacheStash(DelegateStash):
     """Provide a dictionary based caching based stash.
 
-    :param delegate: the underlying persistence stash
-    :param cache_stash: a stash used for caching (defaults to
-                        :class:`.DictionaryStash`)
-
-
     """
     cache_stash: Stash = field(default_factory=lambda: DictionaryStash())
+    """A stash used for caching (defaults to :class:`.DictionaryStash`)."""
 
     def load(self, name: str):
         if self.cache_stash.exists(name):
@@ -175,16 +172,17 @@ class DirectoryStash(Stash):
     """Creates a pickled data file with a file name in a directory with a given
     pattern across all instances.
 
-    :param path: the directory of where to store the files
-
-    :param pattern: the file name portion with ``name`` populating to the
-                    key of the data value
-
     """
     ATTR_EXP_META = ('path', 'pattern')
 
-    path: Path
+    path: Path = field()
+    """The directory of where to store the files."""
+
     pattern: str = field(default='{name}.dat')
+    """The file name portion with ``name`` populating to the key of the data
+    value.
+
+    """
 
     def __post_init__(self):
         if not isinstance(self.path, Path):
@@ -263,6 +261,7 @@ class IncrementKeyDirectoryStash(DirectoryStash):
 
     """
     name: InitVar[str] = field(default='data')
+    """The name of the :obj:`pattern` to use in the super class."""
 
     def __post_init__(self, name: str):
         super().__post_init__()
@@ -325,7 +324,8 @@ class UnionStash(ReadOnlyStash):
     """A stash joins the data of many other stashes.
 
     """
-    stashes: Tuple[Stash]
+    stashes: Tuple[Stash] = field()
+    """The delegate constituent stashes used for each operation."""
 
     def load(self, name: str) -> Any:
         item = None

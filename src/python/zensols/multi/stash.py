@@ -4,7 +4,7 @@
 __author__ = 'Paul Landes'
 
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Iterable, List, Any, Tuple, Callable, Union
 import os
 import logging
@@ -29,21 +29,23 @@ logger = logging.getLogger(__name__)
 class ChunkProcessor(object):
     """Represents a chunk of work created by the parent and processed on the child.
 
-    :param config: the application context configuration used to create the
-                   parent stash
-
-    :param name: the name of the parent stash used to create the chunk, and
-                 subsequently process this chunk
-
-    :param chunk_id: the nth chunk
-
-    :param data: the data created by the parent to be processed
+    """
+    config: Configurable = field()
+    """The application context configuration used to create the parent stash.
 
     """
-    config: Configurable
-    name: str
-    chunk_id: int
-    data: object
+
+    name: str = field()
+    """The name of the parent stash used to create the chunk, and subsequently
+    process this chunk.
+
+    """
+
+    chunk_id: int = field()
+    """The nth chunk."""
+
+    data: object = field()
+    """The data created by the parent to be processed."""
 
     def _create_stash(self):
         fac = ImportConfigFactory(self.config)
@@ -100,20 +102,6 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
     The :meth:`_create_data` and :meth:`_process` methods must be
     implemented.
 
-    :param chunk_size: the size of each group of data sent to the child process
-                       to be handled; in some cases the child process will get
-                       a chunk of data smaller than this (the last) but never
-                       more; if this number is 0, then evenly divide the work
-                       so that each worker takes the largets amount of work to
-                       minimize the number of chunks (in this case the data is
-                       tupleized)
-
-    :param workers: the number of processes spawned to accomplish the work; if
-                    this is a negative number, add the number of CPU
-                    processors with this number, so -1 would result in one
-                    fewer works utilized than the number of CPUs, which is a
-                    good policy for a busy server.
-
     .. document private functions
     .. automethod:: _create_data
     .. automethod:: _process
@@ -125,8 +113,22 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
     """
     ATTR_EXP_META = ('chunk_size', 'workers')
     name: str
-    chunk_size: int
-    workers: int
+    chunk_size: int = field()
+    """The size of each group of data sent to the child process to be handled;
+    in some cases the child process will get a chunk of data smaller than this
+    (the last) but never more; if this number is 0, then evenly divide the work
+    so that each worker takes the largets amount of work to minimize the number
+    of chunks (in this case the data is tupleized).
+
+    """
+
+    workers: int = field()
+    """The number of processes spawned to accomplish the work; if this is a
+    negative number, add the number of CPU processors with this number, so -1
+    would result in one fewer works utilized than the number of CPUs, which is
+    a good policy for a busy server.
+
+    """
 
     def __post_init__(self):
         super().__post_init__()
