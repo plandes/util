@@ -73,7 +73,6 @@ class ChunkProcessor(object):
                 cnt += 1
         Deallocatable._try_deallocate(stash)
         Deallocatable._try_deallocate(factory)
-        #gc.collect()
         return cnt
 
     def __str__(self):
