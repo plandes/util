@@ -3,5 +3,4 @@
 """
 __author__ = 'Paul Landes'
 
-from .reducer import *
 from .stash import *
