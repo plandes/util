@@ -9,9 +9,7 @@ import sys
 from io import StringIO
 from itertools import chain
 from collections import ChainMap
-from configparser import (
-    ConfigParser, ExtendedInterpolation,
-    InterpolationMissingOptionError)
+from configparser import ConfigParser, ExtendedInterpolation
 from . import ConfigurableError, Configurable, IniConfig, ClassImporter
 
 logger = logging.getLogger(__name__)
@@ -23,7 +21,8 @@ class _ParserAdapter(object):
 
     def get(self, section: str, option: str, *args, **kwags):
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'get ({type(self.conf).__name__}): {section}:{option}')
+            logger.debug(
+                f'get ({type(self.conf).__name__}): {section}:{option}')
         return self.conf.get_option(option, section)
 
     def optionxform(self, option: str) -> str:
