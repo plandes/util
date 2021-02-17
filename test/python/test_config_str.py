@@ -20,7 +20,7 @@ class TestConfigStr(unittest.TestCase):
         conf_str = 'param1=3.14,param2=cool'
         conf = StringConfig(conf_str)
         self.assertEqual({'param1': '3.14', 'param2': 'cool'},
-                         conf.get_options(section='default'))
+                         conf.get_options())
         self.assertEqual({'default'}, conf.sections)
 
     def test_section(self):

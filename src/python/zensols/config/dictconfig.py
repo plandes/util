@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Set, Any
+from typing import Dict, Set
 from dataclasses import dataclass
 import logging
 from . import ConfigurableError, Configurable
@@ -13,32 +13,33 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class DictionaryConfig(Configurable):
-    """This is a simple implementation of a dictionary backing configuration.
+    """This is a simple implementation of a dictionary backing configuration.  The
+    provided configuration is just a two level dictionary.  The top level keys
+    are the section and the values are a single depth dictionary with string
+    keys and values.
 
     """
     def __init__(self, config: Dict[str, Dict[str, str]],
-                 default_expect: bool = True,
-                 default_section: str = 'default',
-                 default_vars: Dict[str, str] = None):
+                 expect: bool = True, default_section: str = None):
         """Initialize.
 
-        :param default_section: default section (defaults to `default`)
+        :param config: configures this instance (see class docs)
 
-        :param default_vars: use with existing configuration is not found
+        :param expect: whether or not to raise an error when missing
+                       options for all ``get_option*`` methods
 
-        :param default_expect: if ``True``, raise exceptions when keys and/or
-                               sections are not found in the configuration
+        :param default_section: used as the default section when non given on
+                                the get methds such as :meth:`get_option`
 
         """
-        super().__init__(default_expect, default_section, default_vars)
+        super().__init__(expect, default_section)
         if config is not None:
             self._dict_config = config
 
     def _get_config(self) -> Dict[str, Dict[str, str]]:
         return self._dict_config
 
-    def get_options(self, section: str = None, opt_keys: Set[str] = None,
-                    vars: Dict[str, str] = None) -> Dict[str, str]:
+    def get_options(self, section: str = None) -> Dict[str, str]:
         conf = self._get_config()
         sec = conf.get(section)
         if sec is None:

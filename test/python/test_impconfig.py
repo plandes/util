@@ -51,7 +51,6 @@ class TestImportConfig(unittest.TestCase):
         self.assertEqual(should, set(conf.sections))
 
     def test_picke(self):
-        print()
         sio = StringIO()
         self.conf.write(writer=sio)
         bio = BytesIO()

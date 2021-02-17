@@ -13,7 +13,7 @@ from .dictable import *
 from .writeback import *
 from .yaml import *
 from .iniconfig import *
-from .dict import *
+from .dictconfig import *
 from .json import *
 from .importini import *
 from .envconfig import *

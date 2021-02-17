@@ -8,7 +8,7 @@ import logging
 from pathlib import Path
 import copy
 import yaml
-from zensols.config import Configurable, Dictable
+from zensols.config import ConfigurableError, Configurable, Dictable
 
 logger = logging.getLogger(__name__)
 
@@ -25,8 +25,8 @@ class YamlConfig(Configurable, Dictable):
     CLASS_VER = 0
 
     def __init__(self, config_file: Path = None,
-                 default_section: str = 'default', default_vars: str = None,
-                 delimiter: str = '$', default_expect: bool = False,
+                 default_section: str = None, default_vars: str = None,
+                 delimiter: str = '$', expect: bool = True,
                  sections_name: str = 'sections'):
         """Initialize this instance.
 
@@ -34,15 +34,11 @@ class YamlConfig(Configurable, Dictable):
 
         :param default_section: default section (defaults to `default`)
 
-        :param default_vars: used use with existing configuration is not found
-
-        
-
-        :param default_expect: if ``True``, raise exceptions when keys and/or
+        :param expect: if ``True``, raise exceptions when keys and/or
                                sections are not found in the configuration
 
         """
-        super().__init__(default_expect, default_section)
+        super().__init__(expect, default_section)
         self.config_file = config_file
         self.default_vars = default_vars if default_vars else {}
         self.delimiter = delimiter
@@ -67,8 +63,7 @@ class YamlConfig(Configurable, Dictable):
                     k = path + '.' + k if len(path) else k
                     flatten(k, v)
             else:
-                raise ValueError('unknown yaml type {}: {}'.
-                                 format(type(n), n))
+                raise ConfigurableError(f'unknown yaml type {type(n)}: {n}')
 
         with open(self.config_file) as f:
             content = f.read()
@@ -140,14 +135,14 @@ class """ + class_name + """(Template):
                 logger.debug('not found: {}'.format(name))
         return find(self.config, '', name)
 
-    def _get_option(self, name: str, expect: bool = None) -> str:
+    def _get_option(self, name: str) -> str:
         node = self.get_tree(name)
         if self._is_primitive(node):
             return node
         elif self.default_vars is not None and name in self.default_vars:
             return self.default_vars[name]
-        elif self._narrow_expect(expect):
-            raise ValueError('no such option: {}'.format(name))
+        elif self.expect:
+            raise ConfigurableError('no such option: {}'.format(name))
 
     @property
     def options(self) -> Dict[str, Any]:
@@ -155,7 +150,7 @@ class """ + class_name + """(Template):
             self.config
             self._options = {}
             for k in self._all_keys:
-                self._options[k] = self._get_option(k, expect=True)
+                self._options[k] = self._get_option(k)
         return self._options
 
     def reload(self):
@@ -163,11 +158,11 @@ class """ + class_name + """(Template):
             del self._options
             del self._all_keys
 
-    def has_option(self, name):
+    def has_option(self, name: str):
         opts = self.options
         return name in opts
 
-    def get_option(self, name, section=None, vars=None, expect=None) -> str:
+    def get_option(self, name: str, section: str = None) -> str:
         """Return an option using a dot encoded path.
 
         """
@@ -177,11 +172,11 @@ class """ + class_name + """(Template):
             ops = self.options
             if name in ops:
                 return ops[name]
-            elif self._narrow_expect(expect):
-                raise ValueError('no such option: {}'.format(name))
+            elif self.expect:
+                raise ConfigurableError(f'no such option: {name}')
 
-    def get_options(self, name='default', opt_keys=None, vars=None,
-                    expect=None) -> Dict[str, str]:
+    def get_options(self, name: str = None) -> Dict[str, str]:
+        name = self.default_section if name is None else name
         if self.default_vars and name in self.default_vars:
             return self.default_vars[name]
         else:
@@ -190,8 +185,8 @@ class """ + class_name + """(Template):
                 return node
             elif name in self.default_vars:
                 return self.default_vars[name]
-            elif self._narrow_expect(expect):
-                raise ValueError('no such option: {}'.format(name))
+            elif self.expect:
+                raise ConfigurableError(f'no such option: {name}')
 
     @property
     def root(self) -> str:

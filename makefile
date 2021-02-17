@@ -4,6 +4,6 @@
 PROJ_TYPE=	python
 PROJ_MODULES=	git python-doc python-doc-deploy
 
-#PY_SRC_TEST_PAT ?=	'test_impconfig.py'
+#PY_SRC_TEST_PAT ?=	'test_*.py'
 
 include ./zenbuild/main.mk

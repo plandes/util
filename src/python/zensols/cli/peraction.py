@@ -12,6 +12,7 @@ from pathlib import Path
 from functools import reduce
 import optparse
 from optparse import OptionParser
+from configparser import ExtendedInterpolation
 from zensols.config import IniConfig
 from . import SimpleActionCli
 
@@ -221,9 +222,8 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug('finished config parser')
 
-    def _create_config(self, conf_file, default_vars):
-        return self.config_type(
-            config_file=conf_file, default_vars=default_vars)
+    def _create_config(self, conf_file):
+        return self.config_type(config_file=conf_file)
 
     def _get_default_config(self, params):
         return super().get_config(params)
@@ -252,9 +252,9 @@ class OneConfPerActionOptionsCli(PerActionOptionsCli):
                 good_keys = filter(lambda x: params[x] is not None,
                                    params.keys())
                 defaults = {k: str(params[k]) for k in good_keys}
-                logger.debug('defaults: %s' % defaults)
-                conf = self._create_config(conf_file, defaults)
-                logger.debug('created config: %s' % conf)
+                conf = self._create_config(conf_file)
+                for k, v in defaults.items():
+                    conf.set_option(k, v)
         if conf is None:
             conf = self._get_default_config(params)
         logger.debug('returning config: %s' % conf)
@@ -299,14 +299,23 @@ class OneConfPerActionOptionsCliEnv(OneConfPerActionOptionsCli):
             self.default_config_file = cfile
         self.no_os_environ = no_os_environ
 
-    def _create_config(self, conf_file, default_vars):
+    def _create_config(self, conf_file):
+        conf = super()._create_config(conf_file)
         defs = {}
-        defs.update(default_vars)
         if not self.no_os_environ:
             logger.debug(f'adding environment to config: {os.environ}')
-            defs.update(os.environ)
+            if isinstance(conf, IniConfig) and \
+               isinstance(conf.parser._interpolation, ExtendedInterpolation):
+                env = {}
+                for k, v in os.environ.items():
+                    env[k] = v.replace('$', '$$')
+            else:
+                env = os.environ
+            defs.update(env)
         logger.debug('creating with conf_file: {}'.format(conf_file))
-        return super()._create_config(conf_file, defs)
+        for k, v in defs.items():
+            conf.set_option(k, v)
+        return conf
 
     def _find_conf_file(self, conf, params):
         if logger.isEnabledFor(logging.DEBUG):

@@ -9,7 +9,7 @@ import logging
 import re
 import collections
 from zensols.persist import persisted
-from . import Configurable
+from . import Configurable, ConfigurableError
 
 logger = logging.getLogger(__name__)
 
@@ -24,19 +24,23 @@ class StringConfig(Configurable):
     KEY_VAL_REGEX = re.compile(r'^(?:([^.]+?)\.)?([^=]+?)=(.+)$')
 
     def __init__(self, config_str: str, option_sep: str = ',',
-                 default_section: str = 'default',
-                 default_expect: bool = False):
+                 expect: bool = True, default_section: str = None):
         """Initialize with a string given as described in the class docs.
 
         :param config_str: the configuration
 
         :param option_sep: the string used to delimit the section 
+
+        :param expect: whether or not to raise an error when missing
+                       options for all ``get_option*`` methods
+
+        :param default_section: used as the default section when non given on
+                                the get methds such as :meth:`get_option`
+
         """
-        super().__init__(default_expect)
+        super().__init__(expect, default_section)
         self.config_str = config_str
         self.option_sep = option_sep
-        self.default_section = default_section
-        self.default_expect = default_expect
 
     @persisted('_parsed_config')
     def _get_parsed_config(self) -> Dict[str, str]:
@@ -64,15 +68,11 @@ class StringConfig(Configurable):
         section = self.default_section if section is None else section
         return self._get_parsed_config(section)[name]
 
-    def get_options(self, section: str = None, opt_keys: Set[str] = None,
-                    vars: Dict[str, str] = None) -> Dict[str, str]:
+    def get_options(self, section: str = None) -> Dict[str, str]:
         section = self.default_section if section is None else section
         opts = self._get_parsed_config()[section]
-        if opt_keys is None:
-            opt_keys = opts.keys()
-        else:
-            opt_keys = opt_keys & set(opts.keys())
-        opts = {k: opts[k] for k in opt_keys}
+        if opts is None and self.expect:
+            raise ConfigurableError(f'no section: {section}')
         return opts
 
     def __str__(self) -> str:

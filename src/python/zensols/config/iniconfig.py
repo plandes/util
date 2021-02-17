@@ -23,21 +23,18 @@ class IniConfig(Configurable):
 
     """
     def __init__(self, config_file: Path = None,
-                 default_section: str = 'default', robust: bool = False,
-                 default_vars: Dict[str, str] = None,
-                 default_expect: bool = False, create_defaults: bool = None):
+                 default_section: str = None, robust: bool = False,
+                 expect: bool = True, create_defaults: bool = None):
         """Create with a configuration file path.
 
         :param config_file: the configuration file path to read from
 
         :param default_section: default section (defaults to `default`)
 
-        :param default_vars: use with existing configuration is not found
-
         :param robust: if `True`, then don't raise an error when the
                        configuration file is missing
 
-        :param default_expect: if ``True``, raise exceptions when keys and/or
+        :param expect: if ``True``, raise exceptions when keys and/or
                                sections are not found in the configuration
 
         :param create_defaults: used to initialize the configuration parser,
@@ -45,19 +42,15 @@ class IniConfig(Configurable):
                                 baked in to the configuration file
         """
 
-        super().__init__(default_expect, default_section)
+        super().__init__(expect, default_section)
         if isinstance(config_file, str):
             self.config_file = Path(config_file).expanduser()
         else:
             self.config_file = config_file
         self.robust = robust
-        self.default_vars = self._munge_default_vars(default_vars)
         self.create_defaults = self._munge_create_defaults(create_defaults)
         self.nascent = deepcopy(self.__dict__)
         self._cached_sections = {}
-
-    def _munge_default_vars(self, vars):
-        return vars
 
     def _munge_create_defaults(self, vars):
         return vars
@@ -116,33 +109,37 @@ class IniConfig(Configurable):
         section = self.default_section if section is None else section
         conf = self.parser
         if conf.has_section(section):
-            opts = self.get_options(section, opt_keys=[name])
-            return opts is not None and name in opts
+            return conf.has_option(section, name)
         else:
             return False
 
-    def get_options(self, section: str = None, opt_keys: Set[str] = None,
-                    vars: Dict[str, str] = None) -> Dict[str, str]:
+    def get_options(self, section: str = None) -> Dict[str, str]:
+        opts = None
         section = self.default_section if section is None else section
-        vars = vars if vars else self.default_vars
         conf = self.parser
-        opts = {}
-        if opt_keys is None:
-            if conf is None:
-                opt_keys = {}
-            else:
-                if not self.robust or conf.has_section(section):
-                    opt_keys = conf.options(section)
-                else:
-                    opt_keys = {}
-        else:
-            logger.debug('conf: %s' % conf)
-            copts = conf.options(section) if conf else {}
-            opt_keys = set(opt_keys).intersection(set(copts))
-        for option in opt_keys:
-            logger.debug(f'option: {option}, vars: {vars}')
-            opts[option] = conf.get(section, option, vars=vars)
+        if conf is None:
+            if not self.robust:
+                raise ConfigurableError('no configuration given')
+        elif conf.has_section(section):
+            opts = {k: conf.get(section, k) for k in conf.options(section)}
+        if opts is None:
+            if (not self.robust) and self.expect:
+                raise ConfigurableError(f'no section: {section}')
+            opts = {}
         return opts
+
+    def get_option(self, name: str, section: str = None) -> str:
+        section = self.default_section if section is None else section
+        conf = self.parser
+        opt = None
+        if conf is None:
+            if not self.robust:
+                raise ConfigurableError('no configuration given')
+        elif conf.has_option(section, name):
+            opt = conf.get(section, name)
+        if opt is None and self.expect and (not self.robust):
+            raise ConfigurableError('no option: {section}:{name}')
+        return opt
 
     @property
     def sections(self) -> Set[str]:
@@ -210,8 +207,6 @@ class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
 
     def __init__(self, *args, remove_vars: List[str] = None,
                  env: dict = None, env_sec: str = 'env', **kwargs):
-        if 'default_expect' not in kwargs:
-            kwargs['default_expect'] = True
         self.remove_vars = remove_vars
         if env is None:
             self.env = os.environ

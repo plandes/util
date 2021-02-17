@@ -1,6 +1,6 @@
 import unittest
 from configparser import NoSectionError, DuplicateSectionError
-from zensols.config import IniConfig
+from zensols.config import ConfigurableError, IniConfig
 
 
 class TestConfig(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestConfig(unittest.TestCase):
             conf = IniConfig('test-resources/config-test-nodef.conf')
             opts = conf.options
 
-        self.assertRaises(NoSectionError, run_conf_create)
+        self.assertRaises(ConfigurableError, run_conf_create)
 
     def test_no_default(self):
         conf = IniConfig('test-resources/config-test-nodef.conf', robust=True)
@@ -29,7 +29,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual("file: test-resources/config-test.conf, section: {'default'}", s)
 
     def test_list_parse(self):
-        conf = IniConfig('test-resources/config-test-option.conf')
+        conf = IniConfig('test-resources/config-test-option.conf', expect=False)
         self.assertEqual(['one', 'two', 'three'],
                          conf.get_option_list('param1'))
         self.assertEqual(True, conf.get_option_boolean('param2'))

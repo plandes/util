@@ -76,8 +76,7 @@ class _StringIniConfig(IniConfig):
     """
     def __init__(self, config: str, parent: IniConfig,
                  children: Tuple[Configurable]):
-        super().__init__(
-            parent.default_expect, parent.default_section, parent.default_vars)
+        super().__init__(None, parent.default_section, parent.expect)
         self.config = config
         self.children = [parent] + list(children)
         for c in children:
@@ -116,8 +115,6 @@ class ImportIniConfig(IniConfig):
                  exclude_config_sections: bool = True,
                  children: Tuple[Configurable] = (),
                  **kwargs):
-        if 'default_expect' not in kwargs:
-            kwargs['default_expect'] = True
         super().__init__(*args, **kwargs)
         self.config_section = config_section
         self.exclude_config_sections = exclude_config_sections
@@ -132,7 +129,7 @@ class ImportIniConfig(IniConfig):
 
     def _get_bootstrap_parser(self):
         conf_sec = self.config_section
-        parser = IniConfig(self.config_file, default_expect=True)
+        parser = IniConfig(self.config_file)
         secs = set(parser.get_option_list(self.SECTIONS_SECTION, conf_sec))
         if parser.has_option(self.REFS_SECTION, conf_sec):
             csecs = parser.get_option_list(self.REFS_SECTION, conf_sec)

@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Set, Iterable
+from typing import Dict, Set, Iterable, List, Any, Union
 from abc import ABCMeta, abstractmethod
 import logging
 from pathlib import Path
@@ -12,7 +12,7 @@ import sys
 import re
 from io import TextIOBase
 import inspect
-from . import Serializer, Writable
+from . import Serializer, Writable, Settings
 
 logger = logging.getLogger(__name__)
 
@@ -29,60 +29,30 @@ class Configurable(Writable, metaclass=ABCMeta):
     However, they are reimplemented here for consistency among parser.
 
     """
-    def __init__(self, default_expect: bool, default_section: str = 'default',
-                 default_vars: Dict[str, str] = None):
+    def __init__(self, expect: bool = True, default_section: str = None):
         """Initialize.
 
-        :param default_expect: whether or not to raise an error when missing
-                               options for all ``get_option*`` methods
+        :param expect: whether or not to raise an error when missing
+                       options for all ``get_option*`` methods
+
+        :param default_section: used as the default section when non given on
+                                the get methds such as :meth:`get_option`
 
         """
-        self.default_expect = default_expect
-        self.default_section = default_section
-        self.default_vars = default_vars
+        self.expect = expect
+        if default_section is None:
+            self.default_section = 'default'
+        else:
+            self.default_section = default_section
         self.serializer = Serializer()
 
-    def _narrow_expect(self, expect):
-        if expect is None:
-            expect = self.default_expect
-        return expect
-
-    def get_option(self, name, section=None, vars=None, expect=None) -> str:
-        """Return an option from ``section`` with ``name``.
-
-        :param section: section in the ini file to fetch the value; defaults to
-                        constructor's ``default_section``
-
-        :param vars: contains the defaults for missing values of ``name``
-
-        :param expect: if ``True`` raise an exception if the value does not
-                       exist
-
-        """
-        vars = vars if vars else self.default_vars
-        if section is None:
-            section = self.default_section
-        opts = self.get_options(section, opt_keys=set([name]), vars=vars)
-        if opts:
-            return opts[name]
-        else:
-            if self._narrow_expect(expect):
-                raise ConfigurableError(
-                    f"no option '{name}' found in section: {section}")
-
     @abstractmethod
-    def get_options(self, section: str = None, opt_keys: Set[str] = None,
-                    vars: Dict[str, str] = None) -> Dict[str, str]:
+    def get_options(self, section: str = None) -> Dict[str, str]:
         """Get all options for a section.  If ``opt_keys`` is given return only
         options with those keys.
 
         :param section: section in the ini file to fetch the value; defaults to
                         constructor's ``default_section``
-
-        :param vars: contains the defaults for missing values of ``name``
-
-        :param expect: if ``True`` raise an exception if the value does not
-                       exist
 
         """
         pass
@@ -91,32 +61,45 @@ class Configurable(Writable, metaclass=ABCMeta):
     def has_option(self, name: str, section: str = None) -> bool:
         pass
 
-    def reload(self):
-        """Reload the configuration from the backing store.
-
-        """
-        pass
-
-    def get_option_list(self, name, section=None, vars=None,
-                        expect=None, separator=','):
-        """Just like :py:meth:`get_option` but parse as a list using ``split``.
+    def get_option(self, name: str, section: str = None) -> str:
+        """Return an option from ``section`` with ``name``.
 
         :param section: section in the ini file to fetch the value; defaults to
                         constructor's ``default_section``
 
         :param vars: contains the defaults for missing values of ``name``
 
-        :param expect: if ``True`` raise an exception if the value does not
-                       exist
+        """
+        val = None
+        opts = self.get_options(section or self.default_section)
+        if opts is not None:
+            val = opts.get(name)
+        if val is None:
+            if self.expect:
+                raise ConfigurableError(
+                    f"no option '{name}' found in section: {section}")
+        return val
+
+    def reload(self):
+        """Reload the configuration from the backing store.
 
         """
-        val = self.get_option(name, section, vars, expect)
+        pass
+
+    def get_option_list(self, name: str, section: str = None) -> List[str]:
+        """Just like :py:meth:`get_option` but parse as a list using ``split``.
+
+        :param section: section in the ini file to fetch the value; defaults to
+                        constructor's ``default_section``
+
+        """
+        val = self.get_option(name, section)
         if val is None:
             return []
         else:
             return re.split(r'\s*,\s*', val)
 
-    def get_option_boolean(self, name, section=None, vars=None, expect=None):
+    def get_option_boolean(self, name: str, section: str = None) -> bool:
         """Just like :py:meth:`get_option` but parse as a boolean (any case `true`).
 
         :param section: section in the ini file to fetch the value; defaults to
@@ -128,73 +111,60 @@ class Configurable(Writable, metaclass=ABCMeta):
                        exist
 
         """
-        val = self.get_option(name, section, vars, expect)
+        val = self.get_option(name, section)
         val = val.lower() if val else 'false'
         return val == 'true'
 
-    def get_option_int(self, name, section=None, vars=None, expect=None):
+    def get_option_int(self, name: str, section: str = None):
         """Just like :py:meth:`get_option` but parse as an integer.
 
         :param section: section in the ini file to fetch the value; defaults to
                         constructor's ``default_section``
 
-        :param vars: contains the defaults for missing values of ``name``
-
-        :param expect: if ``True`` raise an exception if the value does not
-                       exist
-
         """
-        val = self.get_option(name, section, vars, expect)
+        val = self.get_option(name, section)
         if val:
             return int(val)
 
-    def get_option_float(self, name, section=None, vars=None, expect=None):
+    def get_option_float(self, name: str, section: str = None):
         """Just like :py:meth:`get_option` but parse as a float.
 
         """
-        val = self.get_option(name, section, vars, expect)
+        val = self.get_option(name, section)
         if val:
             return float(val)
 
-    def get_option_path(self, name, section=None, vars=None,
-                        expect=None, create=None):
+    def get_option_path(self, name: str, section: str = None):
         """Just like :py:meth:`get_option` but return a ``pathlib.Path`` object of the
         string.
 
-        :param create: if ``parent`` then create the path and all parents not
-                       including the file; if ``dir``, then create all parents;
-                       otherwise do not create anything
-
         """
-        val = self.get_option(name, section, vars, expect)
+        val = self.get_option(name, section)
         path = None
         if val is not None:
             path = Path(val)
-            if create == 'dir':
-                path.mkdir(parents=True, exist_ok=True)
-            if create == 'file':
-                path.parent.mkdir(parents=True, exist_ok=True)
         return path
 
-    def get_option_object(self, name, section=None, vars=None, expect=None):
+    def get_option_object(self, name: str, section: str = None):
         """Just like :py:meth:`get_option` but parse as an object per object syntax
         rules.
 
         :see: :py:meth:`.parse_object`
 
         """
-        val = self.get_option(name, section, vars, expect)
+        val = self.get_option(name, section)
         if val:
             return self.serializer.parse_object(val)
 
     @property
-    def options(self):
+    def options(self) -> Dict[str, str]:
         """Return all options from the default section.
 
         """
         return self.get_options()
 
-    def populate(self, obj=None, section=None, parse_types=True):
+    def populate(self, obj: Any = None, section: str = None,
+                 parse_types: bool = True) -> Union[dict, Settings]:
         """Set attributes in ``obj`` with ``setattr`` from the all values in
         ``section``.
 

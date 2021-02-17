@@ -11,13 +11,11 @@ class TestYaml(unittest.TestCase):
         single_op = conf.get_option('project.template-directory.default')
         self.assertEqual('make-proj', single_op)
         self.assertEqual('Zensol Python Project', conf.get_option(
-            'project.context.project.aval', expect=True))
+            'project.context.project.aval'))
         eqstr = 'a non-subst ${HOME} but homedir works val'
-        self.assertEqual(eqstr, conf.get_option(
-            'project.context.litval', expect=True))
+        self.assertEqual(eqstr, conf.get_option('project.context.litval'))
         eqlist = ['apple', 'banana', 'nlparse orange']
-        self.assertEqual(eqlist, conf.get_option(
-            'project.fruit', expect=True))
+        self.assertEqual(eqlist, conf.get_option('project.fruit'))
 
     def test_yaml_ops(self):
         ops = {'HOME': 'homedir',
