@@ -96,8 +96,12 @@ class ImportIniConfig(IniConfig):
          :class:`~configparser.ExtendedInterpolation`.
 
     """
+    IMPORT_SECTION = 'import'
+    SECTIONS_SECTION = 'sections'
+    REFS_SECTION = 'references'
+
     def __init__(self, *args,
-                 config_section: str = 'config',
+                 config_section: str = IMPORT_SECTION,
                  exclude_config_sections: bool = False,
                  **kwargs):
         if 'default_expect' not in kwargs:
@@ -116,9 +120,9 @@ class ImportIniConfig(IniConfig):
     def _get_bootstrap_parser(self):
         conf_sec = self.config_section
         parser = IniConfig(self.config_file, default_expect=True)
-        secs = set(parser.get_option_list('imports', conf_sec))
-        if parser.has_option('sections', conf_sec):
-            csecs = parser.get_option_list('sections', conf_sec)
+        secs = set(parser.get_option_list(self.SECTIONS_SECTION, conf_sec))
+        if parser.has_option(self.REFS_SECTION, conf_sec):
+            csecs = parser.get_option_list(self.REFS_SECTION, conf_sec)
             secs.update(set(csecs))
         secs.add(conf_sec)
         to_remove = set(parser.sections) - secs
@@ -138,8 +142,9 @@ class ImportIniConfig(IniConfig):
         parser = self._get_bootstrap_parser()
         children: List[Configurable] = parser.children
         conf_secs = [conf_sec]
-        for sec in parser.get_option_list('imports', conf_sec):
-            #print(f'populating section {sec}, {children}')
+        for sec in parser.get_option_list(self.SECTIONS_SECTION, conf_sec):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'populating section {sec}, {children}')
             conf_secs.append(sec)
             params = parser.populate(section=sec).asdict()
             class_name = params.get('class_name')
