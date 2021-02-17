@@ -4,7 +4,7 @@ parsed from files.
 """
 __author__ = 'Paul Landes'
 
-from typing import Set, Dict, List, Any
+from typing import Set, Dict, List
 from abc import ABCMeta, abstractmethod
 import logging
 import os

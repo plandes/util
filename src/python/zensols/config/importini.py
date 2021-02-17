@@ -3,48 +3,13 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Tuple, Iterable, Any
+from typing import Iterable
 import logging
 import sys
-import inspect
 from configparser import ConfigParser, ExtendedInterpolation
 from . import Configurable, IniConfig, ClassImporter
 
 logger = logging.getLogger(__name__)
-
-
-class DelegateInterpolation(ExtendedInterpolation):
-    def __init__(self, configurables: Tuple[Configurable]):
-        if configurables is None:
-            self.configurables = ()
-        else:
-            self.configurables = configurables
-
-    def _get_children(self) -> Dict[str, str]:
-        if not hasattr(self, '_children'):
-            defs = {}
-            for config in self.configurables:
-                for sec in config.sections:
-                    opts = config.get_options(sec)
-                    for k, v in opts.items():
-                        defs[f'{sec}:{k}'] = v
-            self._children = defs
-        return self._children
-
-    def before_get(self, parser: ConfigParser, section: str, option: str,
-                   value: str, defaults: Dict[str, str]):
-        print(f'getting <{option}>, <{value}>')
-        children = self._get_children()
-        print(children)
-        defaults = defaults.new_child(children)
-        if parser.has_option(section, option):
-            val = super().before_get(parser, section, option, value, defaults)
-        if val is None:
-            for par in self.configurables:
-                val = parser.get_option(option, section, expect=False)
-                if val is not None:
-                    break
-        return val
 
 
 class ImportIniConfig(IniConfig):
@@ -53,7 +18,8 @@ class ImportIniConfig(IniConfig):
     sections to load as children configuration.  Each of those indicated to
     import are processed in order by:
 
-      1. Creating the delegate child :class:`Configurable` given in the section,
+      1. Creating the delegate child :class:`Configurable` given in the
+         section,
 
       2. Copying all sections from child instance to the parent.
 
@@ -67,15 +33,6 @@ class ImportIniConfig(IniConfig):
             kwargs['default_expect'] = True
         super().__init__(*args, **kwargs)
         self.config_sec = config_sec
-
-    def _instanceX(self, cname: str) -> Any:
-        cs = tuple(
-            map(lambda x: x[1],
-                filter(lambda no: no[0] == cname and inspect.isclass(no[1]),
-                       inspect.getmembers(sys.modules[__name__]))))
-        if len(cs) != 1:
-            raise ValueError(f'no class found: {cname}')
-        return cs[0]
 
     def _mod_name(self) -> str:
         mname = sys.modules[__name__].__name__
