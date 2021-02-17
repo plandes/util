@@ -16,7 +16,7 @@ import copy as cp
 #from functools import reduce
 from time import time
 from zensols.config import Configurable
-from zensols.config import ClassImporter as ClassImporterSuper
+from zensols.config import ClassImporter as ClassImporter
 from zensols.persist import persisted, PersistedWork, Deallocatable
 
 logger = logging.getLogger(__name__)
@@ -97,87 +97,16 @@ class DictionaryClassResolver(ClassResolver):
         return cls
 
 
-class ClassImporter(ClassImporterSuper):
-    pass
-    # """Utility class that reloads a module and instantiates a class from a string
-    # class name.  This is handy for prototyping code in a Python REPL.
+class FactoryClassImporter(ClassImporter):
+    """Just like the super class, but if instances of type
+    :class:`.FactoryStateObserver` are notified with a
+    :class:`.FactoryState.CREATED`.
 
-    # """
-    # CLASS_REGEX = re.compile(r'^(.+)\.(.+?)$')
-
-    # def __init__(self, class_name: str, reload: bool = True):
-    #     """Initialize with the class name.
-
-    #     :param class_name: the fully qualifed name of the class (including the
-    #                        module portion of the class name)
-    #     :param reload: if ``True`` then reload the module before returning the
-    #                    class
-    #     """
-    #     self.class_name = class_name
-    #     self.reload = reload
-
-    # def parse_module_class(self):
-    #     """Parse the module and class name part of the fully qualifed class name.
-    #     """
-
-    #     cname = self.class_name
-    #     match = re.match(self.CLASS_REGEX, cname)
-    #     if not match:
-    #         raise ValueError(f'not a fully qualified class name: {cname}')
-    #     return match.groups()
-
-    # def get_module_class(self):
-    #     """Return the module and class as a tuple of the given class in the
-    #     initializer.
-
-    #     :param reload: if ``True`` then reload the module before returning the
-    #                    class
-
-    #     """
-    #     pkg, cname = self.parse_module_class()
-    #     logger.debug(f'pkg: {pkg}, class: {cname}')
-    #     pkg_s = pkg.split('.')
-    #     mod = reduce(lambda m, n: getattr(m, n), pkg_s[1:], __import__(pkg))
-    #     logger.debug(f'mod: {mod}, reloading: {self.reload}')
-    #     if self.reload:
-    #         logger.debug(f'reload: cls: {mod}, {cname}')
-    #         mod = importlib.reload(mod)
-    #     if not hasattr(mod, cname):
-    #         raise ValueError(f"no class '{cname}' found in module '{mod}'")
-    #     cls = getattr(mod, cname)
-    #     logger.debug(f'class: {cls}')
-    #     return mod, cls
-
-    # def instance(self, *args, **kwargs):
-    #     """Create an instance of the specified class in the initializer.
-
-    #     :param args: the arguments given to the initializer of the new class
-    #     :param kwargs: the keyword arguments given to the initializer of the
-    #                  new class
-
-    #     """
-    #     mod, cls = self.get_module_class()
-    #     try:
-    #         logger.debug(f'class importer creating instance of {cls}')
-    #         inst = cls(*args, **kwargs)
-    #         if isinstance(inst, FactoryStateObserver):
-    #             inst._notify_state(FactoryState.CREATED)
-    #     except Exception as e:
-    #         msg = f'can not instantiate {cls}({args}, {kwargs})'
-    #         logger.error(msg, e)
-    #         raise e
-    #     if logger.isEnabledFor(logging.DEBUG):
-    #         logger.debug(f'inst: {inst}')
-    #     return inst
-
-    # def set_log_level(self, level=logging.INFO):
-    #     """Convenciene method to set the log level of the module given in the
-    #     initializer of this class.
-
-    #     :param level: and instance of ``logging.<level>``
-    #     """
-    #     mod, cls = self.parse_module_class()
-    #     logging.getLogger(mod).setLevel(level)
+    """
+    def _bless(self, inst: Any) -> Any:
+        if isinstance(inst, FactoryStateObserver):
+            inst._notify_state(FactoryState.CREATED)
+        return super()._bless(inst)
 
 
 class ImportClassResolver(ClassResolver):
@@ -192,7 +121,7 @@ class ImportClassResolver(ClassResolver):
         self.reload = reload
 
     def create_class_importer(self, class_name):
-        return ClassImporter(class_name, reload=self.reload)
+        return FactoryClassImporter(class_name, reload=self.reload)
 
     def find_class(self, class_name):
         class_importer = self.create_class_importer(class_name)

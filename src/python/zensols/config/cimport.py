@@ -3,6 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
+from typing import Any
 import logging
 import importlib
 from functools import reduce
@@ -61,6 +62,19 @@ class ClassImporter(object):
         logger.debug(f'class: {cls}')
         return mod, cls
 
+    def _bless(self, inst: Any) -> Any:
+        """A template method to modify a nascent instance just created.  The returned
+        instance is the instance used.
+
+        This base class implementation just returns ``inst``.
+
+        :param inst: the instance to bless
+
+        :return: the instance to returned and used by the client
+
+        """
+        return inst
+
     def instance(self, *args, **kwargs):
         """Create an instance of the specified class in the initializer.
 
@@ -73,8 +87,7 @@ class ClassImporter(object):
         try:
             logger.debug(f'class importer creating instance of {cls}')
             inst = cls(*args, **kwargs)
-            # if isinstance(inst, FactoryStateObserver):
-            #     inst._notify_state(FactoryState.CREATED)
+            inst = self._bless(inst)
         except Exception as e:
             msg = f'can not instantiate {cls}({args}, {kwargs})'
             logger.error(msg, e)
