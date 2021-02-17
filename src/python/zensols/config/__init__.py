@@ -3,6 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
+from .cimport import *
 from .serial import *
 from .writable import *
 from .configbase import *
@@ -12,4 +13,6 @@ from .dictable import *
 from .writeback import *
 from .yaml import *
 from .iniconfig import *
+from .json import *
+from .importini import *
 from .meta import *

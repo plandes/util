@@ -1,9 +1,10 @@
+from __future__ import annotations
 """Abstract base class for a configuration read from a file.
 
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Dict, Set
+from typing import Dict, Set, Iterable
 from abc import ABCMeta, abstractmethod
 import logging
 from pathlib import Path
@@ -15,6 +16,10 @@ from . import Serializer, Writable
 logger = logging.getLogger(__name__)
 
 
+class ConfigurableError(Exception):
+    pass
+
+
 class Configurable(Writable, metaclass=ABCMeta):
     """An abstract base class that represents an application specific
     configuration.
@@ -23,7 +28,8 @@ class Configurable(Writable, metaclass=ABCMeta):
     However, they are reimplemented here for consistency among parser.
 
     """
-    def __init__(self, default_expect: bool, default_section: str = 'default'):
+    def __init__(self, default_expect: bool, default_section: str = 'default',
+                 default_vars: Dict[str, str] = None):
         """Initialize.
 
         :param default_expect: whether or not to raise an error when missing
@@ -32,6 +38,7 @@ class Configurable(Writable, metaclass=ABCMeta):
         """
         self.default_expect = default_expect
         self.default_section = default_section
+        self.default_vars = default_vars
         self.serializer = Serializer()
 
     def _narrow_expect(self, expect):
@@ -59,8 +66,8 @@ class Configurable(Writable, metaclass=ABCMeta):
             return opts[name]
         else:
             if self._narrow_expect(expect):
-                raise ValueError('no option \'{}\' found in section {}'.
-                                 format(name, section))
+                raise ConfigurableError(
+                    f"no option '{name}' found in section: {section}")
 
     @abstractmethod
     def get_options(self, section: str = None, opt_keys: Set[str] = None,
@@ -192,7 +199,8 @@ class Configurable(Writable, metaclass=ABCMeta):
         sec = self.get_options(section)
         if sec is None:
             # needed for the YamlConfig class
-            raise ValueError(f"no section from which to populate: '{section}'")
+            raise ConfigurableError(
+                f"no section from which to populate: '{section}'")
         return self.serializer.populate_state(sec, obj, parse_types)
 
     @property
@@ -202,25 +210,39 @@ class Configurable(Writable, metaclass=ABCMeta):
         """
         return ()
 
-    def copy_sections(self, to_populate: Any, sections: list):
+    def set_option(self, name: str, value: str, section: str = None):
+        """Set an option on this configurable.
+
+        :param name: the name of the option
+
+        :param value: the value to set
+
+        :param section: the section (if applies) to add the option
+
+        :raises NotImplementedError: if this class does not support this
+                                     operation
+
+        """
+        raise NotImplementedError()
+
+    def copy_sections(self, to_populate: Configurable,
+                      sections: Iterable[str] = None):
         """Copy all sections from this configuruable to ``to_populate``.
 
         :param to_populate: the target configuration object
 
-        :type to_populate: Configurable
-
         """
+        if sections is None:
+            sections = self.sections
         for sec in sections:
             for k, v in self.get_options(sec).items():
                 to_populate.set_option(k, v, sec)
 
-    def merge(self, to_populate: Any):
+    def merge(self, to_populate: Configurable):
         """Copy all data from this configuruable to ``to_populate``, and clobber any
         overlapping properties in the process.
 
         :param to_populate: the target configuration object
-
-        :type to_populate: Configurable
 
         """
         to_populate.copy_sections(self, to_populate.sections)

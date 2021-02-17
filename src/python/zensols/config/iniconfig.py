@@ -4,7 +4,7 @@ parsed from files.
 """
 __author__ = 'Paul Landes'
 
-from typing import Set, Dict, List
+from typing import Set, Dict, List, Any
 from abc import ABCMeta, abstractmethod
 import logging
 import os
@@ -12,7 +12,7 @@ from io import TextIOBase, StringIO
 from pathlib import Path
 from copy import deepcopy
 from configparser import ConfigParser, ExtendedInterpolation
-from . import Configurable
+from . import ConfigurableError, Configurable
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class IniConfig(Configurable):
     """
     def __init__(self, config_file: Path = None,
                  default_section: str = 'default', robust: bool = False,
-                 default_vars: Dict[any, any] = None,
+                 default_vars: Dict[str, str] = None,
                  default_expect: bool = False, create_defaults: bool = None):
         """Create with a configuration file path.
 
@@ -54,6 +54,7 @@ class IniConfig(Configurable):
         self.default_vars = self._munge_default_vars(default_vars)
         self.create_defaults = self._munge_create_defaults(create_defaults)
         self.nascent = deepcopy(self.__dict__)
+        self._cached_sections = {}
 
     def _munge_default_vars(self, vars):
         return vars
@@ -100,7 +101,7 @@ class IniConfig(Configurable):
                 self._conf = self._create_config_parser()
                 self._conf.read_file(writer)
             else:
-                raise OSError(f'unknown file type: {cpath}')
+                raise ConfigurableError(f'unknown file type: {cpath}')
         return self._conf
 
     def reload(self):
@@ -155,7 +156,7 @@ class IniConfig(Configurable):
             raise TypeError(f'can not serialize {section}:{name}: {e}')
         return value
 
-    def set_option(self, name, value, section=None):
+    def set_option(self, name: str, value: str, section: str = None):
         section = self.default_section if section is None else section
         value = self._format_option(name, value, section)
         if logger.isEnabledFor(logging.DEBUG):
