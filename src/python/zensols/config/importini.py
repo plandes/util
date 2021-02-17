@@ -113,7 +113,7 @@ class ImportIniConfig(IniConfig):
 
     def __init__(self, *args,
                  config_section: str = IMPORT_SECTION,
-                 exclude_config_sections: bool = False,
+                 exclude_config_sections: bool = True,
                  children: Tuple[Configurable] = (),
                  **kwargs):
         if 'default_expect' not in kwargs:
@@ -195,4 +195,5 @@ class ImportIniConfig(IniConfig):
             for sec in self._config_sections:
                 parser.remove_section(sec)
             del self._config_sections
+        del self.children
         return parser

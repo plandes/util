@@ -1,20 +1,17 @@
 import unittest
-import logging
 import os
+from io import StringIO, BytesIO
+import pickle
 from pathlib import Path
 from zensols.config import StringConfig, ImportIniConfig
-
-
-if 0:
-    logging.basicConfig(level=logging.WARN)
-    logging.getLogger('zensols.config.importini').setLevel(logging.DEBUG)
 
 
 class TestImportConfig(unittest.TestCase):
     def setUp(self):
         self.cconf = StringConfig('nasc.test_impconfig_app_root=.')
         self.conf = ImportIniConfig('test-resources/import-config-test.conf',
-                                    children=[self.cconf])
+                                    children=[self.cconf],
+                                    exclude_config_sections=False)
 
     def test_config(self):
         conf = self.conf
@@ -49,7 +46,18 @@ class TestImportConfig(unittest.TestCase):
                       'jsec_1 jsec_2 imp_env ev impref sec5 need_vars').split())
         self.assertEqual(should, set(conf.sections))
         conf = ImportIniConfig('test-resources/import-config-test.conf',
-                               exclude_config_sections=True,
                                children=[self.cconf])
         should = should - set('import import_ini1 import_a_json impref imp_env import_str2'.split())
         self.assertEqual(should, set(conf.sections))
+
+    def test_picke(self):
+        print()
+        sio = StringIO()
+        self.conf.write(writer=sio)
+        bio = BytesIO()
+        pickle.dump(self.conf, bio)
+        bio.seek(0)
+        unp = pickle.load(bio)
+        sio_unp = StringIO()
+        unp.write(writer=sio_unp)
+        self.assertEqual(sio.getvalue(), sio_unp.getvalue())
