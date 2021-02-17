@@ -23,7 +23,7 @@ class _ParserAdapter(object):
 
     def get(self, section: str, option: str, *args, **kwags):
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'get: {section}:{option}')
+            logger.debug(f'get ({type(self.conf).__name__}): {section}:{option}')
         return self.conf.get_option(option, section)
 
     def optionxform(self, option: str) -> str:
@@ -43,7 +43,7 @@ class _SharedExtendedInterpolation(ExtendedInterpolation):
     """
     def __init__(self, children: Tuple[Configurable], robust: bool = True):
         super().__init__()
-        self.children = map(_ParserAdapter, children)
+        self.children = tuple(map(_ParserAdapter, children))
         self.robust = robust
 
     def before_get(self, parser: ConfigParser, section: str, option: str,
@@ -52,12 +52,13 @@ class _SharedExtendedInterpolation(ExtendedInterpolation):
             logger.debug(f'super: section: {section}:{option}: {value}')
         res = value
         last_ex = None
-        parsers = chain.from_iterable([[parser], self.children])
+        parsers = tuple(chain.from_iterable([[parser], self.children]))
         for pa in parsers:
             try:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'inter: {pa}: {section}:{option} = {value}')
                 res = super().before_get(pa, section, option, value, defaults)
+                last_ex = None
                 break
             except Exception as e:
                 last_ex = e
@@ -80,6 +81,8 @@ class _StringIniConfig(IniConfig):
             parent.default_expect, parent.default_section, parent.default_vars)
         self.config = config
         self.children = [parent] + list(children)
+        for c in children:
+            c.copy_sections(self)
 
     def _create_and_load_parser(self) -> ConfigParser:
         parser = ConfigParser(
@@ -175,7 +178,7 @@ class ImportIniConfig(IniConfig):
             defaults=self.create_defaults,
             interpolation=ExtendedInterpolation())
         for c in children:
-            par_secs = set(parser.sections())
+            par_secs = parser.sections()
             for sec in c.sections:
                 if sec not in par_secs:
                     parser.add_section(sec)

@@ -1,6 +1,13 @@
 import unittest
+import logging
+import os
 from pathlib import Path
 from zensols.config import StringConfig, ImportIniConfig
+
+
+if 0:
+    logging.basicConfig(level=logging.WARN)
+    logging.getLogger('zensols.config.importini').setLevel(logging.DEBUG)
 
 
 class TestImportConfig(unittest.TestCase):
@@ -32,7 +39,7 @@ class TestImportConfig(unittest.TestCase):
 
     def test_config_interpolate(self):
         conf = self.conf
-        self.assertEqual('test-resources/config-write.conf',
+        self.assertEqual('./test-resources/config-write.conf',
                          conf.get_option('config_file', 'import_ini1'))
 
     def test_config_sections(self):
