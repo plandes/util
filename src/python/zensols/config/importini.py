@@ -48,6 +48,20 @@ class DelegateInterpolation(ExtendedInterpolation):
 
 
 class ImportIniConfig(IniConfig):
+    """A configuration that uses other :class:`.Configurable` classes to load other
+    sections.  A special ``config`` section is given that indicates what other
+    sections to load as children configuration.  Each of those indicated to
+    import are processed in order by:
+
+      1. Creating the delegate child :class:`Configurable` given in the section,
+
+      2. Copying all sections from child instance to the parent.
+
+      3. Variable interpolation as a function of
+         :class:`~configparser.ConfigParser` using
+         :class:`~configparser.ExtendedInterpolation`.
+
+    """
     def __init__(self, *args, config_sec: str = 'config', **kwargs):
         if 'default_expect' not in kwargs:
             kwargs['default_expect'] = True

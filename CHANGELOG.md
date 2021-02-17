@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- A new `Configurable` class that imports using other `Configurable` classes:
+  `ImportIniConfig`.
+
+### Changed
+- `ClassResolver` moved to `zensols.config` to be used by the new
+  `ImportIniConfig`.
+
+
 ## [1.3.2] - 2021-02-13
 ### Removed
 - Remove unused `StashMapReducer` and `FunctionStashMapReducer` since they are
