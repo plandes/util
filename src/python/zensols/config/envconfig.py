@@ -8,6 +8,7 @@ import logging
 import collections
 from zensols.persist import persisted
 import os
+from zensols.persist import persisted
 from . import Configurable
 
 logger = logging.getLogger(__name__)
@@ -45,14 +46,18 @@ class EnvironmentConfig(Configurable):
             conf[sec][name] = value
         return conf
 
+    @persisted('_keys')
+    def _get_keys(self) -> Dict[str, str]:
+        return self._get_parsed_config().keys()
+
     @property
     @persisted('_sections')
     def sections(self) -> Set[str]:
         return frozenset([self.default_section])
 
     def has_option(self, name: str, section: str = None) -> bool:
-        section = self.default_section if section is None else section
-        return self._get_parsed_config(section)[name]
+        keys = self._get_keys()
+        return self.default_section == section and name in keys
 
     def get_options(self, section: str = None, opt_keys: Set[str] = None,
                     vars: Dict[str, str] = None) -> Dict[str, str]:

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 import logging
 from pathlib import Path
 import json
+from zensols.persist import persisted
 from . import ConfigurableError, Configurable
 
 logger = logging.getLogger(__name__)
@@ -42,11 +43,10 @@ class JsonConfig(Configurable):
         else:
             self.config_file = config_file
 
+    @persisted('_config')
     def _get_config(self) -> Dict[str, Dict[str, str]]:
-        if not hasattr(self, '_config'):
-            with open(self.config_file) as f:
-                self._config = json.load(f)
-        return self._config
+        with open(self.config_file) as f:
+            return json.load(f)
 
     def get_options(self, section: str = None, opt_keys: Set[str] = None,
                     vars: Dict[str, str] = None) -> Dict[str, str]:
