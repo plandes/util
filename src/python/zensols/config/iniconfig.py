@@ -80,28 +80,33 @@ class IniConfig(Configurable):
             writer.seek(0)
             self._conf.read_file(writer)
 
+    def _create_and_load_parser(self) -> ConfigParser:
+        parser = self._create_config_parser()
+        cpath = self.config_file
+        logger.debug(f'loading config {cpath}')
+        if not cpath.exists():
+            if self.robust:
+                logger.debug(f'no default config file {cpath}--skipping')
+            else:
+                raise IOError(f'no such file: {cpath}')
+            parser = None
+        elif cpath.is_file() or cpath.is_dir():
+            writer = StringIO()
+            self._read_config_content(cpath, writer)
+            writer.seek(0)
+            parser = self._create_config_parser()
+            parser.read_file(writer)
+        else:
+            raise ConfigurableError(f'unknown file type: {cpath}')
+        return parser
+
     @property
-    def parser(self):
+    def parser(self) -> ConfigParser:
         """Load the configuration file.
 
         """
         if not hasattr(self, '_conf'):
-            cpath = self.config_file
-            logger.debug(f'loading config {cpath}')
-            if not cpath.exists():
-                if self.robust:
-                    logger.debug(f'no default config file {cpath}--skipping')
-                else:
-                    raise IOError(f'no such file: {cpath}')
-                self._conf = None
-            elif cpath.is_file() or cpath.is_dir():
-                writer = StringIO()
-                self._read_config_content(cpath, writer)
-                writer.seek(0)
-                self._conf = self._create_config_parser()
-                self._conf.read_file(writer)
-            else:
-                raise ConfigurableError(f'unknown file type: {cpath}')
+            self._conf = self._create_and_load_parser()
         return self._conf
 
     def reload(self):

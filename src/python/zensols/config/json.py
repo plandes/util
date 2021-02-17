@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Union, Dict, Set
+from typing import Union, Dict, Set, Any
 from dataclasses import dataclass
 import logging
 from pathlib import Path
@@ -43,10 +43,27 @@ class JsonConfig(Configurable):
         else:
             self.config_file = config_file
 
+    def _narrow_root(self, conf: Dict[str, Any]) -> Dict[str, str]:
+        if not isinstance(conf, dict):
+            raise ConfigurableError(
+                f'expecting a root level dict: {self.config_file}')
+        return conf
+
     @persisted('_config')
     def _get_config(self) -> Dict[str, Dict[str, str]]:
         with open(self.config_file) as f:
-            return json.load(f)
+            conf = json.load(f)
+        conf = self._narrow_root(conf)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'raw json: {conf}')
+        has_terminals = True
+        for k, v in conf.items():
+            if isinstance(v, dict):
+                has_terminals = False
+                break
+        if has_terminals:
+            conf = {self.default_section: conf}
+        return conf
 
     def get_options(self, section: str = None, opt_keys: Set[str] = None,
                     vars: Dict[str, str] = None) -> Dict[str, str]:

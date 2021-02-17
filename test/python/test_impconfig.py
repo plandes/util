@@ -7,6 +7,7 @@ from zensols.config import ImportIniConfig
 class TestImportConfig(unittest.TestCase):
     def setUp(self):
         self.conf = ImportIniConfig('test-resources/import-config-test.conf')
+        os.environ['app_root'] = '.'
 
     def test_config(self):
         conf = self.conf
@@ -32,3 +33,8 @@ class TestImportConfig(unittest.TestCase):
     def test_child_ref(self):
         self.assertEqual('two way for this: grabbed parents param1, which is cool',
                          self.conf.get_option('text', 'sec5'))
+
+    def test_config_interpolate(self):
+        conf = self.conf
+        self.assertEqual('test-resources/config-write.conf',
+                         conf.get_option('config_file', 'import_ini1'))
