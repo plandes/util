@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - A new `Configurable` class that imports using other `Configurable` classes:
   `ImportIniConfig`.
+- A new environment based configuration that can be loaded by
+  `ImportIniConfig`.
 
 ### Changed
 - `ClassResolver` moved to `zensols.config` to be used by the new
