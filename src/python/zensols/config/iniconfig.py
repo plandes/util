@@ -209,7 +209,10 @@ class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
                  env: dict = None, env_sec: str = 'env', **kwargs):
         self.remove_vars = remove_vars
         if env is None:
-            self.env = os.environ
+            env = {}
+            for k, v in os.environ.items():
+                env[k] = v.replace('$', '$$')
+            self.env = env
         else:
             self.env = env
         self.env_sec = env_sec
