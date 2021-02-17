@@ -208,6 +208,7 @@ class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
     with environment variables passed.
 
     """
+
     def __init__(self, *args, remove_vars: List[str] = None,
                  env: dict = None, env_sec: str = 'env', **kwargs):
         if 'default_expect' not in kwargs:

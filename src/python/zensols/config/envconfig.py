@@ -6,7 +6,6 @@ __author__ = 'Paul Landes'
 from typing import Dict, Set
 import logging
 import collections
-from zensols.persist import persisted
 import os
 from zensols.persist import persisted
 from . import Configurable
@@ -65,4 +64,6 @@ class EnvironmentConfig(Configurable):
         if section == self.default_section:
             env = os.environ
             opts = {k: env[k] for k in opt_keys}
+        else:
+            opts = {}
         return opts
