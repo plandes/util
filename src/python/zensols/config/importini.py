@@ -3,13 +3,27 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Iterable
+from typing import Iterable, Tuple
 import logging
 import sys
+from collections import ChainMap
 from configparser import ConfigParser, ExtendedInterpolation
 from . import Configurable, IniConfig, ClassImporter
 
 logger = logging.getLogger(__name__)
+
+
+class SharedExtendedInterpolation(ExtendedInterpolation):
+    def __init__(self, children: Tuple[Configurable]):
+        super().__init__()
+        self.children = children
+
+    def before_get(self, parser: ConfigParser, section: str, option: str,
+                   value: str, defaults: ChainMap):
+        for c in self.children:
+            if section in c.sections:
+                defaults.new_child(c.get_options(section))
+        return super().before_get(parser, section, option, value, defaults)
 
 
 class ImportIniConfig(IniConfig):
@@ -63,7 +77,9 @@ class ImportIniConfig(IniConfig):
         children = self._get_children()
         parser = ConfigParser(
             defaults=self.create_defaults,
-            interpolation=ExtendedInterpolation())
+            #interpolation=ExtendedInterpolation(),
+            interpolation=SharedExtendedInterpolation(children),
+        )
         for c in children:
             for sec in c.sections:
                 parser.add_section(sec)

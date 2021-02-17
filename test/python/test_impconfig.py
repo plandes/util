@@ -12,7 +12,7 @@ class TestImportConfig(unittest.TestCase):
         conf = self.conf
         should = set(('config default empty import_ini1 import_str2 ' +
                       'import_a_json sec1 sec2 sec3 sec4 temp1 temp2 grk ' +
-                      'jsec_1 jsec_2 imp_env ev').split())
+                      'jsec_1 jsec_2 imp_env ev impref sec5 need_vars').split())
         self.assertEqual(should, set(conf.sections))
         self.assertEqual('this is a cool test', conf.get_option('text', 'sec1'))
         self.assertEqual('imported firstval', conf.get_option('text', 'sec2'))
@@ -28,3 +28,7 @@ class TestImportConfig(unittest.TestCase):
         testval = 'testval'
         os.environ[key] = testval
         self.assertEqual(testval, conf.get_option(key, 'ev'))
+
+    def test_child_ref(self):
+        self.assertEqual('two way for this: grabbed parents param1, which is cool',
+                         self.conf.get_option('text', 'sec5'))

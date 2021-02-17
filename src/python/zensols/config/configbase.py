@@ -9,6 +9,7 @@ from abc import ABCMeta, abstractmethod
 import logging
 from pathlib import Path
 import sys
+import re
 from io import TextIOBase
 import inspect
 from . import Serializer, Writable
@@ -110,7 +111,10 @@ class Configurable(Writable, metaclass=ABCMeta):
 
         """
         val = self.get_option(name, section, vars, expect)
-        return val.split(separator) if val else []
+        if val is None:
+            return []
+        else:
+            return re.split(r'\s*,\s*', val)
 
     def get_option_boolean(self, name, section=None, vars=None, expect=None):
         """Just like :py:meth:`get_option` but parse as a boolean (any case `true`).
