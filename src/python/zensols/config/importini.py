@@ -12,7 +12,7 @@ from collections import ChainMap
 from configparser import (
     ConfigParser, ExtendedInterpolation,
     InterpolationMissingOptionError)
-from . import Configurable, IniConfig, ClassImporter
+from . import ConfigurableError, Configurable, IniConfig, ClassImporter
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +22,8 @@ class _ParserAdapter(object):
         self.conf = conf
 
     def get(self, section: str, option: str, *args, **kwags):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'get: {section}:{option}')
         return self.conf.get_option(option, section)
 
     def optionxform(self, option: str) -> str:
@@ -30,13 +32,16 @@ class _ParserAdapter(object):
     def items(self, section: str, raw: bool = False):
         return list(self.conf.get_options(section))
 
+    def __str__(self) -> str:
+        return str(self.conf.__class__.__name__)
+
 
 class _SharedExtendedInterpolation(ExtendedInterpolation):
     """Adds other :class:`Configurable` instances to available parameter to
     substitute.
 
     """
-    def __init__(self, children: Tuple[Configurable], robust: bool = False):
+    def __init__(self, children: Tuple[Configurable], robust: bool = True):
         super().__init__()
         self.children = map(_ParserAdapter, children)
         self.robust = robust
@@ -50,14 +55,17 @@ class _SharedExtendedInterpolation(ExtendedInterpolation):
         parsers = chain.from_iterable([[parser], self.children])
         for pa in parsers:
             try:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'inter: {pa}: {section}:{option} = {value}')
                 res = super().before_get(pa, section, option, value, defaults)
                 break
-            except InterpolationMissingOptionError as e:
+            except Exception as e:
                 last_ex = e
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'missing option: {e}')
-        if (res is None) and (not self.robust) and (last_ex is not None):
-            raise last_ex
+        if (not self.robust) and (last_ex is not None):
+            msg = f'can not set {section}:{option} = {value}: {last_ex}'
+            raise ConfigurableError(msg)
         return res
 
 
@@ -66,11 +74,12 @@ class _StringIniConfig(IniConfig):
     :class:`~configparser.ExtendedInterpolation`.
 
     """
-    def __init__(self, config: str, parent: IniConfig):
+    def __init__(self, config: str, parent: IniConfig,
+                 children: Tuple[Configurable]):
         super().__init__(
             parent.default_expect, parent.default_section, parent.default_vars)
         self.config = config
-        self.children = [parent]
+        self.children = [parent] + list(children)
 
     def _create_and_load_parser(self) -> ConfigParser:
         parser = ConfigParser(
@@ -103,12 +112,14 @@ class ImportIniConfig(IniConfig):
     def __init__(self, *args,
                  config_section: str = IMPORT_SECTION,
                  exclude_config_sections: bool = False,
+                 children: Tuple[Configurable] = (),
                  **kwargs):
         if 'default_expect' not in kwargs:
             kwargs['default_expect'] = True
         super().__init__(*args, **kwargs)
         self.config_section = config_section
         self.exclude_config_sections = exclude_config_sections
+        self.children = children
 
     def _mod_name(self) -> str:
         mname = sys.modules[__name__].__name__
@@ -132,7 +143,7 @@ class ImportIniConfig(IniConfig):
         sconf = StringIO()
         cparser.write(sconf)
         sconf.seek(0)
-        return _StringIniConfig(sconf, parser)
+        return _StringIniConfig(sconf, parser, self.children)
 
     def _get_children(self) -> Iterable[Configurable]:
         if not self.config_file.is_file():
@@ -164,11 +175,14 @@ class ImportIniConfig(IniConfig):
             defaults=self.create_defaults,
             interpolation=ExtendedInterpolation())
         for c in children:
+            par_secs = set(parser.sections())
             for sec in c.sections:
-                parser.add_section(sec)
+                if sec not in par_secs:
+                    parser.add_section(sec)
                 for k, v in c.get_options(sec).items():
                     v = self._format_option(k, v, sec)
-                    parser.set(sec, k, v)
+                    if not parser.has_option(sec, k):
+                        parser.set(sec, k, v)
         if self.exclude_config_sections:
             self._config_sections = csecs
         return parser

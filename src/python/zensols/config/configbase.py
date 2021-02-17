@@ -62,7 +62,7 @@ class Configurable(Writable, metaclass=ABCMeta):
         vars = vars if vars else self.default_vars
         if section is None:
             section = self.default_section
-        opts = self.get_options(section, opt_keys=[name], vars=vars)
+        opts = self.get_options(section, opt_keys=set([name]), vars=vars)
         if opts:
             return opts[name]
         else:

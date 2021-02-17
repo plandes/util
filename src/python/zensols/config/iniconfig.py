@@ -81,7 +81,6 @@ class IniConfig(Configurable):
             self._conf.read_file(writer)
 
     def _create_and_load_parser(self) -> ConfigParser:
-        parser = self._create_config_parser()
         cpath = self.config_file
         logger.debug(f'loading config {cpath}')
         if not cpath.exists():

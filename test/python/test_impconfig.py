@@ -1,13 +1,13 @@
 import unittest
 from pathlib import Path
-import os
-from zensols.config import ImportIniConfig
+from zensols.config import StringConfig, ImportIniConfig
 
 
 class TestImportConfig(unittest.TestCase):
     def setUp(self):
-        self.conf = ImportIniConfig('test-resources/import-config-test.conf')
-        os.environ['test_impconfig_app_root'] = '.'
+        self.cconf = StringConfig('nasc.test_impconfig_app_root=.')
+        self.conf = ImportIniConfig('test-resources/import-config-test.conf',
+                                    children=[self.cconf])
 
     def test_config(self):
         conf = self.conf
@@ -37,11 +37,12 @@ class TestImportConfig(unittest.TestCase):
 
     def test_config_sections(self):
         conf = self.conf
-        should = set(('import default empty import_ini1 import_str2 ' +
+        should = set(('nasc import default empty import_ini1 import_str2 ' +
                       'import_a_json sec1 sec2 sec3 sec4 temp1 temp2 grk ' +
                       'jsec_1 jsec_2 imp_env ev impref sec5 need_vars').split())
         self.assertEqual(should, set(conf.sections))
         conf = ImportIniConfig('test-resources/import-config-test.conf',
-                               exclude_config_sections=True)
+                               exclude_config_sections=True,
+                               children=[self.cconf])
         should = should - set('import import_ini1 import_a_json impref imp_env import_str2'.split())
         self.assertEqual(should, set(conf.sections))

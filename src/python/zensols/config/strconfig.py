@@ -68,6 +68,15 @@ class StringConfig(Configurable):
                     vars: Dict[str, str] = None) -> Dict[str, str]:
         section = self.default_section if section is None else section
         opts = self._get_parsed_config()[section]
-        if opt_keys is not None:
-            opts = {k: opts[k] for k in opt_keys}
+        if opt_keys is None:
+            opt_keys = opts.keys()
+        else:
+            opt_keys = opt_keys & set(opts.keys())
+        opts = {k: opts[k] for k in opt_keys}
         return opts
+
+    def __str__(self) -> str:
+        return self.__class__.__name__ + ': config=' + self.config_str
+
+    def __repr__(self) -> str:
+        return f'<{self.__str__()}>'
