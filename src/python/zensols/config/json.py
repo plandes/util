@@ -9,22 +9,22 @@ import logging
 from pathlib import Path
 import json
 from zensols.persist import persisted
-from . import ConfigurableError, Configurable
+from . import ConfigurableError, DictionaryConfig
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
-class JsonConfig(Configurable):
+class JsonConfig(DictionaryConfig):
     """A configurator that reads JSON.  The JSON is just a two level dictionary.
     The top level keys are the section and the values are a single depth
     dictionary with string keys and values.
 
     """
     def __init__(self, config_file: Union[str, Path],
+                 default_expect: bool = True,
                  default_section: str = 'default',
-                 default_vars: Dict[str, str] = None,
-                 default_expect: bool = False):
+                 default_vars: Dict[str, str] = None):
         """Initialize.
 
         :param config_file: the configuration file path to read from
@@ -37,7 +37,7 @@ class JsonConfig(Configurable):
                                sections are not found in the configuration
 
         """
-        super().__init__(default_expect, default_section, default_vars)
+        super().__init__(None, default_expect, default_section, default_vars)
         if isinstance(config_file, str):
             self.config_file = Path(config_file).expanduser()
         else:
@@ -64,22 +64,3 @@ class JsonConfig(Configurable):
         if has_terminals:
             conf = {self.default_section: conf}
         return conf
-
-    def get_options(self, section: str = None, opt_keys: Set[str] = None,
-                    vars: Dict[str, str] = None) -> Dict[str, str]:
-        conf = self._get_config()
-        sec = conf.get(section)
-        if sec is None:
-            raise ConfigurableError(f'no section: {section}')
-        return sec
-
-    def has_option(self, name: str, section: str = None) -> bool:
-        conf = self._get_config()
-        sec = conf.get(section)
-        if sec is not None:
-            return sec.contains(name)
-        return False
-
-    @property
-    def sections(self) -> Set[str]:
-        return set(self._get_config().keys())
