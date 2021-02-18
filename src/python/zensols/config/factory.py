@@ -10,10 +10,8 @@ from enum import Enum
 import types
 import logging
 import inspect
-#import importlib
 import re
 import copy as cp
-#from functools import reduce
 from time import time
 from zensols.config import Configurable
 from zensols.config import ClassImporter as ClassImporter
@@ -24,6 +22,13 @@ logger = logging.getLogger(__name__)
 
 class RedefinedInjectionError(ValueError):
     """Raised when any attempt to redefine or reuse injections for a class
+    """
+    pass
+
+
+class FactoryError(ValueError):
+    """Raised when an object can not be instantianted by a :class:`.ConfigFactory`.
+
     """
     pass
 
@@ -196,7 +201,7 @@ class ConfigFactory(object):
         class_name = params.get('class_name')
         if class_name is None:
             if len(params) == 0:
-                raise ValueError(f'no such entry: \'{name}\'')
+                raise FactoryError(f'no such entry: \'{name}\'')
             else:
                 class_name = 'zensols.config.Settings'
         else:
@@ -377,27 +382,55 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         new_meth = types.MethodType(new_meth, inst)
         setattr(inst, name, new_meth)
 
+    def _create_instance(self, section: str, config_params: Dict[str, str],
+                         params: Dict[str, Any]) -> Any:
+        secs = self.config.serializer.parse_object(section)
+        if isinstance(secs, (tuple, list)):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'list instance: {type(secs)}')
+            inst = list(map(lambda s: self.instance(s, **params), secs))
+            if isinstance(secs, tuple):
+                inst = tuple(inst)
+        elif isinstance(secs, dict):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'dict instance: {type(secs)}')
+            inst = {}
+            for k, v in secs.items():
+                v = self.instance(v, **params)
+                inst[k] = v
+        elif isinstance(secs, str):
+            inst = self.instance(secs, **params)
+        else:
+            raise FactoryError(f'unknown instance type {type(secs)}: {secs}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'creating instance in section {section} ' +
+                         f'with {params}, config: {config_params}')
+        return inst
+
     def _populate_instances(self, pconfig: str, section: str):
         child_params = {}
         reload = False
-        defined_directives = set('param reload'.split())
+        defined_directives = set('param reload type'.split())
+        inst_conf = None
         if pconfig is not None:
-            logger.debug(f'parsing param config: {pconfig}')
-            pconfig = eval(pconfig)
-            unknown = set(pconfig.keys()) - defined_directives
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'parsing param config: {pconfig}')
+            inst_conf = eval(pconfig)
+            unknown = set(inst_conf.keys()) - defined_directives
             if len(unknown) > 0:
-                raise ValueError(f'unknown directive(s): {unknown}')
-            if 'param' in pconfig:
-                cparams = pconfig['param']
+                raise FactoryError(f'unknown directive(s): {unknown}')
+            if 'param' in inst_conf:
+                cparams = inst_conf['param']
                 cparams = self.config.serializer.populate_state(cparams, {})
                 child_params.update(cparams)
-            if 'reload' in pconfig:
-                reload = pconfig['reload']
-                logger.debug(f'setting reload: {reload}')
-            logger.debug(f'applying param config: {pconfig}')
-        logger.debug(f'creating instance in section {section}')
+            if 'reload' in inst_conf:
+                reload = inst_conf['reload']
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'setting reload: {reload}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'applying param config: {inst_conf}')
         self._set_reload(reload)
-        return self.instance(section, **child_params)
+        return self._create_instance(section, inst_conf, child_params)
 
     def from_config_string(self, v: str) -> Any:
         m = self.CHILD_REGEXP.match(v)
@@ -435,8 +468,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 pw_name = f'_{prop_name}_pw'
                 params['path'] = pw_name
                 if prop_name not in kwargs:
-                    raise ValueError(f"no property '{prop_name}' found in '" +
-                                     f"section '{sec_name}'")
+                    raise FactoryError(f"no property '{prop_name}' found in '" +
+                                       f"section '{sec_name}'")
                 params['initial_value'] = kwargs[prop_name]
                 # don't delete the key here so that the type can be defined for
                 # dataclasses, effectively as documentation

@@ -20,6 +20,11 @@ class StringConfig(Configurable):
 
       ``<section>.<name>=<value>[,<section>.<name>=<value>,...]``
 
+    A dot (``.``) is used to separate the section from the option instead of a
+    colon (``:``), as used in more sophisticaed interpolation in the
+    :class:`configparser.ExtendedInterpolation`.  The dot is used for this
+    reason to make other section interpolation easier.
+
     """
     KEY_VAL_REGEX = re.compile(r'^(?:([^.]+?)\.)?([^=]+?)=(.+)$')
 

@@ -116,17 +116,26 @@ class loglevel(object):
             logger.debug('test')
 
     """
-    def __init__(self, name: str, level: int = logging.DEBUG):
+    def __init__(self, name: str, level: int = logging.DEBUG,
+                 init: int = None):
         """Initialize.
 
         :param name: the name of the logger to set
 
         :param level: the logging level, which defaults to :obj:`logging.DEBUG`
 
+        :param init: if not ``None``, initialize logging with
+                     :func:`logging.basicConfig` using the given level or
+                     ``True`` to use :obj:`logging.WARNING`
+
         """
         self.logger = logging.getLogger(name)
         self.initial_level = self.logger.level
         self.level = level
+        if init is not None:
+            if init is True:
+                init = logging.WARNING
+            logging.basicConfig(level=init)
 
     def __enter__(self):
         self.logger.setLevel(self.level)

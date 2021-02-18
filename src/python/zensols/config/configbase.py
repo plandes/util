@@ -94,10 +94,7 @@ class Configurable(Writable, metaclass=ABCMeta):
 
         """
         val = self.get_option(name, section)
-        if val is None:
-            return []
-        else:
-            return re.split(r'\s*,\s*', val)
+        return self.serializer.parse_list(val)
 
     def get_option_boolean(self, name: str, section: str = None) -> bool:
         """Just like :py:meth:`get_option` but parse as a boolean (any case `true`).

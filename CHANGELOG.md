@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   `ImportIniConfig`.
 - A new environment based configuration that can be loaded by
   `ImportIniConfig`.
+- Configuration can now *quote* with a string prefix.
+- Configuration can parse lists and create instances of tuple, lists and
+  dictionaries.
 
 ### Changed
 - `ClassResolver` moved to `zensols.config` to be used by the new

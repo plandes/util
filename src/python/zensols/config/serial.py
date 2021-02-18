@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Union, Any, Set, Tuple
+from typing import Dict, Union, Any, Set, Tuple, List
 from dataclasses import dataclass, field
 import logging
 from pprint import pprint
@@ -69,6 +69,8 @@ class Serializer(object):
     BOOL_REGEXP = re.compile(r'^True|False')
     PATH_REGEXP = re.compile(r'^path:\s*(.+)$')
     RESOURCE_REGEXP = re.compile(r'^resource(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
+    STRING_REGEXP = re.compile(r'^str:\s*(.+)$', re.DOTALL)
+    LIST_REGEXP = re.compile(r'^(list|tuple)(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     EVAL_REGEXP = re.compile(r'^eval(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     JSON_REGEXP = re.compile(r'^json:\s*(.+)$', re.DOTALL)
     PRIMITIVES = set([bool, float, int, None.__class__])
@@ -107,6 +109,17 @@ class Serializer(object):
         if evalstr is not None:
             return eval(evalstr)
 
+    def parse_list(self, v: str) -> List[str]:
+        """Parse a comma separated list in to a string list.
+
+        Any whitespace is trimmed around the commas.
+
+        """
+        if v is None:
+            return []
+        else:
+            return re.split(r'\s*,\s*', v)
+
     def parse_object(self, v: str) -> Any:
         """Parse as a string in to a Python object.  The following is done to parse the
         string in order:
@@ -127,9 +140,26 @@ class Serializer(object):
             v = v == 'True'
         else:
             parsed = None
-            m = self.PATH_REGEXP.match(v)
+            m = self.STRING_REGEXP.match(v)
             if m:
-                parsed = Path(m.group(1)).expanduser()
+                parsed = m.group(1)
+            if parsed is None:
+                m = self.PATH_REGEXP.match(v)
+                if m:
+                    parsed = Path(m.group(1)).expanduser()
+            if parsed is None:
+                m = self.LIST_REGEXP.match(v)
+                if m:
+                    ctype, pconfig, lst = m.groups()
+                    parsed = self.parse_list(lst)
+                    if pconfig is not None:
+                        pconfig = eval(pconfig)
+                        tpe = pconfig.get('type')
+                        if tpe is not None:
+                            tpe = eval(tpe)
+                            parsed = list(map(tpe, parsed))
+                    if ctype == 'tuple':
+                        parsed = tuple(parsed)
             if parsed is None:
                 m = self.RESOURCE_REGEXP.match(v)
                 if m:
@@ -193,7 +223,7 @@ class Serializer(object):
         """Format a Python object in to the string represetation per object syntax
         rules.
 
-        :see: :py:meth:`.parse_object`
+        :see: :meth:`parse_object`
 
         """
         v = None

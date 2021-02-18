@@ -1,17 +1,14 @@
-import unittest
+from typing import Tuple, Dict
 from dataclasses import dataclass
+import unittest
+from itertools import chain
 from pathlib import Path
 import shutil
 from zensols.config import (
-    Settings,
-    IniConfig,
-    ImportConfigFactory,
+    FactoryError, IniConfig, ImportConfigFactory, Settings
 )
 from zensols.persist import (
-    DelegateDefaults,
-    DirectoryStash,
-    FactoryStash,
-    ReadOnlyStash,
+    DelegateDefaults, DirectoryStash, ReadOnlyStash, FactoryStash
 )
 
 
@@ -36,6 +33,22 @@ class RangeHolder(object):
 @dataclass
 class StashHolder(object):
     stash: DirectoryStash
+
+
+@dataclass
+class StashCollection(object):
+    stashes: Tuple[ReadOnlyStash]
+
+    def values(self):
+        return chain.from_iterable(map(lambda s: s.values(), self.stashes))
+
+
+@dataclass
+class StashMap(object):
+    stashes: Dict[str, ReadOnlyStash]
+
+    def values(self):
+        return chain.from_iterable(map(lambda s: s.values(), self.stashes))
 
 
 class TestStashFactory(unittest.TestCase):
@@ -121,3 +134,31 @@ class TestStashFactory(unittest.TestCase):
         sh = ("""{"afloat": 1.23, "anint": 123, "astr": "some string", """ +
               """"anarray": [1, 2, 3]}""")
         self.assertEqual(sh, inst.asjson())
+
+    def test_instance_list(self):
+        fac = ImportConfigFactory(self.conf)
+        inst = fac.instance('stash_collection')
+        self.assertEqual(StashCollection, type(inst))
+        stashes = inst.stashes
+        self.assertEqual(tuple, type(stashes))
+        self.assertEqual(2, len(stashes))
+        self.assertEqual('RangeStash1', stashes[0].__class__.__name__)
+        self.assertEqual(RangeStashThisMod, stashes[1].__class__)
+        self.assertEqual(('0', '1', '2', '3', '4', '0', '1', '2', '3', '4', '5'),
+                         tuple(inst.values()))
+
+    def test_instance_dict(self):
+        fac = ImportConfigFactory(self.conf)
+        inst = fac.instance('stash_map')
+        self.assertEqual(StashMap, type(inst))
+        stashes = inst.stashes
+        self.assertEqual(dict, type(stashes))
+        self.assertEqual(2, len(stashes))
+        self.assertEqual(set('r1 r3'.split()), set(stashes.keys()))
+        self.assertEqual('RangeStash1', stashes['r1'].__class__.__name__)
+        self.assertEqual(RangeStashThisMod, stashes['r3'].__class__)
+
+    def test_instance_bad_type(self):
+        fac = ImportConfigFactory(self.conf)
+        self.assertRaises(FactoryError,
+                          lambda: fac.instance('stash_error_type'))

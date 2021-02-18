@@ -18,6 +18,18 @@ class TestConfigPopulate(unittest.TestCase):
         self.assertEqual(s.param7, False)
         self.assertEqual(s.param8, None)
 
+    def test_type(self):
+        s = self.conf.populate(section='type_test')
+        self.assertEqual(s.str1, 'some string')
+        self.assertEqual(s.lst_str, ['1', '2'])
+        self.assertEqual(s.lst_int, [1, 2])
+        self.assertEqual(s.lst_float, [1., 2.])
+        self.assertEqual(s.lst_str2, ['1', '2'])
+        self.assertEqual(s.tup_str, ['1', '2'])
+        self.assertEqual(s.tup_int, [1, 2])
+        self.assertEqual(s.tup_float, [1., 2.])
+        self.assertEqual(s.tup_str2, ['1', '2'])
+
     def test_eval(self):
         s = self.conf.get_option_object('param9')
         self.assertEqual(s, {'scott': 2, 'paul': 1})
