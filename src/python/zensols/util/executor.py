@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Union
+from typing import Union, Iterable
 from dataclasses import dataclass, field
 import logging
 from logging import Logger
@@ -51,7 +51,17 @@ class Executor(object):
 
     """
 
-    def run(self, cmd) -> Union[Popen, int, type(None)]:
+    def run(self, cmd: Union[str, Iterable[str], Path]) -> \
+            Union[Popen, int, type(None)]:
+        """Run a commmand.
+
+        :param cmd: either one string, a sequence of arguments or a path (see
+                    :class:`subprocess.Popen`)
+
+        :return: the process if :obj:`async_proc` is ``True``, otherwise,
+                 return return value
+
+        """
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'system <{cmd}>')
         if not self.dry_run:
