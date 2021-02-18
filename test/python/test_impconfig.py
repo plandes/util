@@ -41,7 +41,7 @@ class TestImportConfig(unittest.TestCase):
 
     def test_config_sections(self):
         conf = self.conf
-        should = set(('nasc import default empty import_ini1 import_str2 ' +
+        should = set(('nasc import imp_def_sec empty import_ini1 import_str2 ' +
                       'import_a_json sec1 sec2 sec3 sec4 temp1 temp2 grk ' +
                       'jsec_1 jsec_2 imp_env ev impref sec5 need_vars').split())
         self.assertEqual(should, set(conf.sections))
