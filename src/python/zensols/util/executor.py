@@ -63,9 +63,13 @@ class Executor(object):
 
         """
         if logger.isEnabledFor(logging.INFO):
-            logger.info(f'system <{cmd}>')
+            if isinstance(cmd, (tuple, list)):
+                cmd_str = ' '.join(cmd)
+            else:
+                cmd_str = str(cmd)
+            logger.info(f'system <{cmd_str}>')
         if not self.dry_run:
-            params = {'shell': True,
+            params = {'shell': isinstance(cmd, (str, Path)),
                       'stdout': subprocess.PIPE,
                       'stderr': subprocess.PIPE}
             if self.working_dir is not None:

@@ -18,15 +18,23 @@ class EnvironmentConfig(Configurable):
 
     """
     def __init__(self, section_name: str = 'env',
-                 default_expect: bool = False):
+                 default_expect: bool = False,
+                 map_delimiter: str = None):
         """Initialize with a string given as described in the class docs.
 
         :param config_str: the configuration
 
-        :param option_sep: the string used to delimit the section 
+        :param option_sep: the string used to delimit the section
+
+        :param map_delimiter: when given, all environment values are replaced
+                              with a duplicate; set this to ``$`` when using
+                              :class:`configparser.ExtendedInterpolation` for
+                              environment variables such as ``PS1``
+
         """
         super().__init__(default_expect, section_name)
         self.default_expect = default_expect
+        self.map_delimiter = map_delimiter
 
     @persisted('_parsed_config')
     def _get_parsed_config(self) -> Dict[str, str]:
@@ -62,8 +70,14 @@ class EnvironmentConfig(Configurable):
                     vars: Dict[str, str] = None) -> Dict[str, str]:
         opt_keys = os.environ.keys() if opt_keys is None else opt_keys
         if section == self.default_section:
-            env = os.environ
-            opts = {k: env[k] for k in opt_keys}
+            opts = {}
+            delim = self.map_delimiter
+            if delim is not None:
+                repl = f'{delim}{delim}'
+            for k, v in os.environ.items():
+                if delim is not None:
+                    v = v.replace(delim, repl)
+                opts[k] = v
         else:
             opts = {}
         return opts
