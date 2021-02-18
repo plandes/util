@@ -67,7 +67,7 @@ one major difference: this API strives to be as simple as possible and
 integrate with all other *zensols* packages.
 
 
-### Application Context
+## Application Context
 
 Any non-trivial application is recommended to have an *application context*
 type class that allows for specific customization and behavior with retrieving
@@ -112,6 +112,10 @@ in how it reads data, which uses the following rules:
 * Any string of numbers (i.e. `5839202`) as an integer
 * A string of numbers with a single decimal point (i.e. `3.123`) as a float.
 * Either `True` or `False` parsed as a boolean.
+* A string starting with `str:` parsed as a string.  This is a way to *quote* a
+  string.
+* A string starting with `list:` or `tuple:` parsed as a comma delimited string
+  with optional space around each element.
 * A string starting with `path:` parsed as a [pathlib.Path] instance.
 * A string starting with `resource:` parsed as `path:`, but points to a
   resource path either locally, or from a `setuptools` installed package (see
@@ -270,6 +274,95 @@ senior_company: domain.Organization = factory('bobs_senior_center')
 Organization(boss=Person(age=69, aliases=['Homer', 'Homer Simpson']))
 ```
 
+Lists, tuples and dictionaries can be used with instance parameters as well.
+Simply use the prefix `list:`, `tuple:` or `json:` (with a dictionary) as
+described in the [parsing](#parsing) section.  Now we'll add another field,
+which are a tuple of employees referring to two other sections in the
+configuration file:
+```ini
+[bobs_senior_center]
+class_name = domain.Organization
+boss = instance({'param': {'age': 69}}): homer
+employees = instance: tuple: bob, bart
+```
+
+### Import Configuration
+
+A more advanced feature is to import other configurations in a top level.  To
+do this:
+1. Create an `import` section that has:
+   * `sections`: a comma delimited list of sections with information of other
+     configuration to load
+   * `references`: a comma delimited list other sections to include while
+     resolving information in the loaded sections.
+2. For each listed in `sections`, create a section with the corresponding name
+   with the following:
+   * `type`: this is the type of configuration, which can be one of `ini`,
+     `yaml`, `json` or `string`.  For more information, look up the
+     corresponding implementation (i.e. for `yaml` look at [YamlConfig]).
+   * `class_name`: this can be used in place of `type` to give a full qualified
+     class name (i.e. `zensols.config.YamlConfig`).
+   * `config_file`: is needed for all file system based configurations.
+     However this varies and specific to the initializer parameter set of the
+     indicated class.  For example for [StringConfig], `config_str` is needed.
+	 
+The `references` section list is needed to *bootstrap* the configuration so it
+has all the data necessary to substitute.  For example, if you have a defaults
+section with a directory location, that section is necessary if you want to
+substitute a path (see the [import_factory example](#complete-examples)).
+
+In most cases, parameter substitution (using `${}`) will work both forwards and
+backwards, meaning that configuration is available in the child configurations
+to the parent and vice versa.  The same goes one child's configuration to
+another.  However, import order is important so put those referenced
+configuration first in the order.
+
+To continue our [person](#instance-parameters) example, we'll create a import
+configuration with almost identical information, but we'll remove the default
+section so we can see parameters substituted in the child from the parent.
+```ini
+[imp_defaults]
+age = 22
+dom_path = obj.conf
+
+[import]
+sections = import_domain
+references = imp_defaults
+
+[import_domain]
+type = ini
+config_file = path: ${imp_defaults:dom_path}
+```
+
+First we reference `imp_defaults` so `config_file` in `import_domain` get the
+full path to the child configuration file.  This loads `obj.conf`, which is the
+same file we used before.  However, it has a new section we didn't use before,
+which is:
+```ini
+[bobs_youth_center]
+class_name = domain.Organization
+boss = instance({'param': {'age': ${imp_defaults:age}}}): homer
+employees = instance: tuple: bob, bart
+```
+
+This section looks like the previous one, except now we set Homer's age to
+`${imp_defaults:age}`, which is set in the parent `imp.conf` (see [examples]).
+
+**Tip**: you can use `resource:` to point to configuration files included in
+your wheel/egg that define the more involved object instantiating as to avoid
+*polluting* the top level configuration the user sees.
+
+As before, we create the factory and use it to create the `company` object:
+```python
+from zensols.config import ImportIniConfig, ImportConfigFactory
+import domain
+
+factory = ImportConfigFactory(ImportIniConfig('imp.conf'))
+company: domain.Organization = factory('bobs_youth_center')
+print(f"homer's new age: {company.boss.age}")
+>>> homer's new age: 18
+```
+
 
 ## Complete Examples
 
@@ -296,6 +389,7 @@ this documentation.
 [Configurable]: ../api/zensols.config.html#zensols.config.configbase.Configurable
 [ExtendedInterpolationEnvConfig]: ../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig
 [YamlConfig]: ../api/zensols.config.html#zensols.config.yaml.YamlConfig
+[StringConfig]: ../api/zensols.config.html#zensols.config.strconfig.StringConfig
 [ImportConfigFactory]: ../api/zensols.config.html#zensols.config.factory.ImportConfigFactory
 [populate]: ../api/zensols.config.html#zensols.config.configbase.Configurable.populate
 [resource_filename]: ../api/zensols.config.html#zensols.config.configbase.Configurable.resource_filename
