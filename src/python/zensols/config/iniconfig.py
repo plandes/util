@@ -138,7 +138,9 @@ class IniConfig(Configurable):
         elif conf.has_option(section, name):
             opt = conf.get(section, name)
         if opt is None and self.expect and (not self.robust):
-            raise ConfigurableError('no option: {section}:{name}')
+            if not conf.has_section(section):
+                raise ConfigurableError(f'no section: {section}')
+            raise ConfigurableError(f'no option: {section}:{name}')
         return opt
 
     @property

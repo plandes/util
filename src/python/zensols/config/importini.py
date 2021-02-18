@@ -130,15 +130,16 @@ class ImportIniConfig(IniConfig):
     def _get_bootstrap_parser(self):
         conf_sec = self.config_section
         parser = IniConfig(self.config_file)
-        secs = set(parser.get_option_list(self.SECTIONS_SECTION, conf_sec))
-        if parser.has_option(self.REFS_SECTION, conf_sec):
-            csecs = parser.get_option_list(self.REFS_SECTION, conf_sec)
-            secs.update(set(csecs))
-        secs.add(conf_sec)
-        to_remove = set(parser.sections) - secs
         cparser = parser.parser
-        for r in to_remove:
-            cparser.remove_section(r)
+        if parser.has_option(self.SECTIONS_SECTION, conf_sec):
+            secs = set(parser.get_option_list(self.SECTIONS_SECTION, conf_sec))
+            if parser.has_option(self.REFS_SECTION, conf_sec):
+                csecs = parser.get_option_list(self.REFS_SECTION, conf_sec)
+                secs.update(set(csecs))
+            secs.add(conf_sec)
+            to_remove = set(parser.sections) - secs
+            for r in to_remove:
+                cparser.remove_section(r)
         sconf = StringIO()
         cparser.write(sconf)
         sconf.seek(0)
@@ -152,20 +153,21 @@ class ImportIniConfig(IniConfig):
         parser = self._get_bootstrap_parser()
         children: List[Configurable] = parser.children
         conf_secs = [conf_sec]
-        for sec in parser.get_option_list(self.SECTIONS_SECTION, conf_sec):
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'populating section {sec}, {children}')
-            conf_secs.append(sec)
-            params = parser.populate(section=sec).asdict()
-            class_name = params.get('class_name')
-            if class_name is None:
-                tpe = params['type']
-                del params['type']
-                class_name = f'{mod_name}.{tpe.capitalize()}Config'
-            else:
-                del params['class_name']
-            inst = ClassImporter(class_name, False).instance(**params)
-            children.append(inst)
+        if parser.has_option(self.SECTIONS_SECTION, conf_sec):
+            for sec in parser.get_option_list(self.SECTIONS_SECTION, conf_sec):
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'populating section {sec}, {children}')
+                conf_secs.append(sec)
+                params = parser.populate(section=sec).asdict()
+                class_name = params.get('class_name')
+                if class_name is None:
+                    tpe = params['type']
+                    del params['type']
+                    class_name = f'{mod_name}.{tpe.capitalize()}Config'
+                else:
+                    del params['class_name']
+                inst = ClassImporter(class_name, False).instance(**params)
+                children.append(inst)
         return conf_secs, children
 
     def _create_config_parser(self) -> ConfigParser:
