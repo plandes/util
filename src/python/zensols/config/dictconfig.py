@@ -18,6 +18,13 @@ class DictionaryConfig(Configurable):
     are the section and the values are a single depth dictionary with string
     keys and values.
 
+    You can override :meth:`_get_config` to restructure the dictionary for
+    application specific use cases.  One such example is
+    :meth:`.JsonConfig._get_config`.
+
+    .. document private functions
+    .. automethod:: _get_config
+
     """
     def __init__(self, config: Dict[str, Dict[str, str]],
                  expect: bool = True, default_section: str = None):
@@ -37,6 +44,9 @@ class DictionaryConfig(Configurable):
             self._dict_config = config
 
     def _get_config(self) -> Dict[str, Dict[str, str]]:
+        """Return the two level dict structure used for this configuration.
+
+        """
         return self._dict_config
 
     def get_options(self, section: str = None) -> Dict[str, str]:
@@ -55,4 +65,7 @@ class DictionaryConfig(Configurable):
 
     @property
     def sections(self) -> Set[str]:
+        """Return the top level keys of the dictionary as sections (see class doc).
+
+        """
         return set(self._get_config().keys())

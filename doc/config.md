@@ -364,6 +364,30 @@ print(f"homer's new age: {company.boss.age}")
 ```
 
 
+## Configuration Implementations
+
+The list of configuration implementations that inherit from [Configurable] are
+listed below:
+
+* File based:
+  * [IniConfig]: Application configuration utility.  This reads from a
+    configuration and returns sets or subsets of options.
+  * [YamlConfig]: Just like zensols.actioncli.Config but parse configuration
+    from YAML files.
+  * [JsonConfig]: A configurator that reads JSON as a two level dictionary.
+    The top level keys are the section and the values are a single depth
+    dictionary with string keys and values.
+  * [ImportIniConfig]: A configuration that uses other [Configurable] classes
+    to load other sections.
+* Memory based:
+  * [DictionaryConfig]: This is a simple implementation of a dictionary backing
+    configuration.
+  * [EnvironmentConfig]: An implementation configuration class that holds
+    environment variables.
+  * [StringConfig]: A simple string based configuration that takes a single
+    comma delimited key/value pair string
+
+
 ## Complete Examples
 
 See the [examples] directory the complete code used to create the examples in
@@ -387,10 +411,15 @@ this documentation.
 [configuration factory]: #configuration-factory
 
 [Configurable]: ../api/zensols.config.html#zensols.config.configbase.Configurable
-[ExtendedInterpolationEnvConfig]: ../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig
+[IniConfig]: ../api/zensols.config.html#zensols.config.iniconfig.IniConfig
+[ImportIniConfig]: ../api/zensols.config.html#zensols.config.importini.ImportIniConfig
+[DictionaryConfig]: ../api/zensols.config.html#zensols.config.dictconfig.DictionaryConfig
+[EnvironmentConfig]: ../api/zensols.config.html#zensols.config.envconfig.EnvironmentConfig
+[JsonConfig]: ../api/zensols.config.html#zensols.config.json.JsonConfig
 [YamlConfig]: ../api/zensols.config.html#zensols.config.yaml.YamlConfig
 [StringConfig]: ../api/zensols.config.html#zensols.config.strconfig.StringConfig
 [ImportConfigFactory]: ../api/zensols.config.html#zensols.config.factory.ImportConfigFactory
+[ExtendedInterpolationEnvConfig]: ../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig
 [populate]: ../api/zensols.config.html#zensols.config.configbase.Configurable.populate
 [resource_filename]: ../api/zensols.config.html#zensols.config.configbase.Configurable.resource_filename
 [examples]: https://github.com/plandes/util/tree/master/example

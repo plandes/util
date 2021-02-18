@@ -11,15 +11,9 @@ import logging
 import math
 from multiprocessing import Pool
 from zensols.util.time import time
-from zensols.config import (
-    Configurable,
-    ImportConfigFactory,
-)
+from zensols.config import Configurable, ImportConfigFactory
 from zensols.persist import (
-    PreemptiveStash,
-    PrimeableStash,
-    chunks,
-    Deallocatable,
+    PreemptiveStash, PrimeableStash, chunks, Deallocatable,
 )
 
 logger = logging.getLogger(__name__)

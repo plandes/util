@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Union, Dict, Set, Any
+from typing import Union, Dict, Any
 from dataclasses import dataclass
 import logging
 from pathlib import Path
@@ -16,9 +16,13 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class JsonConfig(DictionaryConfig):
-    """A configurator that reads JSON.  The JSON is just a two level dictionary.
-    The top level keys are the section and the values are a single depth
-    dictionary with string keys and values.
+    """A configurator that reads JSON as a two level dictionary.  The top level
+    keys are the section and the values are a single depth dictionary with
+    string keys and values.
+
+    A caveat is if all the values are terminal, in which case the top level
+    singleton section is ``default_section`` given in the initalizer and the
+    section content is the single dictionary.
 
     """
     def __init__(self, config_file: Union[str, Path],
