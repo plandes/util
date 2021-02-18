@@ -60,6 +60,17 @@ using series of dot (`.`) separated paths.  See the YAML test
 case [test_yaml.py] for an example.
 
 
+## JSON Format
+
+This format is implemented by the [JsonConfig] class.  It reads JSON as a two
+level dictionary.  The top level keys are the section and the values are a
+single depth dictionary with string keys and values
+
+A caveat is if all the values are terminal, in which case the top level
+singleton section is `default_section` given in the initializer and the
+section content is the single dictionary.
+
+
 ## Inversion of Control
 
 This package provides a [Java Spring] like *inversion of control* system with
@@ -286,10 +297,12 @@ boss = instance({'param': {'age': 69}}): homer
 employees = instance: tuple: bob, bart
 ```
 
-### Import Configuration
+### Import INI Configuration
 
-A more advanced feature is to import other configurations in a top level.  To
-do this:
+A more advanced feature is to import other configurations in a top level.  The
+[ImportIniConfig] class also supports the [INI format](#ini-format), but adds
+other configuration sections to its own.  To create a configuration file that
+is used by the class, do the following:
 1. Create an `import` section that has:
    * `sections`: a comma delimited list of sections with information of other
      configuration to load
@@ -370,15 +383,14 @@ The list of configuration implementations that inherit from [Configurable] are
 listed below:
 
 * File based:
-  * [IniConfig]: Application configuration utility.  This reads from a
-    configuration and returns sets or subsets of options.
-  * [YamlConfig]: Just like zensols.actioncli.Config but parse configuration
-    from YAML files.
-  * [JsonConfig]: A configurator that reads JSON as a two level dictionary.
-    The top level keys are the section and the values are a single depth
-    dictionary with string keys and values.
-  * [ImportIniConfig]: A configuration that uses other [Configurable] classes
-    to load other sections.
+  * [IniConfig]: Application configuration utility in [INI
+    format](#ini-format).  This reads from a configuration and returns sets or
+    subsets of options/
+  * [YamlConfig]: Parse configuration from [YAML files](#yaml-format).
+  * [JsonConfig]: A configurator that reads [JSON](#json-format) as a two level
+    dictionary.
+  * [ImportIniConfig]: An [INI Configuration](#import-ini-configuration) that
+    uses other [Configurable] classes to load other sections.
 * Memory based:
   * [DictionaryConfig]: This is a simple implementation of a dictionary backing
     configuration.

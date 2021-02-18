@@ -21,7 +21,7 @@ class JsonConfig(DictionaryConfig):
     string keys and values.
 
     A caveat is if all the values are terminal, in which case the top level
-    singleton section is ``default_section`` given in the initalizer and the
+    singleton section is ``default_section`` given in the initializer and the
     section content is the single dictionary.
 
     """
