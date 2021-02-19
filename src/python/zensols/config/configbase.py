@@ -9,7 +9,6 @@ from abc import ABCMeta, abstractmethod
 import logging
 from pathlib import Path
 import sys
-import re
 from io import TextIOBase
 import inspect
 from . import Serializer, Writable, Settings

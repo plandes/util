@@ -40,6 +40,7 @@ class IniConfig(Configurable):
         :param create_defaults: used to initialize the configuration parser,
                                 and useful for when substitution values are
                                 baked in to the configuration file
+
         """
 
         super().__init__(expect, default_section)

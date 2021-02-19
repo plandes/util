@@ -115,10 +115,42 @@ class ImportIniConfig(IniConfig):
                  exclude_config_sections: bool = True,
                  children: Tuple[Configurable] = (),
                  **kwargs):
+        """Initialize.
+
+        :param config_file: the configuration file path to read from
+
+        :param default_section: default section (defaults to `default`)
+
+        :param robust: if `True`, then don't raise an error when the
+                       configuration file is missing
+
+        :param expect: if ``True``, raise exceptions when keys and/or
+                               sections are not found in the configuration
+
+        :param create_defaults: used to initialize the configuration parser,
+                                and useful for when substitution values are
+                                baked in to the configuration file
+
+        :param config_section: the name of the section that has the
+                               configuration (i.e. the ``sections`` entry)
+
+        :param exclude_config_sections:
+             if ``True``, the import and other configuration sections are
+             removed
+
+        :param children: additional configurations used both before and after
+                         bootstrapping
+
+        """
         super().__init__(*args, **kwargs)
         self.config_section = config_section
         self.exclude_config_sections = exclude_config_sections
         self.children = children
+        if exclude_config_sections and \
+           (self.default_section == self.config_section):
+            raise ConfigurableError(
+                'you must set exclude_config_sections to False when the ' +
+                'import and config section are the same')
 
     def _mod_name(self) -> str:
         mname = sys.modules[__name__].__name__
@@ -147,7 +179,7 @@ class ImportIniConfig(IniConfig):
 
     def _get_children(self) -> Iterable[Configurable]:
         if not self.config_file.is_file():
-            raise ValueError('not a file: {self.config_file}')
+            raise ConfigurableError('not a file: {self.config_file}')
         mod_name = self._mod_name()
         conf_sec = self.config_section
         parser = self._get_bootstrap_parser()
