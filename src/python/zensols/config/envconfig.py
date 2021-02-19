@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 class EnvironmentConfig(Configurable):
     """An implementation configuration class that holds environment variables.
 
+    This config will need to be added to children to :class:`.ImportIniConfig`
+    if used in the configuration or import sections.
+
     """
     def __init__(self, section_name: str = 'env', expect: bool = False,
                  map_delimiter: str = None):
