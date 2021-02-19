@@ -17,14 +17,15 @@ class EnvironmentConfig(Configurable):
     """An implementation configuration class that holds environment variables.
 
     """
-    def __init__(self, section_name: str = 'env',
-                 default_expect: bool = False,
+    def __init__(self, section_name: str = 'env', expect: bool = False,
                  map_delimiter: str = None):
         """Initialize with a string given as described in the class docs.
 
-        :param config_str: the configuration
+        :param section_name: the name of the created section with the
+                             environment variables
 
-        :param option_sep: the string used to delimit the section
+        :param expect: whether or not to raise an error when missing
+                       options for all ``get_option*`` methods
 
         :param map_delimiter: when given, all environment values are replaced
                               with a duplicate; set this to ``$`` when using
@@ -32,8 +33,7 @@ class EnvironmentConfig(Configurable):
                               environment variables such as ``PS1``
 
         """
-        super().__init__(default_expect, section_name)
-        self.default_expect = default_expect
+        super().__init__(expect, section_name)
         self.map_delimiter = map_delimiter
 
     @persisted('_parsed_config')
