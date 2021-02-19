@@ -69,18 +69,23 @@ class EnvironmentConfig(Configurable):
         keys = self._get_keys()
         return self.default_section == section and name in keys
 
-    def get_options(self, section: str = None, opt_keys: Set[str] = None,
-                    vars: Dict[str, str] = None) -> Dict[str, str]:
-        opt_keys = os.environ.keys() if opt_keys is None else opt_keys
+    @persisted('_env_section')
+    def _get_env_section(self) -> Dict[str, str]:
+        opts = {}
+        delim = self.map_delimiter
+        if delim is not None:
+            repl = f'{delim}{delim}'
+        for k, v in os.environ.items():
+            if delim is None:
+                val = v
+            else:
+                val = v.replace(delim, repl)
+            opts[k] = val
+        return opts
+
+    def get_options(self, section: str = None) -> Dict[str, str]:
         if section == self.default_section:
-            opts = {}
-            delim = self.map_delimiter
-            if delim is not None:
-                repl = f'{delim}{delim}'
-            for k, v in os.environ.items():
-                if delim is not None:
-                    v = v.replace(delim, repl)
-                opts[k] = v
+            opts = self._get_env_section()
         else:
             opts = {}
         return opts
