@@ -23,6 +23,7 @@ class ActionCli(object):
 @dataclass
 class ActionCliFactory(object):
     """Boots the application context from the command line.
+
     """
 
     UTIL_PACKAGE = 'zensols.util'
@@ -65,6 +66,11 @@ class ActionCliFactory(object):
         return ImportIniConfig(path, children=(app_conf,))
 
     def create(self) -> ActionCli:
+        """Create the action CLI application.
+
+        :raises ActionCliError: for any missing or misconfigurations
+
+        """
         path = self.package_resource.get_path(self.app_config_resource)
         if not path.exists():
             raise ActionCliError(
@@ -77,6 +83,3 @@ class ActionCliFactory(object):
             raise ActionCliError(
                 f'wrong type of application CLI created: {type(inst)}')
         return inst
-
-    def tmp(self):
-        self.create_appliction()
