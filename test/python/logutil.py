@@ -16,3 +16,8 @@ class LogTestCase(unittest.TestCase):
 
     def tearDown(self):
         LogUtil.reset()
+
+    def config_logging(self, name: str):
+        print()
+        logging.basicConfig(level=logging.WARNING)
+        logging.getLogger(name).setLevel(logging.DEBUG)
