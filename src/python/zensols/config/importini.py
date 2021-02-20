@@ -193,7 +193,10 @@ class ImportIniConfig(IniConfig):
                 params = parser.populate(section=sec).asdict()
                 class_name = params.get('class_name')
                 if class_name is None:
-                    tpe = params['type']
+                    tpe = params.get('type')
+                    if tpe is None:
+                        raise ConfigurableError(
+                            f"import section '{sec}' has no 'type' parameter")
                     del params['type']
                     class_name = f'{mod_name}.{tpe.capitalize()}Config'
                 else:
