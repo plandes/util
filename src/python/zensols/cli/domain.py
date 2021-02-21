@@ -3,19 +3,19 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 from dataclasses import dataclass, field
 import logging
 from pathlib import Path
-from optparse import OptionParser
 import optparse
+from zensols.persist import persisted
 from zensols.config import Dictable
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
-class Option(Dictable):
+class OptionMetaData(Dictable):
     """A command line option."""
 
     long_name: str = field()
@@ -85,16 +85,37 @@ class Option(Dictable):
             params['choices'] = self.choices
         if self.doc is not None:
             params['help'] = self.doc
-        for att in 'metavar dest'.split():
+        for att in 'metavar dest default'.split():
             v = getattr(self, att)
             if v is not None:
                 params[att] = v
         if self.dtype == bool:
             if self.default is True:
                 params['action'] = 'store_false'
+            else:
+                params['action'] = 'store_true'
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'params: {params}')
         return optparse.Option(long_name, short_name, **params)
+
+
+@dataclass
+class PositionalMetaData(Dictable):
+    """A command line required argument that has no option switches.
+
+    """
+    name: str = field()
+    """The name of the positional argument.  Used in the documentation and when
+    parsing the type.
+
+    """
+
+    dtype: type = field(default=str)
+    """The type of the positional argument.
+
+    :see: :obj:`.Option.dtype`
+
+    """
 
 
 class OptionFactory(object):
@@ -102,22 +123,24 @@ class OptionFactory(object):
 
     """
     @classmethod
-    def dry_run(cls: type) -> Option:
-        return Option('dry_run', 'd', dtype=bool,
-                      doc="don't do anything; just act like it")
+    def dry_run(cls: type, **kwargs) -> OptionMetaData:
+        return OptionMetaData('dry_run', 'd', dtype=bool,
+                              doc="don't do anything; just act like it",
+                              **kwargs)
 
     @classmethod
-    def file(cls: type, name: str, short_name: str):
-        return Option(name, short_name, dtype=Path,
-                      doc=f'the path to the {name} file')
+    def file(cls: type, name: str, short_name: str, **kwargs):
+        return OptionMetaData(name, short_name, dtype=Path,
+                              doc=f'the path to the {name} file',
+                              **kwargs)
 
     @classmethod
-    def config_file(cls: type) -> Option:
-        return cls.file('config', 'c')
+    def config_file(cls: type, **kwargs) -> OptionMetaData:
+        return cls.file('config', 'c', **kwargs)
 
 
 @dataclass
-class Action(Dictable):
+class ActionMetaData(Dictable):
     """An action represents a link between a command line mnemonic *action* and a
     method on a class to invoke.
 
@@ -132,5 +155,13 @@ class Action(Dictable):
     doc: str = field(default=None)
     """A short human readable documentation string used in the usage."""
 
-    options: Tuple[Option] = field(default_factory=lambda: ())
+    options: Tuple[OptionMetaData] = field(default_factory=lambda: ())
     """The command line options for the action."""
+
+    positional: Tuple[PositionalMetaData] = field(default_factory=lambda: ())
+    """The positional arguments expected for the action."""
+
+    @property
+    @persisted('_options_by_name')
+    def options_by_name(self) -> Dict[str, OptionMetaData]:
+        return {m.long_name: m for m in self.options}
