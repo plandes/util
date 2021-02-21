@@ -24,7 +24,11 @@ class UsageWriter(Writable):
     def __post_init__(self):
         self.actions = sorted(self.actions, key=lambda a: a.name)
         self.action_names = tuple(map(lambda a: a.name, self.actions))
-        self.parser.usage = f"%prog <{'|'.join(self.action_names)}> [options]:"
+        if len(self.action_names) > 1:
+            actions = "<{'|'.join(self.action_names)}>"
+        else:
+            actions = ''
+        self.parser.usage = f"%prog {actions}[options]:"
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         actions = sorted(self.actions, key=lambda a: a.name)
@@ -62,9 +66,9 @@ class UsageWriter(Writable):
         opt_str_fmt = ('{:<' + str(opt_str_len) + '}  {:<' +
                        str(def_str_len) + '}  {}\n')
 
-        self.parser.print_help(writer)
+        #self.parser.print_help(writer)
 
-        if len(self.actions) > 0:
+        if len(self.actions) > 1:
             writer.write('\nActions:\n')
             for i, ah in enumerate(action_help):
                 writer.write(ah['doc'] + '\n')

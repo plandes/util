@@ -73,13 +73,16 @@ class Option(Dictable):
         tpe = {str: 'string',
                int: 'int',
                float: 'float',
-               Path: 'file',
+               bool: None,
+               Path: None,
                list: 'choice'}[self.dtype]
         params = {}
         long_name = f'--{self.long_name}'
         short_name = None if self.short_name is None else f'-{self.short_name}'
-        if tpe != 'file':
+        if tpe is not None:
             params['type'] = tpe
+        if self.dtype == list:
+            params['choices'] = self.choices
         if self.doc is not None:
             params['help'] = self.doc
         for att in 'metavar dest'.split():
@@ -89,8 +92,6 @@ class Option(Dictable):
         if self.dtype == bool:
             if self.default is True:
                 params['action'] = 'store_false'
-        if tpe == 'choice':
-            params['choices'] = self.choices
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'params: {params}')
         return optparse.Option(long_name, short_name, **params)
