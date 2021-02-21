@@ -3,12 +3,15 @@ from __future__ import annotations
 
 """
 
-from typing import Any
+from typing import Any, Dict
 from dataclasses import dataclass, field
 import dataclasses
 import logging
 from pathlib import Path
-from zensols.util import PackageResource, DataClassInspector
+from zensols.util import (
+    PackageResource,
+    DataClassInspector, FieldMetaData,
+)
 from zensols.config import (
     Configurable, ImportIniConfig, DictionaryConfig, ImportConfigFactory,
     ClassImporter,
@@ -64,10 +67,6 @@ class ActionCliFactory(object):
                             'type': 'ini'}})
         return ImportIniConfig(path, children=(app_conf,))
 
-    def _get_field_docs(self, cls: type):
-        dh = DataClassInspector(cls)
-        return dh.get_field_docs()
-
     def _get_cli(self, config: Configurable):
         cls = config.get_option('class_name', self.APP_SECTION)
         if logger.isEnabledFor(logging.DEBUG):
@@ -77,7 +76,8 @@ class ActionCliFactory(object):
             logger.debug(f'resolved to class: {cls}')
         if not dataclasses.is_dataclass(cls):
             raise ActionCliError('application CLI app must be a dataclass')
-        fdocs = self._get_field_docs(cls)
+        dh = DataClassInspector(cls)
+        fdocs: Dict[str, FieldMetaData] = dh.get_field_docs()
         from pprint import pprint
         pprint(fdocs)
 
