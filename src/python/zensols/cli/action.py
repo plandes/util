@@ -3,21 +3,19 @@ from __future__ import annotations
 
 """
 
+from typing import Any
 from dataclasses import dataclass, field
+import dataclasses
 import logging
 from pathlib import Path
-from zensols.util import PackageResource
+from zensols.util import PackageResource, DataClassInspector
 from zensols.config import (
-    Configurable, ImportIniConfig, DictionaryConfig, ImportConfigFactory
+    Configurable, ImportIniConfig, DictionaryConfig, ImportConfigFactory,
+    ClassImporter,
 )
 from . import ActionCliError
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class ActionCli(object):
-    pass
 
 
 @dataclass
@@ -39,7 +37,7 @@ class ActionCliFactory(object):
     """The relative resource path to the application's context."""
 
     @classmethod
-    def instance(cls, package_name: str, *args, **kwargs) -> ActionCli:
+    def instance(cls, package_name: str, *args, **kwargs) -> ActionCliFactory:
         """"A create facade method.
 
         :param package_name: used to create the :obj:`package_resource`
@@ -53,19 +51,37 @@ class ActionCliFactory(object):
     def _get_app_context(self, app_context: Path) -> Configurable:
         pres = PackageResource(self.UTIL_PACKAGE)
         res = 'resources/app.conf'
-        if logger.isEnabledFor(logging.INFO):
-            logger.info(f'looking up resource: {res} in {pres}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'looking up resource: {res} in {pres}')
         path = pres.get_path(res)
         if not path.exists():
             # this should never not happen
             raise ValueError(f'no application context found: {path}')
-        logger.info(f'loading app config: {path}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'loading app config: {path}')
         app_conf = DictionaryConfig(
             {'import_app': {'config_file': str(app_context.absolute()),
                             'type': 'ini'}})
         return ImportIniConfig(path, children=(app_conf,))
 
-    def create(self) -> ActionCli:
+    def _get_field_docs(self, cls: type):
+        dh = DataClassInspector(cls)
+        return dh.get_field_docs()
+
+    def _get_cli(self, config: Configurable):
+        cls = config.get_option('class_name', self.APP_SECTION)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'building CLI on class: {cls}')
+        cls = ClassImporter(cls).get_class()
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'resolved to class: {cls}')
+        if not dataclasses.is_dataclass(cls):
+            raise ActionCliError('application CLI app must be a dataclass')
+        fdocs = self._get_field_docs(cls)
+        from pprint import pprint
+        pprint(fdocs)
+
+    def create(self) -> Any:
         """Create the action CLI application.
 
         :raises ActionCliError: for any missing or misconfigurations
@@ -77,9 +93,7 @@ class ActionCliFactory(object):
                 f"application context resource '{self.app_config_resource}' " +
                 f'not found in {self.package_resource}')
         config = self._get_app_context(path)
+        cli = self._get_cli(config)
         fac = ImportConfigFactory(config)
         inst = fac.instance(self.APP_SECTION)
-        if not isinstance(inst, ActionCli):
-            raise ActionCliError(
-                f'wrong type of application CLI created: {type(inst)}')
         return inst

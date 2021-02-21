@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any
+from typing import Any, Tuple
 import logging
 import importlib
 from functools import reduce
@@ -40,12 +40,9 @@ class ClassImporter(object):
             raise ValueError(f'not a fully qualified class name: {cname}')
         return match.groups()
 
-    def get_module_class(self):
+    def get_module_class(self) -> Tuple[object, type]:
         """Return the module and class as a tuple of the given class in the
         initializer.
-
-        :param reload: if ``True`` then reload the module before returning the
-                       class
 
         """
         pkg, cname = self.parse_module_class()
@@ -61,6 +58,12 @@ class ClassImporter(object):
         cls = getattr(mod, cname)
         logger.debug(f'class: {cls}')
         return mod, cls
+
+    def get_class(self) -> type:
+        """Return the given class in the initializer.
+
+        """
+        return self.get_module_class()[1]
 
     def _bless(self, inst: Any) -> Any:
         """A template method to modify a nascent instance just created.  The returned
@@ -83,7 +86,7 @@ class ClassImporter(object):
                      new class
 
         """
-        mod, cls = self.get_module_class()
+        cls = self.get_class()
         try:
             logger.debug(f'class importer creating instance of {cls}')
             inst = cls(*args, **kwargs)
