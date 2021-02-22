@@ -24,6 +24,6 @@ class TestActionObjectCli(LogTestCase):
         #self.config_logging('zensols.cli')
         cli = ActionCliFactory.instance(
             'zensols.testapp', 'test-resources/test_app.conf')
-        app = cli.create()
-        self.assertTrue(isinstance(app, TestActionCli))
+        #app = cli.create()
+        #self.assertTrue(isinstance(app, TestActionCli))
         #app.write()

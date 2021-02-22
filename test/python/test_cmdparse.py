@@ -136,7 +136,11 @@ test                a test action
                               doc='the number of results', **n_kwargs)
         res_action = ActionMetaData('results', 'a test action',
                                     (self.dry_opt, n_op))
-        return show_action, res_action, self.test_action2
+        mix_action = ActionMetaData(
+            'env', 'print environment',
+            (self.dry_opt, n_op),
+            positional=[PositionalMetaData('section', Path)])
+        return show_action, res_action, self.test_action2, mix_action
 
     def test_parse_op_pos(self):
         parser = CommandLineParser(self._complex_actions())
@@ -163,3 +167,30 @@ test                a test action
         self.assertEqual('results', action.meta_data.name)
         self.assertEqual((), action.positional)
         self.assertEqual({'dry_run': None, 'numres': 14}, action.options)
+
+    def test_parse_mix(self):
+        parser = CommandLineParser(self._complex_actions())
+        action: Action = parser.parse('env b.txt'.split())
+        self.assertEqual('env', action.meta_data.name)
+        self.assertEqual((Path('b.txt'),), action.positional)
+        self.assertEqual({'dry_run': None, 'numres': None}, action.options)
+
+        action: Action = parser.parse('env b.txt -n 14'.split())
+        self.assertEqual('env', action.meta_data.name)
+        self.assertEqual((Path('b.txt'),), action.positional)
+        self.assertEqual({'dry_run': None, 'numres': 14}, action.options)
+
+        action: Action = parser.parse('env b.txt -n 14 -d'.split())
+        self.assertEqual('env', action.meta_data.name)
+        self.assertEqual((Path('b.txt'),), action.positional)
+        self.assertEqual({'dry_run': True, 'numres': 14}, action.options)
+
+        action: Action = parser.parse('env b.txt -d -n 15'.split())
+        self.assertEqual('env', action.meta_data.name)
+        self.assertEqual((Path('b.txt'),), action.positional)
+        self.assertEqual({'dry_run': True, 'numres': 15}, action.options)
+
+        action: Action = parser.parse('env -n 16 b.txt'.split())
+        self.assertEqual('env', action.meta_data.name)
+        self.assertEqual((Path('b.txt'),), action.positional)
+        self.assertEqual({'dry_run': None, 'numres': 16}, action.options)
