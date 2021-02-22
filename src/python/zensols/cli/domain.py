@@ -14,7 +14,7 @@ from zensols.config import Dictable
 logger = logging.getLogger(__name__)
 
 
-@dataclass
+@dataclass(eq=True, order=True, unsafe_hash=True)
 class OptionMetaData(Dictable):
     """A command line option."""
 
@@ -62,7 +62,7 @@ class OptionMetaData(Dictable):
             elif self.dtype == bool:
                 self.metavar = None
             else:
-                self.metavar = str(self.dtype).upper()
+                self.metavar = self.dtype.__name__
 
     def create_option(self) -> optparse.Option:
         """Add the option to an option parser.

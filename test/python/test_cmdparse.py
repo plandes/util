@@ -16,7 +16,7 @@ class TestArgumentParse(LogTestCase):
             'test', 'a test action', tuple([self.dry_opt]))
         self.test_action2 = ActionMetaData(
             'prconfig', 'a second test action',
-            positional=[PositionalMetaData('file')])
+            positional=[PositionalMetaData('file', Path)])
 
     def test_opt_create(self):
         opt = self.conf_opt
@@ -43,15 +43,19 @@ Usage: python -m unittest [options]:
 Options:
   --version             show program's version number and exit
   -h, --help            show this help message and exit
+  -d, --dry_run         don't do anything; just act like it
   -c FILE, --config=FILE
                         the path to the config file
-  -d, --dry_run         don't do anything; just act like it
 """
         parser = CommandLineParser(tuple([self.test_action]),
                                    tuple([OptionFactory.config_file()]))
         sio = StringIO()
         parser.write_help(writer=sio)
-        self.assertEqual(should, sio.getvalue())
+        should_lines = sorted(should.split('\n'))
+        val_lines = sorted(sio.getvalue().split('\n'))
+        # each run reorders the -d and -c options--so it must use a dict
+        #self.assertEqual(should, sio.getvalue())
+        self.assertEqual(should_lines, val_lines)
 
         should = """\
 Usage: python -m unittest <prconfig|test> [options]:
@@ -120,6 +124,36 @@ test                a test action
         self.assertEqual('test', action.meta_data.name)
         self.assertEqual((), action.positional)
         self.assertEqual({'dry_run': True}, action.options)
+        action: Action = parser.parse('prconfig a.txt'.split())
+        self.assertEqual('prconfig', action.meta_data.name)
+        self.assertEqual(1, len(action.positional))
+        self.assertEqual(Path('a.txt'), action.positional[0])
+
+    def _complex_actions(self, n_kwargs={}) -> CommandLineParser:
+        show_action = ActionMetaData('show', 'print configuration',
+                                     tuple([self.dry_opt, self.conf_opt]))
+        n_op = OptionMetaData('numres', 'n', dtype=int,
+                              doc='the number of results', **n_kwargs)
+        res_action = ActionMetaData('results', 'a test action',
+                                    (self.dry_opt, n_op))
+        return show_action, res_action, self.test_action2
+
+    def test_parse_op_pos(self):
+        parser = CommandLineParser(self._complex_actions())
+        action: Action = parser.parse(['results'])
+        self.assertEqual('results', action.meta_data.name)
+        self.assertEqual((), action.positional)
+        self.assertEqual({'dry_run': None, 'numres': None}, action.options)
+        action: Action = parser.parse('results -n 1234'.split())
+        self.assertEqual('results', action.meta_data.name)
+        self.assertEqual((), action.positional)
+        self.assertEqual({'dry_run': None, 'numres': 1234}, action.options)
+
+        parser = CommandLineParser(self._complex_actions({'default': 14}))
+        action: Action = parser.parse(['results'])
+        self.assertEqual('results', action.meta_data.name)
+        self.assertEqual((), action.positional)
+        self.assertEqual({'dry_run': None, 'numres': 14}, action.options)
 
     def xtest(self):
         self.test_action = ActionMetaData(

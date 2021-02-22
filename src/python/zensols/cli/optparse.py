@@ -92,7 +92,7 @@ class CommandLineParser(Dictable):
             opts.extend(chain.from_iterable(
                 map(lambda a: a.options, self.actions)))
         parser = self._create_parser(actions)
-        self._configure_parser(parser, opts)
+        self._configure_parser(parser, set(opts))
         return parser
 
     def _get_action_parser(self, action_meta: ActionMetaData) -> \
@@ -118,9 +118,14 @@ class CommandLineParser(Dictable):
             if not isinstance(s, (str, int, bool, Path)):
                 raise ValueError(f'unknown parse type: {s}: {t}')
             return t(s)
-        return tuple(map(parse, zip(metas, vals)))
+
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'parsing positional args: {metas} <--> {vals}')
+        return tuple(map(lambda x: parse(x[0], x[1].dtype), zip(vals, metas)))
 
     def parse(self, args: List[str]) -> Action:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'parsing: {args}')
         parser: OptionParser = self._get_top_parser(True)
         (options, op_args) = parser.parse_args(args)
         second_pass = False
@@ -129,6 +134,8 @@ class CommandLineParser(Dictable):
         elif len(args) == 0:
             raise CommandLineError('no action given')
         else:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'first pass: {options}:{op_args}')
             action_name = op_args[0]
             op_args = op_args[1:]
             second_pass = True
@@ -140,10 +147,12 @@ class CommandLineParser(Dictable):
                 f"action '{action.name}' expects {len(action.positional)} " +
                 f'arguments but got {len(op_args)}')
         if second_pass:
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'second pass: {action.name}, args: {args}')
             parser: OptionParser = self._get_action_parser(action)
             (options, op_args) = parser.parse_args(args)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'second pass: {options}::{op_args}')
+            assert(op_args[0] == action.name)
+            op_args = op_args[1:]
         pos_args = self._parse_positional(action.positional, op_args)
         options = vars(options)
         return Action(action, options, pos_args)
