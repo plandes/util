@@ -3,19 +3,19 @@ from pathlib import Path
 from logutil import LogTestCase
 from zensols.cli import (
     OptionMetaData, PositionalMetaData, ActionMetaData, OptionFactory,
-    Action, CommandLineParser
+    CommandLineError, Action, CommandLineParser
 )
 
 
 class TestArgumentParse(LogTestCase):
     def setUp(self):
-        self.config_logging('zensols.cli')
+        #self.config_logging('zensols.cli')
         self.conf_opt = OptionFactory.config_file()
         self.dry_opt = OptionFactory.dry_run()
         self.test_action = ActionMetaData(
             'test', 'a test action', tuple([self.dry_opt]))
         self.test_action2 = ActionMetaData(
-            'testmore', 'a second test action',
+            'prconfig', 'a second test action',
             positional=[PositionalMetaData('file')])
 
     def test_opt_create(self):
@@ -54,7 +54,7 @@ Options:
         self.assertEqual(should, sio.getvalue())
 
         should = """\
-Usage: python -m unittest <test|testmore> [options]:
+Usage: python -m unittest <prconfig|test> [options]:
 
 Options:
   --version             show program's version number and exit
@@ -63,10 +63,10 @@ Options:
                         the path to the config file
 
 Actions:
+prconfig <file>     a second test action
+
 test                a test action
   -d, --dry_run    don't do anything; just act like it
-
-testmore <file>     a second test action
 """
         parser = CommandLineParser(tuple([self.test_action, self.test_action2]),
                                    tuple([OptionFactory.config_file()]))
@@ -74,24 +74,53 @@ testmore <file>     a second test action
         parser.write_help(writer=sio)
         self.assertEqual(should, sio.getvalue())
 
-    def test_parse(self):
+    def test_parse_basic(self):
         test_action = self.test_action
         parser = CommandLineParser(tuple([test_action]))
         action: Action = parser.parse([])
         self.assertEqual(Action, type(action))
         self.assertEqual(0, len(action.positional))
+
+    def test_parse_option(self):
+        test_action = self.test_action
+        parser = CommandLineParser(tuple([test_action]))
+        action: Action = parser.parse([])
+        self.assertEqual('test', action.meta_data.name)
         self.assertEqual({'dry_run': None}, action.options)
+        self.assertEqual((), action.positional)
 
         action: Action = parser.parse(['-d'])
         self.assertEqual({'dry_run': True}, action.options)
+        self.assertEqual((), action.positional)
 
         test_action = ActionMetaData(
             'test', 'a test action',
             tuple([OptionFactory.dry_run(default=True)]))
         parser = CommandLineParser(tuple([test_action]))
+        action: Action = parser.parse([])
+        self.assertEqual({'dry_run': True}, action.options)
+        self.assertEqual((), action.positional)
         action: Action = parser.parse(['-d'])
         self.assertEqual({'dry_run': False}, action.options)
+        self.assertEqual((), action.positional)
 
-    def test(self):
+    def test_parse_position(self):
+        parser = CommandLineParser((self.test_action,))
+        with self.assertRaisesRegex(CommandLineError, r"^action 'test' expects 0.*"):
+            parser.parse(['test'])
+        parser = CommandLineParser((self.test_action, self.test_action2))
+        with self.assertRaisesRegex(CommandLineError, r'^no action given$'):
+            parser.parse([])
+        parser = CommandLineParser((self.test_action, self.test_action2))
+        action: Action = parser.parse(['test'])
+        self.assertEqual('test', action.meta_data.name)
+        self.assertEqual((), action.positional)
+        self.assertEqual({'dry_run': None}, action.options)
+        action: Action = parser.parse('test -d'.split())
+        self.assertEqual('test', action.meta_data.name)
+        self.assertEqual((), action.positional)
+        self.assertEqual({'dry_run': True}, action.options)
+
+    def xtest(self):
         self.test_action = ActionMetaData(
             'test', 'a test action', tuple([OptionFactory.dry_run()]))

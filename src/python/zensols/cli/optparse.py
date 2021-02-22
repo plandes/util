@@ -3,10 +3,11 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, List, Any, Dict
+from typing import Tuple, List, Any, Dict, Iterable
 from dataclasses import dataclass, field
 import logging
 import sys
+from itertools import chain
 from pathlib import Path
 from io import TextIOBase
 from optparse import OptionParser
@@ -18,6 +19,10 @@ from . import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class CommandLineError(ActionCliError):
+    pass
 
 
 class ActionOptionParser(OptionParser):
@@ -67,21 +72,36 @@ class CommandLineParser(Dictable):
             actions, version='%prog ' + str(self.version))
 
     def _configure_parser(self, parser: OptionParser,
-                          options: List[OptionMetaData]):
+                          options: Iterable[OptionMetaData]):
+        opt_names = set()
         for opt in options:
+            if opt.long_name in opt_names:
+                raise ValueError(f'duplicate option: {opt.long_name}')
+            opt_names.add(opt.long_name)
             op_opt = opt.create_option()
             parser.add_option(op_opt)
 
-    @persisted('_parser')
-    def _get_parser(self) -> ActionOptionParser:
+    def _get_top_parser(self, add_all_opts: bool) -> ActionOptionParser:
         opts = list(self.top_options)
         actions = self.actions
         if len(self.actions) == 1:
             # TODO: add singleton action doc
-            opts.extend(actions[0].options)
             actions = (self.actions[0],)
+            opts.extend(actions[0].options)
+        elif add_all_opts:
+            opts.extend(chain.from_iterable(
+                map(lambda a: a.options, self.actions)))
         parser = self._create_parser(actions)
         self._configure_parser(parser, opts)
+        return parser
+
+    def _get_action_parser(self, action_meta: ActionMetaData) -> \
+            ActionOptionParser:
+        parser = self._create_parser(self.actions)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"creating parser for action: '{action_meta.name}' " +
+                         f'opts: {action_meta.options}')
+        self._configure_parser(parser, action_meta.options)
         return parser
 
     @property
@@ -90,7 +110,7 @@ class CommandLineParser(Dictable):
         return {a.name: a for a in self.actions}
 
     def write_help(self, writer: TextIOBase = sys.stdout):
-        self._get_parser().print_help(file=writer)
+        self._get_top_parser(False).print_help(file=writer)
 
     def _parse_positional(self, metas: List[PositionalMetaData],
                           vals: List[str]) -> Tuple[Any]:
@@ -101,22 +121,29 @@ class CommandLineParser(Dictable):
         return tuple(map(parse, zip(metas, vals)))
 
     def parse(self, args: List[str]) -> Action:
-        parser: OptionParser = self._get_parser()
-        (options, args) = parser.parse_args(args)
+        parser: OptionParser = self._get_top_parser(True)
+        (options, op_args) = parser.parse_args(args)
+        second_pass = False
         if len(self.actions) == 1:
             action_name = self.actions[0].name
         elif len(args) == 0:
-            raise ActionCliError('no action given')
+            raise CommandLineError('no action given')
         else:
-            action_name = args[0]
-            args = args[1:]
+            action_name = op_args[0]
+            op_args = op_args[1:]
+            second_pass = True
         action = self.actions_by_name.get(action_name)
         if action is None:
-            raise ActionCliError(f'no such action: {action_name}')
-        if len(action.positional) != len(args):
-            raise ActionCliError(
-                f'action {action.name} expects {len(action.arguments)} ' +
-                f'but got {len(args)}')
-        pargs = self._parse_positional(action.positional, args)
+            raise CommandLineError(f'no such action: {action_name}')
+        if len(action.positional) != len(op_args):
+            raise CommandLineError(
+                f"action '{action.name}' expects {len(action.positional)} " +
+                f'arguments but got {len(op_args)}')
+        if second_pass:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'second pass: {action.name}, args: {args}')
+            parser: OptionParser = self._get_action_parser(action)
+            (options, op_args) = parser.parse_args(args)
+        pos_args = self._parse_positional(action.positional, op_args)
         options = vars(options)
-        return Action(action, options, pargs)
+        return Action(action, options, pos_args)
