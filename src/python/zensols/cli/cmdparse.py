@@ -228,6 +228,12 @@ class CommandLineParser(Dictable):
         return action_meta, options, op_args
 
     def parse(self, args: List[str]) -> Tuple[Action]:
+        """Parse command line arguments.
+
+        :param args: the arguments given on the command line; which is usually
+                     ``sys.args[1:]``
+
+        """
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'parsing: {args}')
         # action instances
@@ -239,7 +245,8 @@ class CommandLineParser(Dictable):
         action_meta, options, op_args = self._parse_second_pass(
             action_name, second_pass, args, options, op_args)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'removing first pass options: {fp_opts} from {options}')
+            logger.debug(f'removing first pass options: {fp_opts} ' +
+                         f'from {options}')
         # the second pass action should _not_ get the first pass options
         options = {k: options[k] for k in (set(options.keys()) - fp_opts)}
         # parse positional arguments much like the OptionParser did options
