@@ -153,6 +153,11 @@ test                a test action
         self.assertEqual((), action.positional)
         self.assertEqual({'dry_run': True, 'numres': 1234}, action.options)
 
+        action: Action = parser.parse('prconfig b.txt'.split())
+        self.assertEqual('prconfig', action.meta_data.name)
+        self.assertEqual((Path('b.txt'),), action.positional)
+        self.assertEqual({}, action.options)
+
         parser = CommandLineParser(self._complex_actions({'default': 14}))
         action: Action = parser.parse(['results'])
         self.assertEqual('results', action.meta_data.name)
