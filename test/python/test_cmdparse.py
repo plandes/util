@@ -148,13 +148,13 @@ test                a test action
         self.assertEqual('results', action.meta_data.name)
         self.assertEqual((), action.positional)
         self.assertEqual({'dry_run': None, 'numres': 1234}, action.options)
+        action: Action = parser.parse('results -n 1234 -d'.split())
+        self.assertEqual('results', action.meta_data.name)
+        self.assertEqual((), action.positional)
+        self.assertEqual({'dry_run': True, 'numres': 1234}, action.options)
 
         parser = CommandLineParser(self._complex_actions({'default': 14}))
         action: Action = parser.parse(['results'])
         self.assertEqual('results', action.meta_data.name)
         self.assertEqual((), action.positional)
         self.assertEqual({'dry_run': None, 'numres': 14}, action.options)
-
-    def xtest(self):
-        self.test_action = ActionMetaData(
-            'test', 'a test action', tuple([OptionFactory.dry_run()]))

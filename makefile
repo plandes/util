@@ -5,6 +5,6 @@ PROJ_TYPE=	python
 PROJ_MODULES=	git python-doc python-doc-deploy python-resources
 
 #PY_SRC_TEST_PAT ?=	'test_ocli.py'
-PY_SRC_TEST_PAT ?=	'test_cmdp*.py'
+#PY_SRC_TEST_PAT ?=	'test_cmdp*.py'
 
 include ./zenbuild/main.mk
