@@ -288,3 +288,17 @@ test                a test action
         self.assertEqual('env', action.name)
         self.assertEqual((Path('b.txt'),), action.positional)
         self.assertEqual({'dry_run': None, 'numres': None}, action.options)
+
+        action_set: ActionSet = parser.parse('env b.txt -c c.conf -d -n 18'.split())
+        self.assertEqual(2, len(action_set))
+        self.assertEqual(1, len(action_set.first_pass_actions))
+        action: Action = action_set.first_pass_actions[0]
+        self.assertEqual('config', action.name)
+        self.assertEqual({'config': 'c.conf'}, action.options)
+        action: Action = action_set.second_pass_action
+        self.assertEqual('env', action.name)
+        self.assertEqual((Path('b.txt'),), action.positional)
+        self.assertEqual({'dry_run': True, 'numres': 18}, action.options)
+
+        with self.assertRaisesRegex(CommandLineError, '^no action given$'):
+            parser.parse('-c c.conf'.split())
