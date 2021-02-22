@@ -14,18 +14,12 @@ from optparse import OptionParser
 from zensols.persist import persisted
 from zensols.config import Dictable
 from . import (
+    CommandLineError, UsageWriter,
     OptionMetaData, PositionalMetaData, ActionMetaData,
-    ActionCliError, UsageWriter,
+    Action, ActionSet,
 )
 
 logger = logging.getLogger(__name__)
-
-
-class CommandLineError(ActionCliError):
-    """Raised when command line parameters can not be parsed.
-
-    """
-    pass
 
 
 class ActionOptionParser(OptionParser):
@@ -46,91 +40,69 @@ class ActionOptionParser(OptionParser):
 
 
 @dataclass
-class Action(Dictable):
-    """The output of the :class:`.CommandLineParser`.
-
-    """
-    meta_data: ActionMetaData = field()
-    """The action parsed from the command line."""
-
-    options: Dict[str, Any] = field()
-    """The options given as switches."""
-
-    positional: Tuple[str] = field()
-    """The positional arguments parsed."""
-
-    @property
-    def name(self) -> str:
-        """The name of the action."""
-        return self.meta_data.name
-
-
-@dataclass
-class ActionSet(Dictable):
-    """The actions that are parsed by :class:`.CommandLineParser`.
-
-    """
-    actions: Tuple[Action] = field()
-    """The actions parsed.  The first N actions are first pass where as the last is
-    the second pass action.
-
-    """
-
-    @property
-    def first_pass_actions(self) -> Iterable[Action]:
-        return self.actions[0:-1]
-
-    @property
-    def second_pass_action(self) -> Action:
-        return self.actions[-1]
-
-    @property
-    def by_name(self) -> Dict[str, Action]:
-        return {a.name: a for a in self.actions}
-
-    def __getitem__(self, name: str) -> Action:
-        return self.by_name[name]
-
-    def __iter__(self) -> Iterable[Action]:
-        return iter(self.actions)
-
-    def __len__(self) -> int:
-        return len(self.actions)
-
-
-@dataclass
 class CommandLineParser(Dictable):
     """Parse the command line.  The parser iterates twice over the command line:
 
-        1. The first pass parses first past actions 
+        1. The first pass parses only *first pass* actions
+           (:obj:`.ActionMetaData.first_pass`).  This step also is used to
+           discover the mnemonic/name of the single second pass action.
+
+        2. The second pass parse parses only a single action that is given on
+           the command line.
+
+
+    The name is given as a mnemonic of the action, unless there is only one
+    *second pass action* given, in which case all options and usage are given
+    at the top level and a mnemonic is not needed nor parsed.
+
+    :see :obj:`.ActionMetaData.first_pass`
+
     """
-    actions: Tuple[ActionMetaData]
+    actions: Tuple[ActionMetaData] = field()
+    """The action meta data used to parse and print help."""
+
     version: str = field(default='v0')
+    """The version of the application, which is used in the help and the
+    ``--version`` switch.
+
+    """
 
     def __post_init__(self):
         if len(self.actions) == 0:
             raise ValueError('must create parser with at least one action')
 
     @property
-    @persisted('_first_pass_actions')
-    def first_pass_actions(self) -> Tuple[Action]:
+    @persisted('_first_pass_actions_pw')
+    def _first_pass_actions(self) -> Tuple[Action]:
         return tuple(filter(lambda a: a.first_pass, self.actions))
 
     @property
-    @persisted('_second_pass_actions')
-    def second_pass_actions(self) -> Tuple[Action]:
+    @persisted('_second_pass_actions_pw')
+    def _second_pass_actions(self) -> Tuple[Action]:
         return tuple(filter(lambda a: not a.first_pass, self.actions))
 
     @property
-    @persisted('_actions')
-    def actions_by_name(self) -> Dict[str, ActionMetaData]:
+    @persisted('_actions_by_name_pw')
+    def _actions_by_name(self) -> Dict[str, ActionMetaData]:
         return {a.name: a for a in self.actions}
 
     @property
-    @persisted('_first_pass_options')
-    def first_pass_options(self) -> Tuple[OptionMetaData]:
+    @persisted('_first_pass_options_pw')
+    def _first_pass_options(self) -> Tuple[OptionMetaData]:
         return tuple(chain.from_iterable(
-            map(lambda a: a.options, self.first_pass_actions)))
+            map(lambda a: a.options, self._first_pass_actions)))
+
+    @property
+    @persisted('_first_pass_by_option_pw')
+    def _first_pass_by_option(self) -> Dict[str, Action]:
+        actions = {}
+        for action in self._first_pass_actions:
+            for k, v in action.options_by_name.items():
+                if k in actions:
+                    raise ValueError(
+                        f"first pass duplicate option in '{action.name}': {k}")
+                actions[k] = action
+        return actions
 
     def _create_parser(self, actions: Tuple[ActionMetaData]) -> OptionParser:
         return ActionOptionParser(
@@ -147,8 +119,8 @@ class CommandLineParser(Dictable):
             parser.add_option(op_opt)
 
     def _get_first_pass_parser(self, add_all_opts: bool) -> ActionOptionParser:
-        opts = list(self.first_pass_options)
-        sp_actions = self.second_pass_actions
+        opts = list(self._first_pass_options)
+        sp_actions = self._second_pass_actions
         if len(sp_actions) == 1:
             # TODO: add singleton action doc
             sp_actions = (sp_actions[0],)
@@ -162,9 +134,9 @@ class CommandLineParser(Dictable):
 
     def _get_second_pass_parser(self, action_meta: ActionMetaData) -> \
             ActionOptionParser:
-        opts = list(self.first_pass_options)
+        opts = list(self._first_pass_options)
         opts.extend(action_meta.options)
-        parser = self._create_parser(self.second_pass_actions)
+        parser = self._create_parser(self._second_pass_actions)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"creating parser for action: '{action_meta.name}' " +
                          f'opts: {action_meta.options}')
@@ -185,25 +157,10 @@ class CommandLineParser(Dictable):
             logger.debug(f'parsing positional args: {metas} <--> {vals}')
         return tuple(map(lambda x: parse(x[0], x[1].dtype), zip(vals, metas)))
 
-    @property
-    @persisted('_first_pass_by_option')
-    def first_pass_by_option(self) -> Dict[str, Action]:
-        actions = {}
-        for action in self.first_pass_actions:
-            for k, v in action.options_by_name.items():
-                if k in actions:
-                    raise ValueError(
-                        f"first pass duplicate option in '{action.name}': {k}")
-                actions[k] = action
-        return actions
-
-    def parse(self, args: List[str]) -> Tuple[Action]:
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'parsing: {args}')
-        # action instances
-        actions: List[Action] = []
-        fp_opts = set(map(lambda o: o.long_name, self.first_pass_options))
+    def _parse_first_pass(self, args: List[str], actions: List[Action]) -> \
+            Tuple[bool, str, Dict[str, Any], Dict[str, Any], Tuple[str]]:
         second_pass = False
+        fp_opts = set(map(lambda o: o.long_name, self._first_pass_options))
         # first fish out the action name (if given) as a positional parameter
         parser: OptionParser = self._get_first_pass_parser(True)
         (options, op_args) = parser.parse_args(args)
@@ -213,7 +170,7 @@ class CommandLineParser(Dictable):
             logger.debug(f'first pass: {options}:{op_args}')
         # find first pass actions (i.e. whine log level '-w' settings)
         for k, v in options.items():
-            fp_action_meta = self.first_pass_by_option.get(k)
+            fp_action_meta = self._first_pass_by_option.get(k)
             if fp_action_meta is not None:
                 aos = {k: options[k] for k in (set(options.keys()) & fp_opts)}
                 action = Action(fp_action_meta, aos, ())
@@ -223,8 +180,8 @@ class CommandLineParser(Dictable):
         # if only one option for second pass actions are given, the user need
         # not give the action mnemonic/name, instead, just add all its options
         # to the top level
-        if len(self.second_pass_actions) == 1:
-            action_name = self.second_pass_actions[0].name
+        if len(self._second_pass_actions) == 1:
+            action_name = self._second_pass_actions[0].name
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'using singleton fp action: {action_name} ' + 
                              f'with options {options}')
@@ -240,8 +197,13 @@ class CommandLineParser(Dictable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'need second pass for {action_name}, ' +
                              f'option args: {op_args}')
+        return second_pass, action_name, fp_opts, options, op_args
+
+    def _parse_second_pass(self, action_name: str, second_pass: bool,
+                           args: List[str], options: Dict[str, Any],
+                           op_args: Tuple[str]):
         # now that we have parsed the action name, get the meta data
-        action_meta = self.actions_by_name.get(action_name)
+        action_meta = self._actions_by_name.get(action_name)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"action '{action_name}' found: {action_meta}")
         if action_meta is None:
@@ -251,20 +213,40 @@ class CommandLineParser(Dictable):
                 f"action '{action_meta.name}' expects " +
                 f"{len(action_meta.positional)} " +
                 f'arguments but got {len(op_args)}')
+        # if there is more than one second pass action, we must re-parse using
+        # the specific options and positional argument for that action
         if second_pass:
             parser: OptionParser = self._get_second_pass_parser(action_meta)
             (options, op_args) = parser.parse_args(args)
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'second pass: {options}::{op_args}')
+                logger.debug(f'second pass: {options}:{op_args}')
+            # sanity check to match parsed mnemonic and action name
             assert(op_args[0] == action_meta.name)
+            # remove the action name
             op_args = op_args[1:]
             options = vars(options)
+        return action_meta, options, op_args
+
+    def parse(self, args: List[str]) -> Tuple[Action]:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'parsing: {args}')
+        # action instances
+        actions: List[Action] = []
+        # first pass parse
+        second_pass, action_name, fp_opts, options, op_args = \
+            self._parse_first_pass(args, actions)
+        # second pass parse
+        action_meta, options, op_args = self._parse_second_pass(
+            action_name, second_pass, args, options, op_args)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'removing first pass options: {fp_opts} from {options}')
+        # the second pass action should _not_ get the first pass options
         options = {k: options[k] for k in (set(options.keys()) - fp_opts)}
+        # parse positional arguments much like the OptionParser did options
         pos_args = self._parse_positional(action_meta.positional, op_args)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating action with {options} {pos_args}')
+        # create and add the second pass action
         action_inst = Action(action_meta, options, pos_args)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'adding action: {action_inst}')

@@ -3,15 +3,23 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, List, Dict
+from typing import Tuple, List, Dict, Iterable, Any
 from dataclasses import dataclass, field
 import logging
 from pathlib import Path
 import optparse
 from zensols.persist import persisted
 from zensols.config import Dictable
+from . import ActionCliError
 
 logger = logging.getLogger(__name__)
+
+
+class CommandLineError(ActionCliError):
+    """Raised when command line parameters can not be parsed.
+
+    """
+    pass
 
 
 @dataclass(eq=True, order=True, unsafe_hash=True)
@@ -181,3 +189,56 @@ class ActionMetaData(Dictable):
     @persisted('_options_by_name')
     def options_by_name(self) -> Dict[str, OptionMetaData]:
         return {m.long_name: m for m in self.options}
+
+
+@dataclass
+class Action(Dictable):
+    """The output of the :class:`.CommandLineParser`.
+
+    """
+    meta_data: ActionMetaData = field()
+    """The action parsed from the command line."""
+
+    options: Dict[str, Any] = field()
+    """The options given as switches."""
+
+    positional: Tuple[str] = field()
+    """The positional arguments parsed."""
+
+    @property
+    def name(self) -> str:
+        """The name of the action."""
+        return self.meta_data.name
+
+
+@dataclass
+class ActionSet(Dictable):
+    """The actions that are parsed by :class:`.CommandLineParser`.
+
+    """
+    actions: Tuple[Action] = field()
+    """The actions parsed.  The first N actions are first pass where as the last is
+    the second pass action.
+
+    """
+
+    @property
+    def first_pass_actions(self) -> Iterable[Action]:
+        return self.actions[0:-1]
+
+    @property
+    def second_pass_action(self) -> Action:
+        return self.actions[-1]
+
+    @property
+    def by_name(self) -> Dict[str, Action]:
+        return {a.name: a for a in self.actions}
+
+    def __getitem__(self, name: str) -> Action:
+        return self.by_name[name]
+
+    def __iter__(self) -> Iterable[Action]:
+        return iter(self.actions)
+
+    def __len__(self) -> int:
+        return len(self.actions)
