@@ -25,10 +25,12 @@ class UsageWriter(Writable):
         self.action_names = tuple(map(lambda a: a.name, self.actions))
         if len(self.action_names) > 1:
             opts = f"<{'|'.join(self.action_names)}> "
-        else:
+        elif len(self.action_names) > 0:
             opts = ', '.join(self.actions[0].positional)
             if len(opts) > 0:
                 opts = f'<{opts}> '
+        else:
+            opts = ''
         self.parser.usage = f"%prog {opts}[options]:"
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):

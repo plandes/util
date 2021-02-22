@@ -138,6 +138,11 @@ class OptionFactory(object):
     def config_file(cls: type, **kwargs) -> OptionMetaData:
         return cls.file('config', 'c', **kwargs)
 
+    @classmethod
+    def whine_level(cls: type, **kwargs) -> OptionMetaData:
+        return OptionMetaData('whine', 'w', dtype=int,
+                              doc='the level to set for the program logging')
+
 
 @dataclass
 class ActionMetaData(Dictable):
@@ -147,8 +152,6 @@ class ActionMetaData(Dictable):
     """
     name: str = field(default=None)
     """The name of the action, which is also the mnemonic used on the command line.
-    If ``None``, then the action is the *top level* action when no mnemonic is
-    given.
 
     """
 
@@ -160,6 +163,13 @@ class ActionMetaData(Dictable):
 
     positional: Tuple[PositionalMetaData] = field(default_factory=lambda: ())
     """The positional arguments expected for the action."""
+
+    first_pass: bool = field(default=False)
+
+    def __post_init__(self):
+        if self.first_pass and len(self.positional) > 0:
+            raise ValueError(
+                'a first pass action can not have positional arguments')
 
     @property
     @persisted('_options_by_name')
