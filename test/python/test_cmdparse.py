@@ -265,6 +265,37 @@ test                a test action
         self.assertEqual('whine', whine.name)
         self.assertEqual({'whine': 2}, whine.options)
 
+    def test_first_pass_options(self):
+        parser = CommandLineParser((self.test_action2, self.log_action))
+        actions: ActionSet = parser.parse('-w 2 b.txt'.split())
+        self.assertEqual(2, len(actions))
+        action = actions.second_pass_action
+        self.assertEqual('prconfig', action.name)
+        self.assertEqual((Path('b.txt'),), action.positional)
+        self.assertEqual({}, action.options)
+        self.assertEqual(1, len(actions.first_pass_actions))
+        whine = actions.first_pass_actions[0]
+        self.assertEqual(Action, type(whine))
+        self.assertEqual('whine', whine.name)
+        self.assertEqual({'whine': 2}, whine.options)
+
+        test_action2 = ActionMetaData(
+            'prconfig', 'a second test action',
+            positional=[PositionalMetaData('file', Path)],
+            options=[self.conf_opt])
+        parser = CommandLineParser((test_action2, self.log_action))
+        actions: ActionSet = parser.parse('-w 2 b.txt -c c.conf'.split())
+        self.assertEqual(2, len(actions))
+        action = actions.second_pass_action
+        self.assertEqual('prconfig', action.name)
+        self.assertEqual((Path('b.txt'),), action.positional)
+        self.assertEqual({'config': 'c.conf'}, action.options)
+        self.assertEqual(1, len(actions.first_pass_actions))
+        whine = actions.first_pass_actions[0]
+        self.assertEqual(Action, type(whine))
+        self.assertEqual('whine', whine.name)
+        self.assertEqual({'whine': 2}, whine.options)
+
     def test_first_pass_complex(self):
         # skip the show_action since it has a config option at the second pass
         # level

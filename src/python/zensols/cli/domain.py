@@ -165,6 +165,12 @@ class ActionMetaData(Dictable):
     """The positional arguments expected for the action."""
 
     first_pass: bool = field(default=False)
+    """If ``True`` this is a first pass action that is used with no mnemonic.
+    Examples include the ``-w``/``--whine`` logging level, which applies to the
+    entire application and can be configured in a separate class/process from
+    the main single action given as a mnemonic on the command line.
+
+    """
 
     def __post_init__(self):
         if self.first_pass and len(self.positional) > 0:

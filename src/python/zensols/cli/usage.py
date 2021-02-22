@@ -23,10 +23,14 @@ class UsageWriter(Writable):
     def __post_init__(self):
         self.actions = sorted(self.actions, key=lambda a: a.name)
         self.action_names = tuple(map(lambda a: a.name, self.actions))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'actions: {self.action_names}')
         if len(self.action_names) > 1:
             opts = f"<{'|'.join(self.action_names)}> "
         elif len(self.action_names) > 0:
-            opts = ', '.join(self.actions[0].positional)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'action: {self.actions[0]}')
+            opts = ', '.join(map(lambda p: p.name, self.actions[0].positional))
             if len(opts) > 0:
                 opts = f'<{opts}> '
         else:

@@ -22,6 +22,9 @@ logger = logging.getLogger(__name__)
 
 
 class CommandLineError(ActionCliError):
+    """Raised when command line parameters can not be parsed.
+
+    """
     pass
 
 
@@ -58,12 +61,20 @@ class Action(Dictable):
 
     @property
     def name(self) -> str:
+        """The name of the action."""
         return self.meta_data.name
 
 
 @dataclass
 class ActionSet(Dictable):
-    actions: Tuple[Action]
+    """The actions that are parsed by :class:`.CommandLineParser`.
+
+    """
+    actions: Tuple[Action] = field()
+    """The actions parsed.  The first N actions are first pass where as the last is
+    the second pass action.
+
+    """
 
     @property
     def first_pass_actions(self) -> Iterable[Action]:
@@ -89,6 +100,10 @@ class ActionSet(Dictable):
 
 @dataclass
 class CommandLineParser(Dictable):
+    """Parse the command line.  The parser iterates twice over the command line:
+
+        1. The first pass parses first past actions 
+    """
     actions: Tuple[ActionMetaData]
     version: str = field(default='v0')
 
@@ -200,15 +215,19 @@ class CommandLineParser(Dictable):
         for k, v in options.items():
             fp_action_meta = self.first_pass_by_option.get(k)
             if fp_action_meta is not None:
-                options = {k: options[k] for k in (set(options.keys()) & fp_opts)}
-                actions.append(Action(fp_action_meta, options, ()))
+                aos = {k: options[k] for k in (set(options.keys()) & fp_opts)}
+                action = Action(fp_action_meta, aos, ())
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'adding first pass action: {action}')
+                actions.append(action)
         # if only one option for second pass actions are given, the user need
         # not give the action mnemonic/name, instead, just add all its options
         # to the top level
         if len(self.second_pass_actions) == 1:
             action_name = self.second_pass_actions[0].name
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'using singeton top level action: {action_name}')
+                logger.debug(f'using singleton fp action: {action_name} ' + 
+                             f'with options {options}')
         elif len(op_args) == 0:
             # no positional arguments mean we don't know which action to use
             raise CommandLineError('no action given')
@@ -221,6 +240,7 @@ class CommandLineParser(Dictable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'need second pass for {action_name}, ' +
                              f'option args: {op_args}')
+        # now that we have parsed the action name, get the meta data
         action_meta = self.actions_by_name.get(action_name)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"action '{action_name}' found: {action_meta}")
@@ -239,7 +259,9 @@ class CommandLineParser(Dictable):
             assert(op_args[0] == action_meta.name)
             op_args = op_args[1:]
             options = vars(options)
-            options = {k: options[k] for k in (set(options.keys()) - fp_opts)}
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'removing first pass options: {fp_opts} from {options}')
+        options = {k: options[k] for k in (set(options.keys()) - fp_opts)}
         pos_args = self._parse_positional(action_meta.positional, op_args)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating action with {options} {pos_args}')

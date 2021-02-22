@@ -8,5 +8,5 @@ from .simple import *
 from .peraction import *
 from .domain import *
 from .usage import *
-from .optparse import *
+from .cmdparse import *
 from .action import *
