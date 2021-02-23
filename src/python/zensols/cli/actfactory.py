@@ -35,7 +35,7 @@ class DocUtil(object):
         return doc, params
 
 
-class ActionCliResolverError(ActionCliError):
+class ActionCliFactoryError(ActionCliError):
     pass
 
 
@@ -89,7 +89,7 @@ class ActionCli(Dictable):
 
 
 @dataclass
-class ActionCliResolver(Dictable):
+class ActionCliFactory(Dictable):
     SECTION = 'cli'
     """The application context section."""
 
@@ -126,7 +126,7 @@ class ActionCliResolver(Dictable):
         elif fmd.dtype in self.DATA_TYPE:
             dtype = eval(fmd.dtype)
         else:
-            raise ActionCliResolverError(
+            raise ActionCliFactoryError(
                 f'non-supported data type: {fmd.dtype}')
         if fmd.kwargs is not None:
             default = fmd.kwargs.get('default')
@@ -141,13 +141,13 @@ class ActionCliResolver(Dictable):
 
     def _add_action_meta(self, meta: ActionCliMetaData):
         if meta.name in self._meta_datas:
-            raise ActionCliResolverError(
+            raise ActionCliFactoryError(
                 f'duplicate meta data: {meta.name}')
         for name, fmd in meta.class_meta.fields.items():
             omd = self._create_option_meta_data(fmd)
             prexist = self._fields.get(fmd.name)
             if prexist is not None and omd != prexist:
-                raise ActionCliResolverError(
+                raise ActionCliFactoryError(
                     f'duplicate field {name} -> {omd.long_name} in ' +
                     f'{meta.section} but not equal to {prexist}')
             self._fields[fmd.name] = omd

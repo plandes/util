@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 from zensols.config import Dictable
-from zensols.cli import ActionCliFactory
+from zensols.cli import CommandFactory
 from logutil import LogTestCase
 
 
@@ -26,7 +26,7 @@ class TestActionCli(Dictable):
 class TestActionObjectCli(LogTestCase):
     def test_cli(self):
         self.config_logging('zensols.cli')
-        cli = ActionCliFactory.instance(
+        cli = CommandFactory.instance(
             'zensols.testapp', 'test-resources/test_app.conf')
         app = cli.create()
         #self.assertTrue(isinstance(app, TestActionCli))

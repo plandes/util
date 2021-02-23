@@ -3,16 +3,17 @@ from __future__ import annotations
 
 """
 
-from typing import Any, Tuple
+from typing import Tuple, List
 from dataclasses import dataclass, field
 import logging
 from pathlib import Path
 from zensols.util import PackageResource
 from zensols.config import (
     Configurable, ImportIniConfig, DictionaryConfig, ImportConfigFactory,
+    Dictable,
 )
 from . import (
-    ActionCliError, ActionCliResolver, ActionMetaData,
+    ActionCliError, ActionCliFactory, ActionMetaData,
     CommandLineParser
 )
 
@@ -20,7 +21,13 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class ActionCliFactory(object):
+class Command(Dictable):
+    def parse(self, args: List[str]):
+        pass
+
+
+@dataclass
+class CommandFactory(object):
     """Boots the application context from the command line.
 
     """
@@ -34,7 +41,7 @@ class ActionCliFactory(object):
     """The relative resource path to the application's context."""
 
     @classmethod
-    def instance(cls, package_name: str, *args, **kwargs) -> ActionCliFactory:
+    def instance(cls, package_name: str, *args, **kwargs) -> CommandFactory:
         """"A create facade method.
 
         :param package_name: used to create the :obj:`package_resource`
@@ -61,7 +68,7 @@ class ActionCliFactory(object):
                             'type': 'ini'}})
         return ImportIniConfig(path, children=(app_conf,))
 
-    def create(self) -> Tuple[Any]:
+    def create(self) -> Tuple[Command]:
         """Create the action CLI application.
 
         :raises ActionCliError: for any missing or misconfigurations
@@ -74,7 +81,8 @@ class ActionCliFactory(object):
                 f'not found in {self.package_resource}')
         config = self._get_app_context(path)
         fac = ImportConfigFactory(config)
-        cli_resolver: ActionCliResolver = fac(ActionCliResolver.SECTION)
+        cli_resolver: ActionCliFactory = fac(ActionCliFactory.SECTION)
         actions: Tuple[ActionMetaData] = cli_resolver.action_meta_datas
         parser = CommandLineParser(actions, self.package_resource.version)
         parser.write_help()
+        return Command()
