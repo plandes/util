@@ -18,8 +18,9 @@ class TestActionCli(Dictable):
     out_path: Path = field(default=None)
     """The output path."""
 
-    def doit(self):
-        print('in do it')
+    def doit(self, a1, arg0: str, arg1: int = 1, arg2: str = 'str1x'):
+        """Run the test command."""
+        print('in do it:', arg1)
 
 
 class TestActionObjectCli(LogTestCase):

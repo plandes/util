@@ -9,7 +9,7 @@ import dataclasses
 import logging
 from pathlib import Path
 from zensols.util import (
-    DataClassInspector, DataClassMetaData, FieldMetaData
+    DataClassInspector, DataClassMetaData, DataClassFieldMetaData
 )
 from zensols.config import (
     Configurable, Dictable, ConfigFactory, ClassImporter
@@ -17,6 +17,22 @@ from zensols.config import (
 from . import ActionCliError, OptionMetaData, ActionMetaData
 
 logger = logging.getLogger(__name__)
+
+
+class DocUtil(object):
+    @staticmethod
+    def parse(s: str) -> Tuple[str, Dict[str, str]]:
+        doc = s
+        params = None
+        if doc is not None:
+            doc = doc.strip()
+            if len(doc) == 0:
+                doc = None
+            else:
+                doc = doc.lower()
+                if doc[-1] == '.':
+                    doc = doc[0:-1]
+        return doc, params
 
 
 class ActionCliResolverError(ActionCliError):
@@ -55,7 +71,7 @@ class ActionCli(Dictable):
         acm = self.action_cli_meta_data
         name: str = acm.name
         omds: Tuple[OptionMetaData] = []
-        f: FieldMetaData
+        f: DataClassFieldMetaData
         for f in acm.class_meta.fields.values():
             if (self.option_includes is None) or \
                (f.name in self.option_includes):
@@ -63,14 +79,7 @@ class ActionCli(Dictable):
         doc = self.doc
         if doc is None:
             doc = acm.class_meta.cls.__doc__
-            if doc is not None:
-                doc = doc.strip()
-                if len(doc) == 0:
-                    doc = None
-                else:
-                    if doc[-1] == '.':
-                        doc = doc[0:-1]
-                    doc = doc.lower()
+        doc = DocUtil.parse(doc)[0]
         self.name = name
         self.meta_data = ActionMetaData(
             name=self.mnemonic or name,
@@ -91,7 +100,9 @@ class ActionCliResolver(Dictable):
     """Supported data types mapped from data class fields."""
 
     config_factory: ConfigFactory = field()
-    """The configuration factory used to create :class:`.ActionCli` instances."""
+    """The configuration factory used to create :class:`.ActionCli` instances.
+
+    """
 
     apps: Tuple[str] = field()
     """The application section names."""
@@ -106,7 +117,7 @@ class ActionCliResolver(Dictable):
                 self._short_names.add(c)
                 return c
 
-    def _create_option_meta_data(self, fmd: FieldMetaData) -> OptionMetaData:
+    def _create_option_meta_data(self, fmd: DataClassFieldMetaData) -> OptionMetaData:
         long_name = fmd.name.replace('_', '')
         short_name = self._create_short_name(long_name)
         default = None
@@ -119,9 +130,7 @@ class ActionCliResolver(Dictable):
                 f'non-supported data type: {fmd.dtype}')
         if fmd.kwargs is not None:
             default = fmd.kwargs.get('default')
-        doc = fmd.doc.lower()
-        if doc[-1] == '.':
-            doc = doc[0:-1]
+        doc, params = DocUtil.parse(fmd.doc)
         return OptionMetaData(
             long_name=long_name,
             short_name=short_name,

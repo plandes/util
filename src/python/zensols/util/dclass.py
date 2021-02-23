@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(eq=True)
-class FieldMetaData(object):
+class DataClassFieldMetaData(object):
     """Represents a :class:`dataclasses.dataclass` field.
 
     """
@@ -36,12 +36,29 @@ class FieldMetaData(object):
 
 
 @dataclass
+class DataClassMethodMetaDataArg(object):
+    name: str
+    default: str
+    dtype: str = field(default=None)
+
+
+@dataclass
+class DataClassMethodMetaData(object):
+    name: str
+    doc: str
+    args: Tuple[str]
+
+
+@dataclass
 class DataClassMetaData(object):
     cls: type = field()
     """The class that was inspected."""
 
-    fields: Dict[str, FieldMetaData] = field()
+    fields: Dict[str, DataClassFieldMetaData] = field()
     """The fields of the class."""
+
+    methods: Dict[str, DataClassMethodMetaData] = field()
+    """The methods of the class."""
 
 
 @dataclass
@@ -69,6 +86,36 @@ class DataClassInspector(object):
                 if node.name == self.cls.__name__:
                     return node
 
+    def _get_args(self, node: ast.arguments):
+        args = []
+        defaults = node.defaults
+        dlen = len(defaults)
+        for i, arg in enumerate(node.args):
+            name = arg.arg
+            dtype = None
+            default = None
+            didx = i - dlen - 1
+            if didx >= 0:
+                default = defaults[didx].value
+            if arg.annotation is not None:
+                dtype = arg.annotation.id
+            arg = DataClassMethodMetaDataArg(name, default, dtype)
+            args.append(arg)
+        return args
+
+    def _get_method(self, node: ast.FunctionDef) -> DataClassMethodMetaData:
+        method: DataClassMethodMetaData = None
+        is_prop = any(map(lambda n: n.id, node.decorator_list))
+        if node.args is not None and not is_prop:
+            name = node.name
+            args = self._get_args(node.args)
+            node = None if len(node.body) == 0 else node.body[0]
+            if node is not None and len(args) > 0 and args[0].name == 'self':
+                if isinstance(node, ast.Expr) and \
+                   isinstance(node.value, ast.Constant):
+                    method = DataClassMethodMetaData(name, node.value.value, args[1:])
+        return method
+
     def get_meta_data(self) -> DataClassMetaData:
         """Return a dict of attribute (field) to metadata and docstring.
 
@@ -78,19 +125,30 @@ class DataClassInspector(object):
             attrs = tuple(filter(lambda i: i[:1] != '_',
                                  self.cls.__dict__.keys()))
         cnode: ast.Node = self._get_class_node()
-        docs: List[FieldMetaData] = []
+        fields: List[DataClassFieldMetaData] = []
+        methods: List[DataClassMethodMetaData] = []
         for node in cnode.body:
+            # parse the dataclass attribute/field defintion
             if isinstance(node, ast.AnnAssign):
                 name: str = node.target.id
                 dtype: str = node.annotation.id
                 kwlst: List[ast.keyword] = node.value.keywords
                 kwargs = {k.arg: k.value.value for k in kwlst}
-                docs.append(FieldMetaData(name, dtype, kwargs))
+                fields.append(DataClassFieldMetaData(name, dtype, kwargs))
+            # parse documentation string right after the dataclass field
             elif (isinstance(node, ast.Expr) and
                   isinstance(node.value, ast.Constant) and
-                  len(docs) > 0):
+                  len(fields) > 0):
                 doc = node.value.value
-                last_doc: FieldMetaData = docs[-1]
+                last_doc: DataClassFieldMetaData = fields[-1]
                 if last_doc.doc is None:
                     last_doc.doc = doc
-        return DataClassMetaData(self.cls, {d.name: d for d in docs})
+            # parse the method
+            elif isinstance(node, ast.FunctionDef):
+                meth = self._get_method(node)
+                if meth is not None:
+                    methods.append(meth)
+        return DataClassMetaData(
+            self.cls,
+            fields={d.name: d for d in fields},
+            methods={m.name: m for m in methods})
