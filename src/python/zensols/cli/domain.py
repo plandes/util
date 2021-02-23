@@ -26,6 +26,9 @@ class CommandLineError(ActionCliError):
 class OptionMetaData(Dictable):
     """A command line option."""
 
+    DATA_TYPES = {str, int, float, bool, list, Path}
+    """Supported data types."""
+
     long_name: str = field()
     """The long name of the option (i.e. ``--config``)."""
 

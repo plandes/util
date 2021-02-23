@@ -9,4 +9,5 @@ from .peraction import *
 from .domain import *
 from .usage import *
 from .cmdparse import *
+from .resolve import *
 from .action import *
