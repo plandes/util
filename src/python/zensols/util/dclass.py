@@ -69,7 +69,7 @@ class DataClassInspector(object):
                 if node.name == self.cls.__name__:
                     return node
 
-    def get_field_docs(self) -> Dict[str, FieldMetaData]:
+    def get_meta_data(self) -> DataClassMetaData:
         """Return a dict of attribute (field) to metadata and docstring.
 
         """

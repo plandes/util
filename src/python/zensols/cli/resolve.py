@@ -25,8 +25,12 @@ class ActionCliResolverError(ActionCliError):
 
 @dataclass
 class ActionCliMetaData(Dictable):
-    section: str
+    section: str = field()
+    """The application section to introspect."""
+
     class_meta: DataClassMetaData
+
+    options: Dict[str, OptionMetaData] = field(default=None)
 
     def __post_init__(self):
         self.name = self.section.replace('_', '')
@@ -34,7 +38,24 @@ class ActionCliMetaData(Dictable):
 
 @dataclass
 class ActionCli(Dictable):
-    name: str
+    action_cli_meta_data: ActionCliMetaData
+
+    def __post_init__(self):
+        acm = self.action_cli_meta_data
+        f: FieldMetaData
+        omds: Tuple[OptionMetaData] = []
+        for f in acm.class_meta.fields.values():
+            omds.append(acm.options[f.name])
+        doc = acm.class_meta.cls.__doc__
+        if doc is not None:
+            doc = doc.strip()
+            if len(doc) == 0:
+                doc = None
+        self.meta_data = ActionMetaData(
+            name=acm.name,
+            doc=doc,
+            options=omds)
+        self.name = self.meta_data.name
 
 
 @dataclass
@@ -103,42 +124,30 @@ class ActionCliResolver(Dictable):
         if not dataclasses.is_dataclass(cls):
             raise ActionCliError('application CLI app must be a dataclass')
         dh = DataClassInspector(cls)
-        fdocs: Dict[str, FieldMetaData] = dh.get_field_docs()
-        self._add_action_meta(ActionCliMetaData(section, fdocs))
-
-    def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
-        return map(lambda f: (f, f), 'actions'.split())
-
-    def _create_actions(self) -> Dict[str, ActionMetaData]:
-        acts: Dict[str, ActionMetaData] = {}
-        acm: ActionCliMetaData
-        for acm in self._meta_datas.values():
-            omds: Tuple[OptionMetaData] = tuple(
-                map(lambda f: self._fields[f.name],
-                    acm.class_meta.fields.values()))
-            doc = acm.class_meta.cls.__doc__
-            if doc is not None:
-                doc = doc.strip()
-                if len(doc) == 0:
-                    doc = None
-            am = ActionMetaData(
-                name=acm.name,
-                doc=doc,
-                options=omds)
-            acts[am.name] = am
-        return acts
+        meta: DataClassMetaData = dh.get_meta_data()
+        self._add_action_meta(ActionCliMetaData(section, meta))
 
     @property
-    def actions(self) -> Dict[str, ActionMetaData]:
+    def actions(self) -> Dict[str, ActionCli]:
         self._short_names: Set[str] = set()
         self._fields: Dict[str, OptionMetaData] = {}
         self._meta_datas: Dict[str, ActionCliMetaData] = {}
         for app in self.apps:
             self._add_app(app)
-        actions = self._create_actions()
+        acms = tuple(self._meta_datas.values())
+        for acm in acms:
+            acm.options = self._fields
+        actions = {a.name: a for a in map(ActionCli, acms)}
         del self._short_names
         del self._fields
         return actions
+
+    @property
+    def action_meta_datas(self) -> Tuple[ActionMetaData]:
+        return tuple(map(lambda a: a.meta_data, self.actions.values()))
+
+    def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
+        return map(lambda f: (f, f), 'actions'.split())
 
     def tmp(self):
         #self.actions
