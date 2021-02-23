@@ -47,7 +47,8 @@ class ActionCliMetaData(Dictable):
 class ActionCli(Dictable):
     action_cli_meta_data: ActionCliMetaData
     mnemonic: str = field(default=None)
-    includes: Tuple = field(default=None)
+    option_includes: Tuple = field(default=None)
+    doc: str = field(default=None)
     first_pass: bool = field(default=False)
 
     def __post_init__(self):
@@ -56,13 +57,20 @@ class ActionCli(Dictable):
         omds: Tuple[OptionMetaData] = []
         f: FieldMetaData
         for f in acm.class_meta.fields.values():
-            if self.includes is None or f.name in self.includes:
+            if (self.option_includes is None) or \
+               (f.name in self.option_includes):
                 omds.append(acm.options[f.name])
-        doc = acm.class_meta.cls.__doc__
-        if doc is not None:
-            doc = doc.strip()
-            if len(doc) == 0:
-                doc = None
+        doc = self.doc
+        if doc is None:
+            doc = acm.class_meta.cls.__doc__
+            if doc is not None:
+                doc = doc.strip()
+                if len(doc) == 0:
+                    doc = None
+                else:
+                    if doc[-1] == '.':
+                        doc = doc[0:-1]
+                    doc = doc.lower()
         self.name = name
         self.meta_data = ActionMetaData(
             name=self.mnemonic or name,
@@ -76,11 +84,17 @@ class ActionCliResolver(Dictable):
     SECTION = 'cli'
     """The application context section."""
 
-    DATA_TYPE_STRS = set(map(lambda t: t.__name__, OptionMetaData.DATA_TYPES))
+    CONFIG_FORMAT_SECTION = '{section}_action_cli'
+    """Format of :class:`.ActionCli` configuration classes."""
 
-    config_factory: ConfigFactory
-    apps: Tuple[str]
-    #clis: Tuple[]
+    DATA_TYPE = set(map(lambda t: t.__name__, OptionMetaData.DATA_TYPES))
+    """Supported data types mapped from data class fields."""
+
+    config_factory: ConfigFactory = field()
+    """The configuration factory used to create :class:`.ActionCli` instances."""
+
+    apps: Tuple[str] = field()
+    """The application section names."""
 
     @property
     def config(self) -> Configurable:
@@ -98,20 +112,23 @@ class ActionCliResolver(Dictable):
         default = None
         if fmd.dtype == 'Path':
             dtype = Path
-        elif fmd.dtype in self.DATA_TYPE_STRS:
+        elif fmd.dtype in self.DATA_TYPE:
             dtype = eval(fmd.dtype)
         else:
             raise ActionCliResolverError(
                 f'non-supported data type: {fmd.dtype}')
         if fmd.kwargs is not None:
             default = fmd.kwargs.get('default')
+        doc = fmd.doc.lower()
+        if doc[-1] == '.':
+            doc = doc[0:-1]
         return OptionMetaData(
             long_name=long_name,
             short_name=short_name,
             dest=fmd.name,
             dtype=dtype,
             default=default,
-            doc=fmd.doc)
+            doc=doc)
 
     def _add_action_meta(self, meta: ActionCliMetaData):
         if meta.name in self._meta_datas:
@@ -140,8 +157,6 @@ class ActionCliResolver(Dictable):
         dh = DataClassInspector(cls)
         meta: DataClassMetaData = dh.get_meta_data()
         self._add_action_meta(ActionCliMetaData(section, meta))
-
-    CONFIG_FORMAT_SECTION = '{section}_action_cli'
 
     def _create_actions(self, acms: Tuple[ActionCliMetaData]):
         actions = {}
