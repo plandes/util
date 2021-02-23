@@ -8,9 +8,11 @@ from dataclasses import dataclass, field
 import dataclasses
 import logging
 from pathlib import Path
+from itertools import chain
 from zensols.persist import persisted
 from zensols.util import (
-    DataClassInspector, DataClass, DataClassField
+    DataClassInspector, DataClass,
+    DataClassField, DataClassParam, DataClassMethod, DataClassMethodArg
 )
 from zensols.config import (
     Configurable, Dictable, ConfigFactory, ClassImporter
@@ -49,28 +51,28 @@ class ActionCli(Dictable):
     action_cli_meta_data: ActionCliMetaData
     mnemonic: str = field(default=None)
     option_includes: Tuple = field(default=None)
-    doc: str = field(default=None)
+    #doc: str = field(default=None)
     first_pass: bool = field(default=False)
 
-    def __post_init__(self):
+    @property
+    def name(self) -> str:
+        return self.action_cli_meta_data.name
+
+    @property
+    def meta_datas(self):
         acm = self.action_cli_meta_data
-        name: str = acm.name
         omds: Tuple[OptionMetaData] = []
         f: DataClassField
         for f in acm.class_meta.fields.values():
             if (self.option_includes is None) or \
                (f.name in self.option_includes):
                 omds.append(acm.options[f.name])
-        doc = self.doc
-        if doc is None:
-            doc = acm.class_meta.cls.__doc__
-        doc = acm.class_meta.doc.text
-        self.name = name
-        self.meta_data = ActionMetaData(
-            name=self.mnemonic or name,
-            doc=doc,
+        meta_data = ActionMetaData(
+            name=self.mnemonic or self.name,
+            doc='NO DOC',
             options=omds,
             first_pass=self.first_pass)
+        return [meta_data]
 
 
 @dataclass
@@ -102,27 +104,33 @@ class ActionCliFactory(Dictable):
                 self._short_names.add(c)
                 return c
 
-    def _create_option_meta_data(self, fmd: DataClassField) -> OptionMetaData:
-        long_name = fmd.name.replace('_', '')
+    def _create_option_meta_data(self, pmeta: DataClassParam) -> OptionMetaData:
+        long_name = pmeta.name.replace('_', '')
         short_name = self._create_short_name(long_name)
-        default = None
-        if fmd.dtype == 'Path':
+        if pmeta.dtype == 'Path':
             dtype = Path
-        elif fmd.dtype in self.DATA_TYPE:
-            dtype = eval(fmd.dtype)
+        elif pmeta.dtype is None:
+            dtype = str
+        elif pmeta.dtype in self.DATA_TYPE:
+            dtype = eval(pmeta.dtype)
         else:
             raise ActionCliFactoryError(
-                f'non-supported data type: {fmd.dtype}')
-        if fmd.kwargs is not None:
-            default = fmd.kwargs.get('default')
-        doc = fmd.doc.text
+                f'non-supported data type: {pmeta.dtype}')
         return OptionMetaData(
             long_name=long_name,
             short_name=short_name,
-            dest=fmd.name,
+            dest=pmeta.name,
             dtype=dtype,
-            default=default,
-            doc=doc)
+            default=pmeta.default,
+            doc=pmeta.doc)
+
+    def _add_field(self, section: str, name: str, omd: OptionMetaData):
+        prexist = self._fields.get(name)
+        if prexist is not None and omd != prexist:
+            raise ActionCliFactoryError(
+                f'duplicate field {name} -> {omd.long_name} in ' +
+                f'{section} but not equal to {prexist}')
+        self._fields[name] = omd
 
     def _add_action_meta(self, meta: ActionCliMetaData):
         if meta.name in self._meta_datas:
@@ -130,12 +138,14 @@ class ActionCliFactory(Dictable):
                 f'duplicate meta data: {meta.name}')
         for name, fmd in meta.class_meta.fields.items():
             omd = self._create_option_meta_data(fmd)
-            prexist = self._fields.get(fmd.name)
-            if prexist is not None and omd != prexist:
-                raise ActionCliFactoryError(
-                    f'duplicate field {name} -> {omd.long_name} in ' +
-                    f'{meta.section} but not equal to {prexist}')
-            self._fields[fmd.name] = omd
+            self._add_field(meta.section, fmd.name, omd)
+        meth: DataClassMethod
+        for meth in meta.class_meta.methods.values():
+            arg: DataClassMethodArg
+            for arg in meth.args:
+                print(arg)
+                omd = self._create_option_meta_data(arg)
+                self._add_field(meta.section, arg.name, omd)
         self._meta_datas[meta.name] = meta
 
     def _add_app(self, section: str):
@@ -186,7 +196,8 @@ class ActionCliFactory(Dictable):
     @property
     @persisted('_meta_datas')
     def action_meta_datas(self) -> Tuple[ActionMetaData]:
-        return tuple(map(lambda a: a.meta_data, self.actions.values()))
+        return tuple(chain.from_iterable(
+            map(lambda a: a.meta_datas, self.actions.values())))
 
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
         return map(lambda f: (f, f), 'actions'.split())

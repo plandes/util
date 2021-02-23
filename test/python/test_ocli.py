@@ -25,9 +25,8 @@ class TestActionCli(Dictable):
 
 class TestActionObjectCli(LogTestCase):
     def test_cli(self):
-        #self.config_logging('zensols.cli')
+        self.config_logging('zensols.cli')
         cli = CommandFactory.instance(
             'zensols.testapp', 'test-resources/test_app.conf')
-        app = cli.create()
-        #self.assertTrue(isinstance(app, TestActionCli))
-        #app.write()
+        command = cli.create()
+        command.parser.write_help()

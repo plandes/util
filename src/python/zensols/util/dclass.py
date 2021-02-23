@@ -36,7 +36,7 @@ class DataClassDoc(object):
 
 
 @dataclass(eq=True)
-class DataClassField(object):
+class DataClassParam(object):
     """Represents a :class:`dataclasses.dataclass` field.
 
     """
@@ -46,11 +46,17 @@ class DataClassField(object):
     dtype: type = field()
     """The data type."""
 
+    doc: DataClassDoc = field()
+    """The documentation of the field."""
+
+
+@dataclass(eq=True)
+class DataClassField(DataClassParam):
+    """Represents a :class:`dataclasses.dataclass` field.
+
+    """
     kwargs: Dict[str, Any] = field()
     """The field arguments."""
-
-    doc: DataClassDoc = field(default=None)
-    """The documentation of the field."""
 
     @property
     def default(self) -> Any:
@@ -59,18 +65,15 @@ class DataClassField(object):
 
 
 @dataclass(eq=True)
-class DataClassMethodArg(object):
+class DataClassMethodArg(DataClassParam):
     """Meta data for an argument in a method.
 
     """
-    name: str = field()
-    """The name of the argument."""
-
     default: str = field()
     """The default if any, otherwise ``None``."""
 
-    dtype: str = field()
-    """The data type as a typehint, or ``None`` if not given."""
+    is_positional: bool = field()
+    """``True`` is the argument is positional vs. a keyword argument."""
 
 
 @dataclass(eq=True)
@@ -135,13 +138,15 @@ class DataClassInspector(object):
         for i, arg in enumerate(node.args):
             name = arg.arg
             dtype = None
+            is_positional = True
             default = None
             didx = i - dlen - 1
             if didx >= 0:
                 default = defaults[didx].value
+                is_positional = False
             if arg.annotation is not None:
                 dtype = arg.annotation.id
-            arg = DataClassMethodArg(name, default, dtype)
+            arg = DataClassMethodArg(name, dtype, None, default, is_positional)
             args.append(arg)
         return args
 
@@ -178,7 +183,7 @@ class DataClassInspector(object):
                 dtype: str = node.annotation.id
                 kwlst: List[ast.keyword] = node.value.keywords
                 kwargs = {k.arg: k.value.value for k in kwlst}
-                fields.append(DataClassField(name, dtype, kwargs))
+                fields.append(DataClassField(name, dtype, None, kwargs))
             # parse documentation string right after the dataclass field
             elif (isinstance(node, ast.Expr) and
                   isinstance(node.value, ast.Constant) and

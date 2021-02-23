@@ -22,8 +22,10 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class Command(Dictable):
+    parser: CommandLineParser
+
     def parse(self, args: List[str]):
-        pass
+        return self.parser.parse(args)
 
 
 @dataclass
@@ -68,7 +70,7 @@ class CommandFactory(object):
                             'type': 'ini'}})
         return ImportIniConfig(path, children=(app_conf,))
 
-    def create(self) -> Tuple[Command]:
+    def create(self) -> Command:
         """Create the action CLI application.
 
         :raises ActionCliError: for any missing or misconfigurations
@@ -85,5 +87,4 @@ class CommandFactory(object):
         actions: Tuple[ActionMetaData] = cli_resolver.action_meta_datas
         config = CommandLineConfig(actions)
         parser = CommandLineParser(config, self.package_resource.version)
-        #parser.write_help()
-        return Command()
+        return Command(parser)
