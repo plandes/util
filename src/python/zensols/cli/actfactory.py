@@ -9,7 +9,7 @@ import dataclasses
 import logging
 from pathlib import Path
 from zensols.util import (
-    DataClassInspector, DataClassMetaData, DataClassFieldMetaData
+    DataClassInspector, DataClass, DataClassField
 )
 from zensols.config import (
     Configurable, Dictable, ConfigFactory, ClassImporter
@@ -17,22 +17,6 @@ from zensols.config import (
 from . import ActionCliError, OptionMetaData, ActionMetaData
 
 logger = logging.getLogger(__name__)
-
-
-class DocUtil(object):
-    @staticmethod
-    def parse(s: str) -> Tuple[str, Dict[str, str]]:
-        doc = s
-        params = None
-        if doc is not None:
-            doc = doc.strip()
-            if len(doc) == 0:
-                doc = None
-            else:
-                doc = doc.lower()
-                if doc[-1] == '.':
-                    doc = doc[0:-1]
-        return doc, params
 
 
 class ActionCliFactoryError(ActionCliError):
@@ -44,13 +28,13 @@ class ActionCliMetaData(Dictable):
     section: str = field()
     """The application section to introspect."""
 
-    class_meta: DataClassMetaData = field()
+    class_meta: DataClass = field()
     """The target class meta data parsed by :class:`.DataClassInspector`
 
     """
 
     options: Dict[str, OptionMetaData] = field(default=None)
-    """Options added by :class:`.ActionCliResover`, which are those options parsed
+    """Options added by :class:`.ActionCliFactory`, which are those options parsed
     by the entire class metadata.
 
     """
@@ -71,7 +55,7 @@ class ActionCli(Dictable):
         acm = self.action_cli_meta_data
         name: str = acm.name
         omds: Tuple[OptionMetaData] = []
-        f: DataClassFieldMetaData
+        f: DataClassField
         for f in acm.class_meta.fields.values():
             if (self.option_includes is None) or \
                (f.name in self.option_includes):
@@ -79,7 +63,7 @@ class ActionCli(Dictable):
         doc = self.doc
         if doc is None:
             doc = acm.class_meta.cls.__doc__
-        doc = DocUtil.parse(doc)[0]
+        doc = acm.class_meta.doc.text
         self.name = name
         self.meta_data = ActionMetaData(
             name=self.mnemonic or name,
@@ -93,9 +77,6 @@ class ActionCliFactory(Dictable):
     SECTION = 'cli'
     """The application context section."""
 
-    CONFIG_FORMAT_SECTION = '{section}_action_cli'
-    """Format of :class:`.ActionCli` configuration classes."""
-
     DATA_TYPE = set(map(lambda t: t.__name__, OptionMetaData.DATA_TYPES))
     """Supported data types mapped from data class fields."""
 
@@ -107,6 +88,9 @@ class ActionCliFactory(Dictable):
     apps: Tuple[str] = field()
     """The application section names."""
 
+    config_section: str = field(default='{section}_action_cli')
+    """Format of :class:`.ActionCli` configuration classes."""
+
     @property
     def config(self) -> Configurable:
         return self.config_factory.config
@@ -117,7 +101,7 @@ class ActionCliFactory(Dictable):
                 self._short_names.add(c)
                 return c
 
-    def _create_option_meta_data(self, fmd: DataClassFieldMetaData) -> OptionMetaData:
+    def _create_option_meta_data(self, fmd: DataClassField) -> OptionMetaData:
         long_name = fmd.name.replace('_', '')
         short_name = self._create_short_name(long_name)
         default = None
@@ -130,7 +114,7 @@ class ActionCliFactory(Dictable):
                 f'non-supported data type: {fmd.dtype}')
         if fmd.kwargs is not None:
             default = fmd.kwargs.get('default')
-        doc, params = DocUtil.parse(fmd.doc)
+        doc = fmd.doc.text
         return OptionMetaData(
             long_name=long_name,
             short_name=short_name,
@@ -164,14 +148,13 @@ class ActionCliFactory(Dictable):
         if not dataclasses.is_dataclass(cls):
             raise ActionCliError('application CLI app must be a dataclass')
         dh = DataClassInspector(cls)
-        meta: DataClassMetaData = dh.get_meta_data()
+        meta: DataClass = dh.get_meta_data()
         self._add_action_meta(ActionCliMetaData(section, meta))
 
     def _create_actions(self, acms: Tuple[ActionCliMetaData]):
         actions = {}
         for acm in acms:
-            conf_sec = self.CONFIG_FORMAT_SECTION.\
-                format(**{'section': acm.section})
+            conf_sec = self.config_section.format(**{'section': acm.section})
             if conf_sec in self.config.sections:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'found configuration section: {conf_sec}')

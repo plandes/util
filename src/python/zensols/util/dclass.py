@@ -13,7 +13,30 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(eq=True)
-class DataClassFieldMetaData(object):
+class DataClassDoc(object):
+    """A meta data for documentation at any level of the class.
+
+    """
+    text: str = field()
+    params: Dict[str, str] = field(default=None)
+
+    def __post_init__(self):
+        doc = self.text
+        params = None
+        if doc is not None:
+            doc = doc.strip()
+            if len(doc) == 0:
+                doc = None
+            else:
+                doc = doc.lower()
+                if doc[-1] == '.':
+                    doc = doc[0:-1]
+        self.text = doc
+        self.params = params
+
+
+@dataclass(eq=True)
+class DataClassField(object):
     """Represents a :class:`dataclasses.dataclass` field.
 
     """
@@ -26,7 +49,7 @@ class DataClassFieldMetaData(object):
     kwargs: Dict[str, Any] = field()
     """The field arguments."""
 
-    doc: str = field(default=None)
+    doc: DataClassDoc = field(default=None)
     """The documentation of the field."""
 
     @property
@@ -35,8 +58,8 @@ class DataClassFieldMetaData(object):
             return self.kwargs.get('default')
 
 
-@dataclass
-class DataClassMethodMetaDataArg(object):
+@dataclass(eq=True)
+class DataClassMethodArg(object):
     """Meta data for an argument in a method.
 
     """
@@ -50,33 +73,33 @@ class DataClassMethodMetaDataArg(object):
     """The data type as a typehint, or ``None`` if not given."""
 
 
-@dataclass
-class DataClassMethodMetaData(object):
+@dataclass(eq=True)
+class DataClassMethod(object):
     """Meta data for a method in a dataclass.
 
     """
     name: str = field()
     """The name of the method."""
 
-    doc: str = field()
+    doc: DataClassDoc = field()
     """The docstring of the method."""
 
-    args: Tuple[DataClassMethodMetaDataArg] = field()
+    args: Tuple[DataClassMethodArg] = field()
     """The arguments of the method."""
 
 
-@dataclass
-class DataClassMetaData(object):
+@dataclass(eq=True)
+class DataClass(object):
     cls: type = field()
     """The class that was inspected."""
 
-    doc: str = field()
+    doc: DataClassDoc = field()
     """The docstring of the class."""
 
-    fields: Dict[str, DataClassFieldMetaData] = field()
+    fields: Dict[str, DataClassField] = field()
     """The fields of the class."""
 
-    methods: Dict[str, DataClassMethodMetaData] = field()
+    methods: Dict[str, DataClassMethod] = field()
     """The methods of the class."""
 
 
@@ -118,24 +141,26 @@ class DataClassInspector(object):
                 default = defaults[didx].value
             if arg.annotation is not None:
                 dtype = arg.annotation.id
-            arg = DataClassMethodMetaDataArg(name, default, dtype)
+            arg = DataClassMethodArg(name, default, dtype)
             args.append(arg)
         return args
 
-    def _get_method(self, node: ast.FunctionDef) -> DataClassMethodMetaData:
-        method: DataClassMethodMetaData = None
+    def _get_method(self, node: ast.FunctionDef) -> DataClassMethod:
+        method: DataClassMethod = None
         is_prop = any(map(lambda n: n.id, node.decorator_list))
         if node.args is not None and not is_prop:
             name = node.name
             args = self._get_args(node.args)
             node = None if len(node.body) == 0 else node.body[0]
+            # parse the docstring for instance methods only
             if node is not None and len(args) > 0 and args[0].name == 'self':
                 if isinstance(node, ast.Expr) and \
                    isinstance(node.value, ast.Constant):
-                    method = DataClassMethodMetaData(name, node.value.value, args[1:])
+                    doc = DataClassDoc(node.value.value)
+                    method = DataClassMethod(name, doc, args[1:])
         return method
 
-    def get_meta_data(self) -> DataClassMetaData:
+    def get_meta_data(self) -> DataClass:
         """Return a dict of attribute (field) to metadata and docstring.
 
         """
@@ -144,8 +169,8 @@ class DataClassInspector(object):
             attrs = tuple(filter(lambda i: i[:1] != '_',
                                  self.cls.__dict__.keys()))
         cnode: ast.Node = self._get_class_node()
-        fields: List[DataClassFieldMetaData] = []
-        methods: List[DataClassMethodMetaData] = []
+        fields: List[DataClassField] = []
+        methods: List[DataClassMethod] = []
         for node in cnode.body:
             # parse the dataclass attribute/field defintion
             if isinstance(node, ast.AnnAssign):
@@ -153,22 +178,22 @@ class DataClassInspector(object):
                 dtype: str = node.annotation.id
                 kwlst: List[ast.keyword] = node.value.keywords
                 kwargs = {k.arg: k.value.value for k in kwlst}
-                fields.append(DataClassFieldMetaData(name, dtype, kwargs))
+                fields.append(DataClassField(name, dtype, kwargs))
             # parse documentation string right after the dataclass field
             elif (isinstance(node, ast.Expr) and
                   isinstance(node.value, ast.Constant) and
                   len(fields) > 0):
-                doc = node.value.value
-                last_doc: DataClassFieldMetaData = fields[-1]
-                if last_doc.doc is None:
-                    last_doc.doc = doc
+                doc = DataClassDoc(node.value.value)
+                last_field: DataClassField = fields[-1]
+                if last_field.doc is None:
+                    last_field.doc = doc
             # parse the method
             elif isinstance(node, ast.FunctionDef):
                 meth = self._get_method(node)
                 if meth is not None:
                     methods.append(meth)
-        return DataClassMetaData(
+        return DataClass(
             self.cls,
-            self.cls.__doc__,
+            DataClassDoc(self.cls.__doc__),
             fields={d.name: d for d in fields},
             methods={m.name: m for m in methods})
