@@ -56,8 +56,8 @@ class OptionMetaData(Dictable):
     metavar: str = field(default=None)
     """Used in the command line help for the type of the option."""
 
-    required: bool = field(default=False)
-    """Whether or not the target class expects the option to be set."""
+    # required: bool = field(default=False)
+    # """Whether or not the target class expects the option to be set."""
 
     def __post_init__(self):
         if self.dest is None:

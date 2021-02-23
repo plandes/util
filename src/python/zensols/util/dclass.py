@@ -12,7 +12,7 @@ import inspect
 logger = logging.getLogger(__name__)
 
 
-@dataclass
+@dataclass(eq=True)
 class FieldMetaData(object):
     """Represents a :class:`dataclasses.dataclass` field.
 
@@ -36,6 +36,15 @@ class FieldMetaData(object):
 
 
 @dataclass
+class DataClassMetaData(object):
+    cls: type = field()
+    """The class that was inspected."""
+
+    fields: Dict[str, FieldMetaData] = field()
+    """The fields of the class."""
+
+
+@dataclass
 class DataClassInspector(object):
     """A utility class to return all :class:`dataclasses.dataclass` attribute
     (field) documentation.
@@ -50,18 +59,15 @@ class DataClassInspector(object):
 
     """
 
-    def _get_class_nodes(self) -> List[ast.AST]:
-        cls = self.cls
-        fname = inspect.getfile(cls)
+    def _get_class_node(self) -> ast.AST:
+        fname = inspect.getfile(self.cls)
         logger.debug(f'parsing source file: {fname}')
         with open(fname, 'r') as f:
             fstr = f.read()
-        class_nodes = []
         for node in ast.walk(ast.parse(fstr)):
             if isinstance(node, ast.ClassDef):
-                if node.name == cls.__name__:
-                    class_nodes.extend(node.body)
-        return class_nodes
+                if node.name == self.cls.__name__:
+                    return node
 
     def get_field_docs(self) -> Dict[str, FieldMetaData]:
         """Return a dict of attribute (field) to metadata and docstring.
@@ -71,9 +77,9 @@ class DataClassInspector(object):
         if attrs is None:
             attrs = tuple(filter(lambda i: i[:1] != '_',
                                  self.cls.__dict__.keys()))
-        nodes: List[ast.Node] = self._get_class_nodes()
+        cnode: ast.Node = self._get_class_node()
         docs: List[FieldMetaData] = []
-        for node in nodes:
+        for node in cnode.body:
             if isinstance(node, ast.AnnAssign):
                 name: str = node.target.id
                 dtype: str = node.annotation.id
@@ -87,4 +93,4 @@ class DataClassInspector(object):
                 last_doc: FieldMetaData = docs[-1]
                 if last_doc.doc is None:
                     last_doc.doc = doc
-        return {d.name: d for d in docs}
+        return DataClassMetaData(self.cls, {d.name: d for d in docs})
