@@ -28,9 +28,16 @@ class ActionCliMetaData(Dictable):
     section: str = field()
     """The application section to introspect."""
 
-    class_meta: DataClassMetaData
+    class_meta: DataClassMetaData = field()
+    """The target class meta data parsed by :class:`.DataClassInspector`
+
+    """
 
     options: Dict[str, OptionMetaData] = field(default=None)
+    """Options added by :class:`.ActionCliResover`, which are those options parsed
+    by the entire class metadata.
+
+    """
 
     def __post_init__(self):
         self.name = self.section.replace('_', '')
@@ -39,23 +46,29 @@ class ActionCliMetaData(Dictable):
 @dataclass
 class ActionCli(Dictable):
     action_cli_meta_data: ActionCliMetaData
+    mnemonic: str = field(default=None)
+    includes: Tuple = field(default=None)
+    first_pass: bool = field(default=False)
 
     def __post_init__(self):
         acm = self.action_cli_meta_data
-        f: FieldMetaData
+        name: str = acm.name
         omds: Tuple[OptionMetaData] = []
+        f: FieldMetaData
         for f in acm.class_meta.fields.values():
-            omds.append(acm.options[f.name])
+            if self.includes is None or f.name in self.includes:
+                omds.append(acm.options[f.name])
         doc = acm.class_meta.cls.__doc__
         if doc is not None:
             doc = doc.strip()
             if len(doc) == 0:
                 doc = None
+        self.name = name
         self.meta_data = ActionMetaData(
-            name=acm.name,
+            name=self.mnemonic or name,
             doc=doc,
-            options=omds)
-        self.name = self.meta_data.name
+            options=omds,
+            first_pass=self.first_pass)
 
 
 @dataclass
@@ -67,6 +80,7 @@ class ActionCliResolver(Dictable):
 
     config_factory: ConfigFactory
     apps: Tuple[str]
+    #clis: Tuple[]
 
     @property
     def config(self) -> Configurable:
@@ -127,6 +141,23 @@ class ActionCliResolver(Dictable):
         meta: DataClassMetaData = dh.get_meta_data()
         self._add_action_meta(ActionCliMetaData(section, meta))
 
+    CONFIG_FORMAT_SECTION = '{section}_action_cli'
+
+    def _create_actions(self, acms: Tuple[ActionCliMetaData]):
+        actions = {}
+        for acm in acms:
+            conf_sec = self.CONFIG_FORMAT_SECTION.\
+                format(**{'section': acm.section})
+            if conf_sec in self.config.sections:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'found configuration section: {conf_sec}')
+                action = self.config_factory.instance(
+                    conf_sec, action_cli_meta_data=acm)
+            else:
+                action = ActionCli(acm)
+            actions[action.name] = action
+        return actions
+
     @property
     def actions(self) -> Dict[str, ActionCli]:
         self._short_names: Set[str] = set()
@@ -137,7 +168,7 @@ class ActionCliResolver(Dictable):
         acms = tuple(self._meta_datas.values())
         for acm in acms:
             acm.options = self._fields
-        actions = {a.name: a for a in map(ActionCli, acms)}
+        actions = self._create_actions(acms)
         del self._short_names
         del self._fields
         return actions

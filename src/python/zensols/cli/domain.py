@@ -72,8 +72,10 @@ class OptionMetaData(Dictable):
                 self.metavar = 'FILE'
             elif self.dtype == bool:
                 self.metavar = None
+            elif self.dtype == str:
+                self.metavar = 'STRING'
             else:
-                self.metavar = self.dtype.__name__
+                self.metavar = self.dtype.__name__.upper()
 
     def create_option(self) -> optparse.Option:
         """Add the option to an option parser.

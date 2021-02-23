@@ -70,7 +70,7 @@ class Serializer(object):
     PATH_REGEXP = re.compile(r'^path:\s*(.+)$')
     RESOURCE_REGEXP = re.compile(r'^resource(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     STRING_REGEXP = re.compile(r'^str:\s*(.+)$', re.DOTALL)
-    LIST_REGEXP = re.compile(r'^(list|tuple)(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
+    LIST_REGEXP = re.compile(r'^(list|set|tuple)(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     EVAL_REGEXP = re.compile(r'^eval(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     JSON_REGEXP = re.compile(r'^json:\s*(.+)$', re.DOTALL)
     PRIMITIVES = set([bool, float, int, None.__class__])
@@ -160,6 +160,8 @@ class Serializer(object):
                             parsed = list(map(tpe, parsed))
                     if ctype == 'tuple':
                         parsed = tuple(parsed)
+                    elif ctype == 'set':
+                        parsed = set(parsed)
             if parsed is None:
                 m = self.RESOURCE_REGEXP.match(v)
                 if m:
