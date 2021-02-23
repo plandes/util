@@ -1,3 +1,4 @@
+from dataclasses import dataclass, field
 import logging
 from logging import Logger
 import sys
@@ -57,7 +58,7 @@ class StreamLogDumper(threading.Thread):
         StreamLogDumper(stderr, logger, logging.ERROR).start()
 
 
-class LogConfigurer(object):
+class LogConfigurerLegacy(object):
     """Configure logging to go to a file or Graylog.
 
     """
@@ -105,6 +106,29 @@ class LogConfigurer(object):
             sys.stdout = LoggerStream(stdout_logger, logging.INFO)
         if stderr_logger is not None:
             sys.stderr = LoggerStream(stderr_logger, logging.INFO)
+
+
+@dataclass
+class LogConfigurator(object):
+    """A simple log configuration utility.
+
+    """
+    log_name: str = field(default=None)
+    """The log name space."""
+
+    level: str = field(default='info')
+    """The level to set the application logger."""
+
+    default_level: str = field(default='warning')
+    """The level to set the root logger."""
+
+    def config(self):
+        msg = (f'configuring root logger to {self.default_level} and ' +
+               f'{self.log_name} to {self.level}')
+        print(msg)
+        logging.basicConfig(level=self.default_level)
+        if self.log_name is not None:
+            logging.getLogger(self.log_name).setLevel(self.level)
 
 
 class loglevel(object):

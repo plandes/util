@@ -23,7 +23,6 @@ class ActionCliFactory(object):
     """Boots the application context from the command line.
 
     """
-
     UTIL_PACKAGE = 'zensols.util'
     """The package name of *this* utility package."""
 

@@ -33,6 +33,11 @@ class ActionCliMetaData(Dictable):
 
 
 @dataclass
+class ActionCli(Dictable):
+    name: str
+
+
+@dataclass
 class ActionCliResolver(Dictable):
     SECTION = 'cli'
     """The application context section."""
@@ -41,7 +46,6 @@ class ActionCliResolver(Dictable):
 
     config_factory: ConfigFactory
     apps: Tuple[str]
-    meta_datas: Dict[str, ActionCliMetaData] = field(default_factory=dict)
 
     @property
     def config(self) -> Configurable:
@@ -75,7 +79,7 @@ class ActionCliResolver(Dictable):
             doc=fmd.doc)
 
     def _add_action_meta(self, meta: ActionCliMetaData):
-        if meta.name in self.meta_datas:
+        if meta.name in self._meta_datas:
             raise ActionCliResolverError(
                 f'duplicate meta data: {meta.name}')
         for name, fmd in meta.class_meta.fields.items():
@@ -86,7 +90,7 @@ class ActionCliResolver(Dictable):
                     f'duplicate field {name} -> {omd.long_name} in ' +
                     f'{meta.section} but not equal to {prexist}')
             self._fields[fmd.name] = omd
-        self.meta_datas[meta.name] = meta
+        self._meta_datas[meta.name] = meta
 
     def _add_app(self, section: str):
         config = self.config
@@ -108,7 +112,7 @@ class ActionCliResolver(Dictable):
     def _create_actions(self) -> Dict[str, ActionMetaData]:
         acts: Dict[str, ActionMetaData] = {}
         acm: ActionCliMetaData
-        for acm in self.meta_datas.values():
+        for acm in self._meta_datas.values():
             omds: Tuple[OptionMetaData] = tuple(
                 map(lambda f: self._fields[f.name],
                     acm.class_meta.fields.values()))
@@ -128,6 +132,7 @@ class ActionCliResolver(Dictable):
     def actions(self) -> Dict[str, ActionMetaData]:
         self._short_names: Set[str] = set()
         self._fields: Dict[str, OptionMetaData] = {}
+        self._meta_datas: Dict[str, ActionCliMetaData] = {}
         for app in self.apps:
             self._add_app(app)
         actions = self._create_actions()
