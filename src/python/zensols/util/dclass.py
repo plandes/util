@@ -37,22 +37,41 @@ class DataClassFieldMetaData(object):
 
 @dataclass
 class DataClassMethodMetaDataArg(object):
-    name: str
-    default: str
-    dtype: str = field(default=None)
+    """Meta data for an argument in a method.
+
+    """
+    name: str = field()
+    """The name of the argument."""
+
+    default: str = field()
+    """The default if any, otherwise ``None``."""
+
+    dtype: str = field()
+    """The data type as a typehint, or ``None`` if not given."""
 
 
 @dataclass
 class DataClassMethodMetaData(object):
-    name: str
-    doc: str
-    args: Tuple[str]
+    """Meta data for a method in a dataclass.
+
+    """
+    name: str = field()
+    """The name of the method."""
+
+    doc: str = field()
+    """The docstring of the method."""
+
+    args: Tuple[DataClassMethodMetaDataArg] = field()
+    """The arguments of the method."""
 
 
 @dataclass
 class DataClassMetaData(object):
     cls: type = field()
     """The class that was inspected."""
+
+    doc: str = field()
+    """The docstring of the class."""
 
     fields: Dict[str, DataClassFieldMetaData] = field()
     """The fields of the class."""
@@ -150,5 +169,6 @@ class DataClassInspector(object):
                     methods.append(meth)
         return DataClassMetaData(
             self.cls,
+            self.cls.__doc__,
             fields={d.name: d for d in fields},
             methods={m.name: m for m in methods})
