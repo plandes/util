@@ -11,3 +11,4 @@ from .usage import *
 from .cmdparse import *
 from .actfactory import *
 from .cmd import *
+from .lib import *

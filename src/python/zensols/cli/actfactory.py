@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 import dataclasses
 import logging
 from pathlib import Path
+from zensols.persist import persisted
 from zensols.util import (
     DataClassInspector, DataClass, DataClassField
 )
@@ -88,7 +89,7 @@ class ActionCliFactory(Dictable):
     apps: Tuple[str] = field()
     """The application section names."""
 
-    config_section: str = field(default='{section}_action_cli')
+    decorator_section_format: str = field(default='{section}_decorator')
     """Format of :class:`.ActionCli` configuration classes."""
 
     @property
@@ -154,7 +155,8 @@ class ActionCliFactory(Dictable):
     def _create_actions(self, acms: Tuple[ActionCliMetaData]):
         actions = {}
         for acm in acms:
-            conf_sec = self.config_section.format(**{'section': acm.section})
+            conf_sec = self.decorator_section_format.format(
+                **{'section': acm.section})
             if conf_sec in self.config.sections:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'found configuration section: {conf_sec}')
@@ -166,6 +168,7 @@ class ActionCliFactory(Dictable):
         return actions
 
     @property
+    @persisted('_actions')
     def actions(self) -> Dict[str, ActionCli]:
         self._short_names: Set[str] = set()
         self._fields: Dict[str, OptionMetaData] = {}
@@ -181,6 +184,7 @@ class ActionCliFactory(Dictable):
         return actions
 
     @property
+    @persisted('_meta_datas')
     def action_meta_datas(self) -> Tuple[ActionMetaData]:
         return tuple(map(lambda a: a.meta_data, self.actions.values()))
 

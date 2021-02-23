@@ -14,7 +14,7 @@ from zensols.config import (
 )
 from . import (
     ActionCliError, ActionCliFactory, ActionMetaData,
-    CommandLineParser
+    CommandLineConfig, CommandLineParser
 )
 
 logger = logging.getLogger(__name__)
@@ -83,6 +83,7 @@ class CommandFactory(object):
         fac = ImportConfigFactory(config)
         cli_resolver: ActionCliFactory = fac(ActionCliFactory.SECTION)
         actions: Tuple[ActionMetaData] = cli_resolver.action_meta_datas
-        parser = CommandLineParser(actions, self.package_resource.version)
-        parser.write_help()
+        config = CommandLineConfig(actions)
+        parser = CommandLineParser(config, self.package_resource.version)
+        #parser.write_help()
         return Command()

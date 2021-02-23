@@ -3,7 +3,7 @@ from pathlib import Path
 from logutil import LogTestCase
 from zensols.cli import (
     OptionMetaData, PositionalMetaData, ActionMetaData, OptionFactory,
-    CommandLineError, Action, ActionSet, CommandLineParser
+    Action, ActionSet, CommandLineError, CommandLineConfig, CommandLineParser
 )
 
 
@@ -66,7 +66,7 @@ Options:
   -c FILE, --config=FILE
                         the path to the config file
 """
-        parser = CommandLineParser(actions=(self.test_action, self.config_action))
+        parser = CommandLineParser(CommandLineConfig(actions=(self.test_action, self.config_action)))
         sio = StringIO()
         parser.write_help(writer=sio)
         should_lines = sorted(should.split('\n'))
@@ -89,15 +89,15 @@ prconfig <file>     a second test action
 test                a test action
   -d, --dry_run    don't do anything; just act like it
 """
-        parser = CommandLineParser(
-            tuple([self.config_action, self.test_action, self.test_action2]))
+        parser = CommandLineParser(CommandLineConfig(
+            tuple([self.config_action, self.test_action, self.test_action2])))
         sio = StringIO()
         parser.write_help(writer=sio)
         self.assertEqual(should, sio.getvalue())
 
     def test_parse_basic(self):
         test_action = self.test_action
-        parser = CommandLineParser(tuple([test_action]))
+        parser = CommandLineParser(CommandLineConfig(tuple([test_action])))
         action_set: ActionSet = parser.parse([])
         self.assertEqual(1, len(action_set))
         self.assertEqual(0, len(action_set.first_pass_actions))
@@ -107,7 +107,7 @@ test                a test action
 
     def test_parse_option(self):
         test_action = self.test_action
-        parser = CommandLineParser(tuple([test_action]))
+        parser = CommandLineParser(CommandLineConfig(tuple([test_action])))
         action_set: ActionSet = parser.parse([])
         self.assertEqual(1, len(action_set))
         self.assertEqual(0, len(action_set.first_pass_actions))
@@ -126,7 +126,7 @@ test                a test action
         test_action = ActionMetaData(
             'test', 'a test action',
             tuple([OptionFactory.dry_run(default=True)]))
-        parser = CommandLineParser(tuple([test_action]))
+        parser = CommandLineParser(CommandLineConfig(tuple([test_action])))
         action_set: ActionSet = parser.parse([])
         self.assertEqual(1, len(action_set))
         self.assertEqual(0, len(action_set.first_pass_actions))
@@ -141,13 +141,13 @@ test                a test action
         self.assertEqual((), action.positional)
 
     def test_parse_position(self):
-        parser = CommandLineParser((self.test_action,))
+        parser = CommandLineParser(CommandLineConfig((self.test_action,)))
         with self.assertRaisesRegex(CommandLineError, r"^action 'test' expects 0.*"):
             parser.parse(['test'])
-        parser = CommandLineParser((self.test_action, self.test_action2))
+        parser = CommandLineParser(CommandLineConfig((self.test_action, self.test_action2)))
         with self.assertRaisesRegex(CommandLineError, r'^no action given$'):
             parser.parse([])
-        parser = CommandLineParser((self.test_action, self.test_action2))
+        parser = CommandLineParser(CommandLineConfig((self.test_action, self.test_action2)))
         action_set: ActionSet = parser.parse(['test'])
         self.assertEqual(1, len(action_set))
         self.assertEqual(0, len(action_set.first_pass_actions))
@@ -171,7 +171,7 @@ test                a test action
         self.assertEqual(Path('a.txt'), action.positional[0])
 
     def test_parse_op_pos(self):
-        parser = CommandLineParser(self._complex_actions())
+        parser = CommandLineParser(CommandLineConfig(self._complex_actions()))
         action_set: ActionSet = parser.parse(['results'])
         self.assertEqual(1, len(action_set))
         self.assertEqual(0, len(action_set.first_pass_actions))
@@ -202,7 +202,7 @@ test                a test action
         self.assertEqual((Path('b.txt'),), action.positional)
         self.assertEqual({}, action.options)
 
-        parser = CommandLineParser(self._complex_actions({'default': 14}))
+        parser = CommandLineParser(CommandLineConfig(self._complex_actions({'default': 14})))
         action_set: ActionSet = parser.parse(['results'])
         self.assertEqual(1, len(action_set))
         self.assertEqual(0, len(action_set.first_pass_actions))
@@ -212,7 +212,7 @@ test                a test action
         self.assertEqual({'dry_run': None, 'numres': 14}, action.options)
 
     def test_parse_mix(self):
-        parser = CommandLineParser(self._complex_actions())
+        parser = CommandLineParser(CommandLineConfig(self._complex_actions()))
         action_set: ActionSet = parser.parse('env b.txt'.split())
         self.assertEqual(1, len(action_set))
         self.assertEqual(0, len(action_set.first_pass_actions))
@@ -254,7 +254,7 @@ test                a test action
         self.assertEqual({'dry_run': None, 'numres': 16}, action.options)
 
     def test_first_pass(self):
-        parser = CommandLineParser((self.test_action, self.log_action))
+        parser = CommandLineParser(CommandLineConfig((self.test_action, self.log_action)))
         actions: ActionSet = parser.parse('-w 2'.split())
         self.assertEqual(2, len(actions))
         action = actions.second_pass_action
@@ -266,7 +266,7 @@ test                a test action
         self.assertEqual({'whine': 2}, whine.options)
 
     def test_first_pass_options(self):
-        parser = CommandLineParser((self.test_action2, self.log_action))
+        parser = CommandLineParser(CommandLineConfig((self.test_action2, self.log_action)))
         actions: ActionSet = parser.parse('-w 2 b.txt'.split())
         self.assertEqual(2, len(actions))
         action = actions.second_pass_action
@@ -283,7 +283,7 @@ test                a test action
             'prconfig', 'a second test action',
             positional=[PositionalMetaData('file', Path)],
             options=[self.conf_opt])
-        parser = CommandLineParser((test_action2, self.log_action))
+        parser = CommandLineParser(CommandLineConfig((test_action2, self.log_action)))
         actions: ActionSet = parser.parse('-w 2 b.txt -c c.conf'.split())
         self.assertEqual(2, len(actions))
         action = actions.second_pass_action
@@ -300,7 +300,7 @@ test                a test action
         # skip the show_action since it has a config option at the second pass
         # level
         actions = list(self._complex_actions()[1:]) + [self.config_action]
-        parser = CommandLineParser(tuple(actions))
+        parser = CommandLineParser(CommandLineConfig(tuple(actions)))
         action_set: ActionSet = parser.parse('env b.txt'.split())
         self.assertEqual(2, len(action_set))
         self.assertEqual(1, len(action_set.first_pass_actions))
