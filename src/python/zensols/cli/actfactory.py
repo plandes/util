@@ -51,7 +51,6 @@ class ActionCli(Dictable):
     action_cli_meta_data: ActionCliMetaData
     mnemonic: str = field(default=None)
     option_includes: Tuple = field(default=None)
-    #doc: str = field(default=None)
     first_pass: bool = field(default=False)
 
     @property
@@ -67,6 +66,8 @@ class ActionCli(Dictable):
             if (self.option_includes is None) or \
                (f.name in self.option_includes):
                 omds.append(acm.options[f.name])
+        for name in sorted(acm.class_meta.methods.keys()):
+            print(name)
         meta_data = ActionMetaData(
             name=self.mnemonic or self.name,
             doc='NO DOC',
@@ -122,7 +123,7 @@ class ActionCliFactory(Dictable):
             dest=pmeta.name,
             dtype=dtype,
             default=pmeta.default,
-            doc=pmeta.doc)
+            doc=None if pmeta.doc is None else pmeta.doc.text)
 
     def _add_field(self, section: str, name: str, omd: OptionMetaData):
         prexist = self._fields.get(name)
@@ -143,7 +144,6 @@ class ActionCliFactory(Dictable):
         for meth in meta.class_meta.methods.values():
             arg: DataClassMethodArg
             for arg in meth.args:
-                print(arg)
                 omd = self._create_option_meta_data(arg)
                 self._add_field(meta.section, arg.name, omd)
         self._meta_datas[meta.name] = meta
