@@ -3,7 +3,7 @@ from __future__ import annotations
 
 """
 
-from typing import Dict, Tuple, Iterable, Set
+from typing import Dict, Tuple, Iterable, Set, List
 from dataclasses import dataclass, field
 import dataclasses
 import logging
@@ -35,7 +35,6 @@ class ActionCli(Dictable):
     """A command that is invokeable on the command line.
 
     """
-
     section: str = field()
     """The application section to introspect."""
 
@@ -71,21 +70,26 @@ class ActionCli(Dictable):
             self.mnemonic = self.name
 
     @property
-    def meta_datas(self):
-        omds: Tuple[OptionMetaData] = []
+    @persisted('_meta_datas')
+    def meta_datas(self) -> Tuple[ActionMetaData]:
+        metas: List[ActionMetaData] = []
+        omds: List[OptionMetaData] = []
         f: DataClassField
         for f in self.class_meta.fields.values():
             if (self.option_includes is None) or \
                (f.name in self.option_includes):
                 omds.append(self.options[f.name])
+        print('M', self.section, self.class_meta.methods)
         for name in sorted(self.class_meta.methods.keys()):
-            print(name)
-        meta_data = ActionMetaData(
-            name=self.mnemonic or self.name,
-            doc='NO DOC',
-            options=omds,
-            first_pass=self.first_pass)
-        return [meta_data]
+            meta = ActionMetaData(
+                name=name,#self.mnemonic or self.name,
+                doc='NO DOC',
+                options=omds,
+                first_pass=self.first_pass)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'adding metadata: {meta}')
+            metas.append(meta)
+        return metas
 
 
 @dataclass

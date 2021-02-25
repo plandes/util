@@ -153,16 +153,22 @@ class DataClassInspector(object):
     def _get_method(self, node: ast.FunctionDef) -> DataClassMethod:
         method: DataClassMethod = None
         is_prop = any(map(lambda n: n.id, node.decorator_list))
-        if node.args is not None and not is_prop:
+        if not is_prop:
             name = node.name
             args = self._get_args(node.args)
             node = None if len(node.body) == 0 else node.body[0]
             # parse the docstring for instance methods only
-            if node is not None and len(args) > 0 and args[0].name == 'self':
-                if isinstance(node, ast.Expr) and \
-                   isinstance(node.value, ast.Constant):
-                    doc = DataClassDoc(node.value.value)
-                    method = DataClassMethod(name, doc, args[1:])
+            if (node is not None) and (len(args) > 0) and \
+               (args[0].name == 'self'):
+                args = args[-1:]
+            else:
+                args = ()
+            if (isinstance(node, ast.Expr) and
+                isinstance(node.value, ast.Constant)):
+                doc = DataClassDoc(node.value.value)
+            else:
+                doc = None
+            method = DataClassMethod(name, doc, args)
         return method
 
     def get_meta_data(self) -> DataClass:
