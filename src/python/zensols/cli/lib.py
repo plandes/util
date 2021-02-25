@@ -22,6 +22,9 @@ class LogConfigurator(object):
     """The level to set the root logger."""
 
     def config(self):
+        """Configure the log system.
+
+        """
         msg = (f'configuring root logger to {self.default_level} and ' +
                f'{self.log_name} to {self.level}')
         print(msg)

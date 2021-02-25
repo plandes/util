@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, List, Any, Dict, Iterable
+from typing import Tuple, List, Any, Dict, Iterable, Optional
 from dataclasses import dataclass, field
 import logging
 import sys
@@ -30,9 +30,10 @@ class ActionOptionParser(OptionParser):
     since the ``-h`` option invokes the print help behavior and then exists.
 
     """
-    def __init__(self, actions: Tuple[ActionMetaData], *args, **kwargs):
+    def __init__(self, actions: Tuple[ActionMetaData], doc: str = None,
+                 *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.usage_writer = UsageWriter(self, actions)
+        self.usage_writer = UsageWriter(self, actions, doc)
 
     def print_help(self, file=sys.stdout):
         super().print_help(file)
@@ -113,9 +114,17 @@ class CommandLineParser(Dictable):
         if len(self.config.actions) == 0:
             raise ValueError('must create parser with at least one action')
 
+    def _create_program_doc(self) -> Optional[str]:
+        doc = None
+        if len(self.config.second_pass_actions) == 1:
+            doc = self.config.second_pass_actions[0].doc
+            doc = doc[0].upper() + doc[1:] + '.'
+        return doc
+
     def _create_parser(self, actions: Tuple[ActionMetaData]) -> OptionParser:
+        doc = self._create_program_doc()
         return ActionOptionParser(
-            actions, version='%prog ' + str(self.version))
+            actions, doc, version=('%prog ' + str(self.version)))
 
     def _configure_parser(self, parser: OptionParser,
                           options: Iterable[OptionMetaData]):
@@ -153,7 +162,8 @@ class CommandLineParser(Dictable):
         return parser
 
     def write_help(self, writer: TextIOBase = sys.stdout):
-        self._get_first_pass_parser(False).print_help(file=writer)
+        parser = self._get_first_pass_parser(False)
+        parser.print_help(file=writer)
 
     def _parse_positional(self, metas: List[PositionalMetaData],
                           vals: List[str]) -> Tuple[Any]:

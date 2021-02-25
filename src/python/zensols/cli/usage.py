@@ -17,8 +17,12 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class UsageWriter(Writable):
+    """Generates the usage and help messages for an :class:`optparse.OptionParser`.
+
+    """
     parser: OptionParser
     actions: Tuple[ActionMetaData]
+    doc: str = None
 
     def __post_init__(self):
         self.actions = sorted(self.actions, key=lambda a: a.name)
@@ -35,7 +39,11 @@ class UsageWriter(Writable):
                 opts = f'<{opts}> '
         else:
             opts = ''
-        self.parser.usage = f"%prog {opts}[options]:"
+        if self.doc is None:
+            doc = ''
+        else:
+            doc = f'\n\n{self.doc}'
+        self.parser.usage = f"%prog {opts}[options]:{doc}"
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         actions = sorted(self.actions, key=lambda a: a.name)

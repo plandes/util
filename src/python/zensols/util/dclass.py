@@ -6,6 +6,8 @@ __author__ = 'Paul Landes'
 from typing import List, Tuple, Dict, Any
 from dataclasses import dataclass, field
 import logging
+from itertools import chain
+import re
 import ast
 import inspect
 
@@ -14,15 +16,20 @@ logger = logging.getLogger(__name__)
 
 @dataclass(eq=True)
 class DataClassDoc(object):
-    """A meta data for documentation at any level of the class.
+    """A meta data for documentation at any level of the class code (methods etc).
 
     """
+    PARAM_REGEX = re.compile(r'^\s*:param ([^:]+):\s*(.+)$')
+    """Matches :param: documentation."""
+
     text: str = field()
+    """The text of the documentation."""
+
     params: Dict[str, str] = field(default=None)
+    """The parsed parameter documentation."""
 
     def __post_init__(self):
-        doc = self.text
-        params = None
+        doc, params = self._parse_params(self.text)
         if doc is not None:
             doc = doc.strip()
             if len(doc) == 0:
@@ -33,6 +40,31 @@ class DataClassDoc(object):
                     doc = doc[0:-1]
         self.text = doc
         self.params = params
+
+    def _parse_params(self, text: str) -> Dict[str, str]:
+        doc_lines = []
+        params: Dict[str, List[str]] = {}
+        last_param = None
+        param_sec = False
+        for line in text.split('\n'):
+            line = line.strip()
+            if len(line) > 0:
+                m = self.PARAM_REGEX.match(line)
+                if m is None:
+                    if param_sec:
+                        last_param.append(line)
+                    else:
+                        doc_lines.append(line)
+                else:
+                    name, doc = m.groups()
+                    last_param = [doc]
+                    params[name] = last_param
+                    param_sec = True
+        param_doc = {}
+        for k, v in params.items():
+            param_doc[k] = ' '.join(v)
+        doc = ' '.join(doc_lines)
+        return doc, param_doc
 
 
 @dataclass(eq=True)
@@ -160,7 +192,7 @@ class DataClassInspector(object):
             # parse the docstring for instance methods only
             if (node is not None) and (len(args) > 0) and \
                (args[0].name == 'self'):
-                args = args[-1:]
+                args = args[1:]
             else:
                 args = ()
             if (isinstance(node, ast.Expr) and
