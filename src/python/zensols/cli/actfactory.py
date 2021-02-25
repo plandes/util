@@ -48,25 +48,43 @@ class ActionCliMetaData(Dictable):
 
 @dataclass
 class ActionCli(Dictable):
-    action_cli_meta_data: ActionCliMetaData
+    #action_cli_meta_data: ActionCliMetaData
+
+    section: str = field()
+    """The application section to introspect."""
+
+    class_meta: DataClass = field()
+    """The target class meta data parsed by :class:`.DataClassInspector`
+
+    """
+
+    options: Dict[str, OptionMetaData] = field(default=None)
+    """Options added by :class:`.ActionCliFactory`, which are those options parsed
+    by the entire class metadata.
+
+    """
+
     mnemonic: str = field(default=None)
     option_includes: Tuple = field(default=None)
     first_pass: bool = field(default=False)
 
-    @property
-    def name(self) -> str:
-        return self.action_cli_meta_data.name
+    def __post_init__(self):
+        self.name = self.section.replace('_', '')
+
+    # @property
+    # def name(self) -> str:
+    #     return self.action_cli_meta_data.name
 
     @property
     def meta_datas(self):
-        acm = self.action_cli_meta_data
+        #acm = self.action_cli_meta_data
         omds: Tuple[OptionMetaData] = []
         f: DataClassField
-        for f in acm.class_meta.fields.values():
+        for f in self.class_meta.fields.values():
             if (self.option_includes is None) or \
                (f.name in self.option_includes):
-                omds.append(acm.options[f.name])
-        for name in sorted(acm.class_meta.methods.keys()):
+                omds.append(self.options[f.name])
+        for name in sorted(self.class_meta.methods.keys()):
             print(name)
         meta_data = ActionMetaData(
             name=self.mnemonic or self.name,
@@ -133,20 +151,33 @@ class ActionCliFactory(Dictable):
                 f'{section} but not equal to {prexist}')
         self._fields[name] = omd
 
-    def _add_action_meta(self, meta: ActionCliMetaData):
-        if meta.name in self._meta_datas:
-            raise ActionCliFactoryError(
-                f'duplicate meta data: {meta.name}')
-        for name, fmd in meta.class_meta.fields.items():
+    # def _add_action_meta(self, meta: ActionCliMetaData):
+    #     if meta.name in self._meta_datas:
+    #         raise ActionCliFactoryError(f'duplicate meta data: {meta.name}')
+    #     for name, fmd in meta.class_meta.fields.items():
+    #         omd = self._create_option_meta_data(fmd)
+    #         self._add_field(meta.section, fmd.name, omd)
+    #     meth: DataClassMethod
+    #     for meth in meta.class_meta.methods.values():
+    #         arg: DataClassMethodArg
+    #         for arg in meth.args:
+    #             omd = self._create_option_meta_data(arg)
+    #             self._add_field(meta.section, arg.name, omd)
+    #     self._meta_datas[meta.name] = meta
+
+    def _add_action_meta(self, action: ActionCliMetaData):
+        if action.name in self._actions:
+            raise ActionCliFactoryError(f'duplicate meta data: {meta.name}')
+        for name, fmd in action.class_meta.fields.items():
             omd = self._create_option_meta_data(fmd)
-            self._add_field(meta.section, fmd.name, omd)
+            self._add_field(action.section, fmd.name, omd)
         meth: DataClassMethod
-        for meth in meta.class_meta.methods.values():
+        for meth in action.class_meta.methods.values():
             arg: DataClassMethodArg
             for arg in meth.args:
                 omd = self._create_option_meta_data(arg)
-                self._add_field(meta.section, arg.name, omd)
-        self._meta_datas[meta.name] = meta
+                self._add_field(action.section, arg.name, omd)
+        self._actions[action.name] = action
 
     def _add_app(self, section: str):
         config = self.config
@@ -160,35 +191,51 @@ class ActionCliFactory(Dictable):
             raise ActionCliError('application CLI app must be a dataclass')
         dh = DataClassInspector(cls)
         meta: DataClass = dh.get_meta_data()
-        self._add_action_meta(ActionCliMetaData(section, meta))
+        #act_meta = ActionCliMetaData(section, meta)
+        params = {'section': section,
+                  'class_meta': meta,
+                  'options': self._fields}
+        conf_sec = self.decorator_section_format.format(**{'section': section})
+        if conf_sec in self.config.sections:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'found configuration section: {conf_sec}')
+            action = self.config_factory.instance(conf_sec, **params)
+            #, action_cli_meta_data=act_meta)
+        else:
+            action = ActionCli(**params)
+        logger.debug(f'created action: {action}')
+        self._add_action_meta(action)
 
-    def _create_actions(self, acms: Tuple[ActionCliMetaData]):
-        actions = {}
-        for acm in acms:
-            conf_sec = self.decorator_section_format.format(
-                **{'section': acm.section})
-            if conf_sec in self.config.sections:
-                if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'found configuration section: {conf_sec}')
-                action = self.config_factory.instance(
-                    conf_sec, action_cli_meta_data=acm)
-            else:
-                action = ActionCli(acm)
-            actions[action.name] = action
-        return actions
+    # def _create_actions(self, acms: Tuple[ActionCliMetaData]):
+    #     actions = {}
+    #     for acm in acms:
+    #         conf_sec = self.decorator_section_format.format(
+    #             **{'section': acm.section})
+    #         if conf_sec in self.config.sections:
+    #             if logger.isEnabledFor(logging.DEBUG):
+    #                 logger.debug(f'found configuration section: {conf_sec}')
+    #             action = self.config_factory.instance(
+    #                 conf_sec, action_cli_meta_data=acm)
+    #         else:
+    #             action = ActionCli(acm)
+    #         actions[action.name] = action
+    #     return actions
 
     @property
-    @persisted('_actions')
+    @persisted('_actions_pw')
     def actions(self) -> Dict[str, ActionCli]:
         self._short_names: Set[str] = set()
         self._fields: Dict[str, OptionMetaData] = {}
-        self._meta_datas: Dict[str, ActionCliMetaData] = {}
+        self._actions: Dict[str, ActionCli] = {}
+        #self._meta_datas: Dict[str, ActionCliMetaData] = {}
         for app in self.apps:
             self._add_app(app)
-        acms = tuple(self._meta_datas.values())
-        for acm in acms:
-            acm.options = self._fields
-        actions = self._create_actions(acms)
+        # acms = tuple(self._meta_datas.values())
+        # for acm in acms:
+        #     acm.options = self._fields
+        #actions = self._create_actions(acms)
+        actions = self._actions
+        del self._actions
         del self._short_names
         del self._fields
         return actions
