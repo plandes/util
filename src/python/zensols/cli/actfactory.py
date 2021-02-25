@@ -23,32 +23,18 @@ logger = logging.getLogger(__name__)
 
 
 class ActionCliFactoryError(ActionCliError):
+    """Raised by :class:`.ActionCliFactory` for any problems creating
+    :class:`.ActionCli` instances.
+
+    """
     pass
 
 
 @dataclass
-class ActionCliMetaData(Dictable):
-    section: str = field()
-    """The application section to introspect."""
-
-    class_meta: DataClass = field()
-    """The target class meta data parsed by :class:`.DataClassInspector`
-
-    """
-
-    options: Dict[str, OptionMetaData] = field(default=None)
-    """Options added by :class:`.ActionCliFactory`, which are those options parsed
-    by the entire class metadata.
-
-    """
-
-    def __post_init__(self):
-        self.name = self.section.replace('_', '')
-
-
-@dataclass
 class ActionCli(Dictable):
-    #action_cli_meta_data: ActionCliMetaData
+    """A command that is invokeable on the command line.
+
+    """
 
     section: str = field()
     """The application section to introspect."""
@@ -65,19 +51,27 @@ class ActionCli(Dictable):
     """
 
     mnemonic: str = field(default=None)
-    option_includes: Tuple = field(default=None)
+    """The name of the action given on the command line, which defaults to the name
+    of the action.
+
+    """
+
+    option_includes: Tuple[str] = field(default=None)
+    """A list of options to include, or all if ``None``."""
+
     first_pass: bool = field(default=False)
+    """Whether or not this is a first pass action (i.e. such as setting the level
+    in :class:`~zensols.cli.LogConfigurator`
+
+    """
 
     def __post_init__(self):
         self.name = self.section.replace('_', '')
-
-    # @property
-    # def name(self) -> str:
-    #     return self.action_cli_meta_data.name
+        if self.mnemonic is None:
+            self.mnemonic = self.name
 
     @property
     def meta_datas(self):
-        #acm = self.action_cli_meta_data
         omds: Tuple[OptionMetaData] = []
         f: DataClassField
         for f in self.class_meta.fields.values():
@@ -151,23 +145,9 @@ class ActionCliFactory(Dictable):
                 f'{section} but not equal to {prexist}')
         self._fields[name] = omd
 
-    # def _add_action_meta(self, meta: ActionCliMetaData):
-    #     if meta.name in self._meta_datas:
-    #         raise ActionCliFactoryError(f'duplicate meta data: {meta.name}')
-    #     for name, fmd in meta.class_meta.fields.items():
-    #         omd = self._create_option_meta_data(fmd)
-    #         self._add_field(meta.section, fmd.name, omd)
-    #     meth: DataClassMethod
-    #     for meth in meta.class_meta.methods.values():
-    #         arg: DataClassMethodArg
-    #         for arg in meth.args:
-    #             omd = self._create_option_meta_data(arg)
-    #             self._add_field(meta.section, arg.name, omd)
-    #     self._meta_datas[meta.name] = meta
-
-    def _add_action_meta(self, action: ActionCliMetaData):
+    def _add_action(self, action: ActionCli):
         if action.name in self._actions:
-            raise ActionCliFactoryError(f'duplicate meta data: {meta.name}')
+            raise ActionCliFactoryError(f'duplicate meta data: {action.name}')
         for name, fmd in action.class_meta.fields.items():
             omd = self._create_option_meta_data(fmd)
             self._add_field(action.section, fmd.name, omd)
@@ -191,7 +171,6 @@ class ActionCliFactory(Dictable):
             raise ActionCliError('application CLI app must be a dataclass')
         dh = DataClassInspector(cls)
         meta: DataClass = dh.get_meta_data()
-        #act_meta = ActionCliMetaData(section, meta)
         params = {'section': section,
                   'class_meta': meta,
                   'options': self._fields}
@@ -200,26 +179,10 @@ class ActionCliFactory(Dictable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'found configuration section: {conf_sec}')
             action = self.config_factory.instance(conf_sec, **params)
-            #, action_cli_meta_data=act_meta)
         else:
             action = ActionCli(**params)
         logger.debug(f'created action: {action}')
-        self._add_action_meta(action)
-
-    # def _create_actions(self, acms: Tuple[ActionCliMetaData]):
-    #     actions = {}
-    #     for acm in acms:
-    #         conf_sec = self.decorator_section_format.format(
-    #             **{'section': acm.section})
-    #         if conf_sec in self.config.sections:
-    #             if logger.isEnabledFor(logging.DEBUG):
-    #                 logger.debug(f'found configuration section: {conf_sec}')
-    #             action = self.config_factory.instance(
-    #                 conf_sec, action_cli_meta_data=acm)
-    #         else:
-    #             action = ActionCli(acm)
-    #         actions[action.name] = action
-    #     return actions
+        self._add_action(action)
 
     @property
     @persisted('_actions_pw')
@@ -227,13 +190,8 @@ class ActionCliFactory(Dictable):
         self._short_names: Set[str] = set()
         self._fields: Dict[str, OptionMetaData] = {}
         self._actions: Dict[str, ActionCli] = {}
-        #self._meta_datas: Dict[str, ActionCliMetaData] = {}
         for app in self.apps:
             self._add_app(app)
-        # acms = tuple(self._meta_datas.values())
-        # for acm in acms:
-        #     acm.options = self._fields
-        #actions = self._create_actions(acms)
         actions = self._actions
         del self._actions
         del self._short_names

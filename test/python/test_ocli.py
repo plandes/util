@@ -6,7 +6,7 @@ from logutil import LogTestCase
 
 
 @dataclass
-class TestActionCli(Dictable):
+class TestAction(Dictable):
     """Test command line.
 
     """
@@ -27,6 +27,6 @@ class TestActionObjectCli(LogTestCase):
     def test_cli(self):
         self.config_logging('zensols.cli')
         cli = CommandFactory.instance(
-            'zensols.testapp', 'test-resources/test_app.conf')
+            'zensols.testapp', 'test-resources/test-app.conf')
         command = cli.create()
         command.parser.write_help()
