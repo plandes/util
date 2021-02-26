@@ -21,7 +21,7 @@ class TestAction(Dictable):
     out_path: Path = field(default=None)
     """The output path."""
 
-    def doit(self, a1, arg0: str, arg1: int = 1, arg2: str = 'str1x'):
+    def doit(self, a1, arg0: float, arg1: int = 1, arg2: str = 'str1x'):
         """Run the test
         command
 
@@ -40,16 +40,18 @@ class TestAction(Dictable):
         print('in do it:', arg1)
 
 
-class TestActionObjectCli(LogTestCase):
+class TestActionSecondPass(LogTestCase):
     def setUp(self):
+        #self.config_logging('zensols.cli')
         cli = CommandFactory.instance(
-            'zensols.testapp', 'test-resources/test-app.conf')
+            'zensols.testapp', 'test-resources/test-app-sec-pass.conf')
         self.command = cli.create()
 
     def test_metadata(self):
-        #self.config_logging('zensols.cli')
         command = self.command
-        command.parser.write_help()
+        if 0:
+            print()
+            command.parser.write_help()
         mng: ActionCliManager = command.cli_manager
         actions: Dict[str, ActionCli] = mng.actions
         self.assertEqual(2, len(actions))
@@ -73,7 +75,10 @@ class TestActionObjectCli(LogTestCase):
         opt: OptionMetaData = meta.options_by_name['defaultlevel']
         self.assertEqual('f', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
+        self._test_second_action(self, actions)
 
+    @staticmethod
+    def _test_second_action(self, actions):
         test = actions['test']
         self.assertEqual('test', test.section)
         metas = test.meta_datas
@@ -89,3 +94,48 @@ class TestActionObjectCli(LogTestCase):
         self.assertEqual('str1x', opt.default)
         self.assertEqual('STRING', opt.metavar)
         self.assertEqual(str, opt.dtype)
+        pos = meta.positional
+        self.assertEqual(2, len(pos))
+        self.assertEqual('a1', pos[0].name)
+        self.assertEqual(str, pos[0].dtype)
+        self.assertEqual('arg0', pos[1].name)
+        self.assertEqual(float, pos[1].dtype)
+
+
+class TestActionFirstPass(LogTestCase):
+    def setUp(self):
+        #self.config_logging('zensols.cli')
+        cli = CommandFactory.instance(
+            'zensols.testapp', 'test-resources/test-app-first-pass.conf')
+        self.command = cli.create()
+
+    def test_metadata(self):
+        command = self.command
+        if 0:
+            print()
+            command.parser.write_help()
+        mng: ActionCliManager = command.cli_manager
+        actions: Dict[str, ActionCli] = mng.actions
+        self.assertEqual(2, len(actions))
+        self.assertEqual(set('test log_action'.split()), set(actions.keys()))
+
+        log = actions['log_action']
+        self.assertEqual('log_action', log.section)
+        metas = log.meta_datas
+        self.assertEqual(1, len(metas))
+        meta: ActionMetaData = metas[0]
+        self.assertEqual('configlog', meta.name)
+        self.assertEqual('configure the log system', meta.doc)
+        self.assertEqual(2, len(meta.options))
+        self.assertEqual(True, meta.first_pass)
+        opt: OptionMetaData = meta.options_by_name['level']
+        self.assertEqual('level', opt.long_name)
+        self.assertEqual('e', opt.short_name)
+        self.assertEqual('level', opt.dest)
+        self.assertEqual(str, opt.dtype)
+        self.assertEqual('info', opt.default)
+        opt: OptionMetaData = meta.options_by_name['defaultlevel']
+        self.assertEqual('f', opt.short_name)
+        self.assertEqual('the level to set the root logger', opt.doc)
+
+        TestActionSecondPass._test_second_action(self, actions)

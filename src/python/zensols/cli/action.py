@@ -16,7 +16,9 @@ from zensols.util import (
 from zensols.config import (
     Configurable, Dictable, ConfigFactory, ClassImporter
 )
-from . import ActionCliError, OptionMetaData, ActionMetaData
+from . import (
+    ActionCliError, PositionalMetaData, OptionMetaData, ActionMetaData
+)
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +29,28 @@ class ActionCliManagerError(ActionCliError):
 
     """
     pass
+
+
+class DataTypeMapper(object):
+    """A utility class to map string types parsed from :class:`.DataClassInspector`
+    to Python types.
+
+    """
+    DATA_TYPE = set(map(lambda t: t.__name__, OptionMetaData.DATA_TYPES))
+    """Supported data types mapped from data class fields."""
+
+    @classmethod
+    def map_type(cls: type, stype: str) -> type:
+        if stype == 'Path':
+            dtype = Path
+        elif stype is None:
+            dtype = str
+        elif stype in cls.DATA_TYPE:
+            dtype = eval(stype)
+        else:
+            raise ActionCliManagerError(
+                f'non-supported data type: {stype}')
+        return dtype
 
 
 @dataclass
@@ -48,7 +72,7 @@ class ActionCli(Dictable):
 
     """
 
-    mnemonics: Dict[str, str] = field(default_factory=dict)
+    mnemonics: Dict[str, str] = field(default=None)
     """The name of the action given on the command line, which defaults to the name
     of the action.
 
@@ -79,10 +103,12 @@ class ActionCli(Dictable):
                 omds.add(self.options[f.name])
         for name in sorted(self.class_meta.methods.keys()):
             meth = self.class_meta.methods[name]
+            pos_args: List[PositionalMetaData] = []
             arg: DataClassMethodArg
             for arg in meth.args:
                 if arg.is_positional:
-                    pass
+                    dtype = DataTypeMapper.map_type(arg.dtype)
+                    pos_args.append(PositionalMetaData(arg.name, dtype))
                 else:
                     arg_omd: OptionMetaData = self.options[arg.name]
                     omds.add(arg_omd)
@@ -92,12 +118,15 @@ class ActionCli(Dictable):
                 doc = meth.doc
             if doc is not None:
                 doc = doc.text
-            if name in self.mnemonics:
-                name = self.mnemonics[name]
+            if self.mnemonics is not None:
+                name = self.mnemonics.get(name)
+                if name is None:
+                    continue
             meta = ActionMetaData(
                 name=name,
                 doc=doc,
-                options=sorted(omds),
+                options=tuple(sorted(omds)),
+                positional=tuple(pos_args),
                 first_pass=self.first_pass)
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'adding metadata: {meta}')
@@ -109,9 +138,6 @@ class ActionCli(Dictable):
 class ActionCliManager(Dictable):
     SECTION = 'cli'
     """The application context section."""
-
-    DATA_TYPE = set(map(lambda t: t.__name__, OptionMetaData.DATA_TYPES))
-    """Supported data types mapped from data class fields."""
 
     config_factory: ConfigFactory = field()
     """The configuration factory used to create :class:`.ActionCli` instances.
@@ -138,15 +164,7 @@ class ActionCliManager(Dictable):
                              meth: DataClassMethod) -> OptionMetaData:
         long_name = pmeta.name.replace('_', '')
         short_name = self._create_short_name(long_name)
-        if pmeta.dtype == 'Path':
-            dtype = Path
-        elif pmeta.dtype is None:
-            dtype = str
-        elif pmeta.dtype in self.DATA_TYPE:
-            dtype = eval(pmeta.dtype)
-        else:
-            raise ActionCliManagerError(
-                f'non-supported data type: {pmeta.dtype}')
+        dtype = DataTypeMapper.map_type(pmeta.dtype)
         doc = pmeta.doc
         if doc is None:
             if (meth is not None) and (meth.doc is not None):
@@ -170,12 +188,14 @@ class ActionCliManager(Dictable):
         self._fields[name] = omd
 
     def _add_action(self, action: ActionCli):
+        if action.section in self._actions:
+            raise ActionCliError(
+                f'duplicate action for section: {action.section}')
         for name, fmd in action.class_meta.fields.items():
             omd = self._create_op_meta_data(fmd, None)
             self._add_field(action.section, fmd.name, omd)
         meth: DataClassMethod
         for meth in action.class_meta.methods.values():
-            print('M', meth)
             arg: DataClassMethodArg
             for arg in meth.args:
                 omd = self._create_op_meta_data(arg, meth)

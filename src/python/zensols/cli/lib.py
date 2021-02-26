@@ -21,7 +21,12 @@ class LogConfigurator(object):
     default_level: str = field(default='warning')
     """The level to set the root logger."""
 
-    def _to_level(self, s: str) -> int:
+    def to_level(self, s: str) -> int:
+        """Return the integer equivalent logging level.
+
+        :param s: the level
+
+        """
         return getattr(logging, s.upper())
 
     def config(self):
