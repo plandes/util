@@ -73,35 +73,6 @@ class Application(Dictable):
 
 
 @dataclass
-class Command(Dictable):
-    """A command line parse instance.
-
-    """
-    cli_manager: ActionCliManager
-    parser: CommandLineParser
-
-    def parse(self, args: List[str]) -> Tuple[Action]:
-        actions: List[Action] = []
-        action_set: CommandActionSet = self.parser.parse(args)
-        mng = self.cli_manager
-        action_clis: Dict[str, ActionCli] = mng.actions_by_meta_data_name
-        caction: CommandAction
-        for caction in action_set.actions:
-            name = caction.meta_data.name
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'action name: {name}')
-            action_cli: ActionCli = action_clis[name]
-            acli_meth: ActionCliMethod = action_cli.methods[name]
-            action: Action = Action(
-                caction, action_cli,
-                acli_meth.action_meta_data, acli_meth.method)
-            actions.append(action)
-        import sys
-        self._write_object(actions, 0, sys.stdout)
-        return actions
-
-
-@dataclass
 class ApplicationFactory(object):
     """Boots the application context from the command line.
 
