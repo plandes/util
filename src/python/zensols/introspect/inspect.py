@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, Union
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -241,6 +241,13 @@ class ClassInspector(object):
                 if node.name == self.cls.__name__:
                     return node
 
+    def _map_default(self, default: Union[ast.AST, str]):
+        # this happens when an enum is used as a type, but name.id only
+        # give the enum class name and not the enum value
+        if isinstance(default, ast.Name):
+            default = default.id
+        return default
+
     def _get_args(self, node: ast.arguments):
         args = []
         defaults = node.defaults
@@ -253,12 +260,8 @@ class ClassInspector(object):
             didx = i - dsidx
             if didx >= 0:
                 default = defaults[didx].value
+                default = self._map_default(default)
                 is_positional = False
-                # this happens when an enum is used as a type, but name.id only
-                # give the enum class name and not the enum value
-                if isinstance(default, ast.Name):
-                    #default = default.id
-                    default = None
             if arg.annotation is not None:
                 dtype = arg.annotation.id
             dtype = self.data_type_mapper.map_type(dtype)
@@ -316,7 +319,10 @@ class ClassInspector(object):
                 dtype: str = node.annotation.id
                 dtype: type = self.data_type_mapper.map_type(dtype)
                 kwlst: List[ast.keyword] = node.value.keywords
-                kwargs = {k.arg: k.value.value for k in kwlst}
+                kwargs = {}
+                #kwargs = {k.arg: k.value.value for k in kwlst}
+                for k in kwlst:
+                    kwargs[k.arg] = self._map_default(k.value.value)
                 fields.append(ClassField(name, dtype, None, kwargs))
             # parse documentation string right after the dataclass field
             elif (isinstance(node, ast.Expr) and

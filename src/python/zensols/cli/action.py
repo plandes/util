@@ -90,11 +90,11 @@ class ActionCli(Dictable):
     def _add_option(self, name: str, omds: Set[OptionMetaData]):
         if self._is_option_enabled(name):
             opt: OptionMetaData = self.options[name]
-            if self.choices is not None:
-                choices = self.choices.get(name)
-                if choices is not None:
-                    opt.choices = tuple(choices)
-                    opt.update_metavar()
+            # if self.choices is not None:
+            #     choices = self.choices.get(name)
+            #     if choices is not None:
+            #         opt.choices = tuple(choices)
+            #         opt.update_metavar()
             omds.add(opt)
 
     @property

@@ -5,6 +5,14 @@ __author__ = 'Paul Landes'
 
 from dataclasses import dataclass, field
 import logging
+from enum import Enum
+
+
+class LogLevel(Enum):
+    debug = logging.DEBUG
+    info = logging.INFO
+    warning = logging.WARNING
+    error = logging.ERROR
 
 
 @dataclass
@@ -15,7 +23,7 @@ class LogConfigurator(object):
     log_name: str = field(default=None)
     """The log name space."""
 
-    level: str = field(default='info')
+    level: LogLevel = field(default='info')
     """The level to set the application logger."""
 
     default_level: str = field(default='warning')

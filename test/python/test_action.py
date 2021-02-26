@@ -4,7 +4,7 @@ from pathlib import Path
 from zensols.config import Dictable
 from zensols.cli import (
     ActionCli, ActionCliManager, OptionMetaData, ActionMetaData, ActionSet,
-    CommandFactory
+    CommandFactory, LogLevel
 )
 from logutil import LogTestCase
 
@@ -71,7 +71,7 @@ class TestActionSecondPass(LogTestCase):
         self.assertEqual('level', opt.long_name)
         self.assertEqual('e', opt.short_name)
         self.assertEqual('level', opt.dest)
-        self.assertEqual(str, opt.dtype)
+        self.assertEqual(LogLevel, opt.dtype)
         self.assertEqual('info', opt.default)
         opt: OptionMetaData = meta.options_by_name['defaultlevel']
         self.assertEqual('f', opt.short_name)
@@ -133,7 +133,7 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual('level', opt.long_name)
         self.assertEqual('e', opt.short_name)
         self.assertEqual('level', opt.dest)
-        self.assertEqual(str, opt.dtype)
+        self.assertEqual(LogLevel, opt.dtype)
         self.assertEqual('info', opt.default)
         opt: OptionMetaData = meta.options_by_name['defaultlevel']
         self.assertEqual('f', opt.short_name)

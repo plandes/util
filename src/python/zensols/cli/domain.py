@@ -3,8 +3,9 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, Dict, Iterable, Any
+from typing import Tuple, Dict, Iterable, Any, List
 from dataclasses import dataclass, field
+from enum import Enum
 import logging
 import sys
 from itertools import chain
@@ -70,20 +71,30 @@ class OptionMetaData(Dictable):
         if self.dest is None:
             self.dest = self.long_name
         if self.metavar is None:
-            self.update_metavar(False)
+            self._set_metavar()
 
-    def update_metavar(self, clobber: bool = True):
-        if clobber or self.metavar is None:
-            if self.dtype == str and self.choices is not None:
-                self.metavar = f"<{'|'.join(self.choices)}>"
-            elif self.dtype == Path:
-                self.metavar = 'FILE'
-            elif self.dtype == bool:
-                self.metavar = None
-            elif self.dtype == str:
-                self.metavar = 'STRING'
-            else:
-                self.metavar = self.dtype.__name__.upper()
+    @property
+    def is_choice(self):
+        return (self.choices is not None) or (issubclass(self.dtype, Enum))
+
+    @property
+    def derive_choices(self) -> List[str]:
+        if self.choices is not None:
+            return self.choices
+        else:
+            return sorted(self.dtype.__members__.keys())
+
+    def _set_metavar(self, clobber: bool = True):
+        if self.is_choice:
+            self.metavar = f"<{'|'.join(self.derive_choices)}>"
+        elif self.dtype == Path:
+            self.metavar = 'FILE'
+        elif self.dtype == bool:
+            self.metavar = None
+        elif self.dtype == str:
+            self.metavar = 'STRING'
+        else:
+            self.metavar = self.dtype.__name__.upper()
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'metavar recompute using {self.dtype}: ' +
                          f'{self.metavar}, {self.choices}')
@@ -94,13 +105,16 @@ class OptionMetaData(Dictable):
         :param parser: the parser to populate
 
         """
+        params = {}
         tpe = {str: 'string',
                int: 'int',
                float: 'float',
                bool: None,
                Path: None,
-               list: 'choice'}[self.dtype]
-        params = {}
+               list: 'choice'}.get(self.dtype)
+        if tpe is None and self.is_choice:
+            tpe = 'choice'
+            params['choices'] = self.derive_choices
         long_name = f'--{self.long_name}'
         short_name = None if self.short_name is None else f'-{self.short_name}'
         if tpe is not None:
