@@ -9,9 +9,12 @@ import dataclasses
 from dataclasses import dataclass, fields, asdict
 from collections import OrderedDict
 import sys
+import logging
 import json
 from io import TextIOBase
 from . import Writable, ClassResolver
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -90,6 +93,8 @@ class Dictable(Writable):
 
     def _from_dataclass(self, obj: Any, recurse: bool, readable: bool) -> \
             Dict[str, Any]:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'from dataclass: {type(obj)}')
         return self._from_dict(asdict(obj), recurse, readable)
 
     def _format_dictable(self, obj: Any) -> Union[str, None]:

@@ -31,6 +31,9 @@ class ActionCliManagerError(ActionCliError):
 
 
 class DocUtil(object):
+    """A utility class to format API documentation parsed from the class.
+
+    """
     @staticmethod
     def normalize(text: str) -> str:
         doc = text.lower()
@@ -40,14 +43,26 @@ class DocUtil(object):
 
 
 @dataclass
+class ActionCliMethod(Dictable):
+    """A "married" action meta data / class method pair.
+
+    """
+    action_meta_data: ActionMetaData = field()
+    method: ClassMethod = field(repr=False)
+
+
+@dataclass
 class ActionCli(Dictable):
-    """A command that is invokeable on the command line.
+    """A set of commands that is invokeable on the command line, one for each
+    registered method of a class (usually a :class:`dataclasses.dataclass`.
+    This contains meta data necesary to create a full usage command line
+    documentation and parse the user's input.
 
     """
     section: str = field()
     """The application section to introspect."""
 
-    class_meta: Class = field()
+    class_meta: Class = field(repr=False)
     """The target class meta data parsed by :class:`.ClassInspector`
 
     """
@@ -93,9 +108,9 @@ class ActionCli(Dictable):
             omds.add(opt)
 
     @property
-    @persisted('_meta_datas')
-    def meta_datas(self) -> Tuple[ActionMetaData]:
-        metas: List[ActionMetaData] = []
+    @persisted('_methods')
+    def methods(self) -> Dict[str, ActionCliMethod]:
+        meths: Dict[str, ActionCliMethod] = {}
         omds: Set[OptionMetaData] = set()
         f: ClassField
         for f in self.class_meta.fields.values():
@@ -109,16 +124,16 @@ class ActionCli(Dictable):
                     pos_args.append(PositionalMetaData(arg.name, arg.dtype))
                 else:
                     self._add_option(arg.name, omds)
+            if self.mnemonics is not None:
+                name = self.mnemonics.get(name)
+                if name is None:
+                    continue
             if meth.doc is None:
                 doc = self.class_meta.doc
             else:
                 doc = meth.doc
             if doc is not None:
                 doc = DocUtil.normalize(doc.text)
-            if self.mnemonics is not None:
-                name = self.mnemonics.get(name)
-                if name is None:
-                    continue
             meta = ActionMetaData(
                 name=name,
                 doc=doc,
@@ -127,8 +142,14 @@ class ActionCli(Dictable):
                 first_pass=self.first_pass)
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'adding metadata: {meta}')
-            metas.append(meta)
-        return metas
+            meths[name] = ActionCliMethod(meta, meth)
+        del self.options
+        return meths
+
+    @property
+    @persisted('_meta_datas')
+    def meta_datas(self) -> Tuple[ActionMetaData]:
+        return tuple(map(lambda m: m.action_meta_data, self.methods.values()))
 
 
 @dataclass
@@ -240,6 +261,18 @@ class ActionCliManager(Dictable):
             del self._short_names
             del self._fields
         return actions
+
+    @property
+    def actions_by_meta_data_name(self) -> Dict[str, ActionCli]:
+        actions = {}
+        action: ActionCli
+        for action in self.actions.values():
+            for meta in action.meta_datas:
+                if meta.name in actions:
+                    raise ActionCliError(f'duplicate meta data: {meta.name}')
+                actions[meta.name] = action
+        return actions
+
 
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
         return map(lambda f: (f, f), 'actions'.split())

@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import List, Tuple, Dict, Any, Union
+from typing import List, Tuple, Dict, Any
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -206,6 +206,10 @@ class Class(object):
 
     methods: Dict[str, ClassMethod] = field()
     """The methods of the class."""
+
+    @property
+    def name(self) -> str:
+        return ClassImporter.full_classname(self.class_type)
 
 
 @dataclass

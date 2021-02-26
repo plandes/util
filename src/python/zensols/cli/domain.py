@@ -256,7 +256,7 @@ class ActionMetaData(Dictable):
 
 @dataclass
 class CommandAction(Dictable):
-    """The output of the :class:`.CommandLineParser`.
+    """The output of the :class:`.CommandLineParser` for each parsed action.
 
     """
     WRITABLE__DESCENDANTS = True
@@ -278,7 +278,8 @@ class CommandAction(Dictable):
 
 @dataclass
 class CommandActionSet(Dictable):
-    """The actions that are parsed by :class:`.CommandLineParser`.
+    """The actions that are parsed by :class:`.CommandLineParser` as the output of
+    the parse phase..
 
     """
     WRITABLE__DESCENDANTS = True
@@ -288,7 +289,6 @@ class CommandActionSet(Dictable):
     the second pass action.
 
     """
-
     @property
     def first_pass_actions(self) -> Iterable[CommandAction]:
         return self.actions[0:-1]

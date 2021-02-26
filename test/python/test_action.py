@@ -5,7 +5,7 @@ from zensols.config import Dictable
 from zensols.cli import (
     ActionCli, ActionCliManager,
     OptionMetaData, ActionMetaData,
-    CommandFactory, LogLevel
+    CommandActionSet, CommandFactory, LogLevel,
 )
 from logutil import LogTestCase
 
@@ -15,8 +15,6 @@ class TestAction(Dictable):
     """Test command line.
 
     """
-    #CLI_META = {'dry_run'}
-
     dry_run: bool = field(default=False)
     """When given don't do anything, just act like it."""
 
@@ -151,5 +149,5 @@ class TestActionFirstPass(LogTestCase):
         command = self.command
         print()
         #command.parser.write_help()
-        aset: ActionSet = command.parse('one 2 -g 5 -e debug'.split())
-        aset.write()
+        aset: CommandActionSet = command.parse('one 2 -g 5 -e debug'.split())
+        #aset.write()

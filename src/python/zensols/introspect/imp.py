@@ -30,6 +30,17 @@ class ClassImporter(object):
         self.class_name = class_name
         self.reload = reload
 
+    @staticmethod
+    def full_classname(cls: type) -> str:
+        """Return a fully qualified class name string for class ``cls``.
+
+        """
+        module = cls.__module__
+        if module is None or module == str.__class__.__module__:
+            return cls.__name__
+        else:
+            return module + '.' + cls.__name__
+
     def parse_module_class(self):
         """Parse the module and class name part of the fully qualifed class name.
         """

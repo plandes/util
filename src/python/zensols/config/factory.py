@@ -62,11 +62,10 @@ class ClassResolver(ABC):
     """
     @staticmethod
     def full_classname(cls: type) -> str:
-        module = cls.__module__
-        if module is None or module == str.__class__.__module__:
-            return cls.__name__
-        else:
-            return module + '.' + cls.__name__
+        """Return a fully qualified class name string for class ``cls``.
+
+        """
+        return ClassImporter.full_classname(cls)
 
     def find_class(self, class_name: str) -> type:
         """Return a class given the name of the class.

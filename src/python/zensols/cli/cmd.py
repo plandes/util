@@ -3,22 +3,64 @@ from __future__ import annotations
 
 """
 
-from typing import Tuple, List
+from typing import Tuple, List, Dict, Iterable
 from dataclasses import dataclass, field
 import logging
 from itertools import chain
 from pathlib import Path
+from zensols.introspect import ClassMethod
 from zensols.util import PackageResource
 from zensols.config import (
     Configurable, ImportIniConfig, DictionaryConfig, ImportConfigFactory,
     Dictable,
 )
 from . import (
-    ActionCliError, ActionCliManager, ActionMetaData, CommandActionSet,
-    CommandLineConfig, CommandLineParser
-)
+    ActionCliError, ActionCliManager, ActionCli, ActionCliMethod, ActionMetaData,
+    CommandAction, CommandActionSet, CommandLineConfig, CommandLineParser
+ )
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class Action(Dictable):
+    WRITABLE__DESCENDANTS = True
+
+    command_action: CommandAction = field()
+    """The result of the command line parsing of the action.  It contains the data
+    parsed on a per action level.
+
+    """
+
+    action_cli: ActionCli = field()
+    """Command line interface of the action meta data."""
+
+    action_meta_data: ActionMetaData = field()
+    """An action represents a link between a command line mnemonic *action* and a
+    method on a class to invoke.
+
+    """
+
+    method: ClassMethod = field()
+    """The metadata of the method to use for the invocation of the action.
+
+    """
+
+    @property
+    def section(self) -> str:
+        return self.action_cli.section
+
+    @property
+    def method_name(self) -> str:
+        return self.method.name
+
+    @property
+    def class_name(self) -> str:
+        return self.action_cli.class_meta.name
+
+    def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
+        return map(lambda f: (f, f),
+                   'section class_name method_name command_action'.split())
 
 
 @dataclass
@@ -28,6 +70,19 @@ class Command(Dictable):
 
     def parse(self, args: List[str]):
         action_set: CommandActionSet = self.parser.parse(args)
+        actions: Dict[str, ActionCli] = self.cli_manager.actions_by_meta_data_name
+        caction: CommandAction
+        for caction in action_set.actions[1:2]:
+            print(caction.options)
+            name = caction.meta_data.name
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'action name: {name}')
+            action_cli: ActionCli = actions[name]
+            acli_meth: ActionCliMethod = action_cli.methods[name]
+            action: Action = Action(
+                caction, action_cli,
+                acli_meth.action_meta_data, acli_meth.method)
+            action.write()
         return action_set
 
 
