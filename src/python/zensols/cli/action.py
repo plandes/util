@@ -31,28 +31,6 @@ class ActionCliManagerError(ActionCliError):
     pass
 
 
-class DataTypeMapper(object):
-    """A utility class to map string types parsed from :class:`.DataClassInspector`
-    to Python types.
-
-    """
-    DATA_TYPE = set(map(lambda t: t.__name__, OptionMetaData.DATA_TYPES))
-    """Supported data types mapped from data class fields."""
-
-    @classmethod
-    def map_type(cls: type, stype: str) -> type:
-        if stype == 'Path':
-            dtype = Path
-        elif stype is None:
-            dtype = str
-        elif stype in cls.DATA_TYPE:
-            dtype = eval(stype)
-        else:
-            raise ActionCliManagerError(
-                f'non-supported data type: {stype}')
-        return dtype
-
-
 @dataclass
 class ActionCli(Dictable):
     """A command that is invokeable on the command line.
@@ -125,8 +103,8 @@ class ActionCli(Dictable):
             arg: DataClassMethodArg
             for arg in meth.args:
                 if arg.is_positional:
-                    dtype = DataTypeMapper.map_type(arg.dtype)
-                    pos_args.append(PositionalMetaData(arg.name, dtype))
+                    #dtype = DataTypeMapper.map_type(arg.dtype)
+                    pos_args.append(PositionalMetaData(arg.name, arg.dtype))
                 else:
                     self._add_option(arg.name, omds)
             if meth.doc is None:
@@ -181,7 +159,7 @@ class ActionCliManager(Dictable):
                              meth: DataClassMethod) -> OptionMetaData:
         long_name = pmeta.name.replace('_', '')
         short_name = self._create_short_name(long_name)
-        dtype = DataTypeMapper.map_type(pmeta.dtype)
+        dtype = pmeta.dtype
         doc = pmeta.doc
         if doc is None:
             if (meth is not None) and (meth.doc is not None):

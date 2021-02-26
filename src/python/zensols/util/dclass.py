@@ -6,12 +6,41 @@ __author__ = 'Paul Landes'
 from typing import List, Tuple, Dict, Any
 from dataclasses import dataclass, field
 import logging
-from itertools import chain
+from pathlib import Path
 import re
 import ast
 import inspect
 
 logger = logging.getLogger(__name__)
+
+
+class DataClassError(Exception):
+    pass
+
+
+class DataTypeMapper(object):
+    """A utility class to map string types parsed from :class:`.DataClassInspector`
+    to Python types.
+
+    """
+    DEFAULT_DATA_TYPES = {t.__name__: t
+                          for t in [str, int, float, bool, list, Path]}
+    """Supported data types mapped from data class fields."""
+
+    data_types: Dict[str, type] = DEFAULT_DATA_TYPES
+    """Data type mapping for this instance."""
+
+    default_type: type = str
+    """Default type for when no type is given."""
+
+    def map_type(self, stype: str = None) -> type:
+        if stype is None:
+            tpe = self.default_type
+        else:
+            tpe = self.data_types.get(stype)
+        if tpe is None:
+            raise DataClassError(f'non-supported data type: {stype}')
+        return tpe
 
 
 @dataclass(eq=True)
@@ -153,6 +182,13 @@ class DataClassInspector(object):
 
     """
 
+    data_type_mapper: DataTypeMapper = field(
+        default_factory=lambda: DataTypeMapper())
+    """The mapper used for narrowing a type from a string parsed from the Python
+    AST.
+
+    """
+
     def _get_class_node(self) -> ast.AST:
         fname = inspect.getfile(self.cls)
         logger.debug(f'parsing source file: {fname}')
@@ -178,6 +214,7 @@ class DataClassInspector(object):
                 is_positional = False
             if arg.annotation is not None:
                 dtype = arg.annotation.id
+            dtype = self.data_type_mapper.map_type(dtype)
             arg = DataClassMethodArg(name, dtype, None, default, is_positional)
             args.append(arg)
         return args
@@ -220,6 +257,7 @@ class DataClassInspector(object):
             if isinstance(node, ast.AnnAssign):
                 name: str = node.target.id
                 dtype: str = node.annotation.id
+                dtype: type = self.data_type_mapper.map_type(dtype)
                 kwlst: List[ast.keyword] = node.value.keywords
                 kwargs = {k.arg: k.value.value for k in kwlst}
                 fields.append(DataClassField(name, dtype, None, kwargs))
