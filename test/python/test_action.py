@@ -140,7 +140,8 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual('the level to set the root logger', opt.doc)
         TestActionSecondPass._test_second_action(self, actions)
 
-    def xtest_construct(self):
+    def test_construct(self):
+        command = self.command
         print()
         command.parser.write_help()
         aset: ActionSet = command.parser.parse('one 2 -g 5 -e debug'.split())

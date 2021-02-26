@@ -124,7 +124,7 @@ class OptionMetaData(Dictable):
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
         return chain.from_iterable(
             [super()._get_dictable_attributes(),
-             map(lambda f: (f.name, f.name), 'metavar'.split())])
+             map(lambda f: (f, f), 'metavar'.split())])
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         dct = self.asdict()
