@@ -5,7 +5,6 @@ from __future__ import annotations
 
 from typing import Dict, Tuple, Iterable, Set, List
 from dataclasses import dataclass, field
-from enum import Enum
 import dataclasses
 import logging
 from zensols.persist import persisted
@@ -249,7 +248,3 @@ class ActionCliManager(Dictable):
 
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
         return map(lambda f: (f, f), 'actions'.split())
-
-    def tmp(self):
-        #self.actions
-        self.write()
