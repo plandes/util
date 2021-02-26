@@ -3,10 +3,11 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, List, Dict, Iterable, Any
+from typing import Tuple, Dict, Iterable, Any
 from dataclasses import dataclass, field
 import logging
 import sys
+from itertools import chain
 from io import TextIOBase
 from pathlib import Path
 import optparse
@@ -49,8 +50,11 @@ class OptionMetaData(Dictable):
 
     """
 
-    choices: List[str] = field(default=None)
-    """The constant list of choices when :obj:`dtype` is :class:`list`."""
+    choices: Tuple[str] = field(default=None)
+    """The constant list of choices when :obj:`dtype` is :class:`list`.  Note that
+    this class is a tuple so instances are hashable in :class:`.ActionCli`.
+
+    """
 
     default: str = field(default=None)
     """The default value of the option."""
@@ -65,8 +69,12 @@ class OptionMetaData(Dictable):
         if self.dest is None:
             self.dest = self.long_name
         if self.metavar is None:
-            if self.dtype == list:
-                self.metavar = '|'.join(self.choices)
+            self.update_metavar(False)
+
+    def update_metavar(self, clobber: bool = True):
+        if clobber or self.metavar is None:
+            if self.dtype == str and self.choices is not None:
+                self.metavar = f"<{'|'.join(self.choices)}>"
             elif self.dtype == Path:
                 self.metavar = 'FILE'
             elif self.dtype == bool:
@@ -75,6 +83,9 @@ class OptionMetaData(Dictable):
                 self.metavar = 'STRING'
             else:
                 self.metavar = self.dtype.__name__.upper()
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'metavar recompute using {self.dtype}: ' +
+                         f'{self.metavar}, {self.choices}')
 
     def create_option(self) -> optparse.Option:
         """Add the option to an option parser.
@@ -109,6 +120,11 @@ class OptionMetaData(Dictable):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'params: {params}')
         return optparse.Option(long_name, short_name, **params)
+
+    def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
+        return chain.from_iterable(
+            [super()._get_dictable_attributes(),
+             map(lambda f: (f.name, f.name), 'metavar'.split())])
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         dct = self.asdict()

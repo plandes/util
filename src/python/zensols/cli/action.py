@@ -90,6 +90,9 @@ class ActionCli(Dictable):
 
     """
 
+    choices: Dict[str, List[str]] = field(default=None)
+    """Map to a choices type."""
+
     def _is_option_enabled(self, name: str) -> bool:
         incs = self.option_includes
         excs = self.option_excludes
@@ -98,6 +101,16 @@ class ActionCli(Dictable):
             logger.debug(f'option {name} is enabled: {enabled}')
         return enabled
 
+    def _add_option(self, name: str, omds: Set[OptionMetaData]):
+        if self._is_option_enabled(name):
+            opt: OptionMetaData = self.options[name]
+            if self.choices is not None:
+                choices = self.choices.get(name)
+                if choices is not None:
+                    opt.choices = tuple(choices)
+                    opt.update_metavar()
+            omds.add(opt)
+
     @property
     @persisted('_meta_datas')
     def meta_datas(self) -> Tuple[ActionMetaData]:
@@ -105,8 +118,7 @@ class ActionCli(Dictable):
         omds: Set[OptionMetaData] = set()
         f: DataClassField
         for f in self.class_meta.fields.values():
-            if self._is_option_enabled(f.name):
-                omds.add(self.options[f.name])
+            self._add_option(f.name, omds)
         for name in sorted(self.class_meta.methods.keys()):
             meth = self.class_meta.methods[name]
             pos_args: List[PositionalMetaData] = []
@@ -116,9 +128,7 @@ class ActionCli(Dictable):
                     dtype = DataTypeMapper.map_type(arg.dtype)
                     pos_args.append(PositionalMetaData(arg.name, dtype))
                 else:
-                    if self._is_option_enabled(arg.name):
-                        arg_omd: OptionMetaData = self.options[arg.name]
-                        omds.add(arg_omd)
+                    self._add_option(arg.name, omds)
             if meth.doc is None:
                 doc = self.class_meta.doc
             else:
