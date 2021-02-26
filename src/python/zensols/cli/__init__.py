@@ -10,5 +10,5 @@ from .domain import *
 from .usage import *
 from .cmdparse import *
 from .action import *
-from .cmd import *
+from .app import *
 from .lib import *

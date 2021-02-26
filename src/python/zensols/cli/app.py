@@ -3,13 +3,13 @@ from __future__ import annotations
 
 """
 
-from typing import Tuple, List, Dict, Iterable
+from typing import Tuple, List, Dict, Iterable, Any
 from dataclasses import dataclass, field
 import logging
 import sys
 from itertools import chain
 from pathlib import Path
-from zensols.introspect import ClassMethod
+from zensols.introspect import Class, ClassMethod, ClassField, ClassMethodArg
 from zensols.persist import persisted
 from zensols.util import PackageResource
 from zensols.config import (
@@ -44,7 +44,7 @@ class Action(Dictable):
 
     """
 
-    method: ClassMethod = field()
+    method_meta: ClassMethod = field()
     """The metadata of the method to use for the invocation of the action.
 
     """
@@ -54,12 +54,16 @@ class Action(Dictable):
         return self.action_cli.section
 
     @property
+    def class_meta(self) -> Class:
+        return self.action_cli.class_meta
+
+    @property
     def method_name(self) -> str:
-        return self.method.name
+        return self.method_meta.name
 
     @property
     def class_name(self) -> str:
-        return self.action_cli.class_meta.name
+        return self.class_meta.name
 
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
         return map(lambda f: (f, f),
@@ -67,9 +71,76 @@ class Action(Dictable):
 
 
 @dataclass
+class ApplicationResult(Dictable):
+    instance: Any
+    result: Any
+
+
+@dataclass
 class Application(Dictable):
+    """An invokable application created using command line and application context
+    data.
+
+    """
+    WRITABLE__DESCENDANTS = True
+
     config_factory: ConfigFactory = field(repr=False)
+    """The factory used to create the application and its components."""
+
     actions: Tuple[Action] = field()
+    """The list of actions to invoke in order."""
+
+    def _create_instance(self, action: Action) -> Any:
+        cmd_opts: Dict[str, Any] = action.command_action.options
+        field: ClassField
+        const_params: Dict[str, Any] = {}
+        sec = action.section
+        for f in action.class_meta.fields.values():
+            val: str = cmd_opts[f.name]
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'field map: {sec}:{f.name} -> {val}')
+            const_params[f.name] = val
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'creating {sec} with {const_params}')
+        inst = self.config_factory.instance(sec, **const_params)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'created instance of type {type(inst)}')
+        return inst
+
+    def _get_meth_params(self, action: Action, meth_meta: ClassMethod) -> \
+            Tuple[Tuple[Any], Dict[str, Any]]:
+        cmd_opts: Dict[str, Any] = action.command_action.options
+        meth_params: Dict[str, Any] = {}
+        pos_args = action.command_action.positional
+        pos_arg_count: int = 0
+        arg: ClassMethodArg
+        for arg in meth_meta.args:
+            if arg.is_positional:
+                pos_arg_count += 1
+            else:
+                name: str = arg.name
+                val: str = cmd_opts[name]
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'meth map: {name} -> {val}')
+                meth_params[name] = val
+        if pos_arg_count != len(pos_args):
+            raise ActionCliError(f'method {meth_meta.name} expects ' +
+                                 f'{pos_arg_count} but got {len(pos_args)}')
+        return pos_args, meth_params
+
+    def invoke(self) -> Tuple[ApplicationResult]:
+        results: List[ApplicationResult] = []
+        action: Action
+        for action in self.actions[1:2]:
+            inst = self._create_instance(action)
+            meth_meta: ClassMethod = action.method_meta
+            pos_args, meth_params = self._get_meth_params(action, meth_meta)
+            meth = getattr(inst, meth_meta.name)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'invoking {meth} on {type(inst)}')
+            res: Any = meth(*pos_args, **meth_params)
+            results.append(ApplicationResult(inst, res))
+        return tuple(results)
 
 
 @dataclass
@@ -87,7 +158,8 @@ class ApplicationFactory(object):
     """The relative resource path to the application's context."""
 
     @classmethod
-    def instance(cls, package_name: str, *args, **kwargs) -> ApplicationFactory:
+    def instance(cls, package_name: str,
+                 *args, **kwargs) -> ApplicationFactory:
         """"A create facade method.
 
         :param package_name: used to create the :obj:`package_resource`

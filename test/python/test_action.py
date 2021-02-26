@@ -5,7 +5,8 @@ from zensols.config import Dictable
 from zensols.cli import (
     ActionCli, ActionCliManager,
     OptionMetaData, ActionMetaData,
-    CommandActionSet, ApplicationFactory, LogLevel,
+    CommandActionSet, ApplicationFactory, Application, ApplicationResult,
+    LogLevel,
 )
 from logutil import LogTestCase
 
@@ -37,7 +38,8 @@ class TestAction(Dictable):
         :param arg2: forth arg doc
 
         """
-        print('in do it:', arg1)
+        self.invoke_state = (arg1, arg0, arg1, arg2)
+        return tuple(list(self.invoke_state) + ['r'])
 
 
 class TestActionSecondPass(LogTestCase):
@@ -140,10 +142,19 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual('the level to set the root logger', opt.doc)
         TestActionSecondPass._test_second_action(self, actions)
 
-    def xtest_construct(self):
+    def test_construct(self):
         #self.config_logging('zensols.cli')
         if 0:
             print()
             self.cli.parser.write_help()
         aset: CommandActionSet = self.cli.create('one 2 -g 5 -e debug'.split())
-        aset.write()
+        #aset.write()
+        #self.config_logging('zensols.cli')
+        insts = aset.invoke()
+        self.assertEqual(1, len(insts))
+        res: Application = insts[0]
+        self.assertEqual(ApplicationResult, type(res))
+        self.assertTrue(isinstance(res.instance, TestAction))
+        self.assertTrue(isinstance(res.instance, TestAction))
+        self.assertEqual((5, 2.0, 5, 'str1x'), res.instance.invoke_state)
+        self.assertEqual((5, 2.0, 5, 'str1x', 'r'), res.result)

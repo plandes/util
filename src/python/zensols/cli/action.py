@@ -87,7 +87,7 @@ class ActionCli(Dictable):
 
     first_pass: bool = field(default=False)
     """Whether or not this is a first pass action (i.e. such as setting the level
-    in :class:`~zensols.cli.LogConfigurator`
+    in :class:`~zensols.cli.LogConfigurator`).
 
     """
 
