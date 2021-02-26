@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Tuple, List
 from dataclasses import dataclass, field
 import logging
+from itertools import chain
 from pathlib import Path
 from zensols.util import PackageResource
 from zensols.config import (
@@ -13,7 +14,7 @@ from zensols.config import (
     Dictable,
 )
 from . import (
-    ActionCliError, ActionCliFactory, ActionMetaData,
+    ActionCliError, ActionCliManager, ActionMetaData,
     CommandLineConfig, CommandLineParser
 )
 
@@ -22,6 +23,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class Command(Dictable):
+    cli_manager: ActionCliManager
     parser: CommandLineParser
 
     def parse(self, args: List[str]):
@@ -83,8 +85,9 @@ class CommandFactory(object):
                 f'not found in {self.package_resource}')
         config = self._get_app_context(path)
         fac = ImportConfigFactory(config)
-        cli_resolver: ActionCliFactory = fac(ActionCliFactory.SECTION)
-        actions: Tuple[ActionMetaData] = cli_resolver.action_meta_datas
+        cli_manager: ActionCliManager = fac(ActionCliManager.SECTION)
+        actions: Tuple[ActionMetaData] = tuple(chain.from_iterable(
+            map(lambda a: a.meta_datas, cli_manager.actions.values())))
         config = CommandLineConfig(actions)
         parser = CommandLineParser(config, self.package_resource.version)
-        return Command(parser)
+        return Command(cli_manager, parser)

@@ -8,7 +8,6 @@ from dataclasses import dataclass, field
 import dataclasses
 import logging
 from pathlib import Path
-from itertools import chain
 from zensols.persist import persisted
 from zensols.util import (
     DataClassInspector, DataClass,
@@ -22,8 +21,8 @@ from . import ActionCliError, OptionMetaData, ActionMetaData
 logger = logging.getLogger(__name__)
 
 
-class ActionCliFactoryError(ActionCliError):
-    """Raised by :class:`.ActionCliFactory` for any problems creating
+class ActionCliManagerError(ActionCliError):
+    """Raised by :class:`.ActionCliManager` for any problems creating
     :class:`.ActionCli` instances.
 
     """
@@ -44,7 +43,7 @@ class ActionCli(Dictable):
     """
 
     options: Dict[str, OptionMetaData] = field(default=None)
-    """Options added by :class:`.ActionCliFactory`, which are those options parsed
+    """Options added by :class:`.ActionCliManager`, which are those options parsed
     by the entire class metadata.
 
     """
@@ -107,7 +106,7 @@ class ActionCli(Dictable):
 
 
 @dataclass
-class ActionCliFactory(Dictable):
+class ActionCliManager(Dictable):
     SECTION = 'cli'
     """The application context section."""
 
@@ -146,7 +145,7 @@ class ActionCliFactory(Dictable):
         elif pmeta.dtype in self.DATA_TYPE:
             dtype = eval(pmeta.dtype)
         else:
-            raise ActionCliFactoryError(
+            raise ActionCliManagerError(
                 f'non-supported data type: {pmeta.dtype}')
         doc = pmeta.doc
         if doc is None:
@@ -165,7 +164,7 @@ class ActionCliFactory(Dictable):
     def _add_field(self, section: str, name: str, omd: OptionMetaData):
         prexist = self._fields.get(name)
         if prexist is not None and omd != prexist:
-            raise ActionCliFactoryError(
+            raise ActionCliManagerError(
                 f'duplicate field {name} -> {omd.long_name} in ' +
                 f'{section} but not equal to {prexist}')
         self._fields[name] = omd
@@ -223,12 +222,6 @@ class ActionCliFactory(Dictable):
             del self._short_names
             del self._fields
         return actions
-
-    @property
-    @persisted('_meta_datas')
-    def action_meta_datas(self) -> Tuple[ActionMetaData]:
-        return tuple(chain.from_iterable(
-            map(lambda a: a.meta_datas, self.actions.values())))
 
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
         return map(lambda f: (f, f), 'actions'.split())

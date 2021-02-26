@@ -9,6 +9,6 @@ from .peraction import *
 from .domain import *
 from .usage import *
 from .cmdparse import *
-from .actfactory import *
+from .action import *
 from .cmd import *
 from .lib import *

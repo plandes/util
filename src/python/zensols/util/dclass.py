@@ -173,7 +173,7 @@ class DataClassInspector(object):
             is_positional = True
             default = None
             didx = i - dlen - 1
-            if didx >= 0:
+            if didx < len(defaults) and didx >= 0:
                 default = defaults[didx].value
                 is_positional = False
             if arg.annotation is not None:
@@ -184,9 +184,10 @@ class DataClassInspector(object):
 
     def _get_method(self, node: ast.FunctionDef) -> DataClassMethod:
         method: DataClassMethod = None
+        name = node.name
+        is_priv = name.startswith('_')
         is_prop = any(map(lambda n: n.id, node.decorator_list))
-        if not is_prop:
-            name = node.name
+        if not is_prop and not is_priv:
             args = self._get_args(node.args)
             node = None if len(node.body) == 0 else node.body[0]
             # parse the docstring for instance methods only
