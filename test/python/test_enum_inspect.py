@@ -1,6 +1,5 @@
 from typing import Dict, Tuple
 from dataclasses import dataclass, field
-from pathlib import Path
 from enum import Enum, auto
 from zensols.config import Dictable
 from zensols.introspect import (
@@ -69,7 +68,7 @@ class TestActionWithEnum(Dictable):
 
 class TestEnumInspect(LogTestCase):
     def test_non_enum(self):
-        self.config_logging('zensols.introspect')
+        #self.config_logging('zensols.introspect')
         ci = ClassInspector(TestAction)
         cls: Class = ci.get_class()
         self.assertEqual(cls.class_type, TestAction)
@@ -92,7 +91,7 @@ class TestEnumInspect(LogTestCase):
                          tuple(map(lambda a: a.is_positional, args)))
 
     def test_enum(self):
-        self.config_logging('zensols.introspect')
+        #self.config_logging('zensols.introspect')
         ci = ClassInspector(TestActionWithEnum)
         cls: Class = ci.get_class()
         self.assertEqual(cls.class_type, TestActionWithEnum)

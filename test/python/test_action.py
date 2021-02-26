@@ -72,7 +72,7 @@ class TestActionSecondPass(LogTestCase):
         self.assertEqual('e', opt.short_name)
         self.assertEqual('level', opt.dest)
         self.assertEqual(LogLevel, opt.dtype)
-        self.assertEqual('info', opt.default)
+        self.assertEqual(LogLevel.info, opt.default)
         opt: OptionMetaData = meta.options_by_name['defaultlevel']
         self.assertEqual('f', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
@@ -134,13 +134,19 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual('e', opt.short_name)
         self.assertEqual('level', opt.dest)
         self.assertEqual(LogLevel, opt.dtype)
-        self.assertEqual('info', opt.default)
+        self.assertEqual(LogLevel.info, opt.default)
+        op_opt = opt.create_option()
+        self.assertEqual(['--level'], op_opt._long_opts)
+        self.assertEqual(['-e'], op_opt._short_opts)
+        self.assertEqual('choice', op_opt.type)
+        self.assertEqual(tuple('debug error info warning'.split()), op_opt.choices)
+        self.assertEqual('info', op_opt.default)
         opt: OptionMetaData = meta.options_by_name['defaultlevel']
         self.assertEqual('f', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
         TestActionSecondPass._test_second_action(self, actions)
 
-    def test_construct(self):
+    def xtest_construct(self):
         command = self.command
         print()
         command.parser.write_help()

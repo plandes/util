@@ -70,6 +70,8 @@ class OptionMetaData(Dictable):
     def __post_init__(self):
         if self.dest is None:
             self.dest = self.long_name
+        if issubclass(self.dtype, Enum) and self.choices is None:
+            self.choices = tuple(sorted(self.dtype.__members__.keys()))
         if self.metavar is None:
             self._set_metavar()
 
@@ -77,16 +79,16 @@ class OptionMetaData(Dictable):
     def is_choice(self):
         return (self.choices is not None) or (issubclass(self.dtype, Enum))
 
-    @property
-    def derive_choices(self) -> List[str]:
-        if self.choices is not None:
-            return self.choices
-        else:
-            return sorted(self.dtype.__members__.keys())
+    # @property
+    # def derive_choices(self) -> List[str]:
+    #     if self.choices is not None:
+    #         return self.choices
+    #     else:
+    #         return sorted(self.dtype.__members__.keys())
 
     def _set_metavar(self, clobber: bool = True):
         if self.is_choice:
-            self.metavar = f"<{'|'.join(self.derive_choices)}>"
+            self.metavar = f"<{'|'.join(self.choices)}>"
         elif self.dtype == Path:
             self.metavar = 'FILE'
         elif self.dtype == bool:
@@ -114,7 +116,14 @@ class OptionMetaData(Dictable):
                list: 'choice'}.get(self.dtype)
         if tpe is None and self.is_choice:
             tpe = 'choice'
-            params['choices'] = self.derive_choices
+            params['choices'] = self.choices
+            if isinstance(self.default, Enum):
+                #print('D', self.default, type(self.default), self.default.name)
+                default = self.default.name
+        else:
+            default = self.default
+        if default is not None:
+            params['default'] = default
         long_name = f'--{self.long_name}'
         short_name = None if self.short_name is None else f'-{self.short_name}'
         if tpe is not None:
@@ -123,7 +132,7 @@ class OptionMetaData(Dictable):
             params['choices'] = self.choices
         if self.doc is not None:
             params['help'] = self.doc
-        for att in 'metavar dest default'.split():
+        for att in 'metavar dest'.split():
             v = getattr(self, att)
             if v is not None:
                 params[att] = v
