@@ -3,7 +3,6 @@
 """
 __author__ = 'Paul Landes'
 
-from .cimport import *
 from .serial import *
 from .writable import *
 from .configbase import *

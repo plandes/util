@@ -13,8 +13,8 @@ import inspect
 import re
 import copy as cp
 from time import time
+from zensols.introspect import ClassImporter
 from zensols.config import Configurable
-from zensols.config import ClassImporter as ClassImporter
 from zensols.persist import persisted, PersistedWork, Deallocatable
 
 logger = logging.getLogger(__name__)

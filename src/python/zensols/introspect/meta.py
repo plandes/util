@@ -14,12 +14,12 @@ import inspect
 logger = logging.getLogger(__name__)
 
 
-class DataClassError(Exception):
+class ClassError(Exception):
     pass
 
 
-class DataTypeMapper(object):
-    """A utility class to map string types parsed from :class:`.DataClassInspector`
+class TypeMapper(object):
+    """A utility class to map string types parsed from :class:`.ClassInspector`
     to Python types.
 
     """
@@ -39,12 +39,12 @@ class DataTypeMapper(object):
         else:
             tpe = self.data_types.get(stype)
         if tpe is None:
-            raise DataClassError(f'non-supported data type: {stype}')
+            raise ClassError(f'non-supported data type: {stype}')
         return tpe
 
 
 @dataclass(eq=True)
-class DataClassDoc(object):
+class ClassDoc(object):
     """A meta data for documentation at any level of the class code (methods etc).
 
     """
@@ -97,7 +97,7 @@ class DataClassDoc(object):
 
 
 @dataclass(eq=True)
-class DataClassParam(object):
+class ClassParam(object):
     """Represents a :class:`dataclasses.dataclass` field.
 
     """
@@ -107,12 +107,12 @@ class DataClassParam(object):
     dtype: type = field()
     """The data type."""
 
-    doc: DataClassDoc = field()
+    doc: ClassDoc = field()
     """The documentation of the field."""
 
 
 @dataclass(eq=True)
-class DataClassField(DataClassParam):
+class ClassField(ClassParam):
     """Represents a :class:`dataclasses.dataclass` field.
 
     """
@@ -126,7 +126,7 @@ class DataClassField(DataClassParam):
 
 
 @dataclass(eq=True)
-class DataClassMethodArg(DataClassParam):
+class ClassMethodArg(ClassParam):
     """Meta data for an argument in a method.
 
     """
@@ -138,37 +138,37 @@ class DataClassMethodArg(DataClassParam):
 
 
 @dataclass(eq=True)
-class DataClassMethod(object):
+class ClassMethod(object):
     """Meta data for a method in a dataclass.
 
     """
     name: str = field()
     """The name of the method."""
 
-    doc: DataClassDoc = field()
+    doc: ClassDoc = field()
     """The docstring of the method."""
 
-    args: Tuple[DataClassMethodArg] = field()
+    args: Tuple[ClassMethodArg] = field()
     """The arguments of the method."""
 
 
 @dataclass(eq=True)
-class DataClass(object):
+class Class(object):
     cls: type = field()
     """The class that was inspected."""
 
-    doc: DataClassDoc = field()
+    doc: ClassDoc = field()
     """The docstring of the class."""
 
-    fields: Dict[str, DataClassField] = field()
+    fields: Dict[str, ClassField] = field()
     """The fields of the class."""
 
-    methods: Dict[str, DataClassMethod] = field()
+    methods: Dict[str, ClassMethod] = field()
     """The methods of the class."""
 
 
 @dataclass
-class DataClassInspector(object):
+class ClassInspector(object):
     """A utility class to return all :class:`dataclasses.dataclass` attribute
     (field) documentation.
 
@@ -182,8 +182,8 @@ class DataClassInspector(object):
 
     """
 
-    data_type_mapper: DataTypeMapper = field(
-        default_factory=lambda: DataTypeMapper())
+    data_type_mapper: TypeMapper = field(
+        default_factory=lambda: TypeMapper())
     """The mapper used for narrowing a type from a string parsed from the Python
     AST.
 
@@ -215,12 +215,12 @@ class DataClassInspector(object):
             if arg.annotation is not None:
                 dtype = arg.annotation.id
             dtype = self.data_type_mapper.map_type(dtype)
-            arg = DataClassMethodArg(name, dtype, None, default, is_positional)
+            arg = ClassMethodArg(name, dtype, None, default, is_positional)
             args.append(arg)
         return args
 
-    def _get_method(self, node: ast.FunctionDef) -> DataClassMethod:
-        method: DataClassMethod = None
+    def _get_method(self, node: ast.FunctionDef) -> ClassMethod:
+        method: ClassMethod = None
         name = node.name
         is_priv = name.startswith('_')
         is_prop = any(map(lambda n: n.id, node.decorator_list))
@@ -235,13 +235,13 @@ class DataClassInspector(object):
                 args = ()
             if (isinstance(node, ast.Expr) and
                 isinstance(node.value, ast.Constant)):
-                doc = DataClassDoc(node.value.value)
+                doc = ClassDoc(node.value.value)
             else:
                 doc = None
-            method = DataClassMethod(name, doc, args)
+            method = ClassMethod(name, doc, args)
         return method
 
-    def get_meta_data(self) -> DataClass:
+    def get_meta_data(self) -> Class:
         """Return a dict of attribute (field) to metadata and docstring.
 
         """
@@ -250,8 +250,8 @@ class DataClassInspector(object):
             attrs = tuple(filter(lambda i: i[:1] != '_',
                                  self.cls.__dict__.keys()))
         cnode: ast.Node = self._get_class_node()
-        fields: List[DataClassField] = []
-        methods: List[DataClassMethod] = []
+        fields: List[ClassField] = []
+        methods: List[ClassMethod] = []
         for node in cnode.body:
             # parse the dataclass attribute/field defintion
             if isinstance(node, ast.AnnAssign):
@@ -260,13 +260,13 @@ class DataClassInspector(object):
                 dtype: type = self.data_type_mapper.map_type(dtype)
                 kwlst: List[ast.keyword] = node.value.keywords
                 kwargs = {k.arg: k.value.value for k in kwlst}
-                fields.append(DataClassField(name, dtype, None, kwargs))
+                fields.append(ClassField(name, dtype, None, kwargs))
             # parse documentation string right after the dataclass field
             elif (isinstance(node, ast.Expr) and
                   isinstance(node.value, ast.Constant) and
                   len(fields) > 0):
-                doc = DataClassDoc(node.value.value)
-                last_field: DataClassField = fields[-1]
+                doc = ClassDoc(node.value.value)
+                last_field: ClassField = fields[-1]
                 if last_field.doc is None:
                     last_field.doc = doc
             # parse the method
@@ -274,8 +274,8 @@ class DataClassInspector(object):
                 meth = self._get_method(node)
                 if meth is not None:
                     methods.append(meth)
-        return DataClass(
+        return Class(
             self.cls,
-            DataClassDoc(self.cls.__doc__),
+            ClassDoc(self.cls.__doc__),
             fields={d.name: d for d in fields},
             methods={m.name: m for m in methods})

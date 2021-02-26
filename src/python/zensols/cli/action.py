@@ -7,14 +7,13 @@ from typing import Dict, Tuple, Iterable, Set, List
 from dataclasses import dataclass, field
 import dataclasses
 import logging
-from pathlib import Path
 from zensols.persist import persisted
-from zensols.util import (
-    DataClassInspector, DataClass,
-    DataClassField, DataClassParam, DataClassMethod, DataClassMethodArg
+from zensols.introspect import (
+    Class, ClassField, ClassParam, ClassMethod, ClassMethodArg,
+    ClassInspector, ClassImporter,
 )
 from zensols.config import (
-    Configurable, Dictable, ConfigFactory, ClassImporter
+    Configurable, Dictable, ConfigFactory
 )
 from . import (
     ActionCliError, PositionalMetaData, OptionMetaData, ActionMetaData
@@ -39,8 +38,8 @@ class ActionCli(Dictable):
     section: str = field()
     """The application section to introspect."""
 
-    class_meta: DataClass = field()
-    """The target class meta data parsed by :class:`.DataClassInspector`
+    class_meta: Class = field()
+    """The target class meta data parsed by :class:`.ClassInspector`
 
     """
 
@@ -94,16 +93,16 @@ class ActionCli(Dictable):
     def meta_datas(self) -> Tuple[ActionMetaData]:
         metas: List[ActionMetaData] = []
         omds: Set[OptionMetaData] = set()
-        f: DataClassField
+        f: ClassField
         for f in self.class_meta.fields.values():
             self._add_option(f.name, omds)
         for name in sorted(self.class_meta.methods.keys()):
             meth = self.class_meta.methods[name]
             pos_args: List[PositionalMetaData] = []
-            arg: DataClassMethodArg
+            arg: ClassMethodArg
             for arg in meth.args:
                 if arg.is_positional:
-                    #dtype = DataTypeMapper.map_type(arg.dtype)
+                    #dtype = TypeMapper.map_type(arg.dtype)
                     pos_args.append(PositionalMetaData(arg.name, arg.dtype))
                 else:
                     self._add_option(arg.name, omds)
@@ -155,8 +154,8 @@ class ActionCliManager(Dictable):
                 self._short_names.add(c)
                 return c
 
-    def _create_op_meta_data(self, pmeta: DataClassParam,
-                             meth: DataClassMethod) -> OptionMetaData:
+    def _create_op_meta_data(self, pmeta: ClassParam,
+                             meth: ClassMethod) -> OptionMetaData:
         long_name = pmeta.name.replace('_', '')
         short_name = self._create_short_name(long_name)
         dtype = pmeta.dtype
@@ -189,9 +188,9 @@ class ActionCliManager(Dictable):
         for name, fmd in action.class_meta.fields.items():
             omd = self._create_op_meta_data(fmd, None)
             self._add_field(action.section, fmd.name, omd)
-        meth: DataClassMethod
+        meth: ClassMethod
         for meth in action.class_meta.methods.values():
-            arg: DataClassMethodArg
+            arg: ClassMethodArg
             for arg in meth.args:
                 omd = self._create_op_meta_data(arg, meth)
                 self._add_field(action.section, arg.name, omd)
@@ -207,8 +206,8 @@ class ActionCliManager(Dictable):
             logger.debug(f'resolved to class: {cls}')
         if not dataclasses.is_dataclass(cls):
             raise ActionCliError('application CLI app must be a dataclass')
-        dh = DataClassInspector(cls)
-        meta: DataClass = dh.get_meta_data()
+        dh = ClassInspector(cls)
+        meta: Class = dh.get_meta_data()
         params = {'section': section,
                   'class_meta': meta,
                   'options': self._fields}

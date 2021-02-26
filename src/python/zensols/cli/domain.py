@@ -11,7 +11,7 @@ from itertools import chain
 from io import TextIOBase
 from pathlib import Path
 import optparse
-from zensols.util import DataTypeMapper
+from zensols.introspect import TypeMapper
 from zensols.persist import persisted
 from zensols.config import Dictable
 from . import ActionCliError
@@ -30,8 +30,7 @@ class CommandLineError(ActionCliError):
 class OptionMetaData(Dictable):
     """A command line option."""
 
-    #DATA_TYPES = {str, int, float, bool, list, Path}
-    DATA_TYPES = frozenset(DataTypeMapper.DEFAULT_DATA_TYPES.values())
+    DATA_TYPES = frozenset(TypeMapper.DEFAULT_DATA_TYPES.values())
     """Supported data types."""
 
     long_name: str = field()

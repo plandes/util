@@ -8,4 +8,3 @@ from .time import *
 from .log import *
 from .executor import *
 from .pkgres import *
-from .dclass import *
