@@ -4,8 +4,9 @@ from pathlib import Path
 from enum import Enum, auto
 from zensols.config import Dictable
 from zensols.introspect import (
-    ClassInspector, Class, ClassMethod, ClassMethodArg,
+    ClassInspector, Class, ClassMethod, ClassMethodArg, ClassField,
 )
+from zensols.cli import LogLevel
 from logutil import LogTestCase
 
 
@@ -44,8 +45,10 @@ class TestActionWithEnum(Dictable):
     """Test command line.
 
     """
+    deflevel: LogLevel = field(default=LogLevel.error)
+
     def doit(self, a1, arg0: float, arg1: int = 1, arg2: str = 'str1x',
-             eparam: Level = Level.debug):
+             eparam: LogLevel = LogLevel.debug):
         """Run the test
         command
 
@@ -100,15 +103,22 @@ class TestEnumInspect(LogTestCase):
         self.assertEqual(5, len(args))
         self.assertEqual(('a1', 'arg0', 'arg1', 'arg2', 'eparam'),
                          tuple(map(lambda a: a.name, args)))
-        self.assertEqual((str, float, int, str, Level),
+        self.assertEqual((str, float, int, str, LogLevel),
                          tuple(map(lambda a: a.dtype, args)))
         self.assertEqual('fourth arg doc', args[3].doc.text)
-        self.assertEqual((None, None, 1, 'str1x', None),
+        self.assertEqual((None, None, 1, 'str1x', LogLevel.debug),
                          tuple(map(lambda a: a.default, args)))
         self.assertEqual((True, True, False, False, False),
                          tuple(map(lambda a: a.is_positional, args)))
 
         ep: ClassMethodArg = args[-1]
         self.assertEqual('eparam', ep.name)
-        self.assertEqual(Level, ep.dtype)
-        self.assertEqual(None, ep.default)
+        self.assertEqual(LogLevel, ep.dtype)
+        self.assertEqual(LogLevel.debug, ep.default)
+
+        fields: Tuple[ClassField] = cls.fields
+        self.assertEqual({'deflevel'}, set(fields.keys()))
+        field = fields['deflevel']
+        self.assertEqual('deflevel', field.name)
+        self.assertEqual(LogLevel, field.dtype)
+        self.assertEqual(LogLevel.error, field.default)

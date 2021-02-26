@@ -241,11 +241,18 @@ class ClassInspector(object):
                 if node.name == self.cls.__name__:
                     return node
 
-    def _map_default(self, default: Union[ast.AST, str]):
-        # this happens when an enum is used as a type, but name.id only
-        # give the enum class name and not the enum value
-        if isinstance(default, ast.Name):
-            default = default.id
+    def _map_default(self, def_node: ast.AST):
+        """Map a default from what will be at times an :class:`ast.Name`.  This happens
+        when an enum is used as a type, but name.id only give the enum class
+        name and not the enum value
+
+        """
+        if isinstance(def_node, ast.Attribute):
+            enum_name: str = def_node.attr
+            cls: type = self.data_type_mapper.map_type(def_node.value.id)
+            default = cls.__members__[enum_name]
+        else:
+            default = def_node.value
         return default
 
     def _get_args(self, node: ast.arguments):
@@ -259,8 +266,7 @@ class ClassInspector(object):
             default = None
             didx = i - dsidx
             if didx >= 0:
-                default = defaults[didx].value
-                default = self._map_default(default)
+                default = self._map_default(defaults[didx])
                 is_positional = False
             if arg.annotation is not None:
                 dtype = arg.annotation.id
@@ -319,10 +325,7 @@ class ClassInspector(object):
                 dtype: str = node.annotation.id
                 dtype: type = self.data_type_mapper.map_type(dtype)
                 kwlst: List[ast.keyword] = node.value.keywords
-                kwargs = {}
-                #kwargs = {k.arg: k.value.value for k in kwlst}
-                for k in kwlst:
-                    kwargs[k.arg] = self._map_default(k.value.value)
+                kwargs = {k.arg: self._map_default(k.value) for k in kwlst}
                 fields.append(ClassField(name, dtype, None, kwargs))
             # parse documentation string right after the dataclass field
             elif (isinstance(node, ast.Expr) and

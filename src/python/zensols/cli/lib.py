@@ -23,7 +23,7 @@ class LogConfigurator(object):
     log_name: str = field(default=None)
     """The log name space."""
 
-    level: LogLevel = field(default='info')
+    level: LogLevel = field(default=LogLevel.info)
     """The level to set the application logger."""
 
     default_level: str = field(default='warning')
