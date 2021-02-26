@@ -6,6 +6,8 @@ __author__ = 'Paul Landes'
 from typing import Tuple, List, Dict, Iterable, Any
 from dataclasses import dataclass, field
 import logging
+import sys
+from io import TextIOBase
 from pathlib import Path
 import optparse
 from zensols.persist import persisted
@@ -108,6 +110,12 @@ class OptionMetaData(Dictable):
             logger.debug(f'params: {params}')
         return optparse.Option(long_name, short_name, **params)
 
+    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
+        dct = self.asdict()
+        del dct['long_name']
+        self._write_line(self.long_name, depth, writer)
+        self._write_object(dct, depth + 1, writer)
+
 
 @dataclass
 class PositionalMetaData(Dictable):
@@ -160,6 +168,8 @@ class ActionMetaData(Dictable):
     method on a class to invoke.
 
     """
+    WRITABLE__DESCENDANTS = True
+
     name: str = field(default=None)
     """The name of the action, which is also the mnemonic used on the command line.
 
@@ -198,6 +208,8 @@ class Action(Dictable):
     """The output of the :class:`.CommandLineParser`.
 
     """
+    WRITABLE__DESCENDANTS = True
+
     meta_data: ActionMetaData = field()
     """The action parsed from the command line."""
 
@@ -218,6 +230,8 @@ class ActionSet(Dictable):
     """The actions that are parsed by :class:`.CommandLineParser`.
 
     """
+    WRITABLE__DESCENDANTS = True
+
     actions: Tuple[Action] = field()
     """The actions parsed.  The first N actions are first pass where as the last is
     the second pass action.
