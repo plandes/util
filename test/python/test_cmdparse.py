@@ -59,6 +59,8 @@ class TestArgumentParse(LogTestCase):
         should = """\
 Usage: python -m unittest [options]:
 
+A test action.
+
 Options:
   --version             show program's version number and exit
   -h, --help            show this help message and exit
@@ -71,6 +73,12 @@ Options:
         parser.write_help(writer=sio)
         should_lines = sorted(should.split('\n'))
         val_lines = sorted(sio.getvalue().split('\n'))
+        if 0:
+            print()
+            print(should)
+            print('-' * 80)
+            print(sio.getvalue())
+            print('-' * 80)
         # each run reorders the -d and -c options--so it must use a dict
         self.assertEqual(should_lines, val_lines)
 

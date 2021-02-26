@@ -137,5 +137,4 @@ class TestActionFirstPass(LogTestCase):
         opt: OptionMetaData = meta.options_by_name['defaultlevel']
         self.assertEqual('f', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
-
         TestActionSecondPass._test_second_action(self, actions)

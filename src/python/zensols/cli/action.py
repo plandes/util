@@ -90,16 +90,22 @@ class ActionCli(Dictable):
 
     """
 
+    def _is_option_enabled(self, name: str) -> bool:
+        incs = self.option_includes
+        excs = self.option_excludes
+        enabled = ((incs is None) or (name in incs)) and (name not in excs)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'option {name} is enabled: {enabled}')
+        return enabled
+
     @property
     @persisted('_meta_datas')
     def meta_datas(self) -> Tuple[ActionMetaData]:
         metas: List[ActionMetaData] = []
         omds: Set[OptionMetaData] = set()
         f: DataClassField
-        incs = self.option_includes
-        excs = self.option_excludes
         for f in self.class_meta.fields.values():
-            if ((incs is None) or (f.name in incs)) and (f.name not in excs):
+            if self._is_option_enabled(f.name):
                 omds.add(self.options[f.name])
         for name in sorted(self.class_meta.methods.keys()):
             meth = self.class_meta.methods[name]
@@ -110,8 +116,9 @@ class ActionCli(Dictable):
                     dtype = DataTypeMapper.map_type(arg.dtype)
                     pos_args.append(PositionalMetaData(arg.name, dtype))
                 else:
-                    arg_omd: OptionMetaData = self.options[arg.name]
-                    omds.add(arg_omd)
+                    if self._is_option_enabled(arg.name):
+                        arg_omd: OptionMetaData = self.options[arg.name]
+                        omds.add(arg_omd)
             if meth.doc is None:
                 doc = self.class_meta.doc
             else:
