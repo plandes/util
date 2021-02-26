@@ -5,7 +5,7 @@ from zensols.config import Dictable
 from zensols.cli import (
     ActionCli, ActionCliManager,
     OptionMetaData, ActionMetaData,
-    CommandActionSet, CommandFactory, LogLevel,
+    CommandActionSet, ApplicationFactory, LogLevel,
 )
 from logutil import LogTestCase
 
@@ -43,16 +43,14 @@ class TestAction(Dictable):
 class TestActionSecondPass(LogTestCase):
     def setUp(self):
         #self.config_logging('zensols.cli')
-        cli = CommandFactory.instance(
+        self.cli = ApplicationFactory.instance(
             'zensols.testapp', 'test-resources/test-app-sec-pass.conf')
-        self.command = cli.create()
 
     def test_metadata(self):
-        command = self.command
         if 0:
             print()
-            command.parser.write_help()
-        mng: ActionCliManager = command.cli_manager
+            self.cli.parser.write_help()
+        mng: ActionCliManager = self.cli.cli_manager
         actions: Dict[str, ActionCli] = mng.actions
         self.assertEqual(2, len(actions))
         self.assertEqual(set('test log_action'.split()), set(actions.keys()))
@@ -104,16 +102,14 @@ class TestActionSecondPass(LogTestCase):
 
 class TestActionFirstPass(LogTestCase):
     def setUp(self):
-        cli = CommandFactory.instance(
+        self.cli = ApplicationFactory.instance(
             'zensols.testapp', 'test-resources/test-app-first-pass.conf')
-        self.command = cli.create()
 
     def test_metadata(self):
-        command = self.command
         if 0:
             print()
-            command.parser.write_help()
-        mng: ActionCliManager = command.cli_manager
+            self.cli.parser.write_help()
+        mng: ActionCliManager = self.cli.cli_manager
         actions: Dict[str, ActionCli] = mng.actions
         self.assertEqual(2, len(actions))
         self.assertEqual(set('test log_action'.split()), set(actions.keys()))
@@ -144,10 +140,10 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual('the level to set the root logger', opt.doc)
         TestActionSecondPass._test_second_action(self, actions)
 
-    def test_construct(self):
+    def xtest_construct(self):
         #self.config_logging('zensols.cli')
-        command = self.command
-        print()
-        #command.parser.write_help()
-        aset: CommandActionSet = command.parse('one 2 -g 5 -e debug'.split())
-        #aset.write()
+        if 0:
+            print()
+            self.cli.parser.write_help()
+        aset: CommandActionSet = self.cli.create('one 2 -g 5 -e debug'.split())
+        aset.write()

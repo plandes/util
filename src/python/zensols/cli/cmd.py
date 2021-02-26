@@ -6,17 +6,20 @@ from __future__ import annotations
 from typing import Tuple, List, Dict, Iterable
 from dataclasses import dataclass, field
 import logging
+import sys
 from itertools import chain
 from pathlib import Path
 from zensols.introspect import ClassMethod
+from zensols.persist import persisted
 from zensols.util import PackageResource
 from zensols.config import (
-    Configurable, ImportIniConfig, DictionaryConfig, ImportConfigFactory,
-    Dictable,
+    Dictable, Configurable, ConfigFactory,
+    ImportIniConfig, DictionaryConfig, ImportConfigFactory,
 )
 from . import (
-    ActionCliError, ActionCliManager, ActionCli, ActionCliMethod, ActionMetaData,
-    CommandAction, CommandActionSet, CommandLineConfig, CommandLineParser
+    ActionCliError,
+    ActionCliManager, ActionCli, ActionCliMethod, ActionMetaData,
+    CommandAction, CommandActionSet, CommandLineConfig, CommandLineParser,
  )
 
 logger = logging.getLogger(__name__)
@@ -64,30 +67,42 @@ class Action(Dictable):
 
 
 @dataclass
+class Application(Dictable):
+    config_factory: ConfigFactory = field(repr=False)
+    actions: Tuple[Action] = field()
+
+
+@dataclass
 class Command(Dictable):
+    """A command line parse instance.
+
+    """
     cli_manager: ActionCliManager
     parser: CommandLineParser
 
-    def parse(self, args: List[str]):
+    def parse(self, args: List[str]) -> Tuple[Action]:
+        actions: List[Action] = []
         action_set: CommandActionSet = self.parser.parse(args)
-        actions: Dict[str, ActionCli] = self.cli_manager.actions_by_meta_data_name
+        mng = self.cli_manager
+        action_clis: Dict[str, ActionCli] = mng.actions_by_meta_data_name
         caction: CommandAction
-        for caction in action_set.actions[1:2]:
-            print(caction.options)
+        for caction in action_set.actions:
             name = caction.meta_data.name
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'action name: {name}')
-            action_cli: ActionCli = actions[name]
+            action_cli: ActionCli = action_clis[name]
             acli_meth: ActionCliMethod = action_cli.methods[name]
             action: Action = Action(
                 caction, action_cli,
                 acli_meth.action_meta_data, acli_meth.method)
-            action.write()
-        return action_set
+            actions.append(action)
+        import sys
+        self._write_object(actions, 0, sys.stdout)
+        return actions
 
 
 @dataclass
-class CommandFactory(object):
+class ApplicationFactory(object):
     """Boots the application context from the command line.
 
     """
@@ -101,7 +116,7 @@ class CommandFactory(object):
     """The relative resource path to the application's context."""
 
     @classmethod
-    def instance(cls, package_name: str, *args, **kwargs) -> CommandFactory:
+    def instance(cls, package_name: str, *args, **kwargs) -> ApplicationFactory:
         """"A create facade method.
 
         :param package_name: used to create the :obj:`package_resource`
@@ -128,12 +143,9 @@ class CommandFactory(object):
                             'type': 'ini'}})
         return ImportIniConfig(path, children=(app_conf,))
 
-    def create(self) -> Command:
-        """Create the action CLI application.
-
-        :raises ActionCliError: for any missing or misconfigurations
-
-        """
+    @persisted('_resources')
+    def _create_resources(self) -> \
+            Tuple[ConfigFactory, ActionCliManager, CommandLineParser]:
         path = self.package_resource.get_path(self.app_config_resource)
         if not path.exists():
             raise ActionCliError(
@@ -141,9 +153,45 @@ class CommandFactory(object):
                 f'not found in {self.package_resource}')
         config = self._get_app_context(path)
         fac = ImportConfigFactory(config)
-        cli_manager: ActionCliManager = fac(ActionCliManager.SECTION)
+        cli_mng: ActionCliManager = fac(ActionCliManager.SECTION)
         actions: Tuple[ActionMetaData] = tuple(chain.from_iterable(
-            map(lambda a: a.meta_datas, cli_manager.actions.values())))
+            map(lambda a: a.meta_datas, cli_mng.actions.values())))
         config = CommandLineConfig(actions)
         parser = CommandLineParser(config, self.package_resource.version)
-        return Command(cli_manager, parser)
+        return fac, cli_mng, parser
+
+    @property
+    def parser(self) -> CommandLineParser:
+        return self._create_resources()[2]
+
+    @property
+    def cli_manager(self) -> ActionCliManager:
+        return self._create_resources()[1]
+
+    def _parse(self, args: List[str]) -> Tuple[Action]:
+        fac, cli_mng, parser = self._create_resources()
+        actions: List[Action] = []
+        action_set: CommandActionSet = parser.parse(args)
+        action_clis: Dict[str, ActionCli] = cli_mng.actions_by_meta_data_name
+        caction: CommandAction
+        for caction in action_set.actions:
+            name = caction.meta_data.name
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'action name: {name}')
+            action_cli: ActionCli = action_clis[name]
+            acli_meth: ActionCliMethod = action_cli.methods[name]
+            action: Action = Action(
+                caction, action_cli,
+                acli_meth.action_meta_data, acli_meth.method)
+            actions.append(action)
+        return actions
+
+    def create(self, args: List[str] = sys.argv[1:]) -> Application:
+        """Create the action CLI application.
+
+        :raises ActionCliError: for any missing data or misconfigurations
+
+        """
+        fac, cli_mng, parser = self._create_resources()
+        actions: Tuple[Action] = self._parse(args)
+        return Application(fac, actions)
