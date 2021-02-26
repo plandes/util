@@ -15,6 +15,10 @@ logger = logging.getLogger(__name__)
 
 
 class ClassError(Exception):
+    """Raised by :class:`.ClassInspector.` when a class can not be inspected or
+    parsed by :mod:`ast`.
+
+    """
     pass
 
 
@@ -233,8 +237,8 @@ class ClassInspector(object):
                 args = args[1:]
             else:
                 args = ()
-            if (isinstance(node, ast.Expr) and
-                isinstance(node.value, ast.Constant)):
+            if isinstance(node, ast.Expr) and \
+               isinstance(node.value, ast.Constant):
                 doc = ClassDoc(node.value.value)
             else:
                 doc = None

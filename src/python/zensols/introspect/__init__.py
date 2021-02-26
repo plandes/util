@@ -4,4 +4,4 @@
 __author__ = 'Paul Landes'
 
 from .imp import *
-from .meta import *
+from .inspect import *
