@@ -99,11 +99,12 @@ class ClassImporter(object):
             logger.debug(f'inst: {inst}')
         return inst
 
-    def set_log_level(self, level=logging.INFO):
+    def set_log_level(self, level: int = logging.INFO):
         """Convenciene method to set the log level of the module given in the
         initializer of this class.
 
-        :param level: and instance of ``logging.<level>``
+        :param level: a logging level in :mod:`logging`
+
         """
         mod, cls = self.parse_module_class()
         logging.getLogger(mod).setLevel(level)
