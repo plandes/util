@@ -5,11 +5,13 @@ __author__ = 'Paul Landes'
 
 from typing import List, Tuple, Dict, Any
 from dataclasses import dataclass, field
+from enum import Enum
 import logging
 from pathlib import Path
 import re
 import ast
 import inspect
+from . import ClassImporter
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +24,7 @@ class ClassError(Exception):
     pass
 
 
+@dataclass
 class TypeMapper(object):
     """A utility class to map string types parsed from :class:`.ClassInspector`
     to Python types.
@@ -31,17 +34,55 @@ class TypeMapper(object):
                           for t in [str, int, float, bool, list, Path]}
     """Supported data types mapped from data class fields."""
 
-    data_types: Dict[str, type] = DEFAULT_DATA_TYPES
+    cls: type = field()
+    """The class to map."""
+
+    data_types: Dict[str, type] = field(default=None)
     """Data type mapping for this instance."""
 
-    default_type: type = str
+    default_type: type = field(default=str)
     """Default type for when no type is given."""
+
+    allow_enum: bool = field(default=True)
+    """Whether or not to allow :class:`.Enum` as an acceptable type.  When the
+    mapper encouters these classes, the class is loaded from the module and
+    returned as a type.
+
+    """
+
+    def __post_init__(self):
+        if self.data_types is None:
+            self.data_types = self.DEFAULT_DATA_TYPES
+
+    def _try_enum(self, stype: str) -> type:
+        """Try to resolve ``stype`` as an :class:`.Enum' class.
+
+        """
+        mod = self.cls.__module__
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'module: {mod}')
+        class_name = f'{mod}.{stype}'
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'trying to load {class_name}')
+        ci = ClassImporter(class_name, reload=False)
+        cls: type = ci.get_class()
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'successfully loaded class {cls}')
+        if issubclass(cls, Enum):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'mapping {cls} from {stype}')
+        return cls
 
     def map_type(self, stype: str = None) -> type:
         if stype is None:
             tpe = self.default_type
         else:
             tpe = self.data_types.get(stype)
+        if tpe is None and self.allow_enum:
+            try:
+                tpe = self._try_enum(stype)
+            except Exception as e:
+                logger.error('could not narrow to enum: {stype}', e)
         if tpe is None:
             raise ClassError(f'non-supported data type: {stype}')
         return tpe
@@ -67,10 +108,6 @@ class ClassDoc(object):
             doc = doc.strip()
             if len(doc) == 0:
                 doc = None
-            else:
-                doc = doc.lower()
-                if doc[-1] == '.':
-                    doc = doc[0:-1]
         self.text = doc
         self.params = params
 
@@ -158,7 +195,7 @@ class ClassMethod(object):
 
 @dataclass(eq=True)
 class Class(object):
-    cls: type = field()
+    class_type: type = field()
     """The class that was inspected."""
 
     doc: ClassDoc = field()
@@ -181,17 +218,18 @@ class ClassInspector(object):
     """The class to inspect."""
 
     attrs: Tuple[str] = field(default=None)
-    """The attributes to find documentation, or all found are returned when
-    ``None``.
+    """The class attributes to inspect, or all found are returned when ``None``.
 
     """
 
-    data_type_mapper: TypeMapper = field(
-        default_factory=lambda: TypeMapper())
+    data_type_mapper: TypeMapper = field(default=None)
     """The mapper used for narrowing a type from a string parsed from the Python
     AST.
 
     """
+
+    def __post_init__(self):
+        self.data_type_mapper = TypeMapper(self.cls)
 
     def _get_class_node(self) -> ast.AST:
         fname = inspect.getfile(self.cls)
@@ -206,16 +244,21 @@ class ClassInspector(object):
     def _get_args(self, node: ast.arguments):
         args = []
         defaults = node.defaults
-        dlen = len(defaults)
+        dsidx = len(node.args) - len(defaults)
         for i, arg in enumerate(node.args):
             name = arg.arg
             dtype = None
             is_positional = True
             default = None
-            didx = i - dlen - 1
-            if didx < len(defaults) and didx >= 0:
+            didx = i - dsidx
+            if didx >= 0:
                 default = defaults[didx].value
                 is_positional = False
+                # this happens when an enum is used as a type, but name.id only
+                # give the enum class name and not the enum value
+                if isinstance(default, ast.Name):
+                    #default = default.id
+                    default = None
             if arg.annotation is not None:
                 dtype = arg.annotation.id
             dtype = self.data_type_mapper.map_type(dtype)
@@ -228,6 +271,7 @@ class ClassInspector(object):
         name = node.name
         is_priv = name.startswith('_')
         is_prop = any(map(lambda n: n.id, node.decorator_list))
+        # only public methods (not properties) are parsed for now
         if not is_prop and not is_priv:
             args = self._get_args(node.args)
             node = None if len(node.body) == 0 else node.body[0]
@@ -243,9 +287,18 @@ class ClassInspector(object):
             else:
                 doc = None
             method = ClassMethod(name, doc, args)
+            # copy the parsed parameter doc found in the method doc to the
+            # argument meta data
+            if (method.doc is not None) and \
+               (method.doc.params is not None) and \
+               (method.args is not None):
+                for arg in method.args:
+                    param = method.doc.params.get(arg.name)
+                    if (param is not None) and (arg.doc is None):
+                        arg.doc = ClassDoc(param, None)
         return method
 
-    def get_meta_data(self) -> Class:
+    def get_class(self) -> Class:
         """Return a dict of attribute (field) to metadata and docstring.
 
         """

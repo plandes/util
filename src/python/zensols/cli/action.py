@@ -30,6 +30,15 @@ class ActionCliManagerError(ActionCliError):
     pass
 
 
+class DocUtil(object):
+    @staticmethod
+    def normalize(text: str) -> str:
+        doc = text.lower()
+        if doc[-1] == '.':
+            doc = doc[0:-1]
+        return doc
+
+
 @dataclass
 class ActionCli(Dictable):
     """A command that is invokeable on the command line.
@@ -102,7 +111,6 @@ class ActionCli(Dictable):
             arg: ClassMethodArg
             for arg in meth.args:
                 if arg.is_positional:
-                    #dtype = TypeMapper.map_type(arg.dtype)
                     pos_args.append(PositionalMetaData(arg.name, arg.dtype))
                 else:
                     self._add_option(arg.name, omds)
@@ -111,7 +119,7 @@ class ActionCli(Dictable):
             else:
                 doc = meth.doc
             if doc is not None:
-                doc = doc.text
+                doc = DocUtil.normalize(doc.text)
             if self.mnemonics is not None:
                 name = self.mnemonics.get(name)
                 if name is None:
@@ -165,6 +173,7 @@ class ActionCliManager(Dictable):
                 doc = meth.doc.params.get(long_name)
         else:
             doc = doc.text
+        doc = DocUtil.normalize(doc)
         return OptionMetaData(
             long_name=long_name,
             short_name=short_name,
@@ -206,8 +215,8 @@ class ActionCliManager(Dictable):
             logger.debug(f'resolved to class: {cls}')
         if not dataclasses.is_dataclass(cls):
             raise ActionCliError('application CLI app must be a dataclass')
-        dh = ClassInspector(cls)
-        meta: Class = dh.get_meta_data()
+        inspector = ClassInspector(cls)
+        meta: Class = inspector.get_class()
         params = {'section': section,
                   'class_meta': meta,
                   'options': self._fields}
