@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, Dict, Iterable, Any, List
+from typing import Tuple, Dict, Iterable, Any
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -77,14 +77,7 @@ class OptionMetaData(Dictable):
 
     @property
     def is_choice(self):
-        return (self.choices is not None) or (issubclass(self.dtype, Enum))
-
-    # @property
-    # def derive_choices(self) -> List[str]:
-    #     if self.choices is not None:
-    #         return self.choices
-    #     else:
-    #         return sorted(self.dtype.__members__.keys())
+        return (self.choices is not None) or issubclass(self.dtype, Enum)
 
     def _set_metavar(self, clobber: bool = True):
         if self.is_choice:
@@ -117,11 +110,13 @@ class OptionMetaData(Dictable):
         if tpe is None and self.is_choice:
             tpe = 'choice'
             params['choices'] = self.choices
+            # use the string value of the default if set from the enum
             if isinstance(self.default, Enum):
-                #print('D', self.default, type(self.default), self.default.name)
                 default = self.default.name
         else:
             default = self.default
+        # only set the default if given, as default=None is not the same as a
+        # missing default when adding the option
         if default is not None:
             params['default'] = default
         long_name = f'--{self.long_name}'

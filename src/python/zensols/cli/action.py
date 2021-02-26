@@ -175,15 +175,12 @@ class ActionCliManager(Dictable):
         else:
             doc = doc.text
         doc = DocUtil.normalize(doc)
-        default = pmeta.default
-        if not isinstance(default, Enum):
-            default = str(default)
         return OptionMetaData(
             long_name=long_name,
             short_name=short_name,
             dest=pmeta.name,
             dtype=dtype,
-            default=default,
+            default=pmeta.default,
             doc=doc)
 
     def _add_field(self, section: str, name: str, omd: OptionMetaData):
