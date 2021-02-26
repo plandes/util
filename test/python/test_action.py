@@ -3,7 +3,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from zensols.config import Dictable
 from zensols.cli import (
-    ActionCli, ActionCliManager, OptionMetaData, ActionMetaData, ActionSet,
+    ActionCli, ActionCliManager,
+    OptionMetaData, ActionMetaData,
     CommandFactory, LogLevel
 )
 from logutil import LogTestCase
@@ -145,10 +146,10 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual('the level to set the root logger', opt.doc)
         TestActionSecondPass._test_second_action(self, actions)
 
-    def xtest_construct(self):
+    def test_construct(self):
         #self.config_logging('zensols.cli')
         command = self.command
         print()
-        command.parser.write_help()
-        aset: ActionSet = command.parser.parse('one 2 -g 5 -e debug'.split())
+        #command.parser.write_help()
+        aset: ActionSet = command.parse('one 2 -g 5 -e debug'.split())
         aset.write()

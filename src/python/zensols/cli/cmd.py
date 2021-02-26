@@ -14,7 +14,7 @@ from zensols.config import (
     Dictable,
 )
 from . import (
-    ActionCliError, ActionCliManager, ActionMetaData,
+    ActionCliError, ActionCliManager, ActionMetaData, CommandActionSet,
     CommandLineConfig, CommandLineParser
 )
 
@@ -27,7 +27,8 @@ class Command(Dictable):
     parser: CommandLineParser
 
     def parse(self, args: List[str]):
-        return self.parser.parse(args)
+        action_set: CommandActionSet = self.parser.parse(args)
+        return action_set
 
 
 @dataclass
@@ -58,7 +59,7 @@ class CommandFactory(object):
 
     def _get_app_context(self, app_context: Path) -> Configurable:
         pres = PackageResource(self.UTIL_PACKAGE)
-        res = 'resources/app.conf'
+        res = self.app_config_resource
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'looking up resource: {res} in {pres}')
         path = pres.get_path(res)

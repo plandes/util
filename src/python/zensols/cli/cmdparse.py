@@ -16,7 +16,7 @@ from zensols.config import Dictable
 from . import (
     CommandLineError, UsageWriter,
     OptionMetaData, PositionalMetaData, ActionMetaData,
-    Action, ActionSet,
+    CommandAction, CommandActionSet,
 )
 
 logger = logging.getLogger(__name__)
@@ -51,12 +51,12 @@ class CommandLineConfig(Dictable):
 
     @property
     @persisted('_first_pass_actions')
-    def first_pass_actions(self) -> Tuple[Action]:
+    def first_pass_actions(self) -> Tuple[ActionMetaData]:
         return tuple(filter(lambda a: a.first_pass, self.actions))
 
     @property
     @persisted('_second_pass_actions')
-    def second_pass_actions(self) -> Tuple[Action]:
+    def second_pass_actions(self) -> Tuple[ActionMetaData]:
         return tuple(filter(lambda a: not a.first_pass, self.actions))
 
     @property
@@ -72,7 +72,7 @@ class CommandLineConfig(Dictable):
 
     @property
     @persisted('_first_pass_by_option')
-    def first_pass_by_option(self) -> Dict[str, Action]:
+    def first_pass_by_option(self) -> Dict[str, ActionMetaData]:
         actions = {}
         for action in self.first_pass_actions:
             for k, v in action.options_by_name.items():
@@ -176,10 +176,12 @@ class CommandLineParser(Dictable):
             logger.debug(f'parsing positional args: {metas} <--> {vals}')
         return tuple(map(lambda x: parse(x[0], x[1].dtype), zip(vals, metas)))
 
-    def _parse_first_pass(self, args: List[str], actions: List[Action]) -> \
+    def _parse_first_pass(self, args: List[str],
+                          actions: List[CommandAction]) -> \
             Tuple[bool, str, Dict[str, Any], Dict[str, Any], Tuple[str]]:
         second_pass = False
-        fp_opts = set(map(lambda o: o.long_name, self.config.first_pass_options))
+        fp_opts = set(map(lambda o: o.long_name,
+                          self.config.first_pass_options))
         # first fish out the action name (if given) as a positional parameter
         parser: OptionParser = self._get_first_pass_parser(True)
         (options, op_args) = parser.parse_args(args)
@@ -192,7 +194,7 @@ class CommandLineParser(Dictable):
             fp_action_meta = self.config.first_pass_by_option.get(k)
             if fp_action_meta is not None:
                 aos = {k: options[k] for k in (set(options.keys()) & fp_opts)}
-                action = Action(fp_action_meta, aos, ())
+                action = CommandAction(fp_action_meta, aos, ())
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'adding first pass action: {action}')
                 actions.append(action)
@@ -246,7 +248,7 @@ class CommandLineParser(Dictable):
             options = vars(options)
         return action_meta, options, op_args
 
-    def parse(self, args: List[str]) -> Tuple[Action]:
+    def parse(self, args: List[str]) -> CommandActionSet:
         """Parse command line arguments.
 
         :param args: the arguments given on the command line; which is usually
@@ -256,7 +258,7 @@ class CommandLineParser(Dictable):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'parsing: {args}')
         # action instances
-        actions: List[Action] = []
+        actions: List[CommandAction] = []
         # first pass parse
         second_pass, action_name, fp_opts, options, op_args = \
             self._parse_first_pass(args, actions)
@@ -273,8 +275,8 @@ class CommandLineParser(Dictable):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating action with {options} {pos_args}')
         # create and add the second pass action
-        action_inst = Action(action_meta, options, pos_args)
+        action_inst = CommandAction(action_meta, options, pos_args)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'adding action: {action_inst}')
         actions.append(action_inst)
-        return ActionSet(tuple(actions))
+        return CommandActionSet(tuple(actions))
