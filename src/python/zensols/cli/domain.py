@@ -94,13 +94,9 @@ class OptionMetaData(Dictable):
             logger.debug(f'metavar recompute using {self.dtype}: ' +
                          f'{self.metavar}, {self.choices}')
 
-    def create_option(self) -> optparse.Option:
-        """Add the option to an option parser.
-
-        :param parser: the parser to populate
-
-        """
-        params = {}
+    def _str_vals(self) -> Tuple[str, str, str]:
+        default = self.default
+        choices = None
         tpe = {str: 'string',
                int: 'int',
                float: 'float',
@@ -109,12 +105,32 @@ class OptionMetaData(Dictable):
                list: 'choice'}.get(self.dtype)
         if tpe is None and self.is_choice:
             tpe = 'choice'
-            params['choices'] = self.choices
+            choices = self.choices
             # use the string value of the default if set from the enum
             if isinstance(self.default, Enum):
                 default = self.default.name
-        else:
-            default = self.default
+        elif (self.default is not None) and (self.dtype != bool):
+            default = str(self.default)
+        return tpe, default, choices
+
+    @property
+    def default_str(self) -> str:
+        """Get the default as a string usable in printing help and as a default using
+        the :class:`optparse.OptionParser` class.
+
+        """
+        return self._str_vals()[1]
+
+    def create_option(self) -> optparse.Option:
+        """Add the option to an option parser.
+
+        :param parser: the parser to populate
+
+        """
+        params = {}
+        tpe, default, choices = self._str_vals()
+        if choices is not None:
+            params['choices'] = choices
         # only set the default if given, as default=None is not the same as a
         # missing default when adding the option
         if default is not None:

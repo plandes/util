@@ -68,7 +68,7 @@ class UsageWriter(Writable):
             for opt in action.options:
                 sep = '' if opt.short_name is None else ', '
                 if opt.default is not None and opt.dtype != bool:
-                    default = opt.default
+                    default = opt.default_str
                 else:
                     default = ''
                 long_opt = f'--{opt.long_name}'

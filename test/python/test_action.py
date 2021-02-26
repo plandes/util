@@ -105,7 +105,6 @@ class TestActionSecondPass(LogTestCase):
 
 class TestActionFirstPass(LogTestCase):
     def setUp(self):
-        #self.config_logging('zensols.cli')
         cli = CommandFactory.instance(
             'zensols.testapp', 'test-resources/test-app-first-pass.conf')
         self.command = cli.create()
@@ -147,6 +146,7 @@ class TestActionFirstPass(LogTestCase):
         TestActionSecondPass._test_second_action(self, actions)
 
     def xtest_construct(self):
+        #self.config_logging('zensols.cli')
         command = self.command
         print()
         command.parser.write_help()
