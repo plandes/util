@@ -1,4 +1,6 @@
 from typing import Dict
+import sys
+from io import StringIO
 from zensols.cli import (
     ActionCli, ActionCliManager,
     OptionMetaData, ActionMetaData,
@@ -168,10 +170,12 @@ class TestActionInvoke(LogTestCase):
         self._test_second_action(insts[0])
 
 
-class TestActionBoolean(LogTestCase):
-    def test_first_pass_invoke(self):
+class TestActionType(LogTestCase):
+    def setUp(self):
         self.cli = ApplicationFactory.instance(
             'zensols.testapp', 'test-resources/test-app-bool.conf')
+
+    def test_bool(self):
         aset: CommandActionSet = self.cli.create('actionone'.split())
         if 0:
             print()
@@ -196,6 +200,36 @@ class TestActionBoolean(LogTestCase):
         insts = aset.invoke()
         res: Application = insts[0]
         self.assertEqual(('action2', True), res.result)
+
+    def test_wrong_type(self):
+        aset: CommandActionSet = self.cli.create('action3'.split())
+        if 0:
+            print()
+            self.cli.parser.write_help()
+            self.config_logging('zensols.cli')
+        insts = aset.invoke()
+        self.assertEqual(1, len(insts))
+        res: Application = insts[0]
+        self.assertTrue(isinstance(res.instance, ma.TestActionBool))
+        self.assertEqual(('action3', None), res.result)
+
+        aset: CommandActionSet = self.cli.create('action3 -t 3'.split())
+        insts = aset.invoke()
+        res: Application = insts[0]
+        self.assertTrue(isinstance(res.instance, ma.TestActionBool))
+        self.assertEqual(('action3', 3), res.result)
+
+        usage: str = ''
+        with self.assertRaises(SystemExit):
+            stdold = sys.stderr
+            try:
+                sys.stderr = StringIO()
+                self.cli.create('action3 -t notint'.split())
+            finally:
+                usage = sys.stderr.getvalue()
+                sys.stderr = stdold
+        self.assertRegex(
+            usage, r".*error: option -t: invalid integer value: 'notint'.*")
 
 
 class TestActionMetaConfig(LogTestCase):
