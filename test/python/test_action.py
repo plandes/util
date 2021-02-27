@@ -11,7 +11,6 @@ import mockapp.app as ma
 
 class TestActionSecondPass(LogTestCase):
     def setUp(self):
-        #self.config_logging('zensols.cli')
         self.cli = ApplicationFactory.instance(
             'zensols.testapp', 'test-resources/test-app-sec-pass.conf')
 
@@ -115,20 +114,23 @@ class TestActionInvoke(LogTestCase):
         self.cli = ApplicationFactory.instance(
             'zensols.testapp', 'test-resources/test-app-first-pass.conf')
 
-    def test_construct(self):
-        #self.config_logging('zensols.cli')
-        if 0:
+    def test_first_pass_invoke(self):
+        aset: CommandActionSet = self.cli.create('one 2 -g 5 -e debug'.split())
+        if 1:
             print()
             self.cli.parser.write_help()
-        aset: CommandActionSet = self.cli.create('one 2 -g 5 -e debug'.split())
-        #aset.write()
-        #self.config_logging('zensols.cli')
+            self.config_logging('zensols.cli')
         insts = aset.invoke()
         self.assertEqual(2, len(insts))
         res: Application = insts[0]
         self.assertEqual(ApplicationResult, type(res))
         self.assertTrue(isinstance(res.instance, ml.LogConfigurator))
+        self.assertEqual((None, ml.LogLevel.debug, ml.LogLevel.warning),
+                         res.result)
+
         res: Application = insts[1]
         self.assertTrue(isinstance(res.instance, ma.TestAction))
-        self.assertEqual((5, 2.0, 5, 'str1x'), res.instance.invoke_state)
-        self.assertEqual((5, 2.0, 5, 'str1x', 'r'), res.result)
+        res_params = ('one', 2.0, 5, 'str1x')
+        self.assertEqual(res_params, res.instance.invoke_state)
+        self.assertEqual(('one', 2.0, 5, 'str1x', 'r'), res.result)
+        self.assertEqual((str, float, int, str), tuple(map(type, res_params)))

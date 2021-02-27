@@ -2,9 +2,11 @@ from __future__ import annotations
 """A more object oriented data driven command line set of classes.
 
 """
+__author__ = 'Paul Landes'
 
 from typing import Tuple, List, Dict, Iterable, Any
 from dataclasses import dataclass, field
+from enum import Enum
 import logging
 import sys
 from itertools import chain
@@ -72,8 +74,14 @@ class Action(Dictable):
 
 @dataclass
 class ApplicationResult(Dictable):
-    instance: Any
-    result: Any
+    """The results of an application invocation with :meth:`.Application.invoke`.
+
+    """
+    instance: Any = field()
+    """The application instance."""
+
+    result: Any = field()
+    """The results returned from the invocation on the application instance."""
 
 
 @dataclass
@@ -92,20 +100,22 @@ class Application(Dictable):
 
     def _create_instance(self, action: Action) -> Any:
         cmd_opts: Dict[str, Any] = action.command_action.options
-        field: ClassField
         const_params: Dict[str, Any] = {}
         sec = action.section
+        field: ClassField
         for f in action.class_meta.fields.values():
             val: str = cmd_opts.get(f.name)
             if val is None:
-                continue
-            # if val is None:
-            #     raise ActionCliError(
-            #         f'field not found for section {action.section} ' +
-            #         f'({action.class_name}): {f.name}')
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'field map: {sec}:{f.name} -> {val}')
-            const_params[f.name] = val
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(
+                        f'no param for section {action.section} ' +
+                        f'({action.class_name}): {f.name}')
+            else:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'field map: {sec}:{f.name} -> {val}')
+                if issubclass(f.dtype, Enum):
+                    val = f.dtype.__members__[val]
+                const_params[f.name] = val
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating {sec} with {const_params}')
         inst = self.config_factory.instance(sec, **const_params)
@@ -143,7 +153,7 @@ class Application(Dictable):
             pos_args, meth_params = self._get_meth_params(action, meth_meta)
             meth = getattr(inst, meth_meta.name)
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'invoking {meth} on {type(inst)}')
+                logger.debug(f'invoking {meth}')
             res: Any = meth(*pos_args, **meth_params)
             results.append(ApplicationResult(inst, res))
         return tuple(results)

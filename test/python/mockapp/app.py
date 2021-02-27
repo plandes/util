@@ -30,5 +30,5 @@ class TestAction(Dictable):
         :param arg2: forth arg doc
 
         """
-        self.invoke_state = (arg1, arg0, arg1, arg2)
+        self.invoke_state = (a1, arg0, arg1, arg2)
         return tuple(list(self.invoke_state) + ['r'])
