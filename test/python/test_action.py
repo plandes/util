@@ -202,8 +202,16 @@ class TestActionMetaConfig(LogTestCase):
     def test_first_pass_invoke(self):
         self.cli = ApplicationFactory.instance(
             'zensols.testapp', 'test-resources/test-app-meta.conf')
-        #aset: CommandActionSet = self.cli.create('action1'.split())
-        if 1:
+        aset: CommandActionSet = self.cli.create('action3 -o'.split())
+        if 0:
             print()
             self.cli.parser.write_help()
             self.config_logging('zensols.cli')
+        insts = aset.invoke()
+        res: Application = insts[0]
+        self.assertEqual(('bad meth name', True), res.result)
+
+        aset: CommandActionSet = self.cli.create('act4 nada'.split())
+        insts = aset.invoke()
+        res: Application = insts[0]
+        self.assertEqual(('action2', 'nada'), res.result)

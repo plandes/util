@@ -174,8 +174,10 @@ class CommandLineParser(Dictable):
             else:
                 if not isinstance(s, (str, int, bool, Path)):
                     raise ValueError(f'unknown parse type: {s}: {t}')
-                return t(s)
-
+                try:
+                    return t(s)
+                except ValueError as e:
+                    raise CommandLineError(f'expecting type {t.__name__}: {e}')
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'parsing positional args: {metas} <--> {vals}')
         return tuple(map(lambda x: parse(x[0], x[1].dtype), zip(vals, metas)))

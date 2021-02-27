@@ -227,6 +227,8 @@ class ActionCliManager(Dictable):
                 self._add_field(action.section, arg.name, omd)
         self._actions[action.section] = action
 
+    CLASS_META_ATTRIBUTE = 'CLI_META'
+
     def _add_app(self, section: str):
         config = self.config
         class_name: str = config.get_option('class_name', section)
@@ -248,6 +250,9 @@ class ActionCliManager(Dictable):
                 logger.debug(f'found configuration section: {conf_sec}')
             action = self.config_factory.instance(conf_sec, **params)
         else:
+            if hasattr(cls, self.CLASS_META_ATTRIBUTE):
+                cmconf = getattr(cls, self.CLASS_META_ATTRIBUTE)
+                params.update(cmconf)
             action = ActionCli(**params)
         logger.debug(f'created action: {action}')
         self._add_action(action)

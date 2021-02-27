@@ -62,11 +62,14 @@ class TestActionMeta(Dictable):
     """A test app with config metadata.
 
     """
+    CLI_META = {'mnemonics': {'bad_method_name': 'action3',
+                              'another_pythonic_method': 'act4'}}
+
     def good_name(self):
         return 'good'
 
     def bad_method_name(self, opt1: bool = False):
         return 'bad meth name', opt1
 
-    def another_pythonic_method(self, pos1: bool):
+    def another_pythonic_method(self, pos1):
         return 'action2', pos1
