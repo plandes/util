@@ -111,10 +111,10 @@ class Application(Dictable):
                         f'no param for section {action.section} ' +
                         f'({action.class_name}): {f.name}')
             else:
-                if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'field map: {sec}:{f.name} -> {val}')
                 if issubclass(f.dtype, Enum):
                     val = f.dtype.__members__[val]
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'field map: {sec}:{f.name} -> {val}')
                 const_params[f.name] = val
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating {sec} with {const_params}')
@@ -136,6 +136,8 @@ class Application(Dictable):
             else:
                 name: str = arg.name
                 val: str = cmd_opts[name]
+                if issubclass(arg.dtype, Enum):
+                    val = arg.dtype.__members__[val]
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'meth map: {name} -> {val}')
                 meth_params[name] = val

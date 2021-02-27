@@ -146,7 +146,7 @@ class TestActionInvoke(LogTestCase):
 
         res: Application = insts[1]
         self.assertTrue(isinstance(res.instance, ma.TestAction))
-        res_params = ('one', 2.0, 5, 'str1x')
+        res_params = ('one', 2.0, 5, 'str1x', ma.Fruit.banana)
         self.assertEqual(res_params, res.instance.invoke_state)
-        self.assertEqual(('one', 2.0, 5, 'str1x', 'r'), res.result)
-        self.assertEqual((str, float, int, str), tuple(map(type, res_params)))
+        self.assertEqual(('one', 2.0, 5, 'str1x', ma.Fruit.banana, 'r'), res.result)
+        self.assertEqual((str, float, int, str, ma.Fruit), tuple(map(type, res_params)))
