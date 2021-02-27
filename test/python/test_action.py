@@ -231,6 +231,15 @@ class TestActionType(LogTestCase):
         self.assertRegex(
             usage, r".*error: option -t: invalid integer value: 'notint'.*")
 
+        aset: CommandActionSet = self.cli.create('action4 5'.split())
+        insts = aset.invoke()
+        res: Application = insts[0]
+        self.assertTrue(isinstance(res.instance, ma.TestActionBool))
+        self.assertEqual(('action4', 5), res.result)
+
+        with self.assertRaisesRegex(CommandLineError, '^expecting type int.*'):
+            aset: CommandActionSet = self.cli.create('action4 notint'.split())
+
 
 class TestActionMetaConfig(LogTestCase):
     def test_first_pass_invoke(self):

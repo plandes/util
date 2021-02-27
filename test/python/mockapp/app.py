@@ -59,6 +59,9 @@ class TestActionBool(Dictable):
     def action3(self, opt2: int = None):
         return 'action3', opt2
 
+    def action4(self, pos1: int):
+        return 'action4', pos1
+
 
 @dataclass
 class TestActionMeta(Dictable):

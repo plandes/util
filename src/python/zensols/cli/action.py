@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Dict, Tuple, Iterable, Set, List
 from dataclasses import dataclass, field
 import dataclasses
+from collections import defaultdict
 import logging
 from zensols.persist import persisted
 from zensols.introspect import (
@@ -72,6 +73,8 @@ class ActionCli(Dictable):
     by the entire class metadata.
 
     """
+
+    positional_options: Dict[str, OptionMetaData] = field(default=None)
 
     mnemonics: Dict[str, str] = field(default=None)
     """The name of the action given on the command line, which defaults to the name
@@ -148,7 +151,7 @@ class ActionCli(Dictable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'adding metadata: {meta}')
             meths[name] = ActionCliMethod(meta, meth)
-        del self.options
+        self.options = None
         return meths
 
     @property
@@ -162,7 +165,14 @@ class ActionCliManager(Dictable):
     SECTION = 'cli'
     """The application context section."""
 
+    CLASS_META_ATTRIBUTE = 'CLI_META'
+    """The class level attribute on application classes containing a stand in
+    (otherwise missing section configuration :class:`.ActionCli`.
+
+    """
+
     config_factory: ConfigFactory = field()
+
     """The configuration factory used to create :class:`.ActionCli` instances.
 
     """
@@ -224,10 +234,12 @@ class ActionCliManager(Dictable):
             arg: ClassMethodArg
             for arg in meth.args:
                 omd = self._create_op_meta_data(arg, meth)
-                self._add_field(action.section, arg.name, omd)
+                if arg.is_positional:
+                    mopts = self._positional_options[meth.name]
+                    mopts[arg.name] = omd
+                else:
+                    self._add_field(action.section, arg.name, omd)
         self._actions[action.section] = action
-
-    CLASS_META_ATTRIBUTE = 'CLI_META'
 
     def _add_app(self, section: str):
         config = self.config
@@ -243,7 +255,8 @@ class ActionCliManager(Dictable):
         meta: Class = inspector.get_class()
         params = {'section': section,
                   'class_meta': meta,
-                  'options': self._fields}
+                  'options': self._fields,
+                  'positional_options': self._positional_options}
         conf_sec = self.decorator_section_format.format(**{'section': section})
         if conf_sec in self.config.sections:
             if logger.isEnabledFor(logging.DEBUG):
@@ -263,6 +276,7 @@ class ActionCliManager(Dictable):
         self._short_names: Set[str] = set()
         self._fields: Dict[str, OptionMetaData] = {}
         self._actions: Dict[str, ActionCli] = {}
+        self._positional_options: Dict[str, Dict[str, OptionMetaData]] = defaultdict(dict)
         try:
             for app in self.apps:
                 self._add_app(app)
@@ -271,6 +285,7 @@ class ActionCliManager(Dictable):
             del self._actions
             del self._short_names
             del self._fields
+            del self._positional_options
         return actions
 
     @property
