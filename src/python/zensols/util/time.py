@@ -13,6 +13,15 @@ import os
 import signal
 
 time_logger = logging.getLogger(__name__)
+TIMEOUT_DEFAULT = 10
+
+
+class TimeoutError(Exception):
+    """Raised when a time out even occurs in :func:`.timeout` or
+    :class:`.timeprotect`.
+
+    """
+    pass
 
 
 class time(object):
@@ -93,13 +102,6 @@ class time(object):
             self.logger.log(self.level, msg)
         else:
             print(msg)
-
-
-class TimeoutError(Exception):
-    pass
-
-
-TIMEOUT_DEFAULT = 10
 
 
 def timeout(seconds=TIMEOUT_DEFAULT, error_message=os.strerror(errno.ETIME)):
