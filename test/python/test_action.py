@@ -3,6 +3,7 @@ from zensols.cli import (
     ActionCli, ActionCliManager,
     OptionMetaData, ActionMetaData,
     CommandActionSet, ApplicationFactory, Application, ApplicationResult,
+    CommandLineError,
 )
 from logutil import LogTestCase
 import mockapp.log as ml
@@ -163,3 +164,33 @@ class TestActionInvoke(LogTestCase):
         insts = aset.invoke()
         self.assertEqual(1, len(insts))
         self._test_second_action(insts[0])
+
+
+class TestActionMetaConfig(LogTestCase):
+    def test_first_pass_invoke(self):
+        self.cli = ApplicationFactory.instance(
+            'zensols.testapp', 'test-resources/test-app-meta.conf')
+        aset: CommandActionSet = self.cli.create('action1'.split())
+        if 0:
+            print()
+            self.cli.parser.write_help()
+            self.config_logging('zensols.cli')
+        insts = aset.invoke()
+        self.assertEqual(1, len(insts))
+        res: Application = insts[0]
+        self.assertTrue(isinstance(res.instance, ma.TestActionMeta))
+        self.assertEqual(('action1', False), res.result)
+
+        aset: CommandActionSet = self.cli.create('action1 -o'.split())
+        insts = aset.invoke()
+        res: Application = insts[0]
+        self.assertEqual(('action1', True), res.result)
+
+        msg: str = r"^action 'action2' expects 1.*"
+        with self.assertRaisesRegex(CommandLineError, msg):
+            aset: CommandActionSet = self.cli.create('action2'.split())
+
+        aset: CommandActionSet = self.cli.create('action2 nada'.split())
+        insts = aset.invoke()
+        res: Application = insts[0]
+        self.assertEqual(('action2', True), res.result)

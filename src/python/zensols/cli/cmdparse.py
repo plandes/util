@@ -237,7 +237,7 @@ class CommandLineParser(Dictable):
             raise CommandLineError(
                 f"action '{action_meta.name}' expects " +
                 f"{len(action_meta.positional)} " +
-                f'arguments but got {len(op_args)}')
+                f'argument(s) but got {len(op_args)}')
         # if there is more than one second pass action, we must re-parse using
         # the specific options and positional argument for that action
         if second_pass:

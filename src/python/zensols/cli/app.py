@@ -139,7 +139,7 @@ class Application(Dictable):
                 if issubclass(arg.dtype, Enum):
                     val = arg.dtype.__members__[val]
                 if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'meth map: {name} -> {val}')
+                    logger.debug(f'meth map: {meth_meta.name}.{name} -> {val}')
                 meth_params[name] = val
         if pos_arg_count != len(pos_args):
             raise ActionCliError(f'method {meth_meta.name} expects ' +
@@ -204,6 +204,9 @@ class ApplicationFactory(object):
                             'type': 'ini'}})
         return ImportIniConfig(path, children=(app_conf,))
 
+    def _create_config_factory(self, config: Configurable) -> ConfigFactory:
+        return ImportConfigFactory(config)
+
     @persisted('_resources')
     def _create_resources(self) -> \
             Tuple[ConfigFactory, ActionCliManager, CommandLineParser]:
@@ -213,7 +216,7 @@ class ApplicationFactory(object):
                 f"application context resource '{self.app_config_resource}' " +
                 f'not found in {self.package_resource}')
         config = self._get_app_context(path)
-        fac = ImportConfigFactory(config)
+        fac = self._create_config_factory(config)
         cli_mng: ActionCliManager = fac(ActionCliManager.SECTION)
         actions: Tuple[ActionMetaData] = tuple(chain.from_iterable(
             map(lambda a: a.meta_datas, cli_mng.actions.values())))

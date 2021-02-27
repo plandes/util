@@ -111,19 +111,22 @@ class ActionCli(Dictable):
     @persisted('_methods')
     def methods(self) -> Dict[str, ActionCliMethod]:
         meths: Dict[str, ActionCliMethod] = {}
-        omds: Set[OptionMetaData] = set()
+        field_params: Set[OptionMetaData] = set()
         f: ClassField
         for f in self.class_meta.fields.values():
-            self._add_option(f.name, omds)
+            self._add_option(f.name, field_params)
         for name in sorted(self.class_meta.methods.keys()):
             meth = self.class_meta.methods[name]
+            meth_params = set(field_params)
             pos_args: List[PositionalMetaData] = []
             arg: ClassMethodArg
             for arg in meth.args:
                 if arg.is_positional:
                     pos_args.append(PositionalMetaData(arg.name, arg.dtype))
                 else:
-                    self._add_option(arg.name, omds)
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug(f'adding option: {name}:{arg.name}')
+                    self._add_option(arg.name, meth_params)
             if self.mnemonics is not None:
                 name = self.mnemonics.get(name)
                 if name is None:
@@ -137,7 +140,7 @@ class ActionCli(Dictable):
             meta = ActionMetaData(
                 name=name,
                 doc=doc,
-                options=tuple(sorted(omds)),
+                options=tuple(sorted(meth_params)),
                 positional=tuple(pos_args),
                 first_pass=self.first_pass)
             if logger.isEnabledFor(logging.DEBUG):

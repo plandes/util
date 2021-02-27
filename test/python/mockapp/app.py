@@ -43,3 +43,15 @@ class TestAction(Dictable):
         """
         self.invoke_state = (a1, arg0, arg1, arg2, fruit, z)
         return tuple(list(self.invoke_state) + ['r'])
+
+
+@dataclass
+class TestActionMeta(Dictable):
+    """A test app with config metadata.
+
+    """
+    def action1(self, opt1: bool = False):
+        return 'action1', opt1
+
+    def action2(self, pos1: bool):
+        return 'action2', pos1
