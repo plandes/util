@@ -189,7 +189,8 @@ class ActionCliManager(Dictable):
                 doc = meth.doc.params.get(long_name)
         else:
             doc = doc.text
-        doc = DocUtil.normalize(doc)
+        if doc is not None:
+            doc = DocUtil.normalize(doc)
         return OptionMetaData(
             long_name=long_name,
             short_name=short_name,

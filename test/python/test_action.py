@@ -39,7 +39,7 @@ class TestActionSecondPass(LogTestCase):
         self.assertEqual(ml.LogLevel, opt.dtype)
         self.assertEqual(ml.LogLevel.info, opt.default)
         opt: OptionMetaData = meta.options_by_name['defaultlevel']
-        self.assertEqual('f', opt.short_name)
+        self.assertEqual('u', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
         self._test_second_action(self, actions)
 
@@ -52,7 +52,7 @@ class TestActionSecondPass(LogTestCase):
         meta: ActionMetaData = metas[0]
         self.assertEqual('doit', meta.name)
         self.assertEqual('run the test command in the unit test', meta.doc)
-        self.assertEqual(4, len(meta.options))
+        self.assertEqual(5, len(meta.options))
         self.assertEqual(False, meta.first_pass)
         opt: OptionMetaData = meta.options_by_name['arg2']
         self.assertEqual('arg2', opt.long_name)
@@ -104,7 +104,7 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual(tuple('debug error info warning'.split()), op_opt.choices)
         self.assertEqual('info', op_opt.default)
         opt: OptionMetaData = meta.options_by_name['defaultlevel']
-        self.assertEqual('f', opt.short_name)
+        self.assertEqual('u', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
         TestActionSecondPass._test_second_action(self, actions)
 
