@@ -6,9 +6,10 @@ from zensols.cli import (
     ActionCli, ActionCliManager,
     OptionMetaData, ActionMetaData,
     CommandActionSet, ApplicationFactory, Application, ApplicationResult,
-    LogLevel, LogConfigurator,
+#    LogLevel, LogConfigurator,
 )
 from logutil import LogTestCase
+import mockapp.log as ml
 
 
 @dataclass
@@ -70,8 +71,8 @@ class TestActionSecondPass(LogTestCase):
         self.assertEqual('level', opt.long_name)
         self.assertEqual('e', opt.short_name)
         self.assertEqual('level', opt.dest)
-        self.assertEqual(LogLevel, opt.dtype)
-        self.assertEqual(LogLevel.info, opt.default)
+        self.assertEqual(ml.LogLevel, opt.dtype)
+        self.assertEqual(ml.LogLevel.info, opt.default)
         opt: OptionMetaData = meta.options_by_name['defaultlevel']
         self.assertEqual('f', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
@@ -129,8 +130,8 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual('level', opt.long_name)
         self.assertEqual('e', opt.short_name)
         self.assertEqual('level', opt.dest)
-        self.assertEqual(LogLevel, opt.dtype)
-        self.assertEqual(LogLevel.info, opt.default)
+        self.assertEqual(ml.LogLevel, opt.dtype)
+        self.assertEqual(ml.LogLevel.info, opt.default)
         op_opt = opt.create_option()
         self.assertEqual(['--level'], op_opt._long_opts)
         self.assertEqual(['-e'], op_opt._short_opts)
@@ -141,6 +142,12 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual('f', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
         TestActionSecondPass._test_second_action(self, actions)
+
+
+class TestActionInvoke(LogTestCase):
+    def setUp(self):
+        self.cli = ApplicationFactory.instance(
+            'zensols.testapp', 'test-resources/test-app-first-pass.conf')
 
     def test_construct(self):
         #self.config_logging('zensols.cli')
@@ -154,7 +161,7 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual(2, len(insts))
         res: Application = insts[0]
         self.assertEqual(ApplicationResult, type(res))
-        self.assertTrue(isinstance(res.instance, LogConfigurator))
+        self.assertTrue(isinstance(res.instance, ml.LogConfigurator))
         res: Application = insts[1]
         self.assertTrue(isinstance(res.instance, TestAction))
         self.assertEqual((5, 2.0, 5, 'str1x'), res.instance.invoke_state)
