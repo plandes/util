@@ -73,11 +73,13 @@ class TestActionSecondPass(LogTestCase):
         self.assertEqual(ma.Fruit, opt.dtype)
 
         pos = meta.positional
-        self.assertEqual(2, len(pos))
+        self.assertEqual(3, len(pos))
         self.assertEqual('a1', pos[0].name)
         self.assertEqual(str, pos[0].dtype)
         self.assertEqual('arg0', pos[1].name)
         self.assertEqual(float, pos[1].dtype)
+        self.assertEqual('z', pos[2].name)
+        self.assertEqual(ma.Fruit, pos[2].dtype)
 
 
 class TestActionFirstPass(LogTestCase):
@@ -131,7 +133,7 @@ class TestActionInvoke(LogTestCase):
             'zensols.testapp', 'test-resources/test-app-first-pass.conf')
 
     def test_first_pass_invoke(self):
-        aset: CommandActionSet = self.cli.create('one 2 -g 5 -e debug'.split())
+        aset: CommandActionSet = self.cli.create('one 2 apple -g 5 -e debug'.split())
         if 0:
             print()
             self.cli.parser.write_help()
@@ -146,7 +148,7 @@ class TestActionInvoke(LogTestCase):
 
         res: Application = insts[1]
         self.assertTrue(isinstance(res.instance, ma.TestAction))
-        res_params = ('one', 2.0, 5, 'str1x', ma.Fruit.banana)
+        res_params = ('one', 2.0, 5, 'str1x', ma.Fruit.banana, ma.Fruit.apple)
         self.assertEqual(res_params, res.instance.invoke_state)
-        self.assertEqual(('one', 2.0, 5, 'str1x', ma.Fruit.banana, 'r'), res.result)
-        self.assertEqual((str, float, int, str, ma.Fruit), tuple(map(type, res_params)))
+        self.assertEqual(('one', 2.0, 5, 'str1x', ma.Fruit.banana, ma.Fruit.apple, 'r'), res.result)
+        self.assertEqual((str, float, int, str, ma.Fruit, ma.Fruit), tuple(map(type, res_params)))

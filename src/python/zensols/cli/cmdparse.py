@@ -5,6 +5,7 @@ __author__ = 'Paul Landes'
 
 from typing import Tuple, List, Any, Dict, Iterable, Optional
 from dataclasses import dataclass, field
+from enum import Enum
 import logging
 import sys
 from itertools import chain
@@ -168,9 +169,12 @@ class CommandLineParser(Dictable):
     def _parse_positional(self, metas: List[PositionalMetaData],
                           vals: List[str]) -> Tuple[Any]:
         def parse(s: str, t: type) -> Any:
-            if not isinstance(s, (str, int, bool, Path)):
-                raise ValueError(f'unknown parse type: {s}: {t}')
-            return t(s)
+            if issubclass(t, Enum):
+                return t.__members__[s]
+            else:
+                if not isinstance(s, (str, int, bool, Path)):
+                    raise ValueError(f'unknown parse type: {s}: {t}')
+                return t(s)
 
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'parsing positional args: {metas} <--> {vals}')

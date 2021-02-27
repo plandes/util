@@ -20,8 +20,8 @@ class TestAction(Dictable):
     out_path: Path = field(default=None)
     """The output path."""
 
-    def doit(self, a1, arg0: float, arg1: int = 1, arg2: str = 'str1x',
-             fruit: Fruit = Fruit.banana):
+    def doit(self, a1, arg0: float, z: Fruit, arg1: int = 1,
+             arg2: str = 'str1x', fruit: Fruit = Fruit.banana):
         """Run the test
         command
 
@@ -38,6 +38,8 @@ class TestAction(Dictable):
 
         :param fruit: a tasty selection
 
+        :param z: more selectons
+
         """
-        self.invoke_state = (a1, arg0, arg1, arg2, fruit)
+        self.invoke_state = (a1, arg0, arg1, arg2, fruit, z)
         return tuple(list(self.invoke_state) + ['r'])
