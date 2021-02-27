@@ -56,7 +56,8 @@ class ClassImporter(object):
         cname = self.class_name
         match = re.match(self.CLASS_REGEX, cname)
         if not match:
-            raise ValueError(f'not a fully qualified class name: {cname}')
+            raise ClassImporterError(
+                f'not a fully qualified class name: {cname}')
         return match.groups()
 
     def get_module_class(self) -> Tuple[object, type]:
@@ -73,7 +74,8 @@ class ClassImporter(object):
             logger.debug(f'reload: cls: {mod}, {cname}')
             mod = importlib.reload(mod)
         if not hasattr(mod, cname):
-            raise ValueError(f"no class '{cname}' found in module '{mod}'")
+            raise ClassImporterError(
+                f"no class '{cname}' found in module '{mod}'")
         cls = getattr(mod, cname)
         logger.debug(f'class: {cls}')
         return mod, cls
