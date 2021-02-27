@@ -12,6 +12,14 @@ import re
 logger = logging.getLogger(__name__)
 
 
+class ClassImporterError(Exception):
+    """Raised for any run time exceptions during resolving and instantiating
+    classes with :class:`.ClassImporter`.
+
+    """
+    pass
+
+
 class ClassImporter(object):
     """Utility class that reloads a module and instantiates a class from a string
     class name.  This is handy for prototyping code in a Python REPL.
