@@ -46,12 +46,27 @@ class TestAction(Dictable):
 
 
 @dataclass
+class TestActionBool(Dictable):
+    """A test app with config metadata.
+
+    """
+    def action_one(self, opt1: bool = False):
+        return 'action1', opt1
+
+    def action2(self, pos1: bool):
+        return 'action2', pos1
+
+
+@dataclass
 class TestActionMeta(Dictable):
     """A test app with config metadata.
 
     """
-    def action1(self, opt1: bool = False):
-        return 'action1', opt1
+    def good_name(self):
+        return 'good'
 
-    def action2(self, pos1: bool):
+    def bad_method_name(self, opt1: bool = False):
+        return 'bad meth name', opt1
+
+    def another_pythonic_method(self, pos1: bool):
         return 'action2', pos1

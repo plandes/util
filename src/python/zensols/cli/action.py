@@ -131,6 +131,8 @@ class ActionCli(Dictable):
                 name = self.mnemonics.get(name)
                 if name is None:
                     continue
+            else:
+                name = name.replace('_', '')
             if meth.doc is None:
                 doc = self.class_meta.doc
             else:

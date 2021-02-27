@@ -129,9 +129,11 @@ class TestActionFirstPass(LogTestCase):
 
 
 class TestActionInvoke(LogTestCase):
-    def test_first_pass_invoke(self):
+    def setUp(self):
         self.cli = ApplicationFactory.instance(
             'zensols.testapp', 'test-resources/test-app-first-pass.conf')
+
+    def test_first_pass_invoke(self):
         aset: CommandActionSet = self.cli.create('one 2 apple -g 5 -e debug'.split())
         if 0:
             print()
@@ -166,11 +168,11 @@ class TestActionInvoke(LogTestCase):
         self._test_second_action(insts[0])
 
 
-class TestActionMetaConfig(LogTestCase):
+class TestActionBoolean(LogTestCase):
     def test_first_pass_invoke(self):
         self.cli = ApplicationFactory.instance(
-            'zensols.testapp', 'test-resources/test-app-meta.conf')
-        aset: CommandActionSet = self.cli.create('action1'.split())
+            'zensols.testapp', 'test-resources/test-app-bool.conf')
+        aset: CommandActionSet = self.cli.create('actionone'.split())
         if 0:
             print()
             self.cli.parser.write_help()
@@ -178,10 +180,10 @@ class TestActionMetaConfig(LogTestCase):
         insts = aset.invoke()
         self.assertEqual(1, len(insts))
         res: Application = insts[0]
-        self.assertTrue(isinstance(res.instance, ma.TestActionMeta))
+        self.assertTrue(isinstance(res.instance, ma.TestActionBool))
         self.assertEqual(('action1', False), res.result)
 
-        aset: CommandActionSet = self.cli.create('action1 -o'.split())
+        aset: CommandActionSet = self.cli.create('actionone -o'.split())
         insts = aset.invoke()
         res: Application = insts[0]
         self.assertEqual(('action1', True), res.result)
@@ -194,3 +196,14 @@ class TestActionMetaConfig(LogTestCase):
         insts = aset.invoke()
         res: Application = insts[0]
         self.assertEqual(('action2', True), res.result)
+
+
+class TestActionMetaConfig(LogTestCase):
+    def test_first_pass_invoke(self):
+        self.cli = ApplicationFactory.instance(
+            'zensols.testapp', 'test-resources/test-app-meta.conf')
+        #aset: CommandActionSet = self.cli.create('action1'.split())
+        if 1:
+            print()
+            self.cli.parser.write_help()
+            self.config_logging('zensols.cli')
