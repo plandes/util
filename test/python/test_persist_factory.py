@@ -111,7 +111,7 @@ class TestStashFactory(unittest.TestCase):
     def test_with_badkey(self):
         fac = ImportConfigFactory(self.conf)
         self.assertRaises(
-            ValueError, lambda: fac.instance('stash_holder_badkey'))
+            FactoryError, lambda: fac.instance('stash_holder_badkey'))
 
     def test_with_import(self):
         fac = ImportConfigFactory(self.conf)

@@ -20,13 +20,13 @@ from zensols.persist import persisted, PersistedWork, Deallocatable
 logger = logging.getLogger(__name__)
 
 
-class RedefinedInjectionError(ValueError):
+class RedefinedInjectionError(Exception):
     """Raised when any attempt to redefine or reuse injections for a class
     """
     pass
 
 
-class FactoryError(ValueError):
+class FactoryError(Exception):
     """Raised when an object can not be instantianted by a :class:`.ConfigFactory`.
 
     """
