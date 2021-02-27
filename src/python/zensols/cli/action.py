@@ -74,8 +74,6 @@ class ActionCli(Dictable):
 
     """
 
-    positional_options: Dict[str, OptionMetaData] = field(default=None)
-
     mnemonics: Dict[str, str] = field(default=None)
     """The name of the action given on the command line, which defaults to the name
     of the action.
@@ -234,10 +232,7 @@ class ActionCliManager(Dictable):
             arg: ClassMethodArg
             for arg in meth.args:
                 omd = self._create_op_meta_data(arg, meth)
-                if arg.is_positional:
-                    mopts = self._positional_options[meth.name]
-                    mopts[arg.name] = omd
-                else:
+                if not arg.is_positional:
                     self._add_field(action.section, arg.name, omd)
         self._actions[action.section] = action
 
@@ -255,8 +250,7 @@ class ActionCliManager(Dictable):
         meta: Class = inspector.get_class()
         params = {'section': section,
                   'class_meta': meta,
-                  'options': self._fields,
-                  'positional_options': self._positional_options}
+                  'options': self._fields}
         conf_sec = self.decorator_section_format.format(**{'section': section})
         if conf_sec in self.config.sections:
             if logger.isEnabledFor(logging.DEBUG):
@@ -276,7 +270,6 @@ class ActionCliManager(Dictable):
         self._short_names: Set[str] = set()
         self._fields: Dict[str, OptionMetaData] = {}
         self._actions: Dict[str, ActionCli] = {}
-        self._positional_options: Dict[str, Dict[str, OptionMetaData]] = defaultdict(dict)
         try:
             for app in self.apps:
                 self._add_app(app)
@@ -285,7 +278,6 @@ class ActionCliManager(Dictable):
             del self._actions
             del self._short_names
             del self._fields
-            del self._positional_options
         return actions
 
     @property
