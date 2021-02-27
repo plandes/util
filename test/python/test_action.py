@@ -6,7 +6,7 @@ from zensols.cli import (
     ActionCli, ActionCliManager,
     OptionMetaData, ActionMetaData,
     CommandActionSet, ApplicationFactory, Application, ApplicationResult,
-    LogLevel,
+    LogLevel, LogConfigurator,
 )
 from logutil import LogTestCase
 
@@ -151,10 +151,11 @@ class TestActionFirstPass(LogTestCase):
         #aset.write()
         #self.config_logging('zensols.cli')
         insts = aset.invoke()
-        self.assertEqual(1, len(insts))
+        self.assertEqual(2, len(insts))
         res: Application = insts[0]
         self.assertEqual(ApplicationResult, type(res))
-        self.assertTrue(isinstance(res.instance, TestAction))
+        self.assertTrue(isinstance(res.instance, LogConfigurator))
+        res: Application = insts[1]
         self.assertTrue(isinstance(res.instance, TestAction))
         self.assertEqual((5, 2.0, 5, 'str1x'), res.instance.invoke_state)
         self.assertEqual((5, 2.0, 5, 'str1x', 'r'), res.result)

@@ -96,7 +96,13 @@ class Application(Dictable):
         const_params: Dict[str, Any] = {}
         sec = action.section
         for f in action.class_meta.fields.values():
-            val: str = cmd_opts[f.name]
+            val: str = cmd_opts.get(f.name)
+            if val is None:
+                continue
+            # if val is None:
+            #     raise ActionCliError(
+            #         f'field not found for section {action.section} ' +
+            #         f'({action.class_name}): {f.name}')
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'field map: {sec}:{f.name} -> {val}')
             const_params[f.name] = val
@@ -131,7 +137,7 @@ class Application(Dictable):
     def invoke(self) -> Tuple[ApplicationResult]:
         results: List[ApplicationResult] = []
         action: Action
-        for action in self.actions[1:2]:
+        for action in self.actions:
             inst = self._create_instance(action)
             meth_meta: ClassMethod = action.method_meta
             pos_args, meth_params = self._get_meth_params(action, meth_meta)

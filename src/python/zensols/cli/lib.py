@@ -43,9 +43,11 @@ class LogConfigurator(object):
         """
         msg = (f'configuring root logger to {self.default_level} and ' +
                f'{self.log_name} to {self.level}')
+        print()
         print(msg)
-        default = self._to_level(self.default_level)
+        print(type(self.default_level), type(self.level))
+        default = self.to_level(self.default_level)
         logging.basicConfig(level=default)
         if self.log_name is not None:
-            level = self._to_level(self.level)
+            level = self.to_level(self.level)
             logging.getLogger(self.log_name).setLevel(level)
