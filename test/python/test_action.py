@@ -1,46 +1,12 @@
 from typing import Dict
-from dataclasses import dataclass, field
-from pathlib import Path
-from zensols.config import Dictable
 from zensols.cli import (
     ActionCli, ActionCliManager,
     OptionMetaData, ActionMetaData,
     CommandActionSet, ApplicationFactory, Application, ApplicationResult,
-#    LogLevel, LogConfigurator,
 )
 from logutil import LogTestCase
 import mockapp.log as ml
-
-
-@dataclass
-class TestAction(Dictable):
-    """Test command line.
-
-    """
-    dry_run: bool = field(default=False)
-    """When given don't do anything, just act like it."""
-
-    out_path: Path = field(default=None)
-    """The output path."""
-
-    def doit(self, a1, arg0: float, arg1: int = 1, arg2: str = 'str1x'):
-        """Run the test
-        command
-
-        in the unit test
-
-        :param a1: first arg doc
-
-        :param arg0: second arg doc
-
-        :param arg1: third arg
-                     doc
-
-        :param arg2: forth arg doc
-
-        """
-        self.invoke_state = (arg1, arg0, arg1, arg2)
-        return tuple(list(self.invoke_state) + ['r'])
+import mockapp.app as ma
 
 
 class TestActionSecondPass(LogTestCase):
@@ -163,6 +129,6 @@ class TestActionInvoke(LogTestCase):
         self.assertEqual(ApplicationResult, type(res))
         self.assertTrue(isinstance(res.instance, ml.LogConfigurator))
         res: Application = insts[1]
-        self.assertTrue(isinstance(res.instance, TestAction))
+        self.assertTrue(isinstance(res.instance, ma.TestAction))
         self.assertEqual((5, 2.0, 5, 'str1x'), res.instance.invoke_state)
         self.assertEqual((5, 2.0, 5, 'str1x', 'r'), res.result)
