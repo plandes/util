@@ -36,6 +36,8 @@ class TestAction(Dictable):
 
         :param arg2: forth arg doc
 
+        :param fruit: a tasty selection
+
         """
         self.invoke_state = (a1, arg0, arg1, arg2)
         return tuple(list(self.invoke_state) + ['r'])

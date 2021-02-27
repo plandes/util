@@ -49,17 +49,29 @@ class TestActionSecondPass(LogTestCase):
         self.assertEqual('test', test.section)
         metas = test.meta_datas
         self.assertEqual(1, len(metas))
+
         meta: ActionMetaData = metas[0]
         self.assertEqual('doit', meta.name)
         self.assertEqual('run the test command in the unit test', meta.doc)
         self.assertEqual(5, len(meta.options))
         self.assertEqual(False, meta.first_pass)
+
         opt: OptionMetaData = meta.options_by_name['arg2']
         self.assertEqual('arg2', opt.long_name)
         self.assertEqual('2', opt.short_name)
         self.assertEqual('str1x', opt.default)
         self.assertEqual('STRING', opt.metavar)
         self.assertEqual(str, opt.dtype)
+
+        opt: OptionMetaData = meta.options_by_name['fruit']
+        self.assertEqual('f', opt.short_name)
+        self.assertEqual('a tasty selection', opt.doc)
+        self.assertEqual('<apple|banana>', opt.metavar)
+        self.assertEqual(('apple', 'banana'), opt.choices)
+        self.assertEqual('fruit', opt.dest)
+        self.assertEqual(ma.Fruit.banana, opt.default)
+        self.assertEqual(ma.Fruit, opt.dtype)
+
         pos = meta.positional
         self.assertEqual(2, len(pos))
         self.assertEqual('a1', pos[0].name)
@@ -86,11 +98,13 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual('log_action', log.section)
         metas = log.meta_datas
         self.assertEqual(1, len(metas))
+
         meta: ActionMetaData = metas[0]
         self.assertEqual('configlog', meta.name)
         self.assertEqual('configure the log system', meta.doc)
         self.assertEqual(2, len(meta.options))
         self.assertEqual(True, meta.first_pass)
+
         opt: OptionMetaData = meta.options_by_name['level']
         self.assertEqual('level', opt.long_name)
         self.assertEqual('e', opt.short_name)
@@ -103,9 +117,11 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual('choice', op_opt.type)
         self.assertEqual(tuple('debug error info warning'.split()), op_opt.choices)
         self.assertEqual('info', op_opt.default)
+
         opt: OptionMetaData = meta.options_by_name['defaultlevel']
         self.assertEqual('u', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
+
         TestActionSecondPass._test_second_action(self, actions)
 
 
@@ -116,7 +132,7 @@ class TestActionInvoke(LogTestCase):
 
     def test_first_pass_invoke(self):
         aset: CommandActionSet = self.cli.create('one 2 -g 5 -e debug'.split())
-        if 1:
+        if 0:
             print()
             self.cli.parser.write_help()
             self.config_logging('zensols.cli')
