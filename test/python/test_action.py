@@ -128,11 +128,9 @@ class TestActionFirstPass(LogTestCase):
 
 
 class TestActionInvoke(LogTestCase):
-    def setUp(self):
+    def test_first_pass_invoke(self):
         self.cli = ApplicationFactory.instance(
             'zensols.testapp', 'test-resources/test-app-first-pass.conf')
-
-    def test_first_pass_invoke(self):
         aset: CommandActionSet = self.cli.create('one 2 apple -g 5 -e debug'.split())
         if 0:
             print()
@@ -145,10 +143,23 @@ class TestActionInvoke(LogTestCase):
         self.assertTrue(isinstance(res.instance, ml.LogConfigurator))
         self.assertEqual((None, ml.LogLevel.debug, ml.LogLevel.warning),
                          res.result)
+        self._test_second_action(insts[1])
 
-        res: Application = insts[1]
+    def _test_second_action(self, res: Application):
         self.assertTrue(isinstance(res.instance, ma.TestAction))
         res_params = ('one', 2.0, 5, 'str1x', ma.Fruit.banana, ma.Fruit.apple)
         self.assertEqual(res_params, res.instance.invoke_state)
         self.assertEqual(('one', 2.0, 5, 'str1x', ma.Fruit.banana, ma.Fruit.apple, 'r'), res.result)
         self.assertEqual((str, float, int, str, ma.Fruit, ma.Fruit), tuple(map(type, res_params)))
+
+    def test_second_pass_invoke(self):
+        self.cli = ApplicationFactory.instance(
+            'zensols.testapp', 'test-resources/test-app-sec-pass.conf')
+        aset: CommandActionSet = self.cli.create('doit one 2 apple -g 5'.split())
+        if 0:
+            print()
+            self.cli.parser.write_help()
+            self.config_logging('zensols.cli')
+        insts = aset.invoke()
+        self.assertEqual(1, len(insts))
+        self._test_second_action(insts[0])
