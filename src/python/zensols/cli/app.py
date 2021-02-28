@@ -116,9 +116,9 @@ class Application(Dictable):
                         f'no param for section {action.section} ' +
                         f'({action.class_name}): {f.name}')
             else:
-                # convert a string option value to an enumerated value
-                if issubclass(f.dtype, Enum):
-                    val = f.dtype.__members__[val]
+                # # convert a string option value to an enumerated value
+                # if issubclass(f.dtype, Enum):
+                #     val = f.dtype.__members__[val]
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(
                         f'field map: {sec}:{f.name} -> {val} ({f.dtype})')
@@ -155,8 +155,8 @@ class Application(Dictable):
                         f'no such option {name} parsed from CLI for ' +
                         f'method from {cmd_opts}: {meth_meta.name}')
                 val: str = cmd_opts.get(name)
-                if issubclass(arg.dtype, Enum):
-                    val = arg.dtype.__members__[val]
+                # if issubclass(arg.dtype, Enum):
+                #     val = arg.dtype.__members__[val]
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'meth map: {meth_meta.name}.{name} -> {val}')
                 meth_params[name] = val

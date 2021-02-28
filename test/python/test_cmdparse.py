@@ -298,7 +298,7 @@ test                a test action
         action = actions.second_pass_action
         self.assertEqual('prconfig', action.name)
         self.assertEqual((Path('b.txt'),), action.positional)
-        self.assertEqual({'config': 'c.conf'}, action.options)
+        self.assertEqual({'config': Path('c.conf')}, action.options)
         self.assertEqual(1, len(actions.first_pass_actions))
         whine = actions.first_pass_actions[0]
         self.assertEqual(CommandAction, type(whine))
@@ -323,7 +323,7 @@ test                a test action
         self.assertEqual(1, len(action_set.first_pass_actions))
         action: CommandAction = action_set.first_pass_actions[0]
         self.assertEqual('config', action.name)
-        self.assertEqual({'config': 'c.conf'}, action.options)
+        self.assertEqual({'config': Path('c.conf')}, action.options)
         action: CommandAction = action_set.second_pass_action
         self.assertEqual('env', action.name)
         self.assertEqual((Path('b.txt'),), action.positional)
@@ -334,7 +334,7 @@ test                a test action
         self.assertEqual(1, len(action_set.first_pass_actions))
         action: CommandAction = action_set.first_pass_actions[0]
         self.assertEqual('config', action.name)
-        self.assertEqual({'config': 'c.conf'}, action.options)
+        self.assertEqual({'config': Path('c.conf')}, action.options)
         action: CommandAction = action_set.second_pass_action
         self.assertEqual('env', action.name)
         self.assertEqual((Path('b.txt'),), action.positional)

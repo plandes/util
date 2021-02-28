@@ -103,7 +103,8 @@ class CommandLineParser(Dictable):
     :see :obj:`.ActionMetaData.first_pass`
 
     """
-    config: CommandLineConfig
+    config: CommandLineConfig = field()
+    """Configures the command line parser with the action meta data."""
 
     version: str = field(default='v0')
     """The version of the application, which is used in the help and the
@@ -166,21 +167,34 @@ class CommandLineParser(Dictable):
         parser = self._get_first_pass_parser(False)
         parser.print_help(file=writer)
 
+    def _parse_type(self, s: str, t: type) -> Any:
+        if issubclass(t, Enum):
+            return t.__members__[s]
+        else:
+            if not isinstance(s, (str, int, bool, Path)):
+                raise ValueError(f'unknown parse type: {s}: {t}')
+            try:
+                return t(s)
+            except ValueError as e:
+                raise CommandLineError(f'expecting type {t.__name__}: {e}')
+
+    def _parse_options(self, action_meta: ActionMetaData,
+                       op_args: Dict[str, Any]):
+        opts = action_meta.options_by_dest
+        parsed = {}
+        for k, v in op_args.items():
+            opt = opts.get(k)
+            if v is not None and opt is not None:
+                v = self._parse_type(v, opt.dtype)
+            parsed[k] = v
+        return parsed
+
     def _parse_positional(self, metas: List[PositionalMetaData],
                           vals: List[str]) -> Tuple[Any]:
-        def parse(s: str, t: type) -> Any:
-            if issubclass(t, Enum):
-                return t.__members__[s]
-            else:
-                if not isinstance(s, (str, int, bool, Path)):
-                    raise ValueError(f'unknown parse type: {s}: {t}')
-                try:
-                    return t(s)
-                except ValueError as e:
-                    raise CommandLineError(f'expecting type {t.__name__}: {e}')
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'parsing positional args: {metas} <--> {vals}')
-        return tuple(map(lambda x: parse(x[0], x[1].dtype), zip(vals, metas)))
+        return tuple(map(lambda x: self._parse_type(x[0], x[1].dtype),
+                         zip(vals, metas)))
 
     def _parse_first_pass(self, args: List[str],
                           actions: List[CommandAction]) -> \
@@ -197,7 +211,7 @@ class CommandLineParser(Dictable):
             logger.debug(f'first pass: {options}:{op_args}')
         # find first pass actions (i.e. whine log level '-w' settings)
         added_first_pass = set()
-        fp_ops = self.config.first_pass_by_option
+        fp_ops: Dict[str, ActionMetaData] = self.config.first_pass_by_option
         for k, v in options.items():
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'looking for first pass option: {k} in {tuple(fp_ops.keys())}')
@@ -205,6 +219,7 @@ class CommandLineParser(Dictable):
             if (fp_action_meta is not None) and \
                (fp_action_meta.name not in added_first_pass):
                 aos = {k: options[k] for k in (set(options.keys()) & fp_opts)}
+                aos = self._parse_options(fp_action_meta, aos)
                 action = CommandAction(fp_action_meta, aos, ())
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'adding first pass action: {action}')
@@ -236,9 +251,10 @@ class CommandLineParser(Dictable):
                            args: List[str], options: Dict[str, Any],
                            op_args: Tuple[str]):
         # now that we have parsed the action name, get the meta data
-        action_meta = self.config.actions_by_name.get(action_name)
+        action_meta: ActionMetaData = \
+            self.config.actions_by_name.get(action_name)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f"action '{action_name}' found: {action_meta}")
+            logger.debug(f"action '{action_name}' found: {action_meta.name}")
         if action_meta is None:
             raise CommandLineError(f'no such action: {action_name}')
         if len(action_meta.positional) != len(op_args):
@@ -252,12 +268,13 @@ class CommandLineParser(Dictable):
             parser: OptionParser = self._get_second_pass_parser(action_meta)
             (options, op_args) = parser.parse_args(args)
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'second pass: {options}:{op_args}')
+                logger.debug(f'second pass opts: {options}:{op_args}')
             # sanity check to match parsed mnemonic and action name
             assert(op_args[0] == action_meta.name)
             # remove the action name
             op_args = op_args[1:]
             options = vars(options)
+        options = self._parse_options(action_meta, options)
         return action_meta, options, op_args
 
     def parse(self, args: List[str]) -> CommandActionSet:

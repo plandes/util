@@ -136,11 +136,11 @@ class TestActionInvoke(LogTestCase):
             'zensols.testapp', 'test-resources/test-app-first-pass.conf')
 
     def test_first_pass_invoke(self):
+        #self.config_logging('zensols.cli')
         aset: CommandActionSet = self.cli.create('one 2 apple -g 5 -e debug'.split())
         if 0:
             print()
             self.cli.parser.write_help()
-            self.config_logging('zensols.cli')
         insts = aset.invoke()
         self.assertEqual(2, len(insts))
         res: Application = insts[0]

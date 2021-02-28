@@ -3,9 +3,11 @@
 """
 __author__ = 'Paul Landes'
 
+from typing import Type
 from dataclasses import dataclass, field
-import logging
 from enum import Enum
+import logging
+import re
 from pathlib import Path
 from zensols.config import ConfigFactory
 
@@ -30,7 +32,7 @@ class LogConfigurator(object):
     level: LogLevel = field(default=LogLevel.info)
     """The level to set the application logger."""
 
-    default_level: str = field(default='warning')
+    default_level: str = field(default=LogLevel.warning)
     """The level to set the root logger."""
 
     def to_level(self, s: str) -> int:
@@ -47,9 +49,7 @@ class LogConfigurator(object):
         """
         msg = (f'configuring root logger to {self.default_level} and ' +
                f'{self.log_name} to {self.level}')
-        print()
-        print(msg)
-        print(type(self.default_level), type(self.level))
+        logger.info(msg)
         default = self.to_level(self.default_level)
         logging.basicConfig(level=default)
         if self.log_name is not None:
@@ -62,14 +62,28 @@ class AddConfig(object):
     CLI_META = {'first_pass': True,
                 'option_overrides': {'config_path': {'long_name': 'config',
                                                      'short_name': 'c'}}}
+    FILE_EXT_REGEXP = re.compile(r'.+\.([a-zA-Z]+)$')
 
     config_factory: ConfigFactory
 
-    def add(self, config_path: Path = None):
+    config_path: Path = field(default=None)
+    """The path to the configuration file."""
+
+    def _class_for_path(self):
+        ext = self.config_path.name
+        m = self.FILE_EXT_REGEXP.match(ext)
+        if m is not None:
+            ext = m.group(1)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"using extension to map: '{ext}'")
+        return ext
+
+    def add(self):
         """Add configuration at path to the current configuration.
 
         :param config_path: the path to the configuration file
 
         """
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'reading configuration from {config_path}')
+            logger.debug(f'reading configuration from {self.config_path})')
+        cls: Type[ConfigFactory] = self._class_for_path()
