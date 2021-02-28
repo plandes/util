@@ -96,6 +96,15 @@ class ActionCli(Dictable):
     option_excludes: Set[str] = field(default_factory=set)
     """A list of options to exclude, or none if ``None``."""
 
+    option_overrides: Dict[str, Dict[str, str]] = field(default=None)
+    """Overrides when creating new :class:`.OptionMetaData` where the keys are the
+    option names (field or method parameter) and the values are the dict that
+    clobbers respective keys.
+
+    :see: :meth:`.ActionCliManager._create_op_meta_data`
+
+    """
+
     first_pass: bool = field(default=False)
     """Whether or not this is a first pass action (i.e. such as setting the level
     in :class:`~zensols.cli.LogConfigurator`).
@@ -221,8 +230,8 @@ class ActionCliManager(Dictable):
                 self._short_names.add(c)
                 return c
 
-    def _create_op_meta_data(self, pmeta: ClassParam,
-                             meth: ClassMethod) -> OptionMetaData:
+    def _create_op_meta_data(self, pmeta: ClassParam, meth: ClassMethod,
+                             action_cli: ActionCli) -> OptionMetaData:
         """Creates an option meta data used in the CLI from a method parsed from the
         class's Python source code.
 
@@ -239,13 +248,17 @@ class ActionCliManager(Dictable):
             doc = doc.text
         if doc is not None:
             doc = DocUtil.normalize(doc)
-        meta = OptionMetaData(
-            long_name=long_name,
-            short_name=short_name,
-            dest=dest,
-            dtype=dtype,
-            default=pmeta.default,
-            doc=doc)
+        params = {
+            'long_name': long_name,
+            'short_name': short_name,
+            'dest': dest,
+            'dtype': dtype,
+            'default': pmeta.default,
+            'doc': doc
+        }
+        if action_cli.option_overrides is not None:
+            params.update(action_cli.option_overrides)
+        meta = OptionMetaData(**params)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'created option meta: {meta}')
         return meta
@@ -272,16 +285,16 @@ class ActionCliManager(Dictable):
         if action.section in self._actions:
             raise ActionCliError(
                 f'duplicate action for section: {action.section}')
-        # for each dataclass field add that field 
+        # for each dataclass field used to create OptionMetaData's
         for name, fmd in action.class_meta.fields.items():
-            omd = self._create_op_meta_data(fmd, None)
+            omd = self._create_op_meta_data(fmd, None, action)
             self._add_field(action.section, fmd.name, omd)
         meth: ClassMethod
         # add a field for the arguments of each method
         for meth in action.class_meta.methods.values():
             arg: ClassMethodArg
             for arg in meth.args:
-                omd = self._create_op_meta_data(arg, meth)
+                omd = self._create_op_meta_data(arg, meth, action)
                 # positional arguments are only referenced in the
                 # ClassInspector parsed source code
                 if not arg.is_positional:
