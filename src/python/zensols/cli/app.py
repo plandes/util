@@ -83,13 +83,6 @@ class Action(Dictable):
         """
         return self.method_meta.name
 
-    # @property
-    # def action_meta_data(self) -> ActionMetaData:
-    #     """Return the action meta data for the method.
-
-    #     """
-    #     return self.action_cli.methods[self.method_name].action_meta_data
-
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
         return map(lambda f: (f, f),
                    'section class_name method_name command_action'.split())
@@ -307,30 +300,14 @@ class ApplicationFactory(object):
         """
         return self._create_resources()[1]
 
-    def _find_missing(self, action_clis: Dict[str, ActionCli],
-                      action_set: CommandActionSet) -> List[ActionCli]:
-        """Find applications given in the configuration, but not parsed/present as meta
-        data.
-
-        """
-        missing: str = (set(action_clis.keys()) -
-                        set(map(lambda ca: ca.name, action_set.actions)))
-        missing_acts: List[ActionCli] = []
-        action_cli: ActionCli
-        for action_cli in map(lambda nm: action_clis[nm], missing):
-            missing_acts.append(action_cli)
-            meta: ActionMetaData
-            for meta in action_cli.meta_datas:
-                logger.debug(f'missing application with meta: {meta}')
-        return missing_acts
-
     def _parse(self, args: List[str]) -> Tuple[Action]:
         fac, cli_mng, parser = self._create_resources()
         actions: List[Action] = []
         action_set: CommandActionSet = parser.parse(args)
         action_clis: Dict[str, ActionCli] = cli_mng.actions_by_meta_data_name
-        # self._find_missing(action_clis, action_set)
         caction: CommandAction
+        # create an action (coupled with meta data) for each command line
+        # parsed action
         for caction in action_set.actions:
             name = caction.meta_data.name
             if logger.isEnabledFor(logging.DEBUG):
