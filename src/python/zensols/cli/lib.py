@@ -73,8 +73,8 @@ class AddConfig(ApplicationObserver):
                 'option_overrides': {CONFIG_PATH_FIELD: {'long_name': 'config',
                                                          'short_name': 'c'}},
                 'option_includes': {'config_path'}}
-    FILE_EXT_REGEX = re.compile(r'.+\.([a-zA-Z]+)$')
-    ENVIRON_VAR_REGEX = re.compile(r'^.+\.([a-z]+)$')
+    FILE_EXT_REGEX = re.compile(r'.+\.([a-zA-Z]+?)$')
+    ENVIRON_VAR_REGEX = re.compile(r'^.+\.([a-z]+?)$')
     CONFIG_FACTORIES = {'conf': 'ImportIniConfig',
                         'yml': 'YamlConfig',
                         'json': 'JsonConfig'}
