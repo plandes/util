@@ -6,7 +6,6 @@ from __future__ import annotations
 from typing import Dict, Tuple, Iterable, Set, List
 from dataclasses import dataclass, field
 import dataclasses
-from collections import defaultdict
 import logging
 from zensols.persist import persisted
 from zensols.introspect import (
@@ -46,15 +45,25 @@ class DocUtil(object):
 
 @dataclass
 class ActionCliMethod(Dictable):
-    """A "married" action meta data / class method pair.
+    """A "married" action meta data / class method pair.  This is a pair of action
+    meta data that describes how to interpret it as a CLI action and the Python
+    class meta data method, which is used later to invoke the action (really
+    command).
 
     """
     action_meta_data: ActionMetaData = field()
+    """The action meta data for ``method``."""
+
     method: ClassMethod = field(repr=False)
+    """The method containing information about the source class method to invoke
+    later.
+
+    """
 
 
 @dataclass
 class ActionCli(Dictable):
+
     """A set of commands that is invokeable on the command line, one for each
     registered method of a class (usually a :class:`dataclasses.dataclass`.
     This contains meta data necesary to create a full usage command line
