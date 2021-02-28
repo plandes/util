@@ -67,7 +67,7 @@ class LogConfigurator(object):
 
 
 @dataclass
-class AddConfig(ApplicationObserver):
+class ConfigurationImporter(ApplicationObserver):
     CONFIG_PATH_FIELD = 'config_path'
     CLI_META = {'first_pass': True,
                 'option_overrides': {CONFIG_PATH_FIELD: {'long_name': 'config',
@@ -91,12 +91,9 @@ class AddConfig(ApplicationObserver):
 
     """
 
+    # name of this field must match :obj:`CONFIG_PATH_FIELD`
     config_path: Path = field(default=None)
-    """The path to the configuration file.
-
-    The name of this field must match :obj:`CONFIG_PATH_FIELD`.
-
-    """
+    """The path to the configuration file."""
 
     def _get_environ_var_from_app(self) -> str:
         pkg_res: PackageResource = self._app.factory.package_resource

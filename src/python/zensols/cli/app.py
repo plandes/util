@@ -123,6 +123,9 @@ class ActionResult(Dictable):
     def name(self) -> str:
         return self.action.name
 
+    def __call__(self):
+        return self.result
+
 
 @dataclass
 class ApplicationResult(Dictable):
@@ -142,6 +145,9 @@ class ApplicationResult(Dictable):
                                 self.action_results))
         assert(len(sec_pass) == 1)
         return sec_pass[0]
+
+    def __call__(self) -> ActionResult:
+        return self.second_pass_result
 
     def __getitem__(self, index: int) -> ActionResult:
         return self.action_results[index]
