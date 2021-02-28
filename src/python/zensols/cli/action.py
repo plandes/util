@@ -129,6 +129,8 @@ class ActionCli(Dictable):
             self._add_option(f.name, field_params)
         # create an action from each method
         for name in sorted(self.class_meta.methods.keys()):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'creating method {name}')
             meth = self.class_meta.methods[name]
             meth_params = set(field_params)
             pos_args: List[PositionalMetaData] = []
@@ -225,8 +227,9 @@ class ActionCliManager(Dictable):
         class's Python source code.
 
         """
-        long_name = pmeta.name.replace('_', '')
+        long_name = pmeta.name
         short_name = self._create_short_name(long_name)
+        dest = pmeta.name.replace('_', '')
         dtype = pmeta.dtype
         doc = pmeta.doc
         if doc is None:
@@ -236,13 +239,16 @@ class ActionCliManager(Dictable):
             doc = doc.text
         if doc is not None:
             doc = DocUtil.normalize(doc)
-        return OptionMetaData(
+        meta = OptionMetaData(
             long_name=long_name,
             short_name=short_name,
-            dest=pmeta.name,
+            dest=dest,
             dtype=dtype,
             default=pmeta.default,
             doc=doc)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'created option meta: {meta}')
+        return meta
 
     def _add_field(self, section: str, name: str, omd: OptionMetaData):
         """Adds the field by name that will later be used in a :class:`.ActionCli`.
