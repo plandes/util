@@ -87,8 +87,6 @@ class TestActionConfigured(Dictable):
     """A test app to be configured.
 
     """
-    CLI_META = {'option_excludes': {'a_stash'}}
-
     a_stash: Stash
 
     def do_it(self):
