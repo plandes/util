@@ -22,10 +22,12 @@ logger = logging.getLogger(__name__)
 
 
 class LogLevel(Enum):
+    notset = logging.NOTSET
     debug = logging.DEBUG
     info = logging.INFO
     warning = logging.WARNING
     error = logging.ERROR
+    critical = logging.CRITICAL
 
 
 @dataclass
@@ -79,7 +81,7 @@ class AddConfig(ApplicationObserver):
 
     config: Configurable
 
-    expect_path: bool = field(default=True)
+    expect: bool = field(default=True)
     """If ``True``, raise an :class:`.ActionCliError` if the option is not given.
 
     """
@@ -144,6 +146,7 @@ class AddConfig(ApplicationObserver):
         :param config_path: the path to the configuration file
 
         """
+        load_config = True
         if self.config_path is None:
             name: str = self._get_environ_var_from_app()
             if logger.isEnabledFor(logging.DEBUG):
@@ -151,7 +154,11 @@ class AddConfig(ApplicationObserver):
             val: str = os.environ.get(name)
             if val is not None:
                 self.config_path = Path(val)
-            elif self.expect_path:
-                lopt = self._get_config_option()
-                raise ActionCliError(f'missing option {lopt}')
-        self._load()
+            else:
+                if self.expect:
+                    lopt = self._get_config_option()
+                    raise ActionCliError(f'missing option {lopt}')
+                else:
+                    load_config = False
+        if load_config:
+            self._load()

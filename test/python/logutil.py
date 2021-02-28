@@ -18,6 +18,5 @@ class LogTestCase(unittest.TestCase):
         LogUtil.reset()
 
     def config_logging(self, name: str):
-        print()
-        logging.basicConfig(level=logging.WARNING)
+        logging.basicConfig(level=logging.ERROR)
         logging.getLogger(name).setLevel(logging.DEBUG)

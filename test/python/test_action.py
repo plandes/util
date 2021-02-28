@@ -1,11 +1,14 @@
 from typing import Dict
 import sys
+import logging
 from io import StringIO
+from zensols.util.log import loglevel
+from zensols.config import ConfigurableError
 from zensols.cli import (
     ActionCli, ActionCliError, ActionCliManager,
     OptionMetaData, ActionMetaData,
     CommandActionSet, ApplicationFactory, Application, ApplicationResult,
-    CommandLineError,
+    CommandLineError
 )
 from logutil import LogTestCase
 import mockapp.log as ml
@@ -268,10 +271,12 @@ class TestActionConfigAction(LogTestCase):
             print()
             self.cli.parser.write_help()
             self.config_logging('zensols.cli')
-        aset: CommandActionSet = self.cli.create('-c test-resources/stash-factory.conf'.split())
+        aset: CommandActionSet = self.cli.create(
+            '-c test-resources/stash-factory.conf'.split())
         insts = aset.invoke()
         res: Application = insts[-1]
-        self.assertEqual(('test app res', ('0', '1', '2', '3', '4')), res.result)
+        self.assertEqual(('test app res', ('0', '1', '2', '3', '4')),
+                         res.result)
 
     def test_missing_config(self):
         self.cli = ApplicationFactory.instance(
@@ -281,5 +286,19 @@ class TestActionConfigAction(LogTestCase):
             self.cli.parser.write_help()
             self.config_logging('zensols.cli')
         aset: CommandActionSet = self.cli.create([])
-        with self.assertRaisesRegex(ActionCliError, '^missing option --config$'):
-            insts = aset.invoke()
+        errmsg = r'^missing option --config$'
+        with self.assertRaisesRegex(ActionCliError, errmsg):
+            aset.invoke()
+
+    def test_missing_config_ok(self):
+        self.cli = ApplicationFactory.instance(
+            'zensols.testapp', 'test-resources/test-app-config-skip.conf')
+        if 0:
+            print()
+            self.cli.parser.write_help()
+            self.config_logging('zensols.cli')
+        aset: CommandActionSet = self.cli.create([])
+        errmsg = r'^no section: range1_stash$'
+        with loglevel('zensols.config.factory', logging.CRITICAL):
+            with self.assertRaisesRegex(ConfigurableError, errmsg):
+                aset.invoke()
