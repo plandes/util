@@ -7,8 +7,8 @@ from zensols.config import ConfigurableError
 from zensols.cli import (
     ActionCli, ActionCliError, ActionCliManager,
     OptionMetaData, ActionMetaData,
-    CommandActionSet, ApplicationFactory, Application, ApplicationResult,
-    CommandLineError
+    CommandLineError, CommandActionSet,
+    ApplicationFactory, Application, ActionResult, ApplicationResult,
 )
 from logutil import LogTestCase
 import mockapp.log as ml
@@ -147,7 +147,7 @@ class TestActionInvoke(LogTestCase):
         insts = aset.invoke()
         self.assertEqual(2, len(insts))
         res: Application = insts[0]
-        self.assertEqual(ApplicationResult, type(res))
+        self.assertEqual(ActionResult, type(res))
         self.assertTrue(isinstance(res.instance, ml.LogConfigurator))
         self.assertEqual((None, ml.LogLevel.debug, ml.LogLevel.warning),
                          res.result)
@@ -253,8 +253,10 @@ class TestActionMetaConfig(LogTestCase):
             print()
             self.cli.parser.write_help()
             self.config_logging('zensols.cli')
-        insts = aset.invoke()
-        res: Application = insts[0]
+        ares: ApplicationResult = aset.invoke()
+        self.assertEqual(1, len(ares))
+        res: ActionResult = ares[0]
+        self.assertEqual(ActionResult, type(res))
         self.assertEqual(('bad meth name', True), res.result)
 
         aset: CommandActionSet = self.cli.create('act4 nada'.split())
@@ -271,10 +273,15 @@ class TestActionConfigAction(LogTestCase):
             print()
             self.cli.parser.write_help()
             self.config_logging('zensols.cli')
-        aset: CommandActionSet = self.cli.create(
+        aset: Application = self.cli.create(
             '-c test-resources/stash-factory.conf'.split())
-        insts = aset.invoke()
-        res: Application = insts[-1]
+        self.assertEqual(Application, type(aset))
+        ares: ApplicationResult = aset.invoke()
+        self.assertEqual(2, len(ares))
+        self.assertEqual(ActionResult, type(ares.second_pass_result))
+        res: ActionResult = ares[-1]
+        self.assertEqual(ares.second_pass_result, res)
+        self.assertEqual(ActionResult, type(res))
         self.assertEqual(('test app res', ('0', '1', '2', '3', '4')),
                          res.result)
 
@@ -285,7 +292,8 @@ class TestActionConfigAction(LogTestCase):
             print()
             self.cli.parser.write_help()
             self.config_logging('zensols.cli')
-        aset: CommandActionSet = self.cli.create([])
+        aset: Application = self.cli.create([])
+        self.assertEqual(Application, type(aset))
         errmsg = r'^missing option --config$'
         with self.assertRaisesRegex(ActionCliError, errmsg):
             aset.invoke()
@@ -297,7 +305,8 @@ class TestActionConfigAction(LogTestCase):
             print()
             self.cli.parser.write_help()
             self.config_logging('zensols.cli')
-        aset: CommandActionSet = self.cli.create([])
+        aset: Application = self.cli.create([])
+        self.assertEqual(Application, type(aset))
         errmsg = r'^no section: range1_stash$'
         with loglevel('zensols.config.factory', logging.CRITICAL):
             with self.assertRaisesRegex(ConfigurableError, errmsg):

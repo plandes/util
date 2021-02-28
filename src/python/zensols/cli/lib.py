@@ -108,7 +108,7 @@ class AddConfig(ApplicationObserver):
         return name
 
     def _get_config_option(self) -> str:
-        ameta: ActionMetaData = self._action.action_meta_data
+        ameta: ActionMetaData = self._action.meta_data
         ometa: OptionMetaData = ameta.options_by_dest[self.CONFIG_PATH_FIELD]
         return ometa.long_option
 

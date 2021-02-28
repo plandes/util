@@ -43,10 +43,10 @@ class Action(Dictable):
 
     """
 
-    action_cli: ActionCli = field()
+    cli: ActionCli = field()
     """Command line interface of the action meta data."""
 
-    action_meta_data: ActionMetaData = field()
+    meta_data: ActionMetaData = field()
     """An action represents a link between a command line mnemonic *action* and a
     method on a class to invoke.
 
@@ -58,16 +58,26 @@ class Action(Dictable):
     """
 
     @property
+    @persisted('_name')
+    def name(self) -> str:
+        """The name of the action, which is the form:
+
+          ``<action's section name>.<meta data's name>``
+
+        """
+        return f'{self.cli.section}.{self.meta_data.name}'
+
+    @property
     def section(self) -> str:
         """The section from which the :class:`.ActionCli` was created."""
-        return self.action_cli.section
+        return self.cli.section
 
     @property
     def class_meta(self) -> Class:
         """The meta data of the action, which comes from :class:`.ActionCli`.
 
         """
-        return self.action_cli.class_meta
+        return self.cli.class_meta
 
     @property
     def class_name(self) -> str:
@@ -96,15 +106,48 @@ class Action(Dictable):
 
 
 @dataclass
-class ApplicationResult(Dictable):
-    """The results of an application invocation with :meth:`.Application.invoke`.
+class ActionResult(Dictable):
+    """The results of a single method call to an :class:`.Action` instance.
 
     """
+    action: Action = field()
+    """The action that was used to generate the result."""
+
     instance: Any = field()
     """The application instance."""
 
     result: Any = field()
     """The results returned from the invocation on the application instance."""
+
+    @property
+    def name(self) -> str:
+        return self.action.name
+
+
+@dataclass
+class ApplicationResult(Dictable):
+    """The results of an application invocation with :meth:`.Application.invoke`.
+
+    """
+    action_results: Tuple[ActionResult]
+
+    @property
+    @persisted('_by_name')
+    def by_name(self) -> Dict[str, ActionResult]:
+        return {a.name: a for a in self}
+
+    @property
+    def second_pass_result(self) -> ActionResult:
+        sec_pass = tuple(filter(lambda r: not r.action.meta_data.first_pass,
+                                self.action_results))
+        assert(len(sec_pass) == 1)
+        return sec_pass[0]
+
+    def __getitem__(self, index: int) -> ActionResult:
+        return self.action_results[index]
+
+    def __len__(self) -> int:
+        return len(self.action_results)
 
 
 class ApplicationObserver(ABC):
@@ -205,11 +248,11 @@ class Application(Dictable):
                                  f'{pos_arg_count} but got {len(pos_args)}')
         return pos_args, meth_params
 
-    def invoke(self) -> Tuple[ApplicationResult]:
+    def invoke(self) -> ApplicationResult:
         """Invoke the application and return the results.
 
         """
-        results: List[ApplicationResult] = []
+        results: List[ActionResult] = []
         action: Action
         for action in self.actions:
             inst = self._create_instance(action)
@@ -219,8 +262,8 @@ class Application(Dictable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'invoking {meth}')
             res: Any = meth(*pos_args, **meth_params)
-            results.append(ApplicationResult(inst, res))
-        return tuple(results)
+            results.append(ActionResult(action, inst, res))
+        return ApplicationResult(tuple(results))
 
 
 @dataclass
