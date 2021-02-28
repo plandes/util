@@ -257,7 +257,9 @@ class ActionCliManager(Dictable):
             'doc': doc
         }
         if action_cli.option_overrides is not None:
-            params.update(action_cli.option_overrides)
+            overrides = action_cli.option_overrides.get(pmeta.name)
+            if overrides is not None:
+                params.update(overrides)
         meta = OptionMetaData(**params)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'created option meta: {meta}')

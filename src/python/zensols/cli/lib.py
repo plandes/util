@@ -60,18 +60,16 @@ class LogConfigurator(object):
 @dataclass
 class AddConfig(object):
     CLI_META = {'first_pass': True,
-                'option_overrides': {'long_name': 'config'}}
+                'option_overrides': {'config_path': {'long_name': 'config',
+                                                     'short_name': 'c'}}}
 
     config_factory: ConfigFactory
 
-    config_path: Path = field(default=None)
-    """The path to the configuration file."""
-
-    def add(self):
+    def add(self, config_path: Path = None):
         """Add configuration at path to the current configuration.
 
         :param config_path: the path to the configuration file
 
         """
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'reading configuration from {self.config_path}')
+            logger.debug(f'reading configuration from {config_path}')
