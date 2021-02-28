@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 from enum import Enum, auto
-from zensols.config import Dictable
+from zensols.persist import Stash
+from zensols.config import Dictable, Configurable
 
 
 class Fruit(Enum):
@@ -86,5 +87,9 @@ class TestActionConfigured(Dictable):
     """A test app to be configured.
 
     """
+    CLI_META = {'option_excludes': {'a_stash'}}
+
+    a_stash: Stash
+
     def do_it(self):
-        return 'test app res'
+        return 'test app res', tuple(self.a_stash.values())

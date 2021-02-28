@@ -9,7 +9,8 @@ from enum import Enum
 import logging
 import re
 from pathlib import Path
-from zensols.config import ConfigFactory
+from zensols.introspect import ClassImporter
+from zensols.config import ConfigFactory, Configurable
 
 logger = logging.getLogger(__name__)
 
@@ -63,8 +64,11 @@ class AddConfig(object):
                 'option_overrides': {'config_path': {'long_name': 'config',
                                                      'short_name': 'c'}}}
     FILE_EXT_REGEXP = re.compile(r'.+\.([a-zA-Z]+)$')
+    CONFIG_FACTORIES = {'conf': 'ImportIniConfig',
+                        'yml': 'YamlConfig',
+                        'json': 'JsonConfig'}
 
-    config_factory: ConfigFactory
+    config: Configurable
 
     config_path: Path = field(default=None)
     """The path to the configuration file."""
@@ -76,7 +80,12 @@ class AddConfig(object):
             ext = m.group(1)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"using extension to map: '{ext}'")
-        return ext
+        class_str = self.CONFIG_FACTORIES.get(ext)
+        if class_str is None:
+            class_str = 'ImportIniConfig'
+        class_name = f'zensols.config.{class_str}'
+        cls = ClassImporter(class_name).get_class()
+        return cls
 
     def add(self):
         """Add configuration at path to the current configuration.
@@ -84,6 +93,9 @@ class AddConfig(object):
         :param config_path: the path to the configuration file
 
         """
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'reading configuration from {self.config_path})')
         cls: Type[ConfigFactory] = self._class_for_path()
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'using config factory class {cls} to load: ' +
+                         str(self.config_path))
+        inst = cls(self.config_path)
+        inst.copy_sections(self.config)

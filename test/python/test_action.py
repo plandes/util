@@ -268,7 +268,7 @@ class TestActionConfigAction(LogTestCase):
             print()
             self.cli.parser.write_help()
             self.config_logging('zensols.cli')
-        aset: CommandActionSet = self.cli.create('-c test-resources/populate-test.conf'.split())
+        aset: CommandActionSet = self.cli.create('-c test-resources/stash-factory.conf'.split())
         insts = aset.invoke()
         res: Application = insts[-1]
-        self.assertEqual('test app res', res.result)
+        self.assertEqual(('test app res', ('0', '1', '2', '3', '4')), res.result)
