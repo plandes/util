@@ -35,6 +35,9 @@ class LogConfigurator(object):
     """A simple log configuration utility.
 
     """
+    CLI_META = {'first_pass': True,
+                'option_excludes': {'log_name'},
+                'mnemonics': {'config': 'log'}}
     log_name: str = field(default=None)
     """The log name space."""
 

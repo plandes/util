@@ -110,9 +110,6 @@ class ActionCli(Dictable):
 
     """
 
-    choices: Dict[str, List[str]] = field(default=None)
-    """Map to a choices type."""
-
     def _is_option_enabled(self, name: str) -> bool:
         incs = self.option_includes
         excs = self.option_excludes
