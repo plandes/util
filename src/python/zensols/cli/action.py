@@ -227,9 +227,9 @@ class ActionCliManager(Dictable):
         class's Python source code.
 
         """
-        long_name = pmeta.name
+        long_name = pmeta.name.replace('_', '')
         short_name = self._create_short_name(long_name)
-        dest = pmeta.name.replace('_', '')
+        dest = pmeta.name
         dtype = pmeta.dtype
         doc = pmeta.doc
         if doc is None:

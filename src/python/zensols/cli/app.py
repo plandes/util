@@ -99,10 +99,15 @@ class Application(Dictable):
     """The list of actions to invoke in order."""
 
     def _create_instance(self, action: Action) -> Any:
+        """Instantiate the in memory application instance using the CLI input gathered
+        from the user and the configuration.
+
+        """
         cmd_opts: Dict[str, Any] = action.command_action.options
         const_params: Dict[str, Any] = {}
         sec = action.section
         field: ClassField
+        # gather fields
         for f in action.class_meta.fields.values():
             val: str = cmd_opts.get(f.name)
             if val is None:
@@ -111,20 +116,30 @@ class Application(Dictable):
                         f'no param for section {action.section} ' +
                         f'({action.class_name}): {f.name}')
             else:
+                # convert a string option value to an enumerated value
                 if issubclass(f.dtype, Enum):
                     val = f.dtype.__members__[val]
                 if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'field map: {sec}:{f.name} -> {val}')
+                    logger.debug(
+                        f'field map: {sec}:{f.name} -> {val} ({f.dtype})')
                 const_params[f.name] = val
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating {sec} with {const_params}')
+        # create the instance using the configuration factory
         inst = self.config_factory.instance(sec, **const_params)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'created instance of type {type(inst)}')
+            logger.debug(f'created instance {inst}')
         return inst
 
     def _get_meth_params(self, action: Action, meth_meta: ClassMethod) -> \
             Tuple[Tuple[Any], Dict[str, Any]]:
+        """Get the method argument and keyword arguments gathered from the user input
+        and configuration.
+
+        :return: a tuple of the positional arguments (think ``*args``) followed
+                 by the keyword arguments map (think ``**kwargs`)
+
+        """
         cmd_opts: Dict[str, Any] = action.command_action.options
         meth_params: Dict[str, Any] = {}
         pos_args = action.command_action.positional
@@ -135,7 +150,11 @@ class Application(Dictable):
                 pos_arg_count += 1
             else:
                 name: str = arg.name
-                val: str = cmd_opts[name]
+                if name not in cmd_opts:
+                    raise ActionCliError(
+                        f'no such option {name} parsed from CLI for ' +
+                        f'method from {cmd_opts}: {meth_meta.name}')
+                val: str = cmd_opts.get(name)
                 if issubclass(arg.dtype, Enum):
                     val = arg.dtype.__members__[val]
                 if logger.isEnabledFor(logging.DEBUG):
@@ -147,6 +166,9 @@ class Application(Dictable):
         return pos_args, meth_params
 
     def invoke(self) -> Tuple[ApplicationResult]:
+        """Invoke the application and return the results.
+
+        """
         results: List[ApplicationResult] = []
         action: Action
         for action in self.actions:
@@ -176,8 +198,8 @@ class ApplicationFactory(object):
     """The relative resource path to the application's context."""
 
     @classmethod
-    def instance(cls, package_name: str,
-                 *args, **kwargs) -> ApplicationFactory:
+    def instance(cls, package_name: str, *args, **kwargs) -> \
+            ApplicationFactory:
         """"A create facade method.
 
         :param package_name: used to create the :obj:`package_resource`
@@ -232,11 +254,26 @@ class ApplicationFactory(object):
     def cli_manager(self) -> ActionCliManager:
         return self._create_resources()[1]
 
+    def _find_missing(self, action_clis: Dict[str, ActionCli],
+                      action_set: CommandActionSet) -> List[ActionCli]:
+        missing: str = (set(action_clis.keys()) -
+                        set(map(lambda ca: ca.name, action_set.actions)))
+        missing_acts: List[ActionCli] = []
+        action_cli: ActionCli
+        for action_cli in map(lambda nm: action_clis[nm], missing):
+            missing_acts.append(action_cli)
+            meta: ActionMetaData
+            for meta in action_cli.meta_datas:
+                logger.debug(f'missing application with meta: {meta}')
+                #if action_cli.first_pass:
+        return missing_acts
+
     def _parse(self, args: List[str]) -> Tuple[Action]:
         fac, cli_mng, parser = self._create_resources()
         actions: List[Action] = []
         action_set: CommandActionSet = parser.parse(args)
         action_clis: Dict[str, ActionCli] = cli_mng.actions_by_meta_data_name
+        # self._find_missing(action_clis, action_set)
         caction: CommandAction
         for caction in action_set.actions:
             name = caction.meta_data.name

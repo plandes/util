@@ -6,6 +6,10 @@ __author__ = 'Paul Landes'
 from dataclasses import dataclass, field
 import logging
 from enum import Enum
+from pathlib import Path
+from zensols.config import ConfigFactory
+
+logger = logging.getLogger(__name__)
 
 
 class LogLevel(Enum):
@@ -51,3 +55,22 @@ class LogConfigurator(object):
         if self.log_name is not None:
             level = self.to_level(self.level)
             logging.getLogger(self.log_name).setLevel(level)
+
+
+@dataclass
+class AddConfig(object):
+    CLI_META = {'first_pass': True}
+
+    #config_factory: ConfigFactory
+
+    # path: Path = field(default=None)
+    # """a path field"""
+
+    def add(self, config_path: Path = None):
+        """Add configuration at path to the current configuration.
+
+        :param config_path: the path to the configuration file
+
+        """
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('reading configuration--------------------------------------------------=====')

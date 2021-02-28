@@ -65,7 +65,7 @@ class TestActionBool(Dictable):
 
 @dataclass
 class TestActionMeta(Dictable):
-    """A test app with config metadata.
+    """Test action that contains meta data.
 
     """
     CLI_META = {'mnemonics': {'bad_method_name': 'action3',
@@ -79,3 +79,12 @@ class TestActionMeta(Dictable):
 
     def another_pythonic_method(self, pos1):
         return 'action2', pos1
+
+
+@dataclass
+class TestActionConfigured(Dictable):
+    """A test app to be configured.
+
+    """
+    def do_it(self):
+        return 'test app res'

@@ -26,7 +26,7 @@ class LogConfigurator(object):
     level: LogLevel = field(default=LogLevel.info)
     """The level to set the application logger."""
 
-    default_level: str = field(default=LogLevel.warning)
+    default_level: LogLevel = field(default=LogLevel.warning)
     """The level to set the root logger."""
 
     def to_level(self, s: str) -> int:

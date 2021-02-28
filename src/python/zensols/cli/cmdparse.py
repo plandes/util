@@ -76,7 +76,7 @@ class CommandLineConfig(Dictable):
     def first_pass_by_option(self) -> Dict[str, ActionMetaData]:
         actions = {}
         for action in self.first_pass_actions:
-            for k, v in action.options_by_name.items():
+            for k, v in action.options_by_dest.items():
                 if k in actions:
                     raise ValueError(
                         f"first pass duplicate option in '{action.name}': {k}")
@@ -186,7 +186,7 @@ class CommandLineParser(Dictable):
                           actions: List[CommandAction]) -> \
             Tuple[bool, str, Dict[str, Any], Dict[str, Any], Tuple[str]]:
         second_pass = False
-        fp_opts = set(map(lambda o: o.long_name,
+        fp_opts = set(map(lambda o: o.dest,
                           self.config.first_pass_options))
         # first fish out the action name (if given) as a positional parameter
         parser: OptionParser = self._get_first_pass_parser(True)
@@ -196,14 +196,20 @@ class CommandLineParser(Dictable):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'first pass: {options}:{op_args}')
         # find first pass actions (i.e. whine log level '-w' settings)
+        added_first_pass = set()
+        fp_ops = self.config.first_pass_by_option
         for k, v in options.items():
-            fp_action_meta = self.config.first_pass_by_option.get(k)
-            if fp_action_meta is not None:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'looking for first pass option: {k} in {tuple(fp_ops.keys())}')
+            fp_action_meta = fp_ops.get(k)
+            if (fp_action_meta is not None) and \
+               (fp_action_meta.name not in added_first_pass):
                 aos = {k: options[k] for k in (set(options.keys()) & fp_opts)}
                 action = CommandAction(fp_action_meta, aos, ())
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'adding first pass action: {action}')
                 actions.append(action)
+                added_first_pass.add(fp_action_meta.name)
         # if only one option for second pass actions are given, the user need
         # not give the action mnemonic/name, instead, just add all its options
         # to the top level

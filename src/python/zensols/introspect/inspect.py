@@ -328,9 +328,10 @@ class ClassInspector(object):
                 name: str = node.target.id
                 dtype: str = node.annotation.id
                 dtype: type = self.data_type_mapper.map_type(dtype)
-                kwlst: List[ast.keyword] = node.value.keywords
-                kwargs = {k.arg: self._map_default(k.value) for k in kwlst}
-                fields.append(ClassField(name, dtype, None, kwargs))
+                if node.value is not None:
+                    kwlst: List[ast.keyword] = node.value.keywords
+                    kwargs = {k.arg: self._map_default(k.value) for k in kwlst}
+                    fields.append(ClassField(name, dtype, None, kwargs))
             # parse documentation string right after the dataclass field
             elif (isinstance(node, ast.Expr) and
                   isinstance(node.value, ast.Constant) and

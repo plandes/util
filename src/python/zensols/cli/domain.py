@@ -106,9 +106,9 @@ class OptionMetaData(Dictable):
         if tpe is None and self.is_choice:
             tpe = 'choice'
             choices = self.choices
-            # use the string value of the default if set from the enum
-            if isinstance(self.default, Enum):
-                default = self.default.name
+        # use the string value of the default if set from the enum
+        if isinstance(self.default, Enum):
+            default = self.default.name
         elif (self.default is not None) and (self.dtype != bool):
             default = str(self.default)
         return tpe, default, choices
@@ -249,9 +249,9 @@ class ActionMetaData(Dictable):
                 'a first pass action can not have positional arguments')
 
     @property
-    @persisted('_options_by_name')
-    def options_by_name(self) -> Dict[str, OptionMetaData]:
-        return {m.long_name: m for m in self.options}
+    @persisted('_options_by_dest')
+    def options_by_dest(self) -> Dict[str, OptionMetaData]:
+        return {m.dest: m for m in self.options}
 
 
 @dataclass

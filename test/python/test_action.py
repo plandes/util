@@ -35,13 +35,13 @@ class TestActionSecondPass(LogTestCase):
         self.assertEqual('configure the log system', meta.doc)
         self.assertEqual(2, len(meta.options))
         self.assertEqual(False, meta.first_pass)
-        opt: OptionMetaData = meta.options_by_name['level']
+        opt: OptionMetaData = meta.options_by_dest['level']
         self.assertEqual('level', opt.long_name)
         self.assertEqual('e', opt.short_name)
         self.assertEqual('level', opt.dest)
         self.assertEqual(ml.LogLevel, opt.dtype)
         self.assertEqual(ml.LogLevel.info, opt.default)
-        opt: OptionMetaData = meta.options_by_name['defaultlevel']
+        opt: OptionMetaData = meta.options_by_dest['default_level']
         self.assertEqual('u', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
         self._test_second_action(self, actions)
@@ -59,14 +59,14 @@ class TestActionSecondPass(LogTestCase):
         self.assertEqual(5, len(meta.options))
         self.assertEqual(False, meta.first_pass)
 
-        opt: OptionMetaData = meta.options_by_name['arg2']
+        opt: OptionMetaData = meta.options_by_dest['arg2']
         self.assertEqual('arg2', opt.long_name)
         self.assertEqual('2', opt.short_name)
         self.assertEqual('str1x', opt.default)
         self.assertEqual('STRING', opt.metavar)
         self.assertEqual(str, opt.dtype)
 
-        opt: OptionMetaData = meta.options_by_name['fruit']
+        opt: OptionMetaData = meta.options_by_dest['fruit']
         self.assertEqual('f', opt.short_name)
         self.assertEqual('a tasty selection', opt.doc)
         self.assertEqual('<apple|banana>', opt.metavar)
@@ -110,7 +110,7 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual(2, len(meta.options))
         self.assertEqual(True, meta.first_pass)
 
-        opt: OptionMetaData = meta.options_by_name['level']
+        opt: OptionMetaData = meta.options_by_dest['level']
         self.assertEqual('level', opt.long_name)
         self.assertEqual('e', opt.short_name)
         self.assertEqual('level', opt.dest)
@@ -123,7 +123,7 @@ class TestActionFirstPass(LogTestCase):
         self.assertEqual(tuple('debug error info warning'.split()), op_opt.choices)
         self.assertEqual('info', op_opt.default)
 
-        opt: OptionMetaData = meta.options_by_name['defaultlevel']
+        opt: OptionMetaData = meta.options_by_dest['default_level']
         self.assertEqual('u', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
 
@@ -258,3 +258,17 @@ class TestActionMetaConfig(LogTestCase):
         insts = aset.invoke()
         res: Application = insts[0]
         self.assertEqual(('action2', 'nada'), res.result)
+
+
+class TestActionConfigAction(LogTestCase):
+    def test_config_action(self):
+        self.cli = ApplicationFactory.instance(
+            'zensols.testapp', 'test-resources/test-app-config-opt.conf')
+        if 0:
+            print()
+            self.cli.parser.write_help()
+            self.config_logging('zensols.cli')
+        aset: CommandActionSet = self.cli.create('-c test-resources/populate-test.conf'.split())
+        insts = aset.invoke()
+        res: Application = insts[-1]
+        self.assertEqual('test app res', res.result)
