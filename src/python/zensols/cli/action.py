@@ -63,7 +63,6 @@ class ActionCliMethod(Dictable):
 
 @dataclass
 class ActionCli(Dictable):
-
     """A set of commands that is invokeable on the command line, one for each
     registered method of a class (usually a :class:`dataclasses.dataclass`.
     This contains meta data necesary to create a full usage command line

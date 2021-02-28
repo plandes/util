@@ -15,16 +15,8 @@ import optparse
 from zensols.introspect import TypeMapper
 from zensols.persist import persisted
 from zensols.config import Dictable
-from . import ActionCliError
 
 logger = logging.getLogger(__name__)
-
-
-class CommandLineError(ActionCliError):
-    """Raised when command line parameters can not be parsed.
-
-    """
-    pass
 
 
 @dataclass(eq=True, order=True, unsafe_hash=True)
@@ -121,6 +113,15 @@ class OptionMetaData(Dictable):
         """
         return self._str_vals()[1]
 
+    @property
+    def long_option(self) -> str:
+        return f'--{self.long_name}'
+
+    @property
+    @persisted('_short_option')
+    def short_option(self) -> str:
+        return None if self.short_name is None else f'-{self.short_name}'
+
     def create_option(self) -> optparse.Option:
         """Add the option to an option parser.
 
@@ -135,8 +136,6 @@ class OptionMetaData(Dictable):
         # missing default when adding the option
         if default is not None:
             params['default'] = default
-        long_name = f'--{self.long_name}'
-        short_name = None if self.short_name is None else f'-{self.short_name}'
         if tpe is not None:
             params['type'] = tpe
         if self.dtype == list:
@@ -154,7 +153,7 @@ class OptionMetaData(Dictable):
                 params['action'] = 'store_true'
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'params: {params}')
-        return optparse.Option(long_name, short_name, **params)
+        return optparse.Option(self.long_option, self.short_option, **params)
 
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
         return chain.from_iterable(
@@ -274,6 +273,9 @@ class CommandAction(Dictable):
     def name(self) -> str:
         """The name of the action."""
         return self.meta_data.name
+
+    def __str__(self) -> str:
+        return f'{self.meta_data.name}: {self.options}/{self.positional}'
 
 
 @dataclass

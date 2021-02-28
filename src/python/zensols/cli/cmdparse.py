@@ -15,12 +15,26 @@ from optparse import OptionParser
 from zensols.persist import persisted
 from zensols.config import Dictable
 from . import (
-    CommandLineError, UsageWriter,
     OptionMetaData, PositionalMetaData, ActionMetaData,
-    CommandAction, CommandActionSet,
+    UsageWriter, CommandAction, CommandActionSet,
 )
+from . import ActionCliError
 
 logger = logging.getLogger(__name__)
+
+
+class CommandLineError(ActionCliError):
+    """Raised when command line parameters can not be parsed.
+
+    """
+    pass
+
+
+class CommandLineConfigError(Exception):
+    """Programmer error for command line parser configuration errors.
+
+    """
+    pass
 
 
 class ActionOptionParser(OptionParser):
@@ -78,7 +92,7 @@ class CommandLineConfig(Dictable):
         for action in self.first_pass_actions:
             for k, v in action.options_by_dest.items():
                 if k in actions:
-                    raise ValueError(
+                    raise CommandLineConfigError(
                         f"first pass duplicate option in '{action.name}': {k}")
                 actions[k] = action
         return actions
@@ -114,7 +128,8 @@ class CommandLineParser(Dictable):
 
     def __post_init__(self):
         if len(self.config.actions) == 0:
-            raise ValueError('must create parser with at least one action')
+            raise CommandLineConfigError(
+                'must create parser with at least one action')
 
     def _create_program_doc(self) -> Optional[str]:
         doc = None
@@ -133,7 +148,8 @@ class CommandLineParser(Dictable):
         opt_names = set()
         for opt in options:
             if opt.long_name in opt_names:
-                raise ValueError(f'duplicate option: {opt.long_name}')
+                raise CommandLineConfigError(
+                    f'duplicate option: {opt.long_name}')
             opt_names.add(opt.long_name)
             op_opt = opt.create_option()
             parser.add_option(op_opt)
@@ -172,7 +188,7 @@ class CommandLineParser(Dictable):
             return t.__members__[s]
         else:
             if not isinstance(s, (str, int, bool, Path)):
-                raise ValueError(f'unknown parse type: {s}: {t}')
+                raise CommandLineConfigError(f'unknown parse type: {s}: {t}')
             try:
                 return t(s)
             except ValueError as e:

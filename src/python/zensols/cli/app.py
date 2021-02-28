@@ -6,7 +6,7 @@ __author__ = 'Paul Landes'
 
 from typing import Tuple, List, Dict, Iterable, Any
 from dataclasses import dataclass, field
-from enum import Enum
+from abc import ABC, abstractmethod
 import logging
 import sys
 from itertools import chain
@@ -29,6 +29,12 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class Action(Dictable):
+    """Contains everything needed to invoke an action invoked from the command
+    line.  A list of these, one per executable action, is used by
+    :class:`.Application` and invoked in order on the target application
+    class(es).
+
+    """
     WRITABLE__DESCENDANTS = True
 
     command_action: CommandAction = field()
@@ -53,23 +59,47 @@ class Action(Dictable):
 
     @property
     def section(self) -> str:
+        """The section from which the :class:`.ActionCli` was created."""
         return self.action_cli.section
 
     @property
     def class_meta(self) -> Class:
+        """The meta data of the action, which comes from :class:`.ActionCli`.
+
+        """
         return self.action_cli.class_meta
 
     @property
-    def method_name(self) -> str:
-        return self.method_meta.name
+    def class_name(self) -> str:
+        """Return the class name of the target application instance.
+
+        """
+        return self.class_meta.name
 
     @property
-    def class_name(self) -> str:
-        return self.class_meta.name
+    def method_name(self) -> str:
+        """The method to invoke on the target application instance class.
+
+        """
+        return self.method_meta.name
+
+    # @property
+    # def action_meta_data(self) -> ActionMetaData:
+    #     """Return the action meta data for the method.
+
+    #     """
+    #     return self.action_cli.methods[self.method_name].action_meta_data
 
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
         return map(lambda f: (f, f),
                    'section class_name method_name command_action'.split())
+
+    def __str__(self):
+        return (f'{self.section} ({self.class_name}.{self.method_name}): ' +
+                f'<{self.command_action}>')
+
+    def __repr__(self):
+        return self.__str__()
 
 
 @dataclass
@@ -84,16 +114,35 @@ class ApplicationResult(Dictable):
     """The results returned from the invocation on the application instance."""
 
 
+class ApplicationObserver(ABC):
+    """Extended by application targets to get call backs and information from the
+    controlling :class:`.Application`.
+
+    """
+    @abstractmethod
+    def _application_created(self, app: Application, action: Action):
+        """Called just after the application target is created.
+
+        :param app: the application that created the application target
+
+        """
+        pass
+
+
 @dataclass
 class Application(Dictable):
     """An invokable application created using command line and application context
-    data.
+    data.  This class creates an instance of the *target application instance*,
+    then invokes the corresponding action method.
 
     """
     WRITABLE__DESCENDANTS = True
 
     config_factory: ConfigFactory = field(repr=False)
     """The factory used to create the application and its components."""
+
+    factory: ApplicationFactory = field(repr=False)
+    """The factory that created this application."""
 
     actions: Tuple[Action] = field()
     """The list of actions to invoke in order."""
@@ -106,19 +155,17 @@ class Application(Dictable):
         cmd_opts: Dict[str, Any] = action.command_action.options
         const_params: Dict[str, Any] = {}
         sec = action.section
-        field: ClassField
         # gather fields
+        field: ClassField
         for f in action.class_meta.fields.values():
             val: str = cmd_opts.get(f.name)
+            # set the field used to create the app target instance if given by
+            # the user on the command line
             if val is None:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(
-                        f'no param for section {action.section} ' +
-                        f'({action.class_name}): {f.name}')
+                        f'no param for action <{action}>: {f.name}')
             else:
-                # # convert a string option value to an enumerated value
-                # if issubclass(f.dtype, Enum):
-                #     val = f.dtype.__members__[val]
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(
                         f'field map: {sec}:{f.name} -> {val} ({f.dtype})')
@@ -127,6 +174,8 @@ class Application(Dictable):
             logger.debug(f'creating {sec} with {const_params}')
         # create the instance using the configuration factory
         inst = self.config_factory.instance(sec, **const_params)
+        if isinstance(inst, ApplicationObserver):
+            inst._application_created(self, action)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'created instance {inst}')
         return inst
@@ -155,8 +204,6 @@ class Application(Dictable):
                         f'no such option {name} parsed from CLI for ' +
                         f'method from {cmd_opts}: {meth_meta.name}')
                 val: str = cmd_opts.get(name)
-                # if issubclass(arg.dtype, Enum):
-                #     val = arg.dtype.__members__[val]
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'meth map: {meth_meta.name}.{name} -> {val}')
                 meth_params[name] = val
@@ -248,14 +295,24 @@ class ApplicationFactory(object):
 
     @property
     def parser(self) -> CommandLineParser:
+        """Used to parse the command line.
+
+        """
         return self._create_resources()[2]
 
     @property
     def cli_manager(self) -> ActionCliManager:
+        """The manager that creates the action based CLIs.
+
+        """
         return self._create_resources()[1]
 
     def _find_missing(self, action_clis: Dict[str, ActionCli],
                       action_set: CommandActionSet) -> List[ActionCli]:
+        """Find applications given in the configuration, but not parsed/present as meta
+        data.
+
+        """
         missing: str = (set(action_clis.keys()) -
                         set(map(lambda ca: ca.name, action_set.actions)))
         missing_acts: List[ActionCli] = []
@@ -265,7 +322,6 @@ class ApplicationFactory(object):
             meta: ActionMetaData
             for meta in action_cli.meta_datas:
                 logger.debug(f'missing application with meta: {meta}')
-                #if action_cli.first_pass:
         return missing_acts
 
     def _parse(self, args: List[str]) -> Tuple[Action]:
@@ -295,4 +351,4 @@ class ApplicationFactory(object):
         """
         fac, cli_mng, parser = self._create_resources()
         actions: Tuple[Action] = self._parse(args)
-        return Application(fac, actions)
+        return Application(fac, self, actions)

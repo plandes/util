@@ -2,7 +2,7 @@ from typing import Dict
 import sys
 from io import StringIO
 from zensols.cli import (
-    ActionCli, ActionCliManager,
+    ActionCli, ActionCliError, ActionCliManager,
     OptionMetaData, ActionMetaData,
     CommandActionSet, ApplicationFactory, Application, ApplicationResult,
     CommandLineError,
@@ -261,7 +261,7 @@ class TestActionMetaConfig(LogTestCase):
 
 
 class TestActionConfigAction(LogTestCase):
-    def test_config_action(self):
+    def test_with_config(self):
         self.cli = ApplicationFactory.instance(
             'zensols.testapp', 'test-resources/test-app-config-opt.conf')
         if 0:
@@ -272,3 +272,14 @@ class TestActionConfigAction(LogTestCase):
         insts = aset.invoke()
         res: Application = insts[-1]
         self.assertEqual(('test app res', ('0', '1', '2', '3', '4')), res.result)
+
+    def test_missing_config(self):
+        self.cli = ApplicationFactory.instance(
+            'zensols.testapp', 'test-resources/test-app-config-opt.conf')
+        if 0:
+            print()
+            self.cli.parser.write_help()
+            self.config_logging('zensols.cli')
+        aset: CommandActionSet = self.cli.create([])
+        with self.assertRaisesRegex(ActionCliError, '^missing option --config$'):
+            insts = aset.invoke()

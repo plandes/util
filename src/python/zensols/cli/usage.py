@@ -73,8 +73,8 @@ class UsageWriter(Writable):
                     default = opt.default_str
                 else:
                     default = ''
-                long_opt = f'--{opt.long_name}'
-                short_opt = '' if opt.short_name is None else f'-{opt.short_name}'
+                long_opt = opt.long_option
+                short_opt = '' if opt.short_option is None else opt.short_option
                 metavar = '' if opt.metavar is None else f' {opt.metavar}'
                 doc = '' if opt.doc is None else opt.doc
                 opt_str = f'  {short_opt}{sep}{long_opt}{metavar}'
