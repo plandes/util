@@ -235,35 +235,35 @@ class ActionCliManager(Dictable):
         class's Python source code.
 
         """
-        if not action_cli._is_option_enabled(pmeta.name):
-            return None
-        long_name = pmeta.name.replace('_', '')
-        short_name = self._create_short_name(long_name)
-        dest = pmeta.name
-        dtype = pmeta.dtype
-        doc = pmeta.doc
-        if doc is None:
-            if (meth is not None) and (meth.doc is not None):
-                doc = meth.doc.params.get(long_name)
-        else:
-            doc = doc.text
-        if doc is not None:
-            doc = DocUtil.normalize(doc)
-        params = {
-            'long_name': long_name,
-            'short_name': short_name,
-            'dest': dest,
-            'dtype': dtype,
-            'default': pmeta.default,
-            'doc': doc
-        }
-        if action_cli.option_overrides is not None:
-            overrides = action_cli.option_overrides.get(pmeta.name)
-            if overrides is not None:
-                params.update(overrides)
-        meta = OptionMetaData(**params)
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'created option meta: {meta}')
+        meta = None
+        if action_cli._is_option_enabled(pmeta.name):
+            long_name = pmeta.name.replace('_', '')
+            short_name = self._create_short_name(long_name)
+            dest = pmeta.name
+            dtype = pmeta.dtype
+            doc = pmeta.doc
+            if doc is None:
+                if (meth is not None) and (meth.doc is not None):
+                    doc = meth.doc.params.get(long_name)
+            else:
+                doc = doc.text
+            if doc is not None:
+                doc = DocUtil.normalize(doc)
+            params = {
+                'long_name': long_name,
+                'short_name': short_name,
+                'dest': dest,
+                'dtype': dtype,
+                'default': pmeta.default,
+                'doc': doc
+            }
+            if action_cli.option_overrides is not None:
+                overrides = action_cli.option_overrides.get(pmeta.name)
+                if overrides is not None:
+                    params.update(overrides)
+            meta = OptionMetaData(**params)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'created option meta: {meta}')
         return meta
 
     def _add_field(self, section: str, name: str, omd: OptionMetaData):
