@@ -252,8 +252,9 @@ class Application(Dictable):
                     logger.debug(f'meth map: {meth_meta.name}.{name} -> {val}')
                 meth_params[name] = val
         if pos_arg_count != len(pos_args):
-            raise ActionCliError(f'method {meth_meta.name} expects ' +
-                                 f'{pos_arg_count} but got {len(pos_args)}')
+            raise ActionCliError(
+                f'method {meth_meta.name} expects {pos_arg_count} but got ' +
+                f'{len(pos_args)} in {action.name}.{meth_meta.name}')
         return pos_args, meth_params
 
     def invoke(self) -> ApplicationResult:
@@ -392,23 +393,25 @@ class ApplicationFactory(object):
         fac, cli_mng, parser = self._create_resources()
         actions: List[Action] = []
         action_set: CommandActionSet = parser.parse(args)
-        action_clis: Dict[str, ActionCli] = cli_mng.actions_by_meta_data_name
-        caction: CommandAction
-        # create an action (coupled with meta data) for each command line
-        # parsed action
-        for caction in action_set.actions:
-            name = caction.meta_data.name
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'action name: {name}')
-            action_cli: ActionCli = action_clis[name]
-            acli_meth: ActionCliMethod = action_cli.methods[name]
-            action: Action = Action(
-                caction, action_cli,
-                acli_meth.action_meta_data, acli_meth.method)
-            actions.append(action)
+        cmd_actions: Dict[str, CommandAction] = action_set.by_name
+        action_cli: ActionCli
+        for action_cli in cli_mng.actions_ordered:
+            acli_meth: ActionCliMethod
+            for acli_meth in action_cli.methods.values():
+                name: str = acli_meth.action_meta_data.name
+                caction: CommandAction = cmd_actions.get(name)
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'action name: {name} -> {caction.name}')
+                if caction is None and action_cli.always_invoke:
+                    caction = CommandAction(acli_meth.action_meta_data, {}, ())
+                if caction is not None:
+                    action: Action = Action(
+                        caction, action_cli,
+                        acli_meth.action_meta_data, acli_meth.method)
+                    actions.append(action)
         return actions
 
-    def create(self, args: List[str] = sys.argv[1:]) -> Application:
+    def create(self, args: List[str]) -> Application:
         """Create the action CLI application.
 
         :raises ActionCliError: for any missing data or misconfigurations
@@ -417,3 +420,5 @@ class ApplicationFactory(object):
         fac, cli_mng, parser = self._create_resources()
         actions: Tuple[Action] = self._parse(args)
         return Application(fac, self, actions)
+
+    

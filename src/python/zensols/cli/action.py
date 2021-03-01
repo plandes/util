@@ -7,6 +7,7 @@ from typing import Dict, Tuple, Iterable, Set, List
 from dataclasses import dataclass, field
 import dataclasses
 import logging
+from itertools import chain
 from zensols.persist import persisted
 from zensols.introspect import (
     Class, ClassField, ClassParam, ClassMethod, ClassMethodArg,
@@ -107,6 +108,14 @@ class ActionCli(Dictable):
     first_pass: bool = field(default=False)
     """Whether or not this is a first pass action (i.e. such as setting the level
     in :class:`~zensols.cli.LogConfigurator`).
+
+    """
+
+    always_invoke: bool = field(default=False)
+    """If ``True``, always invoke all methods for the action regardless if an
+    action mnemonic and options pertaining to the action are not given by the
+    user/command line.  This is useful for configuration first pass type
+    classes like :class:`.PackageInfoImporter`.
 
     """
 
@@ -355,7 +364,8 @@ class ActionCliManager(Dictable):
     @persisted('_actions_pw')
     def actions(self) -> Dict[str, ActionCli]:
         """Get a list of action CLIs that is used in :class:`.CommandLineParser` to
-        create instances of the application.  Each action CLI has a list of 
+        create instances of the application.  Each action CLI has a collection
+        of :class:`.ActionMetaData` instances.
 
         :return: keys are the configuration sections with the action CLIs as
                  values
@@ -375,6 +385,15 @@ class ActionCliManager(Dictable):
         return actions
 
     @property
+    @persisted('_actions_ordered')
+    def actions_ordered(self) -> Tuple[ActionCli]:
+        acts = self.actions
+        fp = filter(lambda a: a.first_pass, acts.values())
+        sp = filter(lambda a: not a.first_pass, acts.values())
+        return tuple(chain.from_iterable([fp, sp]))
+
+    @property
+    @persisted('_actions_by_meta_data_name_pw')
     def actions_by_meta_data_name(self) -> Dict[str, ActionCli]:
         """Return a dict of :class:`.ActionMetaData` instances, each of which is each
         mnemonic by name and the meta data by values.

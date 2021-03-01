@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 from zensols.util import PackageResource
 from zensols.introspect import ClassImporter
-from zensols.config import ConfigFactory, Configurable
+from zensols.config import ConfigFactory, Configurable, DictionaryConfig
 from . import (
     ActionCliError, OptionMetaData, ActionMetaData,
     ApplicationObserver, Action, Application,
@@ -86,10 +86,13 @@ class LogConfigurator(object):
         params = {'level': level}
         if self.format is not None:
             params['format'] = self.format.replace('%%', '%')
+        self._debug(f'config log system with level {level} ' +
+                    f'({self.default_level})')
         logging.basicConfig(**params)
         if self.log_name is not None:
             level: int = self._to_level('app', self.level)
-            self._debug(f'setting logger {self.log_name} to {self.level}')
+            self._debug(f'setting logger {self.log_name} to {level} ' +
+                        f'({self.level})')
             logging.getLogger(self.log_name).setLevel(level)
 
 
@@ -97,6 +100,7 @@ class LogConfigurator(object):
 class ConfigurationImporter(ApplicationObserver):
     CONFIG_PATH_FIELD = 'config_path'
     CLI_META = {'first_pass': True,
+                'mnemonics': {'add': '_add_config_as_import'},
                 'option_overrides': {CONFIG_PATH_FIELD: {'long_name': 'config',
                                                          'short_name': 'c'}},
                 'option_includes': {'config_path'}}
@@ -186,3 +190,32 @@ class ConfigurationImporter(ApplicationObserver):
                     load_config = False
         if load_config:
             self._load()
+
+
+@dataclass
+class PackageInfoImporter(ApplicationObserver):
+    CLI_META = {'first_pass': True,
+                'always_invoke': True,
+                'mnemonics': {'add': '_add_package_info'},
+                'option_includes': {}}
+
+    config: Configurable
+
+    section: str = field(default='package')
+    """The name of the section to create with the package information."""
+
+    def _application_created(self, app: Application, action: Action):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'configurator created with {action}')
+        self._app = app
+        self._action = action
+
+    def add(self):
+        """Add package information to the configuration.
+
+        """
+        pkg_res: PackageResource = self._app.factory.package_resource
+        params = {'name': pkg_res.name,
+                  'version': pkg_res.version}
+        dconf = DictionaryConfig({self.section: params})
+        dconf.copy_sections(self.config)
