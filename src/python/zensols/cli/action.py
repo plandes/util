@@ -189,6 +189,7 @@ class ActionCliManager(Dictable):
     given to be instantiated and the CLI.
 
     :see: :obj:`actions`
+
     :see: :obj:`actions_by_meta_data_name`
 
     """
@@ -223,6 +224,8 @@ class ActionCliManager(Dictable):
         """
         for c in long_name:
             if c not in self._short_names:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'adding short name for {long_name}: {c}')
                 self._short_names.add(c)
                 return c
 
@@ -232,6 +235,8 @@ class ActionCliManager(Dictable):
         class's Python source code.
 
         """
+        if not action_cli._is_option_enabled(pmeta.name):
+            return None
         long_name = pmeta.name.replace('_', '')
         short_name = self._create_short_name(long_name)
         dest = pmeta.name
@@ -286,17 +291,19 @@ class ActionCliManager(Dictable):
         # for each dataclass field used to create OptionMetaData's
         for name, fmd in action.class_meta.fields.items():
             omd = self._create_op_meta_data(fmd, None, action)
-            self._add_field(action.section, fmd.name, omd)
+            if omd is not None:
+                self._add_field(action.section, fmd.name, omd)
         meth: ClassMethod
         # add a field for the arguments of each method
         for meth in action.class_meta.methods.values():
             arg: ClassMethodArg
             for arg in meth.args:
-                omd = self._create_op_meta_data(arg, meth, action)
                 # positional arguments are only referenced in the
                 # ClassInspector parsed source code
                 if not arg.is_positional:
-                    self._add_field(action.section, arg.name, omd)
+                    omd = self._create_op_meta_data(arg, meth, action)
+                    if omd is not None:
+                        self._add_field(action.section, arg.name, omd)
         self._actions[action.section] = action
 
     def _add_app(self, section: str):

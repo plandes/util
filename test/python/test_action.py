@@ -40,12 +40,12 @@ class TestActionSecondPass(LogTestCase):
         self.assertEqual(False, meta.first_pass)
         opt: OptionMetaData = meta.options_by_dest['level']
         self.assertEqual('level', opt.long_name)
-        self.assertEqual('e', opt.short_name)
+        self.assertEqual('l', opt.short_name)
         self.assertEqual('level', opt.dest)
         self.assertEqual(ml.LogLevel, opt.dtype)
         self.assertEqual(ml.LogLevel.info, opt.default)
         opt: OptionMetaData = meta.options_by_dest['default_level']
-        self.assertEqual('u', opt.short_name)
+        self.assertEqual('e', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
         self._test_second_action(self, actions)
 
@@ -64,7 +64,7 @@ class TestActionSecondPass(LogTestCase):
 
         opt: OptionMetaData = meta.options_by_dest['arg2']
         self.assertEqual('arg2', opt.long_name)
-        self.assertEqual('2', opt.short_name)
+        self.assertEqual('r', opt.short_name)
         self.assertEqual('str1x', opt.default)
         self.assertEqual('STRING', opt.metavar)
         self.assertEqual(str, opt.dtype)
@@ -115,19 +115,19 @@ class TestActionFirstPass(LogTestCase):
 
         opt: OptionMetaData = meta.options_by_dest['level']
         self.assertEqual('level', opt.long_name)
-        self.assertEqual('e', opt.short_name)
+        self.assertEqual('l', opt.short_name)
         self.assertEqual('level', opt.dest)
         self.assertEqual(ml.LogLevel, opt.dtype)
         self.assertEqual(ml.LogLevel.info, opt.default)
         op_opt = opt.create_option()
         self.assertEqual(['--level'], op_opt._long_opts)
-        self.assertEqual(['-e'], op_opt._short_opts)
+        self.assertEqual(['-l'], op_opt._short_opts)
         self.assertEqual('choice', op_opt.type)
         self.assertEqual(tuple('debug error info warning'.split()), op_opt.choices)
         self.assertEqual('info', op_opt.default)
 
         opt: OptionMetaData = meta.options_by_dest['default_level']
-        self.assertEqual('u', opt.short_name)
+        self.assertEqual('e', opt.short_name)
         self.assertEqual('the level to set the root logger', opt.doc)
 
         TestActionSecondPass._test_second_action(self, actions)
@@ -139,11 +139,10 @@ class TestActionInvoke(LogTestCase):
             'zensols.testapp', 'test-resources/test-app-first-pass.conf')
 
     def test_first_pass_invoke(self):
-        #self.config_logging('zensols.cli')
-        aset: CommandActionSet = self.cli.create('one 2 apple -g 5 -e debug'.split())
         if 0:
-            print()
+            self.config_logging('zensols.cli')
             self.cli.parser.write_help()
+        aset: CommandActionSet = self.cli.create('one 2 apple -a 5 -l debug'.split())
         insts = aset.invoke()
         self.assertEqual(2, len(insts))
         res: Application = insts[0]
@@ -163,7 +162,7 @@ class TestActionInvoke(LogTestCase):
     def test_second_pass_invoke(self):
         self.cli = ApplicationFactory.instance(
             'zensols.testapp', 'test-resources/test-app-sec-pass.conf')
-        aset: CommandActionSet = self.cli.create('doit one 2 apple -g 5'.split())
+        aset: CommandActionSet = self.cli.create('doit one 2 apple -a 5'.split())
         if 0:
             print()
             self.cli.parser.write_help()
@@ -216,7 +215,7 @@ class TestActionType(LogTestCase):
         self.assertTrue(isinstance(res.instance, ma.TestActionBool))
         self.assertEqual(('action3', None), res.result)
 
-        aset: CommandActionSet = self.cli.create('action3 -t 3'.split())
+        aset: CommandActionSet = self.cli.create('action3 -p 3'.split())
         insts = aset.invoke()
         res: Application = insts[0]
         self.assertTrue(isinstance(res.instance, ma.TestActionBool))
@@ -227,12 +226,12 @@ class TestActionType(LogTestCase):
             stdold = sys.stderr
             try:
                 sys.stderr = StringIO()
-                self.cli.create('action3 -t notint'.split())
+                self.cli.create('action3 -p notint'.split())
             finally:
                 usage = sys.stderr.getvalue()
                 sys.stderr = stdold
         self.assertRegex(
-            usage, r".*error: option -t: invalid integer value: 'notint'.*")
+            usage, r".*error: option -p: invalid integer value: 'notint'.*")
 
         aset: CommandActionSet = self.cli.create('action4 5'.split())
         insts = aset.invoke()
