@@ -274,7 +274,9 @@ class Application(Dictable):
 
 @dataclass
 class ApplicationFactory(object):
-    """Boots the application context from the command line.
+    """Boots the application context from the command line.  This first loads
+    resource ``resources/app.conf`` from this package, then adds
+    :obj:`app_config_resource` from the application package of the client.
 
     """
     UTIL_PACKAGE = 'zensols.util'
@@ -289,7 +291,8 @@ class ApplicationFactory(object):
     @classmethod
     def instance(cls, package_name: str, *args, **kwargs) -> \
             ApplicationFactory:
-        """"A create facade method.
+        """"A convenience method to create a factory instance by first converting the
+        package name string to a :class:`.PackageResoure`.
 
         :param package_name: used to create the :obj:`package_resource`
 
@@ -299,35 +302,66 @@ class ApplicationFactory(object):
         pres = PackageResource(package_name)
         return cls(pres, *args, **kwargs)
 
-    def _get_app_context(self, app_context: Path) -> Configurable:
-        pres = PackageResource(self.UTIL_PACKAGE)
-        res = self.app_config_resource
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'looking up resource: {res} in {pres}')
-        path = pres.get_path(res)
-        if not path.exists():
-            # this should never not happen
-            raise ValueError(f'no application context found: {path}')
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'loading app config: {path}')
+    def _create_application_context(self, parent_context: Path,
+                                    app_context: Path) -> Configurable:
+        """Factory method to create the application context from the :mod:`cli`
+        resource (parent) context and a path to the application specific
+        (child) context.
+
+        :param parent_context: the :mod:`cli` root level context path
+
+        :param app_context: the application child context path
+
+        """
         app_conf = DictionaryConfig(
             {'import_app': {'config_file': str(app_context.absolute()),
                             'type': 'ini'}})
-        return ImportIniConfig(path, children=(app_conf,))
+        return ImportIniConfig(parent_context, children=(app_conf,))
 
     def _create_config_factory(self, config: Configurable) -> ConfigFactory:
+        """Factory method to create the configuration factory from the application
+        context created in :meth:`_get_app_context`.
+
+        """
         return ImportConfigFactory(config)
+
+    def _get_app_context(self, app_context: Path) -> Configurable:
+        """Create the initial *bootstrap* app config.
+
+        :param app_context: the path to the app specific application context
+                            configuration file
+
+        """
+        pres = PackageResource(self.UTIL_PACKAGE)
+        res: str = self.app_config_resource
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'looking up resource: {res} in {pres}')
+        parent_context: Path = pres.get_path(res)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('loading zensols.util app context parent ' +
+                         f'{parent_context.absolute()} with child app ' +
+                         f'context {app_context.absolute()}')
+        if not parent_context.exists():
+            # this should never not happen
+            raise ValueError(f'no application context found: {parent_context}')
+        return self._create_application_context(parent_context, app_context)
 
     @persisted('_resources')
     def _create_resources(self) -> \
             Tuple[ConfigFactory, ActionCliManager, CommandLineParser]:
-        path = self.package_resource.get_path(self.app_config_resource)
+        """Create the config factory, the command action line manager, and command line
+        parser resources.  The data is cached and use in property getters.
+
+        """
+        path: Path = self.package_resource.get_path(self.app_config_resource)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'path to app specific context: {path.absolute()}')
         if not path.exists():
             raise ActionCliError(
                 f"application context resource '{self.app_config_resource}' " +
                 f'not found in {self.package_resource}')
-        config = self._get_app_context(path)
-        fac = self._create_config_factory(config)
+        config: Configurable = self._get_app_context(path)
+        fac: ConfigFactory = self._create_config_factory(config)
         cli_mng: ActionCliManager = fac(ActionCliManager.SECTION)
         actions: Tuple[ActionMetaData] = tuple(chain.from_iterable(
             map(lambda a: a.meta_datas, cli_mng.actions.values())))
@@ -350,6 +384,9 @@ class ApplicationFactory(object):
         return self._create_resources()[1]
 
     def _parse(self, args: List[str]) -> Tuple[Action]:
+        """Parse the command line.
+
+        """
         fac, cli_mng, parser = self._create_resources()
         actions: List[Action] = []
         action_set: CommandActionSet = parser.parse(args)

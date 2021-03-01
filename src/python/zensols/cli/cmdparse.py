@@ -134,14 +134,13 @@ class CommandLineParser(Dictable):
     ``--version`` switch.
 
     """
-
     def __post_init__(self):
         if len(self.config.actions) == 0:
-            raise CommandLineConfigError(
-                'must create parser with at least one action')
+            raise ValueError('must create parser with at least one action')
 
     def _create_program_doc(self) -> Optional[str]:
         doc = None
+        # TODO: add configurable doc for multi second pass
         if len(self.config.second_pass_actions) == 1:
             doc = self.config.second_pass_actions[0].doc
             doc = doc[0].upper() + doc[1:] + '.'
@@ -166,9 +165,7 @@ class CommandLineParser(Dictable):
     def _get_first_pass_parser(self, add_all_opts: bool) -> ActionOptionParser:
         opts = list(self.config.first_pass_options)
         sp_actions = self.config.second_pass_actions
-        #opts.append(self._create_help())
         if len(sp_actions) == 1:
-            # TODO: add singleton action doc
             sp_actions = (sp_actions[0],)
             opts.extend(sp_actions[0].options)
         elif add_all_opts:
