@@ -354,7 +354,7 @@ class ActionCliManager(Dictable):
                  values
 
         """
-        self._short_names: Set[str] = set()
+        self._short_names: Set[str] = {'h', 'v'}
         self._fields: Dict[str, OptionMetaData] = {}
         self._actions: Dict[str, ActionCli] = {}
         try:

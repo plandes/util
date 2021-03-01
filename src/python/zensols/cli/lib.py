@@ -22,12 +22,16 @@ logger = logging.getLogger(__name__)
 
 
 class LogLevel(Enum):
-    notset = logging.NOTSET
+    """Set of configurable log levels on the command line.  Note that we don't
+    include all so as to not overwhelm the help usage.
+
+    """
+    #notset = logging.NOTSET
     debug = logging.DEBUG
     info = logging.INFO
     warning = logging.WARNING
     error = logging.ERROR
-    critical = logging.CRITICAL
+    #critical = logging.CRITICAL
 
 
 @dataclass
@@ -36,18 +40,18 @@ class LogConfigurator(object):
 
     """
     CLI_META = {'first_pass': True,
-                'option_excludes': {'log_name'},
+                'option_includes': {'level'},
                 'mnemonics': {'config': 'log'}}
     log_name: str = field(default=None)
     """The log name space."""
 
-    level: LogLevel = field(default=LogLevel.info)
-    """The level to set the application logger."""
-
     default_level: str = field(default=LogLevel.warning)
     """The level to set the root logger."""
 
-    def to_level(self, s: str) -> int:
+    level: LogLevel = field(default=LogLevel.info)
+    """The level to set the application logger."""
+
+    def _to_level(self, s: str) -> int:
         """Return the integer equivalent logging level.
 
         :param s: the level
@@ -65,7 +69,7 @@ class LogConfigurator(object):
         default = self.to_level(self.default_level)
         logging.basicConfig(level=default)
         if self.log_name is not None:
-            level = self.to_level(self.level)
+            level = self._to_level(self.level)
             logging.getLogger(self.log_name).setLevel(level)
 
 

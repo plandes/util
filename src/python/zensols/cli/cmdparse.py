@@ -11,7 +11,7 @@ import sys
 from itertools import chain
 from pathlib import Path
 from io import TextIOBase
-from optparse import OptionParser
+from optparse import OptionParser, Option
 from zensols.persist import persisted
 from zensols.config import Dictable
 from . import (
@@ -42,13 +42,22 @@ class ActionOptionParser(OptionParser):
     command line handlers.
 
     **Implementation note**: we have to extend :class:`~optparser.OptionParser`
-    since the ``-h`` option invokes the print help behavior and then exists.
+    since the ``-h`` option invokes the print help behavior and then exists
+    printing the second pass action options.  Instead, we look for the help
+    option in the first pass, print help with the correction options, then
+    exit.
 
     """
     def __init__(self, actions: Tuple[ActionMetaData], doc: str = None,
                  *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, add_help_option=False, **kwargs)
         self.usage_writer = UsageWriter(self, actions, doc)
+        self.add_option(self._create_help())
+
+    def _create_help(self):
+        return Option('--help', '-h',
+                      help='show this help message and exit',
+                      action='store_true')
 
     def print_help(self, file=sys.stdout):
         super().print_help(file)
@@ -157,6 +166,7 @@ class CommandLineParser(Dictable):
     def _get_first_pass_parser(self, add_all_opts: bool) -> ActionOptionParser:
         opts = list(self.config.first_pass_options)
         sp_actions = self.config.second_pass_actions
+        #opts.append(self._create_help())
         if len(sp_actions) == 1:
             # TODO: add singleton action doc
             sp_actions = (sp_actions[0],)
@@ -223,6 +233,11 @@ class CommandLineParser(Dictable):
         (options, op_args) = parser.parse_args(args)
         # make assoc array options in to a dict
         options = vars(options)
+        if options['help'] is True:
+            self.write_help()
+            sys.exit(0)
+        else:
+            del options['help']
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'first pass: {options}:{op_args}')
         # find first pass actions (i.e. whine log level '-w' settings)
@@ -290,6 +305,7 @@ class CommandLineParser(Dictable):
             # remove the action name
             op_args = op_args[1:]
             options = vars(options)
+            del options['help']
         options = self._parse_options(action_meta, options)
         return action_meta, options, op_args
 
@@ -304,6 +320,7 @@ class CommandLineParser(Dictable):
             logger.debug(f'parsing: {args}')
         # action instances
         actions: List[CommandAction] = []
+        #parser = self._get_first_pass_parser(False)
         # first pass parse
         second_pass, action_name, fp_opts, options, op_args = \
             self._parse_first_pass(args, actions)
