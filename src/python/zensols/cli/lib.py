@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Type
+from typing import Type, Any
 from dataclasses import dataclass, field
 from enum import Enum
 import os
@@ -26,12 +26,10 @@ class LogLevel(Enum):
     include all so as to not overwhelm the help usage.
 
     """
-    #notset = logging.NOTSET
     debug = logging.DEBUG
     info = logging.INFO
-    warning = logging.WARNING
-    error = logging.ERROR
-    #critical = logging.CRITICAL
+    warn = logging.WARNING
+    err = logging.ERROR
 
 
 @dataclass
@@ -39,37 +37,59 @@ class LogConfigurator(object):
     """A simple log configuration utility.
 
     """
-    CLI_META = {'first_pass': True,
-                'option_includes': {'level'},
-                'mnemonics': {'config': 'log'}}
+    CLI_META = {'first_pass': True,  # not a separate action
+                # don't add the '-l' as a short option
+                'option_overrides': {'level': {'short_name': None}},
+                # we configure this class, but use a better naming for
+                # debugging
+                'mnemonics': {'config': 'log'},
+                # only set 'level' as a command line option so we can configure
+                # the rest in the application context.
+                'option_includes': {'level'}}
+
     log_name: str = field(default=None)
     """The log name space."""
 
-    default_level: str = field(default=LogLevel.warning)
+    default_level: LogLevel = field(default=LogLevel.warn)
     """The level to set the root logger."""
 
     level: LogLevel = field(default=LogLevel.info)
     """The level to set the application logger."""
 
-    def _to_level(self, s: str) -> int:
-        """Return the integer equivalent logging level.
+    format: str = field(default=None)
+    """The format string to use for the logging system."""
 
-        :param s: the level
+    debug: bool = field(default=False)
+    """Print some logging to standard out to debug this class."""
 
-        """
-        return getattr(logging, s.upper())
+    def _to_level(self, name: str, level: Any) -> int:
+        if isinstance(level, str):
+            obj = LogLevel.__members__.get(level)
+            if obj is None:
+                raise ValueError(f'no such level for {name}: {level}')
+            level = obj
+        return level.value
+
+    def _debug(self, msg: str):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(msg)
+        if self.debug:
+            print(msg)
 
     def config(self):
         """Configure the log system.
 
         """
-        msg = (f'configuring root logger to {self.default_level} and ' +
-               f'{self.log_name} to {self.level}')
-        logger.info(msg)
-        default = self.to_level(self.default_level)
-        logging.basicConfig(level=default)
+        self._debug(f'configuring root logger to {self.default_level} ' +
+                    f'and {self.log_name} to {self.level}')
+        level: int = self._to_level('default', self.default_level)
+        params = {'level': level}
+        if self.format is not None:
+            params['format'] = self.format.replace('%%', '%')
+        logging.basicConfig(**params)
         if self.log_name is not None:
-            level = self._to_level(self.level)
+            level: int = self._to_level('app', self.level)
+            self._debug(f'setting logger {self.log_name} to {self.level}')
             logging.getLogger(self.log_name).setLevel(level)
 
 

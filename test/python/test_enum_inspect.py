@@ -5,14 +5,14 @@ from zensols.config import Dictable
 from zensols.introspect import (
     ClassInspector, Class, ClassMethod, ClassMethodArg, ClassField,
 )
-from zensols.cli import LogLevel
 from logutil import LogTestCase
 
 
-class Level(Enum):
+class LogLevel(Enum):
     debug = auto()
     info = auto()
     warn = auto()
+    error = auto()
 
 
 @dataclass

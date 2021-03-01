@@ -201,6 +201,8 @@ class Application(Dictable):
         field: ClassField
         for f in action.class_meta.fields.values():
             val: str = cmd_opts.get(f.name)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'setting CLI parameter {f.name} -> {val}')
             # set the field used to create the app target instance if given by
             # the user on the command line
             if val is None:
