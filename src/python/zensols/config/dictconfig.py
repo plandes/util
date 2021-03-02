@@ -26,7 +26,7 @@ class DictionaryConfig(Configurable):
     .. automethod:: _get_config
 
     """
-    def __init__(self, config: Dict[str, Dict[str, str]],
+    def __init__(self, config: Dict[str, Dict[str, str]] = None,
                  expect: bool = True, default_section: str = None):
         """Initialize.
 
@@ -40,7 +40,9 @@ class DictionaryConfig(Configurable):
 
         """
         super().__init__(expect, default_section)
-        if config is not None:
+        if config is None:
+            self._dict_config = {}
+        else:
             self._dict_config = config
 
     def _get_config(self) -> Dict[str, Dict[str, str]]:
@@ -69,3 +71,11 @@ class DictionaryConfig(Configurable):
 
         """
         return set(self._get_config().keys())
+
+    def set_option(self, name: str, value: str, section: str = None):
+        if section not in self.sections:
+            dct = {}
+            self._dict_config[section] = dct
+        else:
+            dct = self._dict_config[section]
+        dct[name] = value
