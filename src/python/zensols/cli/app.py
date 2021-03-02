@@ -295,24 +295,20 @@ class ApplicationFactory(object):
     """The package name of *this* utility package."""
 
     package_resource: PackageResource = field()
-    """Package resource (i.e. zensols.someappname)."""
+    """Package resource (i.e. ``zensols.someappname``).  This field is converted to
+    a package if given as a string during post initialization.
+
+    """
 
     app_config_resource: str = field(default='resources/app.conf')
     """The relative resource path to the application's context."""
 
-    @classmethod
-    def instance(cls, package_name: str, *args, **kwargs) -> \
-            ApplicationFactory:
-        """"A convenience method to create a factory instance by first converting the
-        package name string to a :class:`.PackageResoure`.
+    children_configs: Tuple[Configurable] = field(default=None)
+    """Any children configurations added to the root level configuration."""
 
-        :param package_name: used to create the :obj:`package_resource`
-
-        :param app_config_resource: see class docs
-
-        """
-        pres = PackageResource(package_name)
-        return cls(pres, *args, **kwargs)
+    def __post_init__(self):
+        if isinstance(self.package_resource, str):
+            self.package_resource = PackageResource(self.package_resource)
 
     def _create_application_context(self, parent_context: Path,
                                     app_context: Path) -> Configurable:
@@ -328,7 +324,10 @@ class ApplicationFactory(object):
         app_conf = DictionaryConfig(
             {'import_app': {'config_file': str(app_context.absolute()),
                             'type': 'ini'}})
-        return ImportIniConfig(parent_context, children=(app_conf,))
+        children = [app_conf]
+        if self.children_configs is not None:
+            children.extend(self.children_configs)
+        return ImportIniConfig(parent_context, children=children)
 
     def _create_config_factory(self, config: Configurable) -> ConfigFactory:
         """Factory method to create the configuration factory from the application

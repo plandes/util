@@ -17,7 +17,7 @@ import mockapp.app as ma
 
 class TestActionSecondPass(LogTestCase):
     def setUp(self):
-        self.cli = ApplicationFactory.instance(
+        self.cli = ApplicationFactory(
             'zensols.testapp', 'test-resources/test-app-sec-pass.conf')
 
     def test_metadata(self):
@@ -90,7 +90,7 @@ class TestActionSecondPass(LogTestCase):
 
 class TestActionFirstPass(LogTestCase):
     def setUp(self):
-        self.cli = ApplicationFactory.instance(
+        self.cli = ApplicationFactory(
             'zensols.testapp', 'test-resources/test-app-first-pass.conf')
 
     def test_metadata(self):
@@ -135,7 +135,7 @@ class TestActionFirstPass(LogTestCase):
 
 class TestActionInvoke(LogTestCase):
     def setUp(self):
-        self.cli = ApplicationFactory.instance(
+        self.cli = ApplicationFactory(
             'zensols.testapp', 'test-resources/test-app-first-pass.conf')
 
     def Xtest_first_pass_invoke(self):
@@ -160,7 +160,7 @@ class TestActionInvoke(LogTestCase):
         self.assertEqual((str, float, int, str, ma.Fruit, ma.Fruit), tuple(map(type, res_params)))
 
     def test_second_pass_invoke(self):
-        self.cli = ApplicationFactory.instance(
+        self.cli = ApplicationFactory(
             'zensols.testapp', 'test-resources/test-app-sec-pass.conf')
         aset: CommandActionSet = self.cli.create('doit one 2 apple -a 5'.split())
         if 0:
@@ -174,7 +174,7 @@ class TestActionInvoke(LogTestCase):
 
 class TestActionType(LogTestCase):
     def setUp(self):
-        self.cli = ApplicationFactory.instance(
+        self.cli = ApplicationFactory(
             'zensols.testapp', 'test-resources/test-app-bool.conf')
 
     def test_bool(self):
@@ -245,7 +245,7 @@ class TestActionType(LogTestCase):
 
 class TestActionMetaConfig(LogTestCase):
     def test_first_pass_invoke(self):
-        self.cli = ApplicationFactory.instance(
+        self.cli = ApplicationFactory(
             'zensols.testapp', 'test-resources/test-app-meta.conf')
         aset: CommandActionSet = self.cli.create('action3 -o'.split())
         if 0:
@@ -266,7 +266,7 @@ class TestActionMetaConfig(LogTestCase):
 
 class TestActionConfigAction(LogTestCase):
     def test_with_config(self):
-        self.cli = ApplicationFactory.instance(
+        self.cli = ApplicationFactory(
             'zensols.testapp', 'test-resources/test-app-config-opt.conf')
         if 0:
             print()
@@ -285,7 +285,7 @@ class TestActionConfigAction(LogTestCase):
                          res.result)
 
     def test_missing_config(self):
-        self.cli = ApplicationFactory.instance(
+        self.cli = ApplicationFactory(
             'zensols.testapp', 'test-resources/test-app-config-opt.conf')
         if 0:
             print()
@@ -298,7 +298,7 @@ class TestActionConfigAction(LogTestCase):
             aset.invoke()
 
     def test_missing_config_ok(self):
-        self.cli = ApplicationFactory.instance(
+        self.cli = ApplicationFactory(
             'zensols.testapp', 'test-resources/test-app-config-skip.conf')
         if 0:
             print()
@@ -314,7 +314,7 @@ class TestActionConfigAction(LogTestCase):
 
 class TestActionDefault(LogTestCase):
     def test_with_config(self):
-        self.cli = ApplicationFactory.instance(
+        self.cli = ApplicationFactory(
             'zensols.testapp', 'test-resources/test-app-default-action.conf')
         if 0:
             print()
