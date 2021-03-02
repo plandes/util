@@ -257,6 +257,14 @@ class Application(Dictable):
                 f'{len(pos_args)} in {action.name}.{meth_meta.name}')
         return pos_args, meth_params
 
+    def _pre_process(self, action: Action, instance: Any):
+        if not action.cli.first_pass:
+            config = self.config_factory.config
+            cli_manager: ActionCliManager = self.factory.cli_manager
+            if cli_manager.cleanups is not None:
+                for sec in cli_manager.cleanups:
+                    config.remove_section(sec)
+
     def invoke(self) -> ApplicationResult:
         """Invoke the application and return the results.
 
@@ -264,7 +272,8 @@ class Application(Dictable):
         results: List[ActionResult] = []
         action: Action
         for action in self.actions:
-            inst = self._create_instance(action)
+            inst: Any = self._create_instance(action)
+            self._pre_process(action, inst)
             meth_meta: ClassMethod = action.method_meta
             pos_args, meth_params = self._get_meth_params(action, meth_meta)
             meth = getattr(inst, meth_meta.name)
@@ -374,11 +383,9 @@ class ApplicationFactory(object):
         return fac, cli_mng, parser
 
     @property
-    def parser(self) -> CommandLineParser:
-        """Used to parse the command line.
-
-        """
-        return self._create_resources()[2]
+    def config_factory(self) -> ConfigFactory:
+        """The configuration factory used to create the application."""
+        return self._create_resources()[0]
 
     @property
     def cli_manager(self) -> ActionCliManager:
@@ -386,6 +393,13 @@ class ApplicationFactory(object):
 
         """
         return self._create_resources()[1]
+
+    @property
+    def parser(self) -> CommandLineParser:
+        """Used to parse the command line.
+
+        """
+        return self._create_resources()[2]
 
     def _parse(self, args: List[str]) -> Tuple[Action]:
         """Parse the command line.

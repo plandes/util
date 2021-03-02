@@ -208,6 +208,10 @@ class Configurable(Writable, metaclass=ABCMeta):
             for k, v in self.get_options(sec).items():
                 to_populate.set_option(k, v, sec)
 
+    def remove_section(self, section: str):
+        """Remove a seciton with the given name."""
+        raise NotImplementedError()
+
     def merge(self, to_populate: Configurable):
         """Copy all data from this configuruable to ``to_populate``, and clobber any
         overlapping properties in the process.

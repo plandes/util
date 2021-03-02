@@ -219,6 +219,9 @@ class ActionCliManager(Dictable):
     apps: Tuple[str] = field()
     """The application section names."""
 
+    cleanups: Tuple[str] = field(default=None)
+    """The sections to remove after the application is built."""
+
     decorator_section_format: str = field(default='{section}_decorator')
     """Format of :class:`.ActionCli` configuration classes."""
 

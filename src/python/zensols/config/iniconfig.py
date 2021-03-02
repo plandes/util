@@ -169,6 +169,9 @@ class IniConfig(Configurable):
             self.parser.add_section(section)
         self.parser.set(section, name, value)
 
+    def remove_section(self, section: str):
+        self.parser.remove_section(section)
+
     def derive_from_resource(self, path: str, copy_sections=()) -> \
             Configurable:
         """Derive a new configuration from the resource file name ``path``.
