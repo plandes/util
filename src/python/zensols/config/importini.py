@@ -124,9 +124,6 @@ class ImportIniConfig(IniConfig):
         :param robust: if `True`, then don't raise an error when the
                        configuration file is missing
 
-        :param expect: if ``True``, raise exceptions when keys and/or
-                               sections are not found in the configuration
-
         :param create_defaults: used to initialize the configuration parser,
                                 and useful for when substitution values are
                                 baked in to the configuration file
