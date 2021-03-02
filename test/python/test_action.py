@@ -326,4 +326,9 @@ class TestActionDefault(LogTestCase):
         res: ActionResult = app_res.second_pass_result
         self.assertEqual('action2', res.action.meta_data.name)
         self.assertEqual(('action2', 3), res.result)
-        aset: CommandActionSet = self.cli.create('-p 3'.split())
+        aset: CommandActionSet = self.cli.create('-p 4'.split())
+        self.assertEqual(Application, type(aset))
+        app_res: ApplicationResult = aset.invoke()
+        res: ActionResult = app_res.second_pass_result
+        self.assertEqual('action2', res.action.meta_data.name)
+        self.assertEqual(('action2', 4), res.result)

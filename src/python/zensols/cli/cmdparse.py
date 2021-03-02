@@ -59,9 +59,11 @@ class ActionOptionParser(OptionParser):
                       help='show this help message and exit',
                       action='store_true')
 
-    def print_help(self, file=sys.stdout):
+    def print_help(self, file: TextIOBase = sys.stdout,
+                   include_actions: bool = True):
         super().print_help(file)
-        self.usage_writer.write(writer=file)
+        if include_actions:
+            self.usage_writer.write(writer=file)
 
 
 @dataclass
@@ -190,9 +192,22 @@ class CommandLineParser(Dictable):
         self._configure_parser(parser, opts)
         return parser
 
-    def write_help(self, writer: TextIOBase = sys.stdout):
+    def write_help(self, writer: TextIOBase = sys.stdout,
+                   include_actions: bool = True):
+        """Write the usage information and help text.
+
+        :param include_actions: if ``True`` write each actions' usage as well
+
+        """
         parser = self._get_first_pass_parser(False)
-        parser.print_help(file=writer)
+        parser.print_help(writer, include_actions)
+
+    def error(self, msg: str):
+        """Print a usage with the error message and exit the program as fail.
+
+        """
+        parser = self._get_first_pass_parser(False)
+        parser.error(msg)
 
     def _parse_type(self, s: str, t: type) -> Any:
         if issubclass(t, Enum):
@@ -272,7 +287,7 @@ class CommandLineParser(Dictable):
             else:
                 action_name = self.default_action
                 op_args = []
-                args = [action_name]
+                args = [action_name] + args
                 second_pass = True
         else:
             # otherwise, use the first positional parameter as the mnemonic and

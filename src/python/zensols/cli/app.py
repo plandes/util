@@ -440,7 +440,10 @@ class ApplicationFactory(object):
         :return: the result of the second pass action
 
         """
-        app: Application = self.create(args)
-        app_res: ApplicationResult = app.invoke()
-        act_res: ActionResult = app_res()
-        return act_res
+        try:
+            app: Application = self.create(args)
+            app_res: ApplicationResult = app.invoke()
+            act_res: ActionResult = app_res()
+            return act_res
+        except ActionCliError as e:
+            self.parser.error(str(e))
