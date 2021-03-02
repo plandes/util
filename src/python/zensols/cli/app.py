@@ -372,6 +372,13 @@ class ApplicationFactory(object):
     children_configs: Tuple[Configurable] = field(default=None)
     """Any children configurations added to the root level configuration."""
 
+    reload_factory: bool = field(default=False)
+    """If ``True``, reload classes in :class:`.ImportConfigFactory`.
+
+    :see: :meth:`_create_config_factory`
+
+    """
+
     def __post_init__(self):
         if isinstance(self.package_resource, str):
             self.package_resource = PackageResource(self.package_resource)
@@ -396,7 +403,7 @@ class ApplicationFactory(object):
         context created in :meth:`_get_app_context`.
 
         """
-        return ImportConfigFactory(config)
+        return ImportConfigFactory(config, reload=self.reload_factory)
 
     @persisted('_resources')
     def _create_resources(self) -> \
