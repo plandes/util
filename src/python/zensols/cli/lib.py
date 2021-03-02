@@ -48,6 +48,11 @@ class LogConfigurator(object):
                 # only set 'level' as a command line option so we can configure
                 # the rest in the application context.
                 'option_includes': {'level'}}
+    """Command line meta data to avoid having to decorate this class in the
+    configuration.  Given the complexity of this class, this configuration only
+    exposes the parts of this class necessary for the CLI.
+
+    """
 
     log_name: str = field(default=None)
     """The log name space."""
@@ -100,19 +105,65 @@ class LogConfigurator(object):
 
 @dataclass
 class ConfigurationImporter(ApplicationObserver):
+    """This class imports a child configuration in to the application context.  It
+    does this by:
+
+      1. Attempt to load the configuration indicated by the ``--config``
+         option.
+
+      2. If the option doesn't exist, attempt to get the path to load from an
+         environment variable (see :meth:`_get_environ_var_from_app`).
+
+      3. Loads the *child* configuration.
+
+      4. Copy all sections from the child configuration to :obj:`config`.
+
+    The child configuration is one given in :obj:`CONFIG_FACTORIES`.  If the
+    child has a `.conf` extension, :class:`.ImportIniConfig` is used with its
+    child set as :obj:`config` so the two can reference each other at
+    property/factory resolve time.
+
+    In the case the child configuration is loaded
+
+    """
     CONFIG_PATH_FIELD = 'config_path'
-    CLI_META = {'first_pass': True,
+    """The field name in this class of the child configuration path."""
+
+    CLI_META = {'first_pass': True,  # not a separate action
+                # the mnemonic must be unique and used to referece the method
                 'mnemonics': {'add': '_add_config_as_import'},
+                # better/shorter  long name, and reserve the short name
                 'option_overrides': {CONFIG_PATH_FIELD: {'long_name': 'config',
                                                          'short_name': 'c'}},
-                'option_includes': {'config_path'}}
+                # only the path to the configuration should be exposed as a
+                # an option on the comamnd line
+                'option_includes': {CONFIG_PATH_FIELD}}
+    """Command line meta data to avoid having to decorate this class in the
+    configuration.  Given the complexity of this class, this configuration only
+    exposes the parts of this class necessary for the CLI.
+
+    """
+
     FILE_EXT_REGEX = re.compile(r'.+\.([a-zA-Z]+?)$')
+    """A regular expression to parse out the extension from a file name."""
+
     ENVIRON_VAR_REGEX = re.compile(r'^.+\.([a-z]+?)$')
+    """A regular expression to parse the name from the package name for the
+    environment variable that might hold the configuration
+    (i.e. ``APPNAMERC``).
+
+    """
+
     CONFIG_FACTORIES = {'conf': 'ImportIniConfig',
                         'yml': 'YamlConfig',
                         'json': 'JsonConfig'}
+    """The configuration factory extension to clas name."""
 
-    config: Configurable
+    config: Configurable = field()
+    """The parent configuration, which is populated from the child configuration
+    (see class docs).
+
+    """
 
     expect: bool = field(default=True)
     """If ``True``, raise an :class:`.ActionCliError` if the option is not given.
@@ -129,26 +180,48 @@ class ConfigurationImporter(ApplicationObserver):
     """The path to the configuration file."""
 
     def _get_environ_var_from_app(self) -> str:
-        pkg_res: PackageResource = self._app.factory.package_resource
-        name: str = pkg_res.name
-        m = self.ENVIRON_VAR_REGEX.match(name)
-        if m is not None:
-            name = m.group(1)
-        name = f'{name}rc'.upper()
+        """Return the environment variable based on the name of the application.  This
+        returns the :obj:`config_path_environ_name` if set, otherwise, it
+        generates it based on the name returned from the packge + ``RC`` and
+        capitalizes it.
+
+        """
+        if self.config_path_environ_name is not None:
+            name = self.config_path_environ_name
+        else:
+            pkg_res: PackageResource = self._app.factory.package_resource
+            name: str = pkg_res.name
+            m = self.ENVIRON_VAR_REGEX.match(name)
+            if m is not None:
+                name = m.group(1)
+            name = f'{name}rc'.upper()
         return name
 
     def _get_config_option(self) -> str:
+        """Return the long option name (with dashes) as given on the command line.
+
+        """
         ameta: ActionMetaData = self._action.meta_data
         ometa: OptionMetaData = ameta.options_by_dest[self.CONFIG_PATH_FIELD]
         return ometa.long_option
 
     def _application_created(self, app: Application, action: Action):
+        """In this call back, set the app and action for using in the invocation
+        :meth:`add`.
+
+        """
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'configurator created with {action}')
         self._app = app
         self._action = action
 
-    def _class_for_path(self):
+    def _class_for_path(self) -> Type[Configurable]:
+        """Return a Python class object for the configuration based on the file
+        extension.
+
+        :see: :obj:`CONFIG_FACTORIES`
+
+        """
         ext = self.config_path.name
         m = self.FILE_EXT_REGEX.match(ext)
         if m is not None:
@@ -163,6 +236,10 @@ class ConfigurationImporter(ApplicationObserver):
         return cls
 
     def _load(self):
+        """Once we have the path and the class used to load the configuration, create
+        the instance and load it.
+
+        """
         cls: Type[ConfigFactory] = self._class_for_path()
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'using config factory class {cls} to load: ' +
@@ -200,12 +277,31 @@ class ConfigurationImporter(ApplicationObserver):
 
 @dataclass
 class PackageInfoImporter(ApplicationObserver):
-    CLI_META = {'first_pass': True,
-                'always_invoke': True,
-                'mnemonics': {'add': '_add_package_info'},
-                'option_includes': {}}
+    """Adds a section to the configuration with the application package
+    information.
 
-    config: Configurable
+    """
+    CLI_META = {'first_pass': True,  # not a separate action
+                # since there are no options and this is a first pass, force
+                # the CLI API to invoke it as otherwise there's no indication
+                # to the CLI that it needs to be called
+                'always_invoke': True,
+                # the mnemonic must be unique and used to referece the method
+                'mnemonics': {'add': '_add_package_info'},
+                # only the path to the configuration should be exposed as a
+                # an option on the comamnd line
+                'option_includes': {}}
+    """Command line meta data to avoid having to decorate this class in the
+    configuration.  Given the complexity of this class, this configuration only
+    exposes the parts of this class necessary for the CLI.
+
+    """
+
+    config: Configurable = field()
+    """The parent configuration, which is populated with the package
+    information.
+
+    """
 
     section: str = field(default='package')
     """The name of the section to create with the package information."""
@@ -217,7 +313,7 @@ class PackageInfoImporter(ApplicationObserver):
         self._action = action
 
     def add(self):
-        """Add package information to the configuration.
+        """Add package information to the configuration (see class docs).
 
         """
         pkg_res: PackageResource = self._app.factory.package_resource

@@ -115,7 +115,9 @@ class ActionCli(Dictable):
     """If ``True``, always invoke all methods for the action regardless if an
     action mnemonic and options pertaining to the action are not given by the
     user/command line.  This is useful for configuration first pass type
-    classes like :class:`.PackageInfoImporter`.
+    classes like :class:`.PackageInfoImporter` to force the CLI API to invoke
+    it, as otherwise there's no indication to the CLI that it needs to be
+    called.
 
     """
 
