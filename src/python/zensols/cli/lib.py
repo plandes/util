@@ -278,7 +278,14 @@ class ConfigurationImporter(ApplicationObserver):
 @dataclass
 class PackageInfoImporter(ApplicationObserver):
     """Adds a section to the configuration with the application package
-    information.
+    information.  The section to add is given in :obj:`section`, and the
+    key/values are:
+
+      * **name**: the package name (:obj:`.PackageResources.name`)
+      * **version**: the package version (:obj:`.PackageResources.version`)
+
+    This class is useful to configure the default application module given by
+    the package name for the :class:`.LogConfigurator` class.
 
     """
     CLI_META = {'first_pass': True,  # not a separate action
