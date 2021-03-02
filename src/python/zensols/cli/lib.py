@@ -168,15 +168,8 @@ class ConfigurationImporter(ApplicationObserver):
             logger.debug(f'using config factory class {cls} to load: ' +
                          str(self.config_path))
         if issubclass(cls, ImportIniConfig):
-            # from zensols.config import DictionaryConfig
-            # clone = DictionaryConfig()
-            # self.config.write()
-            # self.config.copy_sections(clone)
-            # clone.write()
             inst = cls(self.config_path, children=(self.config,))
             inst.copy_sections(self.config)
-            #inst = cls(self.config_path)
-            #self.config.children.append(inst)
         else:
             inst = cls(self.config_path)
             inst.copy_sections(self.config)
