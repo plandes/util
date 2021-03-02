@@ -134,6 +134,10 @@ class CommandLineParser(Dictable):
     ``--version`` switch.
 
     """
+
+    default_action: str = field(default=None)
+    """The default mnemonic use when the user does not supply one."""
+
     def __post_init__(self):
         if len(self.config.actions) == 0:
             raise ValueError('must create parser with at least one action')
@@ -259,11 +263,17 @@ class CommandLineParser(Dictable):
         if len(self.config.second_pass_actions) == 1:
             action_name = self.config.second_pass_actions[0].name
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'using singleton fp action: {action_name} ' + 
+                logger.debug(f'using singleton fp action: {action_name} ' +
                              f'with options {options}')
         elif len(op_args) == 0:
-            # no positional arguments mean we don't know which action to use
-            raise CommandLineError('no action given')
+            if self.default_action is None:
+                # no positional arguments mean we don't know which action to use
+                raise CommandLineError('no action given')
+            else:
+                action_name = self.default_action
+                op_args = []
+                args = [action_name]
+                second_pass = True
         else:
             # otherwise, use the first positional parameter as the mnemonic and
             # the remainder as positional parameters for that action
@@ -273,7 +283,7 @@ class CommandLineParser(Dictable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'need second pass for {action_name}, ' +
                              f'option args: {op_args}')
-        return second_pass, action_name, fp_opts, options, op_args
+        return second_pass, action_name, fp_opts, options, op_args, args
 
     def _parse_second_pass(self, action_name: str, second_pass: bool,
                            args: List[str], options: Dict[str, Any],
@@ -282,7 +292,7 @@ class CommandLineParser(Dictable):
         action_meta: ActionMetaData = \
             self.config.actions_by_name.get(action_name)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f"action '{action_name}' found: {action_meta.name}")
+            logger.debug(f"action '{action_name}' found: {action_meta}")
         if action_meta is None:
             raise CommandLineError(f'no such action: {action_name}')
         if len(action_meta.positional) != len(op_args):
@@ -306,6 +316,17 @@ class CommandLineParser(Dictable):
         options = self._parse_options(action_meta, options)
         return action_meta, options, op_args
 
+    def _validate_setup(self):
+        """Make sure we don't have a default action with positional args."""
+        if self.default_action is not None:
+            action_meta: ActionMetaData
+            for action_meta in self.config.second_pass_actions:
+                if len(action_meta.positional) > 0:
+                    raise ValueError(
+                        'no positional arguments allowed when default ' +
+                        f"action '{self.default_action}' " +
+                        f'given for method {action_meta.name}')
+
     def parse(self, args: List[str]) -> CommandActionSet:
         """Parse command line arguments.
 
@@ -317,9 +338,10 @@ class CommandLineParser(Dictable):
             logger.debug(f'parsing: {args}')
         # action instances
         actions: List[CommandAction] = []
-        #parser = self._get_first_pass_parser(False)
+        # some top level sanity checks
+        self._validate_setup()
         # first pass parse
-        second_pass, action_name, fp_opts, options, op_args = \
+        second_pass, action_name, fp_opts, options, op_args, args = \
             self._parse_first_pass(args, actions)
         # second pass parse
         action_meta, options, op_args = self._parse_second_pass(

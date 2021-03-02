@@ -222,6 +222,9 @@ class ActionCliManager(Dictable):
     decorator_section_format: str = field(default='{section}_decorator')
     """Format of :class:`.ActionCli` configuration classes."""
 
+    default_action: str = field(default=None)
+    """The default mnemonic use when the user does not supply one."""
+
     @property
     def config(self) -> Configurable:
         return self.config_factory.config

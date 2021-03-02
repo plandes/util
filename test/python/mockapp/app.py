@@ -91,3 +91,15 @@ class TestActionConfigured(Dictable):
 
     def do_it(self):
         return 'test app res', tuple(self.a_stash.values())
+
+
+@dataclass
+class TestActionDefault(Dictable):
+    """A test app with config metadata.
+
+    """
+    def action_one(self, opt1: bool = False):
+        return 'action1', opt1
+
+    def action2(self, opt2: int = None):
+        return 'action2', opt2

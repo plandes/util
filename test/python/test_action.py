@@ -138,7 +138,7 @@ class TestActionInvoke(LogTestCase):
         self.cli = ApplicationFactory.instance(
             'zensols.testapp', 'test-resources/test-app-first-pass.conf')
 
-    def test_first_pass_invoke(self):
+    def Xtest_first_pass_invoke(self):
         if 0:
             self.config_logging('zensols.cli')
             self.cli.parser.write_help()
@@ -310,3 +310,20 @@ class TestActionConfigAction(LogTestCase):
         with loglevel('zensols.config.factory', logging.CRITICAL):
             with self.assertRaisesRegex(ConfigurableError, errmsg):
                 aset.invoke()
+
+
+class TestActionDefault(LogTestCase):
+    def test_with_config(self):
+        self.cli = ApplicationFactory.instance(
+            'zensols.testapp', 'test-resources/test-app-default-action.conf')
+        if 0:
+            print()
+            self.cli.parser.write_help()
+            self.config_logging('zensols.cli')
+        aset: CommandActionSet = self.cli.create('action2 -p 3'.split())
+        self.assertEqual(Application, type(aset))
+        app_res: ApplicationResult = aset.invoke()
+        res: ActionResult = app_res.second_pass_result
+        self.assertEqual('action2', res.action.meta_data.name)
+        self.assertEqual(('action2', 3), res.result)
+        aset: CommandActionSet = self.cli.create('-p 3'.split())

@@ -369,7 +369,8 @@ class ApplicationFactory(object):
         actions: Tuple[ActionMetaData] = tuple(chain.from_iterable(
             map(lambda a: a.meta_datas, cli_mng.actions.values())))
         config = CommandLineConfig(actions)
-        parser = CommandLineParser(config, self.package_resource.version)
+        parser = CommandLineParser(config, self.package_resource.version,
+                                   default_action=cli_mng.default_action)
         return fac, cli_mng, parser
 
     @property
@@ -401,7 +402,7 @@ class ApplicationFactory(object):
                 name: str = acli_meth.action_meta_data.name
                 caction: CommandAction = cmd_actions.get(name)
                 if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'action name: {name} -> {caction.name}')
+                    logger.debug(f'action name: {name} -> {caction}')
                 if caction is None and action_cli.always_invoke:
                     caction = CommandAction(acli_meth.action_meta_data, {}, ())
                 if caction is not None:
@@ -411,14 +412,35 @@ class ApplicationFactory(object):
                     actions.append(action)
         return actions
 
-    def create(self, args: List[str]) -> Application:
+    def _get_default_args(self) -> List[str]:
+        """Return the arguments to parse when none are given.  This defaults to the
+        system arguments skipping the firt (program) argument.
+
+        """
+        return sys.argv[1:]
+
+    def create(self, args: List[str] = None) -> Application:
         """Create the action CLI application.
 
         :raises ActionCliError: for any missing data or misconfigurations
 
         """
         fac, cli_mng, parser = self._create_resources()
+        if args is None:
+            args = self._get_default_args()
         actions: Tuple[Action] = self._parse(args)
         return Application(fac, self, actions)
 
-    
+    def invoke(self, args: List[str] = None) -> Any:
+        """Creates and invokes the entire application returning the result of the
+        second pass action.
+
+        :raises ActionCliError: for any missing data or misconfigurations
+
+        :return: the result of the second pass action
+
+        """
+        app: Application = self.create(args)
+        app_res: ApplicationResult = app.invoke()
+        act_res: ActionResult = app_res()
+        return act_res
