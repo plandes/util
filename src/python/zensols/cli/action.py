@@ -61,7 +61,7 @@ class ActionCliMethod(Dictable):
 
     """
 
-
+
 @dataclass
 class ActionCli(Dictable):
     """A set of commands that is invokeable on the command line, one for each
@@ -137,6 +137,9 @@ class ActionCli(Dictable):
     @property
     @persisted('_methods')
     def methods(self) -> Dict[str, ActionCliMethod]:
+        """Return the methods for this action CLI with method name keys.
+
+        """
         meths: Dict[str, ActionCliMethod] = {}
         field_params: Set[OptionMetaData] = set()
         f: ClassField
@@ -188,9 +191,12 @@ class ActionCli(Dictable):
     @property
     @persisted('_meta_datas')
     def meta_datas(self) -> Tuple[ActionMetaData]:
+        """Return action meta data across all methods.
+
+        """
         return tuple(map(lambda m: m.action_meta_data, self.methods.values()))
 
-
+
 @dataclass
 class ActionCliManager(Dictable):
     """An :class:`.ActionCli` is created from the configuration given by the
@@ -395,6 +401,9 @@ class ActionCliManager(Dictable):
     @property
     @persisted('_actions_ordered')
     def actions_ordered(self) -> Tuple[ActionCli]:
+        """Return all actions in the order they were given in the configuration.
+
+        """
         acts = self.actions
         fp = filter(lambda a: a.first_pass, acts.values())
         sp = filter(lambda a: not a.first_pass, acts.values())
