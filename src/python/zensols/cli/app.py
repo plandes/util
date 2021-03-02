@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, List, Dict, Iterable, Any
+from typing import Tuple, List, Dict, Iterable, Any, Callable
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 import logging
@@ -172,6 +172,33 @@ class ApplicationObserver(ABC):
 
 
 @dataclass
+class Invokable(object):
+    """A callable that invokes an :class:`.Action`.  This is used by
+:class:`.Application` to invoke the entire CLI application.
+
+    """
+
+    action: Action = field()
+    """The action used to create this instance."""
+
+    instance: Any = field()
+    """The instantiated object generated from :obj:`action`."""
+
+    method: Callable = field()
+    """The object method bound to :obj:`instance` to be called."""
+
+    args: Tuple[any] = field()
+    """The arguments used when calling :obj:`method`."""
+
+    kwargs: Dict[str, Any] = field()
+    """The keyword arguments used when calling :obj:`method`."""
+
+    def __call__(self):
+        """Call :obj:`method` with :obj:`args` and :obj:`kwargs`."""
+        return self.method(*self.args, **self.kwargs)
+
+
+@dataclass
 class Application(Dictable):
     """An invokable application created using command line and application context
     data.  This class creates an instance of the *target application instance*,
@@ -263,24 +290,63 @@ class Application(Dictable):
             cli_manager: ActionCliManager = self.factory.cli_manager
             if cli_manager.cleanups is not None:
                 for sec in cli_manager.cleanups:
+                    if sec not in config.sections:
+                        raise ValueError(f'no section to remove: {sec}')
                     config.remove_section(sec)
+
+    def _create_invokable(self, action: Action) -> Invokable:
+        inst: Any = self._create_instance(action)
+        self._pre_process(action, inst)
+        meth_meta: ClassMethod = action.method_meta
+        pos_args, meth_params = self._get_meth_params(action, meth_meta)
+        meth = getattr(inst, meth_meta.name)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'invoking {meth}')
+        return Invokable(action, inst, meth, pos_args, meth_params)
+
+    @property
+    def first_pass_actions(self) -> Iterable[Action]:
+        return filter(lambda a: a.meta_data.first_pass, self.actions)
+
+    @property
+    def second_pass_action(self) -> Action:
+        acts = filter(lambda a: not a.meta_data.first_pass, self.actions)
+        acts = tuple(acts)
+        assert len(acts) == 1
+        return acts[0]
+
+    def _invoke_first_pass(self) -> Tuple[ActionResult]:
+        """Invokes only the first pass actions and returns the results.
+
+        """
+        results: List[ActionResult] = []
+        action: Action
+        for action in self.first_pass_actions:
+            invokable: Invokable = self._create_invokable(action)
+            res: Any = invokable()
+            results.append(ActionResult(action, invokable.instance, res))
+        return tuple(results)
+
+    def invoke_but_second_pass(self) -> Tuple[Tuple[ActionResult], Invokable]:
+        """Invoke first pass actions but not the second pass action.
+
+        :return: the results from the first pass actions and an invokable for
+                 the second pass action
+
+        """
+        results: List[ActionResult] = list(self._invoke_first_pass())
+        action: Action = self.second_pass_action
+        invokable: Invokable = self._create_invokable(action)
+        return results, invokable
 
     def invoke(self) -> ApplicationResult:
         """Invoke the application and return the results.
 
         """
-        results: List[ActionResult] = []
-        action: Action
-        for action in self.actions:
-            inst: Any = self._create_instance(action)
-            self._pre_process(action, inst)
-            meth_meta: ClassMethod = action.method_meta
-            pos_args, meth_params = self._get_meth_params(action, meth_meta)
-            meth = getattr(inst, meth_meta.name)
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'invoking {meth}')
-            res: Any = meth(*pos_args, **meth_params)
-            results.append(ActionResult(action, inst, res))
+        results, invokable = self.invoke_but_second_pass()
+        res: Any = invokable()
+        sp_res = ActionResult(invokable.action, invokable.instance, res)
+        results.append(sp_res)
         return ApplicationResult(tuple(results))
 
 
@@ -310,8 +376,7 @@ class ApplicationFactory(object):
         if isinstance(self.package_resource, str):
             self.package_resource = PackageResource(self.package_resource)
 
-    def _create_application_context(self, parent_context: Path,
-                                    app_context: Path) -> Configurable:
+    def _create_application_context(self, app_context: Path) -> Configurable:
         """Factory method to create the application context from the :mod:`cli`
         resource (parent) context and a path to the application specific
         (child) context.
@@ -321,13 +386,10 @@ class ApplicationFactory(object):
         :param app_context: the application child context path
 
         """
-        app_conf = DictionaryConfig(
-            {'import_app': {'config_file': str(app_context.absolute()),
-                            'type': 'ini'}})
-        children = [app_conf]
+        children = []
         if self.children_configs is not None:
             children.extend(self.children_configs)
-        return ImportIniConfig(parent_context, children=children)
+        return ImportIniConfig(app_context, children=children)
 
     def _create_config_factory(self, config: Configurable) -> ConfigFactory:
         """Factory method to create the configuration factory from the application
@@ -335,27 +397,6 @@ class ApplicationFactory(object):
 
         """
         return ImportConfigFactory(config)
-
-    def _get_app_context(self, app_context: Path) -> Configurable:
-        """Create the initial *bootstrap* app config.
-
-        :param app_context: the path to the app specific application context
-                            configuration file
-
-        """
-        pres = PackageResource(self.UTIL_PACKAGE)
-        res: str = self.app_config_resource
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'looking up resource: {res} in {pres}')
-        parent_context: Path = pres.get_path(res)
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('loading zensols.util app context parent ' +
-                         f'{parent_context.absolute()} with child app ' +
-                         f'context {app_context.absolute()}')
-        if not parent_context.exists():
-            # this should never not happen
-            raise ValueError(f'no application context found: {parent_context}')
-        return self._create_application_context(parent_context, app_context)
 
     @persisted('_resources')
     def _create_resources(self) -> \
@@ -371,7 +412,7 @@ class ApplicationFactory(object):
             raise ActionCliError(
                 f"application context resource '{self.app_config_resource}' " +
                 f'not found in {self.package_resource}')
-        config: Configurable = self._get_app_context(path)
+        config: Configurable = self._create_application_context(path)
         fac: ConfigFactory = self._create_config_factory(config)
         cli_mng: ActionCliManager = fac(ActionCliManager.SECTION)
         actions: Tuple[ActionMetaData] = tuple(chain.from_iterable(

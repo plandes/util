@@ -21,8 +21,14 @@ class EnvironmentConfig(Configurable):
 
     """
     def __init__(self, section_name: str = 'env', expect: bool = False,
-                 map_delimiter: str = None):
+                 map_delimiter: str = None, skip_delimiter: bool = False,
+                 includes: Set[str] = None):
         """Initialize with a string given as described in the class docs.
+
+        The string ``<DOLLAR>`` used with ``map_delimiter`` is the same as
+        ``$`` since adding the dollar in some configuration scenarios has
+        parsing issues.  One example is when ``$$`` failes on copying section
+        to an :class:`.IniConfig`.
 
         :param section_name: the name of the created section with the
                              environment variables
@@ -37,7 +43,11 @@ class EnvironmentConfig(Configurable):
 
         """
         super().__init__(expect, section_name)
+        if map_delimiter == '<DOLLAR>':
+            map_delimiter = '$'
         self.map_delimiter = map_delimiter
+        self.skip_delimiter = skip_delimiter
+        self.includes = includes
 
     @persisted('_parsed_config')
     def _get_parsed_config(self) -> Dict[str, str]:
@@ -76,6 +86,9 @@ class EnvironmentConfig(Configurable):
         if delim is not None:
             repl = f'{delim}{delim}'
         for k, v in os.environ.items():
+            if ((self.includes is not None) and (k not in self.includes)) or \
+               (self.skip_delimiter and v.find(delim) >= 0):
+                continue
             if delim is None:
                 val = v
             else:

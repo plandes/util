@@ -198,7 +198,11 @@ class ImportIniConfig(IniConfig):
                         raise ConfigurableError(
                             f"import section '{sec}' has no 'type' parameter")
                     del params['type']
-                    class_name = f'{mod_name}.{tpe.capitalize()}Config'
+                    if tpe == 'importini':
+                        tpe = 'ImportIni'
+                    else:
+                        tpe = tpe.capitalize()
+                    class_name = f'{mod_name}.{tpe}Config'
                 else:
                     del params['class_name']
                 inst = ClassImporter(class_name, False).instance(**params)
