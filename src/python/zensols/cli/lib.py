@@ -12,7 +12,9 @@ import re
 from pathlib import Path
 from zensols.util import PackageResource
 from zensols.introspect import ClassImporter
-from zensols.config import ConfigFactory, Configurable, DictionaryConfig
+from zensols.config import (
+    ConfigFactory, Configurable, DictionaryConfig, ImportIniConfig
+)
 from . import (
     ActionCliError, OptionMetaData, ActionMetaData,
     ApplicationObserver, Action, Application,
@@ -165,8 +167,19 @@ class ConfigurationImporter(ApplicationObserver):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'using config factory class {cls} to load: ' +
                          str(self.config_path))
-        inst = cls(self.config_path)
-        inst.copy_sections(self.config)
+        if issubclass(cls, ImportIniConfig):
+            # from zensols.config import DictionaryConfig
+            # clone = DictionaryConfig()
+            # self.config.write()
+            # self.config.copy_sections(clone)
+            # clone.write()
+            inst = cls(self.config_path, children=(self.config,))
+            inst.copy_sections(self.config)
+            #inst = cls(self.config_path)
+            #self.config.children.append(inst)
+        else:
+            inst = cls(self.config_path)
+            inst.copy_sections(self.config)
 
     def add(self):
         """Add configuration at path to the current configuration.
