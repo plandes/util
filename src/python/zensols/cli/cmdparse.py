@@ -49,9 +49,9 @@ class ActionOptionParser(OptionParser):
 
     """
     def __init__(self, actions: Tuple[ActionMetaData], doc: str = None,
-                 *args, **kwargs):
+                 default_action: str = None, *args, **kwargs):
         super().__init__(*args, add_help_option=False, **kwargs)
-        self.usage_writer = UsageWriter(self, actions, doc)
+        self.usage_writer = UsageWriter(self, actions, doc, default_action)
         self.add_option(self._create_help())
 
     def _create_help(self):
@@ -154,8 +154,8 @@ class CommandLineParser(Dictable):
 
     def _create_parser(self, actions: Tuple[ActionMetaData]) -> OptionParser:
         doc = self._create_program_doc()
-        return ActionOptionParser(
-            actions, doc, version=('%prog ' + str(self.version)))
+        return ActionOptionParser(actions, doc, self.default_action,
+                                  version=('%prog ' + str(self.version)))
 
     def _configure_parser(self, parser: OptionParser,
                           options: Iterable[OptionMetaData]):

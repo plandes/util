@@ -4,7 +4,7 @@
 __author__ = 'Paul Landes'
 
 from typing import Tuple
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import logging
 import sys
 from io import TextIOBase
@@ -20,9 +20,17 @@ class UsageWriter(Writable):
     """Generates the usage and help messages for an :class:`optparse.OptionParser`.
 
     """
-    parser: OptionParser
-    actions: Tuple[ActionMetaData]
+    parser: OptionParser = field()
+    """Parses the command line in to primitive Python data structures."""
+
+    actions: Tuple[ActionMetaData] = field()
+    """The set of actions to document as a usage."""
+
     doc: str = None
+    """The application document string."""
+
+    default_action: str = field(default=None)
+    """The default mnemonic use when the user does not supply one."""
 
     def __post_init__(self):
         self.actions = sorted(self.actions, key=lambda a: a.name)
@@ -30,7 +38,11 @@ class UsageWriter(Writable):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'actions: {self.action_names}')
         if len(self.action_names) > 1:
-            opts = f"<{'|'.join(self.action_names)}> "
+            names = '|'.join(self.action_names)
+            if self.default_action is None:
+                opts = f"<{names}> "
+            else:
+                opts = f"[{names}] "
         elif len(self.action_names) > 0:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'action: {self.actions[0]}')
@@ -63,6 +75,8 @@ class UsageWriter(Writable):
                 pargs = ', '.join(map(lambda p: p.name, action.positional))
                 args = f' <{pargs}>'
             action_name = action.name + args
+            if self.default_action == action_name:
+                action_name = f'{action_name} (default)'
             action_name_len = max(action_name_len, len(action_name))
             opt: OptionMetaData
             if logger.isEnabledFor(logging.DEBUG):
