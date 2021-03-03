@@ -32,8 +32,12 @@ class UsageWriter(Writable):
     default_action: str = field(default=None)
     """The default mnemonic use when the user does not supply one."""
 
+    sort_actions: bool = field(default=False)
+    """If ``True`` sort mnemonic output."""
+
     def __post_init__(self):
-        self.actions = sorted(self.actions, key=lambda a: a.name)
+        if self.sort_actions:
+            self.actions = sorted(self.actions, key=lambda a: a.name)
         self.action_names = tuple(map(lambda a: a.name, self.actions))
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'actions: {self.action_names}')
@@ -58,7 +62,10 @@ class UsageWriter(Writable):
         self.parser.usage = f"%prog {opts}[options]:{doc}"
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
-        actions = sorted(self.actions, key=lambda a: a.name)
+        if self.sort_actions:
+            actions = sorted(self.actions, key=lambda a: a.name)
+        else:
+            actions = self.actions
         action_help = []
         opt_str_len = 0
         def_str_len = 0

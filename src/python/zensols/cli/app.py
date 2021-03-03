@@ -16,7 +16,7 @@ from zensols.persist import persisted
 from zensols.util import PackageResource
 from zensols.config import (
     Dictable, Configurable, ConfigFactory,
-    ImportIniConfig, DictionaryConfig, ImportConfigFactory,
+    ImportIniConfig, ImportConfigFactory,
 )
 from . import (
     ActionCliError,

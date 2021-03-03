@@ -84,7 +84,7 @@ Options:
         self.assertEqual(should_lines, val_lines)
 
         should = """\
-Usage: python -m unittest <prconfig|test> [options]:
+Usage: python -m unittest <test|prconfig> [options]:
 
 Options:
   --version             show program's version number and exit
@@ -93,10 +93,10 @@ Options:
                         the path to the config file
 
 Actions:
-prconfig <file>     a second test action
-
 test                a test action
   -d, --dry_run    don't do anything; just act like it
+
+prconfig <file>     a second test action
 """
         parser = CommandLineParser(CommandLineConfig(
             tuple([self.config_action, self.test_action, self.test_action2])))

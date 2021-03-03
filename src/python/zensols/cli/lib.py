@@ -15,10 +15,11 @@ from pathlib import Path
 from zensols.util import PackageResource
 from zensols.introspect import ClassImporter
 from zensols.config import (
+    Dictable,
     ConfigFactory, Configurable, DictionaryConfig, ImportIniConfig
 )
 from . import (
-    ActionCliError, OptionMetaData, ActionMetaData,
+    ActionCliError, ActionCli, ActionCliMethod, OptionMetaData, ActionMetaData,
     ApplicationObserver, Action, Application,
 )
 
@@ -343,12 +344,16 @@ class ExportEnvironment(object):
     shell scripts.
 
     """
-    CLI_META = {'option_includes': {'output_path', 'output_format'},
+    # we can't use "output_format" because ListActions would use the same
+    # causing a name collision
+    OUTPUT_FORMAT = 'export_output_format'
+    OUTPUT_PATH = 'output_path'
+    CLI_META = {'option_includes': {OUTPUT_FORMAT, OUTPUT_PATH},
                 'option_overrides':
-                {'output_path': {'long_name': 'output',
+                {OUTPUT_FORMAT: {'long_name': 'expfmt',
                                  'short_name': None},
-                 'output_format': {'long_name': 'exportformat',
-                                   'short_name': None}}}
+                 OUTPUT_PATH: {'long_name': 'output',
+                               'short_name': None}}}
 
     config: Configurable = field()
 
@@ -358,12 +363,12 @@ class ExportEnvironment(object):
     output_path: Path = field(default=None)
     """The output file name for the export script."""
 
-    output_format: ExportFormat = field(default=ExportFormat.bash)
+    export_output_format: ExportFormat = field(default=ExportFormat.bash)
     """The output format."""
 
     def _write(self, writer: TextIOBase):
         exports: Dict[str, str] = self.config.populate(section=self.section)
-        if self.output_format == ExportFormat.bash:
+        if self.export_output_format == ExportFormat.bash:
             fmt = 'export {k}="{v}"\n'
         else:
             fmt = '{k}="{v}"\n'
@@ -377,3 +382,53 @@ class ExportEnvironment(object):
         else:
             with open(self.output_path, 'w') as f:
                 self._write(f)
+
+
+class ListFormat(Enum):
+    """Options for outputing the action list in :class:`.ListActions`.
+
+    """
+    txt = auto()
+    json = auto()
+    name = auto()
+
+
+@dataclass
+class ListActions(ApplicationObserver, Dictable):
+    # we can't use "output_format" because ExportEnvironment would use the same
+    # causing a name collision
+    OUTPUT_FORMAT = 'list_output_format'
+    CLI_META = {'option_includes': {OUTPUT_FORMAT},
+                'option_overrides':
+                {OUTPUT_FORMAT: {'long_name': 'lstfmt',
+                                 'short_name': None}}}
+
+    list_output_format: ListFormat = field(default=ListFormat.txt)
+    """The output format for the action listing."""
+
+    def _application_created(self, app: Application, action: Action):
+        """In this call back, set the app and action for using in the invocation
+        :meth:`add`.
+
+        """
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'configurator created with {action}')
+        self._app = app
+        self._action = action
+
+    def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
+        action_cli: ActionCli
+        ac_docs: Dict[str, str] = {}
+        for action_cli in self._app.factory.cli_manager.actions_ordered:
+            if not action_cli.first_pass:
+                meth: ActionCliMethod
+                for name, meth in action_cli.methods.items():
+                    ac_docs[name] = meth.action_meta_data.doc
+        return ac_docs
+
+    def list(self):
+        """List all actions and, depending on format, their help."""
+        {ListFormat.text: lambda: self.write(),
+         ListFormat.json: lambda: print(self.asjson(indent=4)),
+         ListFormat.names: lambda: print('\n'.join(self.asdict().keys()))
+         }[self.list_output_format]()
