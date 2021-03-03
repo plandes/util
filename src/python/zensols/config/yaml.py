@@ -144,6 +144,11 @@ class """ + class_name + """(Template):
         elif self.expect:
             raise ConfigurableError('no such option: {}'.format(name))
 
+    def set_option(self, name: str, value: str, section: str = None):
+        """This is a no-op for now as client's don't expect an exception."""
+        # TODO: implement
+        pass
+
     @property
     def options(self) -> Dict[str, Any]:
         if not hasattr(self, '_options'):
