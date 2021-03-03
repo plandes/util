@@ -248,12 +248,15 @@ class ConfigurationImporter(ApplicationObserver):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'using config factory class {cls} to load: ' +
                          str(self.config_path))
-        if issubclass(cls, ImportIniConfig):
-            inst = cls(self.config_path, children=(self.config,))
-            inst.copy_sections(self.config)
-        else:
-            inst = cls(self.config_path)
-            inst.copy_sections(self.config)
+        # create the source config
+        inst = cls(self.config_path)
+        # first copy the given source configuration in to our app context
+        # skipping sections that have missing options (which might be the
+        # app context currently being built)
+        self.config.copy_sections(inst, robust=True)
+        # finally, copy the app context with the source config and let it crash
+        # with any missing properties this time
+        inst.copy_sections(self.config)
 
     def add(self):
         """Add configuration at path to the current configuration.
