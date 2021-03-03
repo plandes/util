@@ -265,17 +265,20 @@ class ClassInspector(object):
         dsidx = len(node.args) - len(defaults)
         for i, arg in enumerate(node.args):
             name = arg.arg
-            dtype = None
-            is_positional = True
-            default = None
-            didx = i - dsidx
-            if didx >= 0:
-                default = self._map_default(defaults[didx])
-                is_positional = False
-            if arg.annotation is not None:
-                dtype = arg.annotation.id
-            dtype = self.data_type_mapper.map_type(dtype)
-            arg = ClassMethodArg(name, dtype, None, default, is_positional)
+            try:
+                dtype = None
+                is_positional = True
+                default = None
+                didx = i - dsidx
+                if didx >= 0:
+                    default = self._map_default(defaults[didx])
+                    is_positional = False
+                if arg.annotation is not None:
+                    dtype = arg.annotation.id
+                dtype = self.data_type_mapper.map_type(dtype)
+                arg = ClassMethodArg(name, dtype, None, default, is_positional)
+            except Exception as e:
+                raise ClassError(f'could not map argument {name}: {e}')
             args.append(arg)
         return args
 
@@ -324,7 +327,8 @@ class ClassInspector(object):
         methods: List[ClassMethod] = []
         for node in cnode.body:
             # parse the dataclass attribute/field defintion
-            if isinstance(node, ast.AnnAssign):
+            if isinstance(node, ast.AnnAssign) and \
+               isinstance(node.annotation, ast.Name):
                 name: str = node.target.id
                 dtype: str = node.annotation.id
                 dtype: type = self.data_type_mapper.map_type(dtype)
