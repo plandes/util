@@ -3,10 +3,12 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Type, Any
+from typing import Type, Any, Dict
 from dataclasses import dataclass, field
-from enum import Enum
+from enum import Enum, auto
+from io import TextIOBase
 import os
+import sys
 import logging
 import re
 from pathlib import Path
@@ -328,3 +330,50 @@ class PackageInfoImporter(ApplicationObserver):
                   'version': pkg_res.version}
         dconf = DictionaryConfig({self.section: params})
         dconf.copy_sections(self.config)
+
+
+class ExportFormat(Enum):
+    bash = auto()
+    make = auto()
+
+
+@dataclass
+class ExportEnvironment(object):
+    """The class dumps a list of bash shell export statements for sourcing in build
+    shell scripts.
+
+    """
+    CLI_META = {'option_includes': {'output_path', 'output_format'},
+                'option_overrides':
+                {'output_path': {'long_name': 'output',
+                                 'short_name': None},
+                 'output_format': {'long_name': 'exportformat',
+                                   'short_name': None}}}
+
+    config: Configurable = field()
+
+    section: str = field()
+    """The section to dump as a series of export statements."""
+
+    output_path: Path = field(default=None)
+    """The output file name for the export script."""
+
+    output_format: ExportFormat = field(default=ExportFormat.bash)
+    """The output format."""
+
+    def _write(self, writer: TextIOBase):
+        exports: Dict[str, str] = self.config.populate(section=self.section)
+        if self.output_format == ExportFormat.bash:
+            fmt = 'export {k}="{v}"\n'
+        else:
+            fmt = '{k}="{v}"\n'
+        for k, v in exports.asdict().items():
+            writer.write(fmt.format(**{'k': k.upper(), 'v': v}))
+
+    def export(self):
+        """Create bash shell exports for shell sourcing."""
+        if self.output_path is None:
+            self._write(sys.stdout)
+        else:
+            with open(self.output_path, 'w') as f:
+                self._write(f)
