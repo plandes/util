@@ -29,10 +29,17 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class Action(Dictable):
-    """Contains everything needed to invoke an action invoked from the command
-    line.  A list of these, one per executable action, is used by
-    :class:`.Application` and invoked in order on the target application
-    class(es).
+    """An invokable action from the command line the :class:`.Application` class.
+    This class combines the user input from the command line with the meta data
+    from the Python classes given in the configuration.
+
+    Combined, these two data sources provide a means to execute an action,
+    which is conceptually one functionality of the application and literally a
+    Python class method.
+
+    The class also is somewhat of a facade allowing a client to access data
+    from both sources without needing to know where it comes from via the
+    class's properties.
 
     """
     WRITABLE__DESCENDANTS = True
@@ -174,7 +181,7 @@ class ApplicationObserver(ABC):
 @dataclass
 class Invokable(object):
     """A callable that invokes an :class:`.Action`.  This is used by
-:class:`.Application` to invoke the entire CLI application.
+    :class:`.Application` to invoke the entire CLI application.
 
     """
 

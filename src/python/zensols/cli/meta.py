@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, Dict, Iterable, Any
+from typing import Tuple, Dict, Iterable
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -15,23 +15,8 @@ import optparse
 from zensols.introspect import TypeMapper
 from zensols.persist import persisted
 from zensols.config import Dictable
-from . import ActionCliError
 
 logger = logging.getLogger(__name__)
-
-
-class CommandLineError(ActionCliError):
-    """Raised when command line parameters can not be parsed.
-
-    """
-    pass
-
-
-class CommandLineConfigError(Exception):
-    """Programmer error for command line parser configuration errors.
-
-    """
-    pass
 
 
 @dataclass(eq=True, order=True, unsafe_hash=True)
@@ -277,69 +262,3 @@ class ActionMetaData(Dictable):
     @persisted('_options_by_dest')
     def options_by_dest(self) -> Dict[str, OptionMetaData]:
         return {m.dest: m for m in self.options}
-
-
-@dataclass
-class CommandAction(Dictable):
-    """The output of the :class:`.CommandLineParser` for each parsed action.
-
-    """
-    WRITABLE__DESCENDANTS = True
-
-    meta_data: ActionMetaData = field()
-    """The action parsed from the command line."""
-
-    options: Dict[str, Any] = field()
-    """The options given as switches."""
-
-    positional: Tuple[str] = field()
-    """The positional arguments parsed."""
-
-    @property
-    def name(self) -> str:
-        """The name of the action."""
-        return self.meta_data.name
-
-    def __str__(self) -> str:
-        return f'{self.meta_data.name}: {self.options}/{self.positional}'
-
-
-@dataclass
-class CommandActionSet(Dictable):
-    """The actions that are parsed by :class:`.CommandLineParser` as the output of
-    the parse phase.  This is indexable by command action name and iterable
-    across all actions.  Properties :obj:`first_pass_actions` and
-    :obj:`second_pass_action` give access to the split from the respective
-    types of actions.
-
-    """
-    WRITABLE__DESCENDANTS = True
-
-    actions: Tuple[CommandAction] = field()
-    """The actions parsed.  The first N actions are first pass where as the last is
-    the second pass action.
-
-    """
-    @property
-    def first_pass_actions(self) -> Iterable[CommandAction]:
-        """All first pass actions."""
-        return self.actions[0:-1]
-
-    @property
-    def second_pass_action(self) -> CommandAction:
-        """The single second pass action."""
-        return self.actions[-1]
-
-    @property
-    def by_name(self) -> Dict[str, CommandAction]:
-        """Command actions by name keys."""
-        return {a.name: a for a in self.actions}
-
-    def __getitem__(self, name: str) -> CommandAction:
-        return self.by_name[name]
-
-    def __iter__(self) -> Iterable[CommandAction]:
-        return iter(self.actions)
-
-    def __len__(self) -> int:
-        return len(self.actions)
