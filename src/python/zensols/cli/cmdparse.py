@@ -11,59 +11,16 @@ import sys
 from itertools import chain
 from pathlib import Path
 from io import TextIOBase
-from optparse import OptionParser, Option
+from optparse import OptionParser
 from zensols.persist import persisted
 from zensols.config import Dictable
 from . import (
+    CommandLineError, CommandLineConfigError,
     OptionMetaData, PositionalMetaData, ActionMetaData,
-    UsageWriter, CommandAction, CommandActionSet,
+    CommandAction, CommandActionSet, UsageActionOptionParser,
 )
-from . import ActionCliError
 
 logger = logging.getLogger(__name__)
-
-
-class CommandLineError(ActionCliError):
-    """Raised when command line parameters can not be parsed.
-
-    """
-    pass
-
-
-class CommandLineConfigError(Exception):
-    """Programmer error for command line parser configuration errors.
-
-    """
-    pass
-
-
-class ActionOptionParser(OptionParser):
-    """Implements a human readable implementation of print_help for action based
-    command line handlers.
-
-    **Implementation note**: we have to extend :class:`~optparser.OptionParser`
-    since the ``-h`` option invokes the print help behavior and then exists
-    printing the second pass action options.  Instead, we look for the help
-    option in the first pass, print help with the correction options, then
-    exit.
-
-    """
-    def __init__(self, actions: Tuple[ActionMetaData], doc: str = None,
-                 default_action: str = None, *args, **kwargs):
-        super().__init__(*args, add_help_option=False, **kwargs)
-        self.usage_writer = UsageWriter(self, actions, doc, default_action)
-        self.add_option(self._create_help())
-
-    def _create_help(self):
-        return Option('--help', '-h',
-                      help='show this help message and exit',
-                      action='store_true')
-
-    def print_help(self, file: TextIOBase = sys.stdout,
-                   include_actions: bool = True):
-        super().print_help(file)
-        if include_actions:
-            self.usage_writer.write(writer=file)
 
 
 @dataclass
@@ -142,7 +99,8 @@ class CommandLineParser(Dictable):
 
     def __post_init__(self):
         if len(self.config.actions) == 0:
-            raise ValueError('must create parser with at least one action')
+            raise CommandLineConfigError(
+                'must create parser with at least one action')
 
     def _create_program_doc(self) -> Optional[str]:
         doc = None
@@ -154,8 +112,8 @@ class CommandLineParser(Dictable):
 
     def _create_parser(self, actions: Tuple[ActionMetaData]) -> OptionParser:
         doc = self._create_program_doc()
-        return ActionOptionParser(actions, doc, self.default_action,
-                                  version=('%prog ' + str(self.version)))
+        return UsageActionOptionParser(actions, doc, self.default_action,
+                                       version=('%prog ' + str(self.version)))
 
     def _configure_parser(self, parser: OptionParser,
                           options: Iterable[OptionMetaData]):
@@ -168,7 +126,8 @@ class CommandLineParser(Dictable):
             op_opt = opt.create_option()
             parser.add_option(op_opt)
 
-    def _get_first_pass_parser(self, add_all_opts: bool) -> ActionOptionParser:
+    def _get_first_pass_parser(self, add_all_opts: bool) -> \
+            UsageActionOptionParser:
         opts = list(self.config.first_pass_options)
         sp_actions = self.config.second_pass_actions
         if len(sp_actions) == 1:
@@ -182,7 +141,7 @@ class CommandLineParser(Dictable):
         return parser
 
     def _get_second_pass_parser(self, action_meta: ActionMetaData) -> \
-            ActionOptionParser:
+            UsageActionOptionParser:
         opts = list(self.config.first_pass_options)
         opts.extend(action_meta.options)
         parser = self._create_parser(self.config.second_pass_actions)
@@ -261,7 +220,8 @@ class CommandLineParser(Dictable):
         fp_ops: Dict[str, ActionMetaData] = self.config.first_pass_by_option
         for k, v in options.items():
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'looking for first pass option: {k} in {tuple(fp_ops.keys())}')
+                logger.debug(f'looking for first pass option: {k} ' +
+                             f'in {tuple(fp_ops.keys())}')
             fp_action_meta = fp_ops.get(k)
             if (fp_action_meta is not None) and \
                (fp_action_meta.name not in added_first_pass):
@@ -282,7 +242,8 @@ class CommandLineParser(Dictable):
                              f'with options {options}')
         elif len(op_args) == 0:
             if self.default_action is None:
-                # no positional arguments mean we don't know which action to use
+                # no positional arguments mean we don't know which action to
+                # use
                 raise CommandLineError('no action given')
             else:
                 action_name = self.default_action
@@ -337,7 +298,7 @@ class CommandLineParser(Dictable):
             action_meta: ActionMetaData
             for action_meta in self.config.second_pass_actions:
                 if len(action_meta.positional) > 0:
-                    raise ValueError(
+                    raise CommandLineConfigError(
                         'no positional arguments allowed when default ' +
                         f"action '{self.default_action}' " +
                         f'given for method {action_meta.name}')

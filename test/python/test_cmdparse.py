@@ -11,6 +11,9 @@ from zensols.cli import (
 class TestArgumentParse(LogTestCase):
     def setUp(self):
         #self.config_logging('zensols.cli')
+        wo = OptionMetaData('whine', 'w', dtype=int,
+                            doc='the level to set for the program logging')
+
         self.conf_opt = OptionFactory.config_file()
         self.dry_opt = OptionFactory.dry_run()
         self.test_action = ActionMetaData(
@@ -20,7 +23,7 @@ class TestArgumentParse(LogTestCase):
             positional=[PositionalMetaData('file', Path)])
         self.log_action = ActionMetaData(
             'whine', 'set the logging level for the program',
-            tuple([OptionFactory.whine_level()]), first_pass=True)
+            tuple([wo]), first_pass=True)
         self.config_action = ActionMetaData(
             'config', 'configure the application',
             tuple([OptionFactory.config_file()]), first_pass=True)

@@ -15,8 +15,23 @@ import optparse
 from zensols.introspect import TypeMapper
 from zensols.persist import persisted
 from zensols.config import Dictable
+from . import ActionCliError
 
 logger = logging.getLogger(__name__)
+
+
+class CommandLineError(ActionCliError):
+    """Raised when command line parameters can not be parsed.
+
+    """
+    pass
+
+
+class CommandLineConfigError(Exception):
+    """Programmer error for command line parser configuration errors.
+
+    """
+    pass
 
 
 @dataclass(eq=True, order=True, unsafe_hash=True)
@@ -68,7 +83,11 @@ class OptionMetaData(Dictable):
             self._set_metavar()
 
     @property
-    def is_choice(self):
+    def is_choice(self) -> bool:
+        """Whether or not this option represents string combinations that map to a
+        :class:`enum.Enum` Python class.
+
+        """
         return (self.choices is not None) or issubclass(self.dtype, Enum)
 
     def _set_metavar(self, clobber: bool = True):
@@ -115,11 +134,13 @@ class OptionMetaData(Dictable):
 
     @property
     def long_option(self) -> str:
+        """The long option string with dashes."""
         return f'--{self.long_name}'
 
     @property
     @persisted('_short_option')
     def short_option(self) -> str:
+        """The short option string with dash."""
         return None if self.short_name is None else f'-{self.short_name}'
 
     def create_option(self) -> optparse.Option:
@@ -192,24 +213,29 @@ class OptionFactory(object):
     """
     @classmethod
     def dry_run(cls: type, **kwargs) -> OptionMetaData:
+        """A boolean dry run option."""
         return OptionMetaData('dry_run', 'd', dtype=bool,
                               doc="don't do anything; just act like it",
                               **kwargs)
 
     @classmethod
     def file(cls: type, name: str, short_name: str, **kwargs):
+        """A file :class:`~pathlib.Path` option."""
         return OptionMetaData(name, short_name, dtype=Path,
                               doc=f'the path to the {name} file',
                               **kwargs)
 
     @classmethod
-    def config_file(cls: type, **kwargs) -> OptionMetaData:
-        return cls.file('config', 'c', **kwargs)
+    def directory(cls: type, name: str, short_name: str, **kwargs):
+        """A directory :class:`~pathlib.Path` option."""
+        return OptionMetaData(name, short_name, dtype=Path,
+                              doc=f'the path to the {name} directory',
+                              **kwargs)
 
     @classmethod
-    def whine_level(cls: type, **kwargs) -> OptionMetaData:
-        return OptionMetaData('whine', 'w', dtype=int,
-                              doc='the level to set for the program logging')
+    def config_file(cls: type, **kwargs) -> OptionMetaData:
+        """A subordinate file based configuration option."""
+        return cls.file('config', 'c', **kwargs)
 
 
 @dataclass
@@ -281,7 +307,10 @@ class CommandAction(Dictable):
 @dataclass
 class CommandActionSet(Dictable):
     """The actions that are parsed by :class:`.CommandLineParser` as the output of
-    the parse phase..
+    the parse phase.  This is indexable by command action name and iterable
+    across all actions.  Properties :obj:`first_pass_actions` and
+    :obj:`second_pass_action` give access to the split from the respective
+    types of actions.
 
     """
     WRITABLE__DESCENDANTS = True
@@ -293,14 +322,17 @@ class CommandActionSet(Dictable):
     """
     @property
     def first_pass_actions(self) -> Iterable[CommandAction]:
+        """All first pass actions."""
         return self.actions[0:-1]
 
     @property
     def second_pass_action(self) -> CommandAction:
+        """The single second pass action."""
         return self.actions[-1]
 
     @property
     def by_name(self) -> Dict[str, CommandAction]:
+        """Command actions by name keys."""
         return {a.name: a for a in self.actions}
 
     def __getitem__(self, name: str) -> CommandAction:
