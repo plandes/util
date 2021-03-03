@@ -196,17 +196,36 @@ class Configurable(Writable, metaclass=ABCMeta):
         raise NotImplementedError()
 
     def copy_sections(self, to_populate: Configurable,
-                      sections: Iterable[str] = None):
+                      sections: Iterable[str] = None,
+                      robust: bool = False) -> Exception:
         """Copy all sections from this configuruable to ``to_populate``.
 
         :param to_populate: the target configuration object
 
+        :param sections: the sections to populate or ``None`` to copy allow
+
+        :param robust: if ``True``, when any exception occurs (namely
+                       interplation exceptions), don't copy and remove the
+                       section in the target configuraiton
+
+        :return: the last exception that occured while trying to copy the
+                 properties
+
         """
+        last_ex = None
         if sections is None:
             sections = self.sections
         for sec in sections:
-            for k, v in self.get_options(sec).items():
-                to_populate.set_option(k, v, sec)
+            try:
+                for k, v in self.get_options(sec).items():
+                    to_populate.set_option(k, v, sec)
+            except Exception as e:
+                if not robust:
+                    raise e
+                else:
+                    to_populate.remove_section(sec)
+                    last_ex = e
+        return last_ex
 
     def remove_section(self, section: str):
         """Remove a seciton with the given name."""

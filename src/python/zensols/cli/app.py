@@ -15,7 +15,7 @@ from zensols.introspect import Class, ClassMethod, ClassField, ClassMethodArg
 from zensols.persist import persisted
 from zensols.util import PackageResource
 from zensols.config import (
-    Dictable, Configurable, ConfigFactory,
+    Serializer, Dictable, Configurable, ConfigFactory,
     ImportIniConfig, ImportConfigFactory,
 )
 from . import (
@@ -416,6 +416,11 @@ class ApplicationFactory(object):
     def __post_init__(self):
         if isinstance(self.package_resource, str):
             self.package_resource = PackageResource(self.package_resource)
+        self._configure_serializer()
+
+    def _configure_serializer(self):
+        dist_name = self.package_resource.name
+        Serializer.DEFAULT_RESOURCE_MODULE = dist_name
 
     def _create_application_context(self, app_context: Path) -> Configurable:
         """Factory method to create the application context from the :mod:`cli`
