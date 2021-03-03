@@ -6,11 +6,12 @@ __author__ = 'Paul Landes'
 from typing import Type, Any, Dict
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from io import TextIOBase
 import os
 import sys
 import logging
+#from collections import OrderedDict
 import re
+from io import TextIOBase
 from pathlib import Path
 from zensols.util import PackageResource
 from zensols.introspect import ClassImporter
@@ -388,7 +389,7 @@ class ListFormat(Enum):
     """Options for outputing the action list in :class:`.ListActions`.
 
     """
-    txt = auto()
+    text = auto()
     json = auto()
     name = auto()
 
@@ -403,8 +404,11 @@ class ListActions(ApplicationObserver, Dictable):
                 {OUTPUT_FORMAT: {'long_name': 'lstfmt',
                                  'short_name': None}}}
 
-    list_output_format: ListFormat = field(default=ListFormat.txt)
+    list_output_format: ListFormat = field(default=ListFormat.text)
     """The output format for the action listing."""
+
+    def __post_init__(self):
+        self._command_line = False
 
     def _application_created(self, app: Application, action: Action):
         """In this call back, set the app and action for using in the invocation
@@ -423,12 +427,26 @@ class ListActions(ApplicationObserver, Dictable):
             if not action_cli.first_pass:
                 meth: ActionCliMethod
                 for name, meth in action_cli.methods.items():
-                    ac_docs[name] = meth.action_meta_data.doc
+                    meta: ActionMetaData = meth.action_meta_data
+                    if self._command_line:
+                        md = meta.asdict()
+                        del md['first_pass']
+                        ac_docs[name] = md
+                    else:
+                        ac_docs[name] = meta.doc
         return ac_docs
 
     def list(self):
         """List all actions and, depending on format, their help."""
-        {ListFormat.txt: lambda: self.write(),
-         ListFormat.json: lambda: print(self.asjson(indent=4)),
-         ListFormat.name: lambda: print('\n'.join(self.asdict().keys()))
-         }[self.list_output_format]()
+        def list_json():
+            try:
+                self._command_line = True
+                print(self.asjson(indent=4))
+            finally:
+                self._command_line = False
+
+        {
+            ListFormat.name: lambda: print('\n'.join(self.asdict().keys())),
+            ListFormat.text: lambda: self.write(),
+            ListFormat.json: list_json,
+        }[self.list_output_format]()

@@ -3,12 +3,11 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, Dict, Iterable
+from typing import Tuple, Dict, Any
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
 import sys
-from itertools import chain
 from io import TextIOBase
 from pathlib import Path
 import optparse
@@ -32,7 +31,7 @@ class OptionMetaData(Dictable):
     short_name: str = field(default=None)
     """The short name of the option (i.e. ``-c``)."""
 
-    dest: str = field(default=None)
+    dest: str = field(default=None, repr=False)
     """The the field/parameter name used to on the target class."""
 
     dtype: type = field(default=str)
@@ -56,7 +55,7 @@ class OptionMetaData(Dictable):
     doc: str = field(default=None)
     """The document string used in the command line help."""
 
-    metavar: str = field(default=None)
+    metavar: str = field(default=None, repr=False)
     """Used in the command line help for the type of the option."""
 
     def __post_init__(self):
@@ -161,10 +160,17 @@ class OptionMetaData(Dictable):
             logger.debug(f'params: {params}')
         return optparse.Option(self.long_option, self.short_option, **params)
 
-    def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
-        return chain.from_iterable(
-            [super()._get_dictable_attributes(),
-             map(lambda f: (f, f), 'metavar'.split())])
+    def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
+        dct = super()._from_dictable(*args, **kwargs)
+        dct['dtype'] = self.dtype.__name__
+        if not self.is_choice:
+            del dct['choices']
+        else:
+            if self.default is not None:
+                dct['default'] = self.default.name
+        dct = {k: dct[k] for k in
+               filter(lambda x: dct[x] is not None, dct.keys())}
+        return dct
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         dct = self.asdict()
@@ -262,3 +268,9 @@ class ActionMetaData(Dictable):
     @persisted('_options_by_dest')
     def options_by_dest(self) -> Dict[str, OptionMetaData]:
         return {m.dest: m for m in self.options}
+
+    def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
+        dct = super()._from_dictable(*args, **kwargs)
+        if len(dct['positional']) == 0:
+            del dct['positional']
+        return dct
