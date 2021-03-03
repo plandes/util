@@ -430,5 +430,5 @@ class ListActions(ApplicationObserver, Dictable):
         """List all actions and, depending on format, their help."""
         {ListFormat.txt: lambda: self.write(),
          ListFormat.json: lambda: print(self.asjson(indent=4)),
-         ListFormat.names: lambda: print('\n'.join(self.asdict().keys()))
+         ListFormat.name: lambda: print('\n'.join(self.asdict().keys()))
          }[self.list_output_format]()
