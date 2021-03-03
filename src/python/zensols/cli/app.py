@@ -114,7 +114,9 @@ class Action(Dictable):
 
 @dataclass
 class ActionResult(Dictable):
-    """The results of a single method call to an :class:`.Action` instance.
+    """The results of a single method call to an :class:`.Action` instance.  There
+    is one of these per action (both first and second pass) provided in
+    :class:`.ApplicationResult`.
 
     """
     action: Action = field()
@@ -136,18 +138,30 @@ class ActionResult(Dictable):
 
 @dataclass
 class ApplicationResult(Dictable):
-    """The results of an application invocation with :meth:`.Application.invoke`.
+    """A container class of the results of an application invocation with
+    :meth:`.Application.invoke`.  This is keyed by index of the actions given
+    in :obj:`actions`.
 
     """
-    action_results: Tuple[ActionResult]
+    action_results: Tuple[ActionResult] = field()
+    """Both first and second pass action results.  These are provided in the same
+    order for which was executed when the class:`.Application` ran, which is
+    that same order provided to the :class:`.ActionCliManager`.
+
+    """
 
     @property
     @persisted('_by_name')
     def by_name(self) -> Dict[str, ActionResult]:
+        """Per action results keyed by action name (obj:`.Action.name`)."""
         return {a.name: a for a in self}
 
     @property
     def second_pass_result(self) -> ActionResult:
+        """The single second pass result of that action indicated to invoke on the
+        command line by the user.
+
+        """
         sec_pass = tuple(filter(lambda r: not r.action.meta_data.first_pass,
                                 self.action_results))
         assert(len(sec_pass) == 1)
@@ -210,6 +224,11 @@ class Application(Dictable):
     """An invokable application created using command line and application context
     data.  This class creates an instance of the *target application instance*,
     then invokes the corresponding action method.
+
+    The application has all the first pass actions configured to run and/or
+    given options indicating by the user to run (see :obj:`first_pass_actions).
+    It also has the second pass action given as a mnemonic, or the single
+    second pass action if there is only one (see :obj:`second_pas_action`).
 
     """
     WRITABLE__DESCENDANTS = True
@@ -313,10 +332,18 @@ class Application(Dictable):
 
     @property
     def first_pass_actions(self) -> Iterable[Action]:
+        """All first pass actions registered in the application and/or indicated by the
+        user to run via the command line.
+
+        """
         return filter(lambda a: a.meta_data.first_pass, self.actions)
 
     @property
     def second_pass_action(self) -> Action:
+        """The second pass action registered in the application and indicated to
+        execute by the command line input.
+
+        """
         acts = filter(lambda a: not a.meta_data.first_pass, self.actions)
         acts = tuple(acts)
         assert len(acts) == 1
