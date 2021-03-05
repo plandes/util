@@ -71,7 +71,7 @@ class Serializer(object):
     RESOURCE_REGEXP = re.compile(r'^resource(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     STRING_REGEXP = re.compile(r'^str:\s*(.+)$', re.DOTALL)
     LIST_REGEXP = re.compile(r'^(list|set|tuple)(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
-    EVAL_REGEXP = re.compile(r'^eval(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
+    EVAL_REGEXP = re.compile(r'^(?:eval|dict)(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     JSON_REGEXP = re.compile(r'^json:\s*(.+)$', re.DOTALL)
     PRIMITIVES = set([bool, float, int, None.__class__])
     DEFAULT_RESOURCE_MODULE = None
