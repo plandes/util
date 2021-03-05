@@ -72,7 +72,8 @@ Options:
   -c FILE, --config=FILE
                         the path to the config file
 """
-        parser = CommandLineParser(CommandLineConfig(actions=(self.test_action, self.config_action)))
+        clc = CommandLineConfig(actions=(self.test_action, self.config_action))
+        parser = CommandLineParser(clc, application_doc='A test action.')
         sio = StringIO()
         parser.write_help(writer=sio)
         should_lines = sorted(should.split('\n'))
