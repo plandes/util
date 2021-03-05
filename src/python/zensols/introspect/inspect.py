@@ -255,6 +255,8 @@ class ClassInspector(object):
             enum_name: str = def_node.attr
             cls: type = self.data_type_mapper.map_type(def_node.value.id)
             default = cls.__members__[enum_name]
+        elif isinstance(def_node, ast.Num):
+            default = def_node.n
         else:
             default = def_node.value
         return default
