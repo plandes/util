@@ -257,6 +257,8 @@ class ClassInspector(object):
             default = cls.__members__[enum_name]
         elif isinstance(def_node, ast.Num):
             default = def_node.n
+        elif isinstance(def_node, ast.Str):
+            default = def_node.s
         else:
             default = def_node.value
         return default
