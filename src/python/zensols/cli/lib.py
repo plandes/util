@@ -3,21 +3,19 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Type, Any, Dict
+from typing import Type, Any, Dict, Union
 from dataclasses import dataclass, field
 from enum import Enum, auto
 import os
 import sys
 import logging
-#from collections import OrderedDict
 import re
 from io import TextIOBase
 from pathlib import Path
 from zensols.util import PackageResource
 from zensols.introspect import ClassImporter
 from zensols.config import (
-    Dictable,
-    ConfigFactory, Configurable, DictionaryConfig, ImportIniConfig
+    Dictable, ConfigFactory, Configurable, DictionaryConfig
 )
 from . import (
     ActionCliError, ActionCli, ActionCliMethod, OptionMetaData, ActionMetaData,
@@ -70,6 +68,9 @@ class LogConfigurator(object):
     format: str = field(default=None)
     """The format string to use for the logging system."""
 
+    loggers: Dict[str, Union[str, LogLevel]] = field(default=None)
+    """Additional loggers to configure."""
+
     debug: bool = field(default=False)
     """Print some logging to standard out to debug this class."""
 
@@ -105,6 +106,10 @@ class LogConfigurator(object):
             self._debug(f'setting logger {self.log_name} to {level} ' +
                         f'({self.level})')
             logging.getLogger(self.log_name).setLevel(level)
+        if self.loggers is not None:
+            for name, level in self.loggers.items():
+                level = self._to_level(name, level)
+                logging.getLogger(name).setLevel(level)
 
 
 @dataclass
