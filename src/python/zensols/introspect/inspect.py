@@ -255,6 +255,7 @@ class ClassInspector(object):
             enum_name: str = def_node.attr
             cls: type = self.data_type_mapper.map_type(def_node.value.id)
             default = cls.__members__[enum_name]
+        # ast.Num and ast.Str added for Python 3.7 backward compat
         elif isinstance(def_node, ast.Num):
             default = def_node.n
         elif isinstance(def_node, ast.Str):
@@ -304,8 +305,14 @@ class ClassInspector(object):
             if isinstance(node, ast.Expr) and \
                isinstance(node.value, ast.Constant):
                 doc = ClassDoc(node.value.value)
+            # ast.Str added for Python 3.7 backward compat
+            elif isinstance(node, ast.Expr) and \
+                 isinstance(node.value, ast.Str):
+                doc = ClassDoc(node.value.s)
             else:
                 doc = None
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'doc: {name}: {doc}')
             method = ClassMethod(name, doc, args)
             # copy the parsed parameter doc found in the method doc to the
             # argument meta data
@@ -348,11 +355,23 @@ class ClassInspector(object):
                 last_field: ClassField = fields[-1]
                 if last_field.doc is None:
                     last_field.doc = doc
+            # ast.Str added for Python 3.7 backward compat
+            elif (isinstance(node, ast.Expr) and
+                  isinstance(node.value, ast.Str) and
+                  len(fields) > 0):
+                doc = ClassDoc(node.value.s)
+                last_field: ClassField = fields[-1]
+                if last_field.doc is None:
+                    last_field.doc = doc
             # parse the method
             elif isinstance(node, ast.FunctionDef):
                 meth = self._get_method(node)
                 if meth is not None:
                     methods.append(meth)
+            else:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'not processed node: {type(node)}: ' +
+                                 f'{node.value}')
         return Class(
             self.cls,
             ClassDoc(self.cls.__doc__),
