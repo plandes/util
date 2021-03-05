@@ -41,6 +41,14 @@ class EnvironmentConfig(Configurable):
                               :class:`configparser.ExtendedInterpolation` for
                               environment variables such as ``PS1``
 
+        :param skip_delimiter: a string, when present, causes the environment
+                               variable to be skipped; this is useful for
+                               environment variables that cause interpolation
+                               errors
+
+        :param includes: if given, the set of environment variables to set
+                         excluding the rest; include all if ``None``
+
         """
         super().__init__(expect, section_name)
         if map_delimiter == '<DOLLAR>':
