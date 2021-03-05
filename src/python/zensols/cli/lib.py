@@ -15,7 +15,7 @@ from pathlib import Path
 from zensols.util import PackageResource
 from zensols.introspect import ClassImporter
 from zensols.config import (
-    Dictable, ConfigFactory, Configurable, DictionaryConfig
+    Dictable, Configurable, ConfigurableFactory, DictionaryConfig
 )
 from . import (
     ActionCliError, ActionCli, ActionCliMethod, OptionMetaData, ActionMetaData,
@@ -127,9 +127,9 @@ class ConfigurationImporter(ApplicationObserver):
 
       4. Copy all sections from the child configuration to :obj:`config`.
 
-    The child configuration is one given in :obj:`CONFIG_FACTORIES`.  If the
-    child has a `.conf` extension, :class:`.ImportIniConfig` is used with its
-    child set as :obj:`config` so the two can reference each other at
+    The child configuration is created by :class:`.ConfigurableFactory`.  If
+    the child has a `.conf` extension, :class:`.ImportIniConfig` is used with
+    its child set as :obj:`config` so the two can reference each other at
     property/factory resolve time.
 
     In the case the child configuration is loaded
@@ -153,20 +153,12 @@ class ConfigurationImporter(ApplicationObserver):
 
     """
 
-    FILE_EXT_REGEX = re.compile(r'.+\.([a-zA-Z]+?)$')
-    """A regular expression to parse out the extension from a file name."""
-
     ENVIRON_VAR_REGEX = re.compile(r'^.+\.([a-z]+?)$')
     """A regular expression to parse the name from the package name for the
     environment variable that might hold the configuration
     (i.e. ``APPNAMERC``).
 
     """
-
-    CONFIG_FACTORIES = {'conf': 'ImportIniConfig',
-                        'yml': 'YamlConfig',
-                        'json': 'JsonConfig'}
-    """The configuration factory extension to clas name."""
 
     config: Configurable = field()
     """The parent configuration, which is populated from the child configuration
@@ -224,37 +216,12 @@ class ConfigurationImporter(ApplicationObserver):
         self._app = app
         self._action = action
 
-    def _class_for_path(self) -> Type[Configurable]:
-        """Return a Python class object for the configuration based on the file
-        extension.
-
-        :see: :obj:`CONFIG_FACTORIES`
-
-        """
-        ext = self.config_path.name
-        m = self.FILE_EXT_REGEX.match(ext)
-        if m is not None:
-            ext = m.group(1)
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f"using extension to map: '{ext}'")
-        class_str = self.CONFIG_FACTORIES.get(ext)
-        if class_str is None:
-            class_str = 'ImportIniConfig'
-        class_name = f'zensols.config.{class_str}'
-        cls = ClassImporter(class_name).get_class()
-        return cls
-
     def _load(self):
         """Once we have the path and the class used to load the configuration, create
         the instance and load it.
 
         """
-        cls: Type[ConfigFactory] = self._class_for_path()
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'using config factory class {cls} to load: ' +
-                         str(self.config_path))
-        # create the source config
-        inst = cls(self.config_path)
+        inst = ConfigurableFactory().from_path(self.config_path)
         # first copy the given source configuration in to our app context
         # skipping sections that have missing options (which might be the
         # app context currently being built)

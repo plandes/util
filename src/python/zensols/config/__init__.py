@@ -14,6 +14,7 @@ from .yaml import *
 from .iniconfig import *
 from .dictconfig import *
 from .json import *
+from .configfac import *
 from .importini import *
 from .envconfig import *
 from .meta import *

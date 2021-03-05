@@ -467,8 +467,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 pw_name = f'_{prop_name}_pw'
                 params['path'] = pw_name
                 if prop_name not in kwargs:
-                    raise FactoryError(f"no property '{prop_name}' found in '" +
-                                       f"section '{sec_name}'")
+                    raise FactoryError(f"no property '{prop_name}' found '" +
+                                       f"in section '{sec_name}'")
                 params['initial_value'] = kwargs[prop_name]
                 # don't delete the key here so that the type can be defined for
                 # dataclasses, effectively as documentation
@@ -502,10 +502,10 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         try:
             self._set_reload(self.reload_root)
             if self.reload:
-                # we still have to reload at the top level (root in the instance
-                # graph)
-                class_resolver = self.class_resolver
-                class_importer = class_resolver.create_class_importer(class_name)
+                # we still have to reload at the top level (root in the
+                # instance graph)
+                cresolver: ClassResolver = self.class_resolver
+                class_importer = cresolver.create_class_importer(class_name)
                 inst = class_importer.instance(*args, **kwargs)
                 reset_props = True
             else:
@@ -528,7 +528,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             if reset_props or not hasattr(cls, prop_name):
                 logger.debug(f'setting property {prop_name}={pw_name}')
                 getter = eval(f"lambda s: getattr(s, '{pw_name}')()")
-                setter = eval(f"lambda s, v: hasattr(s, '{pw_name}') and getattr(s, '{pw_name}').set(v)")
+                setter = eval(f"lambda s, v: hasattr(s, '{pw_name}') " +
+                              f"and getattr(s, '{pw_name}').set(v)")
                 prop = property(getter, setter)
                 logger.debug(f'set property: {prop}')
                 setattr(cls, prop_name, prop)

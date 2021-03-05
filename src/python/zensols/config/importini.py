@@ -3,14 +3,16 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Iterable, Tuple, List
+from typing import Iterable, Tuple, List, Dict, Any
 import logging
-import sys
-from io import StringIO, TextIOBase
 from itertools import chain
 from collections import ChainMap
+from io import StringIO, TextIOBase
+from pathlib import Path
 from configparser import ConfigParser, ExtendedInterpolation
-from . import ConfigurableError, Configurable, IniConfig, ClassImporter
+from . import (
+    ConfigurableError, Configurable, ConfigurableFactory, IniConfig
+)
 
 logger = logging.getLogger(__name__)
 
@@ -155,13 +157,6 @@ class ImportIniConfig(IniConfig):
                 'you must set exclude_config_sections to False when the ' +
                 'import and config section are the same')
 
-    def _mod_name(self) -> str:
-        mname = sys.modules[__name__].__name__
-        parts = mname.split('.')
-        if len(parts) > 1:
-            mname = '.'.join(parts[:-1])
-        return mname
-
     def _get_bootstrap_parser(self) -> _StringIniConfig:
         conf_sec = self.config_section
         parser = IniConfig(self.config_file)
@@ -180,10 +175,29 @@ class ImportIniConfig(IniConfig):
         sconf.seek(0)
         return _StringIniConfig(sconf, parser, self.children)
 
+    def _create_config(self, section: str, params: Dict[str, Any]) -> \
+            Configurable:
+        cf = ConfigurableFactory(params)
+        class_name = params.get('class_name')
+        tpe = params.get('type')
+        config_file = params.get('config_file')
+        if class_name is not None:
+            del params['class_name']
+            inst = cf.from_class_name(class_name)
+        elif tpe is not None:
+            del params['type']
+            if tpe is None:
+                raise ConfigurableError(
+                    f"import section '{section}' has no 'type' parameter")
+            inst = cf.from_type(tpe)
+        elif config_file is not None:
+            del params['config_file']
+            inst = cf.from_class_name(Path(config_file))
+        return inst
+
     def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
         if not self.config_file.is_file():
             raise ConfigurableError('not a file: {self.config_file}')
-        mod_name: str = self._mod_name()
         conf_sec: str = self.config_section
         parser: _StringIniConfig = self._get_bootstrap_parser()
         children: List[Configurable] = parser.children
@@ -193,22 +207,8 @@ class ImportIniConfig(IniConfig):
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'populating section {sec}, {children}')
                 conf_secs.append(sec)
-                params = parser.populate(section=sec).asdict()
-                class_name = params.get('class_name')
-                if class_name is None:
-                    tpe = params.get('type')
-                    if tpe is None:
-                        raise ConfigurableError(
-                            f"import section '{sec}' has no 'type' parameter")
-                    del params['type']
-                    if tpe == 'importini':
-                        tpe = 'ImportIni'
-                    else:
-                        tpe = tpe.capitalize()
-                    class_name = f'{mod_name}.{tpe}Config'
-                else:
-                    del params['class_name']
-                inst = ClassImporter(class_name, False).instance(**params)
+                params = parser.populate({}, section=sec)
+                inst = self._create_config(sec, params)
                 parser.append_child(inst)
         return conf_secs, children
 
