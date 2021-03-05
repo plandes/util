@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- A new command line generated from configurables, configuration factories and
+  the meta data of `dataclass`s.
+
+
 ## [1.3.3] - 2021-02-17
 ### Added
 - A new `Configurable` class that imports using other `Configurable` classes:
