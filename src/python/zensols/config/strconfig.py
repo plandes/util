@@ -29,21 +29,18 @@ class StringConfig(Configurable):
     KEY_VAL_REGEX = re.compile(r'^(?:([^.]+?)\.)?([^=]+?)=(.+)$')
 
     def __init__(self, config_str: str, option_sep: str = ',',
-                 expect: bool = True, default_section: str = None):
+                 default_section: str = None):
         """Initialize with a string given as described in the class docs.
 
         :param config_str: the configuration
 
         :param option_sep: the string used to delimit the section 
 
-        :param expect: whether or not to raise an error when missing
-                       options for all ``get_option*`` methods
-
         :param default_section: used as the default section when non given on
                                 the get methds such as :meth:`get_option`
 
         """
-        super().__init__(expect, default_section)
+        super().__init__(default_section)
         self.config_str = config_str
         self.option_sep = option_sep
 
@@ -56,7 +53,7 @@ class StringConfig(Configurable):
         for kv in self.config_str.split(self.option_sep):
             m = self.KEY_VAL_REGEX.match(kv)
             if m is None:
-                raise ValueError(f'unexpected format: {kv}')
+                raise ConfigurableError(f'unexpected format: {kv}')
             sec, name, value = m.groups()
             sec = self.default_section if sec is None else sec
             if logger.isEnabledFor(logging.DEBUG):
@@ -76,7 +73,7 @@ class StringConfig(Configurable):
     def get_options(self, section: str = None) -> Dict[str, str]:
         section = self.default_section if section is None else section
         opts = self._get_parsed_config()[section]
-        if opts is None and self.expect:
+        if opts is None:
             raise ConfigurableError(f'no section: {section}')
         return opts
 

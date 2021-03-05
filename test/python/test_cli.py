@@ -1,7 +1,7 @@
 import unittest
 import os
 from zensols.cli import SimpleActionCli
-from zensols.config import IniConfig
+from zensols.config import ConfigurableError, IniConfig
 
 
 class AppTester(object):
@@ -26,7 +26,7 @@ class AppCommandLine(SimpleActionCli):
         executors = {'app_test_key': lambda params: AppTester(**params)}
         invokes = {'info': ['app_test_key', 'startaction', 'test doc']}
         if conf_file:
-            conf = IniConfig(conf_file, robust=True)
+            conf = IniConfig(conf_file)
         else:
             conf = None
         super(AppCommandLine, self).__init__(
@@ -73,8 +73,9 @@ class TestActionCli(unittest.TestCase):
         global good_val, good_conf
         good_val = 'test1'
         good_conf = IniConfig
-        AppCommandLine('test-resources/actioncli-test.confDNE').invoke(
-            'info -o test1'.split(' '))
+        with self.assertRaisesRegex(ConfigurableError, r'^no such file: test-resources.*'):
+            AppCommandLine('test-resources/actioncli-test.confDNE').invoke(
+                'info -o test1'.split(' '))
         good_val = 'conf-test1'
         AppCommandLine('test-resources/actioncli-test.conf').invoke(
             'info'.split(' '))

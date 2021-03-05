@@ -81,7 +81,7 @@ class _StringIniConfig(IniConfig):
     """
     def __init__(self, config: TextIOBase, parent: IniConfig,
                  children: Tuple[Configurable]):
-        super().__init__(None, parent.default_section, parent.expect)
+        super().__init__(None, parent.default_section)
         self.config = config
         self.children = [parent] + list(children)
 

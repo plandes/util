@@ -15,13 +15,14 @@ class TestConfig(unittest.TestCase):
     def test_missing_default_raises_error(self):
         def run_conf_create():
             conf = IniConfig('test-resources/config-test-nodef.conf')
-            opts = conf.options
+            conf.options
 
         self.assertRaises(ConfigurableError, run_conf_create)
 
     def test_no_default(self):
-        conf = IniConfig('test-resources/config-test-nodef.conf', robust=True)
-        self.assertEqual({}, conf.options)
+        with self.assertRaisesRegex(ConfigurableError, r'no section: default$'):
+            conf = IniConfig('test-resources/config-test-nodef.conf')
+            self.assertEqual({}, conf.options)
 
     def test_print(self):
         conf = IniConfig('test-resources/config-test.conf')
@@ -29,15 +30,17 @@ class TestConfig(unittest.TestCase):
         self.assertEqual("file: test-resources/config-test.conf, section: {'default'}", s)
 
     def test_list_parse(self):
-        conf = IniConfig('test-resources/config-test-option.conf', expect=False)
+        conf = IniConfig('test-resources/config-test-option.conf')
         self.assertEqual(['one', 'two', 'three'],
                          conf.get_option_list('param1'))
         self.assertEqual(True, conf.get_option_boolean('param2'))
         self.assertEqual(True, conf.get_option_boolean('param3'))
         self.assertEqual(True, conf.get_option_boolean('param4'))
         self.assertEqual(False, conf.get_option_boolean('param5'))
-        self.assertEqual(False, conf.get_option_boolean('no_such_param'))
-        self.assertEqual([], conf.get_option_list('no_such_param'))
+        with self.assertRaisesRegex(ConfigurableError, '^no option: default:no_such_param.*'):
+            conf.get_option_boolean('no_such_param')
+        with self.assertRaisesRegex(ConfigurableError, '^no option: default:no_such_param.*'):
+            self.assertEqual([], conf.get_option_list('no_such_param'))
 
     def test_has_option(self):
         conf = IniConfig('test-resources/config-test-option.conf')

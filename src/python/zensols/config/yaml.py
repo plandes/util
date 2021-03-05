@@ -26,19 +26,15 @@ class YamlConfig(Configurable, Dictable):
 
     def __init__(self, config_file: Path = None,
                  default_section: str = None, default_vars: str = None,
-                 delimiter: str = '$', expect: bool = True,
-                 sections_name: str = 'sections'):
+                 delimiter: str = '$', sections_name: str = 'sections'):
         """Initialize this instance.
 
         :param config_file: the ``.yml`` configuration file path to read from
 
         :param default_section: default section (defaults to `default`)
 
-        :param expect: if ``True``, raise exceptions when keys and/or
-                               sections are not found in the configuration
-
         """
-        super().__init__(expect, default_section)
+        super().__init__(default_section)
         self.config_file = config_file
         self.default_vars = default_vars if default_vars else {}
         self.delimiter = delimiter
@@ -141,7 +137,7 @@ class """ + class_name + """(Template):
             return node
         elif self.default_vars is not None and name in self.default_vars:
             return self.default_vars[name]
-        elif self.expect:
+        else:
             raise ConfigurableError('no such option: {}'.format(name))
 
     def set_option(self, name: str, value: str, section: str = None):
@@ -177,7 +173,7 @@ class """ + class_name + """(Template):
             ops = self.options
             if name in ops:
                 return ops[name]
-            elif self.expect:
+            else:
                 raise ConfigurableError(f'no such option: {name}')
 
     def get_options(self, name: str = None) -> Dict[str, str]:
@@ -190,7 +186,7 @@ class """ + class_name + """(Template):
                 return node
             elif name in self.default_vars:
                 return self.default_vars[name]
-            elif self.expect:
+            else:
                 raise ConfigurableError(f'no such option: {name}')
 
     @property

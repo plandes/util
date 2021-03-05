@@ -26,21 +26,18 @@ class JsonConfig(DictionaryConfig):
 
     """
     def __init__(self, config_file: Union[str, Path],
-                 expect: bool = True, default_section: str = None):
+                 default_section: str = None):
         """Initialize.
 
         :param config_file: the configuration file path to read from
 
         :param config: configures this instance (see class docs)
 
-        :param expect: whether or not to raise an error when missing
-                       options for all ``get_option*`` methods
-
         :param default_section: used as the default section when non given on
                                 the get methds such as :meth:`get_option`
 
         """
-        super().__init__(None, expect, default_section)
+        super().__init__(None, default_section)
         if isinstance(config_file, str):
             self.config_file = Path(config_file).expanduser()
         else:

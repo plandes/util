@@ -27,19 +27,16 @@ class DictionaryConfig(Configurable):
 
     """
     def __init__(self, config: Dict[str, Dict[str, str]] = None,
-                 expect: bool = True, default_section: str = None):
+                 default_section: str = None):
         """Initialize.
 
         :param config: configures this instance (see class docs)
-
-        :param expect: whether or not to raise an error when missing
-                       options for all ``get_option*`` methods
 
         :param default_section: used as the default section when non given on
                                 the get methds such as :meth:`get_option`
 
         """
-        super().__init__(expect, default_section)
+        super().__init__(default_section)
         if config is None:
             self._dict_config = {}
         else:

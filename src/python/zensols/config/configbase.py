@@ -28,17 +28,13 @@ class Configurable(Writable, metaclass=ABCMeta):
     However, they are reimplemented here for consistency among parser.
 
     """
-    def __init__(self, expect: bool = True, default_section: str = None):
+    def __init__(self, default_section: str = None):
         """Initialize.
-
-        :param expect: whether or not to raise an error when missing
-                       options for all ``get_option*`` methods
 
         :param default_section: used as the default section when non given on
                                 the get methds such as :meth:`get_option`
 
         """
-        self.expect = expect
         if default_section is None:
             self.default_section = 'default'
         else:
@@ -74,9 +70,8 @@ class Configurable(Writable, metaclass=ABCMeta):
         if opts is not None:
             val = opts.get(name)
         if val is None:
-            if self.expect:
-                raise ConfigurableError(
-                    f"no option '{name}' found in section: {section}")
+            raise ConfigurableError(
+                f"no option '{name}' found in section: {section}")
         return val
 
     def reload(self):
@@ -102,9 +97,6 @@ class Configurable(Writable, metaclass=ABCMeta):
                         constructor's ``default_section``
 
         :param vars: contains the defaults for missing values of ``name``
-
-        :param expect: if ``True`` raise an exception if the value does not
-                       exist
 
         """
         val = self.get_option(name, section)

@@ -8,7 +8,7 @@ import logging
 import collections
 import os
 from zensols.persist import persisted
-from . import Configurable
+from . import ConfigurableError, Configurable
 
 logger = logging.getLogger(__name__)
 
@@ -20,9 +20,8 @@ class EnvironmentConfig(Configurable):
     if used in the configuration or import sections.
 
     """
-    def __init__(self, section_name: str = 'env', expect: bool = False,
-                 map_delimiter: str = None, skip_delimiter: bool = False,
-                 includes: Set[str] = None):
+    def __init__(self, section_name: str = 'env', map_delimiter: str = None,
+                 skip_delimiter: bool = False, includes: Set[str] = None):
         """Initialize with a string given as described in the class docs.
 
         The string ``<DOLLAR>`` used with ``map_delimiter`` is the same as
@@ -32,9 +31,6 @@ class EnvironmentConfig(Configurable):
 
         :param section_name: the name of the created section with the
                              environment variables
-
-        :param expect: whether or not to raise an error when missing
-                       options for all ``get_option*`` methods
 
         :param map_delimiter: when given, all environment values are replaced
                               with a duplicate; set this to ``$`` when using
@@ -50,7 +46,7 @@ class EnvironmentConfig(Configurable):
                          excluding the rest; include all if ``None``
 
         """
-        super().__init__(expect, section_name)
+        super().__init__(section_name)
         if map_delimiter == '<DOLLAR>':
             map_delimiter = '$'
         self.map_delimiter = map_delimiter
@@ -66,7 +62,7 @@ class EnvironmentConfig(Configurable):
         for kv in self.config_str.split(self.option_sep):
             m = self.KEY_VAL_REGEX.match(kv)
             if m is None:
-                raise ValueError(f'unexpected format: {kv}')
+                raise ConfigurableError(f'unexpected format: {kv}')
             sec, name, value = m.groups()
             sec = self.default_section if sec is None else sec
             if logger.isEnabledFor(logging.DEBUG):

@@ -23,8 +23,8 @@ class IniConfig(Configurable):
 
     """
     def __init__(self, config_file: Path = None,
-                 default_section: str = None, robust: bool = False,
-                 expect: bool = True, create_defaults: bool = None):
+                 default_section: str = None,
+                 create_defaults: bool = None):
         """Create with a configuration file path.
 
         :param config_file: the configuration file path to read from
@@ -34,21 +34,17 @@ class IniConfig(Configurable):
         :param robust: if `True`, then don't raise an error when the
                        configuration file is missing
 
-        :param expect: if ``True``, raise exceptions when keys and/or
-                               sections are not found in the configuration
-
         :param create_defaults: used to initialize the configuration parser,
                                 and useful for when substitution values are
                                 baked in to the configuration file
 
         """
 
-        super().__init__(expect, default_section)
+        super().__init__(default_section)
         if isinstance(config_file, str):
             self.config_file = Path(config_file).expanduser()
         else:
             self.config_file = config_file
-        self.robust = robust
         self.create_defaults = self._munge_create_defaults(create_defaults)
         self.nascent = deepcopy(self.__dict__)
         self._cached_sections = {}
@@ -78,11 +74,7 @@ class IniConfig(Configurable):
         cpath = self.config_file
         logger.debug(f'loading config {cpath}')
         if not cpath.exists():
-            if self.robust:
-                logger.debug(f'no default config file {cpath}--skipping')
-            else:
-                raise IOError(f'no such file: {cpath}')
-            parser = None
+            raise ConfigurableError(f'no such file: {cpath}')
         elif cpath.is_file() or cpath.is_dir():
             writer = StringIO()
             self._read_config_content(cpath, writer)
@@ -124,9 +116,7 @@ class IniConfig(Configurable):
         elif conf.has_section(section):
             opts = {k: conf.get(section, k) for k in conf.options(section)}
         if opts is None:
-            if (not self.robust) and self.expect:
-                raise ConfigurableError(f'no section: {section}')
-            opts = {}
+            raise ConfigurableError(f'no section: {section}')
         return opts
 
     def get_option(self, name: str, section: str = None) -> str:
@@ -138,7 +128,7 @@ class IniConfig(Configurable):
                 raise ConfigurableError('no configuration given')
         elif conf.has_option(section, name):
             opt = conf.get(section, name)
-        if opt is None and self.expect and (not self.robust):
+        if opt is None:
             if not conf.has_section(section):
                 raise ConfigurableError(f'no section: {section}')
             raise ConfigurableError(f'no option: {section}:{name}')
