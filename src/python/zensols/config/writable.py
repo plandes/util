@@ -8,8 +8,9 @@ from typing import Union, Any, Iterable
 from abc import ABC, abstractmethod
 import sys
 import logging
-from collections import OrderedDict
 from logging import Logger
+from collections import OrderedDict
+import itertools as it
 from io import TextIOBase, StringIO
 from functools import lru_cache
 
@@ -97,12 +98,16 @@ class Writable(ABC):
         writer.write(line)
         self._write_empty(writer)
 
-    def _write_block(self, lines: str, depth: int, writer: TextIOBase):
+    def _write_block(self, lines: str, depth: int, writer: TextIOBase,
+                     limit: int = None):
         """Write a block of text with indentation.
 
         """
         sp = self._sp(depth)
-        for line in lines.split('\n'):
+        lines = lines.split('\n')
+        if limit is not None:
+            lines = it.islice(lines, limit)
+        for line in lines:
             writer.write(sp)
             writer.write(line)
             self._write_empty(writer)
