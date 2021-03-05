@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Type, Any, Dict, Union
+from typing import Any, Dict, Union
 from dataclasses import dataclass, field
 from enum import Enum, auto
 import os
@@ -13,7 +13,6 @@ import re
 from io import TextIOBase
 from pathlib import Path
 from zensols.util import PackageResource
-from zensols.introspect import ClassImporter
 from zensols.config import (
     Dictable, Configurable, ConfigurableFactory, DictionaryConfig
 )
