@@ -17,7 +17,7 @@ from zensols.config import (
     Configurable, Dictable, ConfigFactory
 )
 from . import (
-    ActionCliError, PositionalMetaData, OptionMetaData, ActionMetaData
+    DocUtil, ActionCliError, PositionalMetaData, OptionMetaData, ActionMetaData
 )
 
 logger = logging.getLogger(__name__)
@@ -29,19 +29,6 @@ class ActionCliManagerError(ActionCliError):
 
     """
     pass
-
-
-class DocUtil(object):
-    """A utility class to format API documentation parsed from the class.
-
-    """
-    @staticmethod
-    def normalize(text: str) -> str:
-        """Lower case and remove punctuation."""
-        doc = text.lower()
-        if doc[-1] == '.':
-            doc = doc[0:-1]
-        return doc
 
 
 @dataclass
@@ -232,6 +219,9 @@ class ActionCliManager(Dictable):
 
     decorator_section_format: str = field(default='{section}_decorator')
     """Format of :class:`.ActionCli` configuration classes."""
+
+    doc: str = field(default=None)
+    """The application documentation."""
 
     default_action: str = field(default=None)
     """The default mnemonic use when the user does not supply one."""

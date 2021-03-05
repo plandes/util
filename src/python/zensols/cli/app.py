@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, List, Dict, Iterable, Any, Callable
+from typing import Tuple, List, Dict, Iterable, Any, Callable, Optional
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 import logging
@@ -19,7 +19,7 @@ from zensols.config import (
     ImportIniConfig, ImportConfigFactory,
 )
 from . import (
-    ActionCliError,
+    ActionCliError, DocUtil,
     ActionCliManager, ActionCli, ActionCliMethod, ActionMetaData,
     CommandAction, CommandActionSet, CommandLineConfig, CommandLineParser,
  )
@@ -444,6 +444,46 @@ class ApplicationFactory(object):
         """
         return ImportConfigFactory(config, reload=self.reload_factory)
 
+    def _find_app_doc(self, cli_mng: ActionCliManager) -> str:
+        """Try to find documentation suitable for the program as a fallback if the
+        command line parser can't find anything.
+
+        This returns the class level documentation if there is only one class
+        by all second pass actions that don't originate from this module's
+        parent (i.e. those, that come from :mod:`zensols.lib`).
+
+        """
+        def flt_act(action: ActionCli):
+            name = action.class_meta.name
+            return not action.first_pass and not name.startswith(mod_name)
+
+        mod_name: str = DocUtil.module_name()
+        ac_clis: Tuple[ActionCli] = tuple(cli_mng.actions.values())
+        sp_actions = tuple(filter(flt_act, ac_clis))
+        sp_metas = tuple(chain.from_iterable(
+            map(lambda ac: ac.meta_datas, sp_actions)))
+        doc = None
+        if len(sp_metas) == 1:
+            doc = sp_metas[0].doc
+            doc = DocUtil.unnormalize(doc)
+        else:
+            actions: Dict[str, ActionCli] = \
+                {c.class_meta.name: c for c in sp_actions}
+            if len(actions) == 1:
+                doc = next(iter(actions.values())).class_meta.doc.text
+        return doc
+
+    def _get_app_doc(self, cli_mng: ActionCliManager) -> Optional[str]:
+        """Return the application documentation, or ``None`` if it is unavailable.
+
+        :see: :meth:`_find_app_doc`
+
+        """
+        doc = cli_mng.doc
+        if doc is None:
+            doc = self._find_app_doc(cli_mng)
+        return doc
+
     @persisted('_resources')
     def _create_resources(self) -> \
             Tuple[ConfigFactory, ActionCliManager, CommandLineParser]:
@@ -465,7 +505,8 @@ class ApplicationFactory(object):
             map(lambda a: a.meta_datas, cli_mng.actions.values())))
         config = CommandLineConfig(actions)
         parser = CommandLineParser(config, self.package_resource.version,
-                                   default_action=cli_mng.default_action)
+                                   default_action=cli_mng.default_action,
+                                   application_doc=self._get_app_doc(cli_mng))
         return fac, cli_mng, parser
 
     @property

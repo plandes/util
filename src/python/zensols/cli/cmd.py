@@ -15,7 +15,7 @@ from optparse import OptionParser
 from zensols.persist import persisted
 from zensols.config import Dictable
 from . import (
-    ActionCliError,#CommandLineError, CommandLineConfigError,
+    ActionCliError, DocUtil,
     OptionMetaData, PositionalMetaData, ActionMetaData,
     UsageActionOptionParser,
 )
@@ -177,23 +177,22 @@ class CommandLineParser(Dictable):
     default_action: str = field(default=None)
     """The default mnemonic use when the user does not supply one."""
 
+    application_doc: str = field(default=None)
+    """The program documentation to use when it can not be deduced from the action.
+
+    """
+
     def __post_init__(self):
         if len(self.config.actions) == 0:
             raise CommandLineConfigError(
                 'must create parser with at least one action')
 
-    def _create_program_doc(self) -> Optional[str]:
-        doc = None
-        # TODO: add configurable doc for multi second pass
-        if len(self.config.second_pass_actions) == 1:
-            doc = self.config.second_pass_actions[0].doc
-            doc = doc[0].upper() + doc[1:] + '.'
-        return doc
-
     def _create_parser(self, actions: Tuple[ActionMetaData]) -> OptionParser:
-        doc = self._create_program_doc()
-        return UsageActionOptionParser(actions, doc, self.default_action,
-                                       version=('%prog ' + str(self.version)))
+        return UsageActionOptionParser(
+            actions,
+            self.application_doc,
+            self.default_action,
+            version=('%prog ' + str(self.version)))
 
     def _configure_parser(self, parser: OptionParser,
                           options: Iterable[OptionMetaData]):

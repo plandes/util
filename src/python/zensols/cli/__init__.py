@@ -6,6 +6,7 @@ __author__ = 'Paul Landes'
 
 from .simple import *
 from .peraction import *
+from .util import *
 from .meta import *
 from .usage import *
 from .cmd import *
