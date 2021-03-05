@@ -8,6 +8,7 @@ from zensols.config import StringConfig, ImportIniConfig
 
 class TestImportConfig(unittest.TestCase):
     def setUp(self):
+        os.environ['FAKEVAR_DOT'] = '.'
         self.cconf = StringConfig('nasc.test_impconfig_app_root=.')
         self.conf = ImportIniConfig('test-resources/import-config-test.conf',
                                     children=[self.cconf],
@@ -43,12 +44,16 @@ class TestImportConfig(unittest.TestCase):
         conf = self.conf
         should = set(('nasc import imp_def_sec empty import_ini1 import_str2 ' +
                       'import_a_json sec1 sec2 sec3 sec4 temp1 temp2 grk ' +
-                      'jsec_1 jsec_2 imp_env ev impref sec5 need_vars').split())
+                      'jsec_1 jsec_2 imp_env ev impref sec5 sec6 need_vars').split())
         self.assertEqual(should, set(conf.sections))
         conf = ImportIniConfig('test-resources/import-config-test.conf',
                                children=[self.cconf])
         should = should - set('import import_ini1 import_a_json impref imp_env import_str2'.split())
         self.assertEqual(should, set(conf.sections))
+
+    def test_env_section(self):
+        conf = self.conf
+        self.assertEqual('dot: <.>', conf.get_option('text', 'sec6'))
 
     def test_picke(self):
         sio = StringIO()

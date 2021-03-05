@@ -6,7 +6,7 @@ __author__ = 'Paul Landes'
 from typing import Iterable, Tuple, List
 import logging
 import sys
-from io import StringIO
+from io import StringIO, TextIOBase
 from itertools import chain
 from collections import ChainMap
 from configparser import ConfigParser, ExtendedInterpolation
@@ -16,6 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 class _ParserAdapter(object):
+    """Adapts a :class:`~configparser.ConfigParser` to a :class:`.Configurable`.
+
+    """
     def __init__(self, conf: Configurable):
         self.conf = conf
 
@@ -40,7 +43,7 @@ class _SharedExtendedInterpolation(ExtendedInterpolation):
     substitute.
 
     """
-    def __init__(self, children: Tuple[Configurable], robust: bool = True):
+    def __init__(self, children: Tuple[Configurable], robust: bool = False):
         super().__init__()
         self.children = tuple(map(_ParserAdapter, children))
         self.robust = robust
@@ -74,12 +77,15 @@ class _StringIniConfig(IniConfig):
     :class:`~configparser.ExtendedInterpolation`.
 
     """
-    def __init__(self, config: str, parent: IniConfig,
+    def __init__(self, config: TextIOBase, parent: IniConfig,
                  children: Tuple[Configurable]):
         super().__init__(None, parent.default_section, parent.expect)
         self.config = config
         self.children = [parent] + list(children)
-        for c in children:
+
+    def append_child(self, child: Configurable):
+        self.children.append(child)
+        for c in self.children:
             c.copy_sections(self)
 
     def _create_and_load_parser(self) -> ConfigParser:
@@ -156,7 +162,7 @@ class ImportIniConfig(IniConfig):
             mname = '.'.join(parts[:-1])
         return mname
 
-    def _get_bootstrap_parser(self):
+    def _get_bootstrap_parser(self) -> _StringIniConfig:
         conf_sec = self.config_section
         parser = IniConfig(self.config_file)
         cparser = parser.parser
@@ -174,14 +180,14 @@ class ImportIniConfig(IniConfig):
         sconf.seek(0)
         return _StringIniConfig(sconf, parser, self.children)
 
-    def _get_children(self) -> Iterable[Configurable]:
+    def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
         if not self.config_file.is_file():
             raise ConfigurableError('not a file: {self.config_file}')
-        mod_name = self._mod_name()
-        conf_sec = self.config_section
-        parser = self._get_bootstrap_parser()
+        mod_name: str = self._mod_name()
+        conf_sec: str = self.config_section
+        parser: _StringIniConfig = self._get_bootstrap_parser()
         children: List[Configurable] = parser.children
-        conf_secs = [conf_sec]
+        conf_secs: List[str] = [conf_sec]
         if parser.has_option(self.SECTIONS_SECTION, conf_sec):
             for sec in parser.get_option_list(self.SECTIONS_SECTION, conf_sec):
                 if logger.isEnabledFor(logging.DEBUG):
@@ -203,7 +209,7 @@ class ImportIniConfig(IniConfig):
                 else:
                     del params['class_name']
                 inst = ClassImporter(class_name, False).instance(**params)
-                children.append(inst)
+                parser.append_child(inst)
         return conf_secs, children
 
     def _create_config_parser(self) -> ConfigParser:
@@ -217,9 +223,9 @@ class ImportIniConfig(IniConfig):
                 if sec not in par_secs:
                     parser.add_section(sec)
                 for k, v in c.get_options(sec).items():
+                    #if not parser.has_option(sec, k):
                     v = self._format_option(k, v, sec)
-                    if not parser.has_option(sec, k):
-                        parser.set(sec, k, v)
+                    parser.set(sec, k, v)
         if self.exclude_config_sections:
             self._config_sections = csecs
         return parser
