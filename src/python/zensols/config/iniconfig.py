@@ -117,7 +117,7 @@ class IniConfig(Configurable):
     def get_options(self, section: str = None) -> Dict[str, str]:
         opts = None
         section = self.default_section if section is None else section
-        conf = self.parser
+        conf: ConfigParser = self.parser
         if conf is None:
             if not self.robust:
                 raise ConfigurableError('no configuration given')
@@ -130,9 +130,9 @@ class IniConfig(Configurable):
         return opts
 
     def get_option(self, name: str, section: str = None) -> str:
-        section = self.default_section if section is None else section
-        conf = self.parser
         opt = None
+        section = self.default_section if section is None else section
+        conf: ConfigParser = self.parser
         if conf is None:
             if not self.robust:
                 raise ConfigurableError('no configuration given')

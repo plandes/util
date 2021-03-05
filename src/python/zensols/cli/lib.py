@@ -220,15 +220,23 @@ class ConfigurationImporter(ApplicationObserver):
         """Once we have the path and the class used to load the configuration, create
         the instance and load it.
 
+        Special handling is required to make options forward *and* backward
+        propogate.
+
         """
-        inst = ConfigurableFactory().from_path(self.config_path)
-        # first copy the given source configuration in to our app context
-        # skipping sections that have missing options (which might be the
-        # app context currently being built)
-        self.config.copy_sections(inst, robust=True)
-        # finally, copy the app context with the source config and let it crash
-        # with any missing properties this time
-        inst.copy_sections(self.config)
+        # create the command line specified config
+        cf = ConfigurableFactory()
+        cl_config = cf.from_path(self.config_path)
+
+        # First inject our app context (app.conf) to the command line specified
+        # configuration (--config) skipping sections that have missing options.
+        # Examples of those missing include cyclical dependencies such option
+        # references from our app context to the command line context.
+        self.config.copy_sections(cl_config, robust=True)
+
+        # copy the command line config to our app context letting it barf with
+        # any missing properties this time
+        cl_config.copy_sections(self.config)
 
     def add(self):
         """Add configuration at path to the current configuration.

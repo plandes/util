@@ -220,6 +220,7 @@ class Configurable(Writable, metaclass=ABCMeta):
                 for k, v in self.get_options(sec).items():
                     to_populate.set_option(k, v, sec)
             except Exception as e:
+                # robust is needed by lib.ConfigurationImporter_load()
                 if not robust:
                     raise e
                 else:
