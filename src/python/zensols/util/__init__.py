@@ -4,6 +4,7 @@ and fork/exec operations.
 """
 __author__ = 'Paul Landes'
 
+from .std import *
 from .time import *
 from .log import *
 from .executor import *

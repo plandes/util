@@ -1,4 +1,8 @@
-from dataclasses import dataclass, field
+"""Utility classes and context managers around logging.
+
+"""
+__author__ = 'Paul Landes'
+
 import logging
 from logging import Logger
 import sys
