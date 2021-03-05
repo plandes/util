@@ -122,6 +122,7 @@ class ImportIniConfig(IniConfig):
                  config_section: str = IMPORT_SECTION,
                  exclude_config_sections: bool = True,
                  children: Tuple[Configurable] = (),
+                 use_interpolation: bool = True,
                  **kwargs):
         """Initialize.
 
@@ -151,6 +152,7 @@ class ImportIniConfig(IniConfig):
         self.config_section = config_section
         self.exclude_config_sections = exclude_config_sections
         self.children = children
+        self.use_interpolation = use_interpolation
         if exclude_config_sections and \
            (self.default_section == self.config_section):
             raise ConfigurableError(
@@ -214,16 +216,18 @@ class ImportIniConfig(IniConfig):
 
     def _create_config_parser(self) -> ConfigParser:
         csecs, children = self._get_children()
-        parser = ConfigParser(
-            defaults=self.create_defaults,
-            interpolation=ExtendedInterpolation())
+        if self.use_interpolation:
+            parser = ConfigParser(
+                defaults=self.create_defaults,
+                interpolation=ExtendedInterpolation())
+        else:
+            parser = ConfigParser(defaults=self.create_defaults)
         for c in children:
             par_secs = parser.sections()
             for sec in c.sections:
                 if sec not in par_secs:
                     parser.add_section(sec)
                 for k, v in c.get_options(sec).items():
-                    #if not parser.has_option(sec, k):
                     v = self._format_option(k, v, sec)
                     parser.set(sec, k, v)
         if self.exclude_config_sections:
