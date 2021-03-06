@@ -24,8 +24,6 @@ class Tracker(object):
     """Tracks and distributes employee payroll.
 
     """
-    config: Configurable
-
     db: EmployeeDatabase = field()
     """An instance not given on the commnd line."""
 
