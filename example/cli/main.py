@@ -14,7 +14,7 @@ class PayrollApplicationFactory(ApplicationFactory):
         dconf = DictionaryConfig(
             {'appenv': {'root_dir': str(root_dir)},
              'financial': {'salary': 15.}})
-        return cls(package_resource='payroll', children_configs=(dconf,))
+        return cls(package_resource='mycom.payroll', children_configs=(dconf,))
 
 
 def main(args: List[str] = None) -> Any:
@@ -27,4 +27,5 @@ if __name__ == '__main__':
     #args = 'show -c payroll.conf -f verbose'.split()
     #args = '-c payroll.conf -f verbose'.split()
     #args = 'salary -c payroll.conf'.split()
+    #args = 'report -c payroll.conf'.split()
     main(args)
