@@ -1,4 +1,4 @@
-# Command Line Interface
+# Simple CLI (Deprecated)
 
 The command line interface library intends to make command line execution and
 configuration easy.  The library supports (among other features) an
