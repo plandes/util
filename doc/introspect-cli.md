@@ -17,13 +17,15 @@ version being the CLI [example] directory.
 ## Boilerplate
 
 Every introspective CLI application needs an *application context* (see the
-[configuration documentation](config.html#application-context)), which is
-just a specialized grouping of data specific to an application that has two
-forms: file(s) on the file system and their in-memory isomorphic form.  The
-files that make up the application context are those already detailed in the
-[configuration] section.  The *application context* file always has the same
-name and directory structure (`resources/app.conf`), which is added as a
-resource file to a package distribution built with [setuptools]:
+[configuration documentation](config.html#application-context)), which is just
+a specialized grouping of data specific to an application that has two forms:
+file(s) on the file system and their in-memory isomorphic form.  The files that
+make up the application context are those already detailed in the
+[configuration] section.  The *application context* file, which by default, is
+`resources/app.conf`, which is added as a resource file to a package
+distribution built with [setuptools] since the file is located in `resources`.
+Our initial application context just provides the `cli` section with it's
+referenced `app`:
 ```ini
 [cli]
 class_name = zensols.cli.ActionCliManager
@@ -33,13 +35,11 @@ apps = list: app
 class_name = payroll.Tracker
 ```
 
-The class [ActionCliManager] is used by the framework to build the command line
-and link it to the target class(es), and is configured in the `cli` section.
-The `app` section defines a the instance that will be the target of the
-framework, and will invoke a method on the class when run from the command line
-from `__main__`.  The `apps` line in the `cli` section lists all the
-application to create, each of which maps as an *action* using a mnemonic for
-each of it's methods.
+The class [ActionCliManager] is the framework class that builds the command
+line and links it to the target class(es).  The `app` section gives the class
+to instantiate, which has the method to call from the command line `__main__`.
+The `apps` line in the `cli` section lists all the application to create, each
+of which maps as an *action* using a mnemonic for each of it's methods.
 
 Since this example creates a simple payroll application, we'll create a *hello
 world* like class in `payroll.py` that will evolve in to a more complex
@@ -62,7 +62,7 @@ from zensols.cli import ApplicationFactory
 
 
 def main():
-    cli = ApplicationFactory('mycom.payroll')
+    cli = ApplicationFactory('payroll', 'app.conf')
     cli.invoke()
 
 
@@ -72,8 +72,15 @@ if __name__ == '__main__':
 
 The [ApplicationFactory] is the framework entry point that requires only one
 parameter, which is the package distribution name and usually the name space of
-the application.  When we run this application from the command line using a
-help flag (`--help`), we get:
+the application.  Large organizations or projects prefix the string with their
+name and the name is used in `setup.py` to resources that make up the package
+distribution.
+
+The second parameter is the [resource](config.html#resources) *application
+context*, which as mentioned usually goes in the `resources` directory.
+However, to keep things simple, ours points to a file in the root directory for
+this example.  When we run this application from the command line using a help
+flag (`--help`), we get:
 ```bash
 $ ./main.py --help
 
@@ -97,6 +104,7 @@ to that method, the CLI calls it and produces the expected output.
 $ ./main.py --help
 hello world
 ```
+
 
 ## Domain
 
@@ -134,7 +142,7 @@ class EmployeeDatabase(object):
     departments: Tuple[Department]
 ```
 
-We'll create a mock set of data directly in the `resources/app.conf` file to go
+We'll create a mock set of data directly in the `app.conf` file to go
 along with our mock DB instance and add the DB instance to the main app:
 ```ini
 [homer]
@@ -213,7 +221,7 @@ mappings (see [LogConfigurator.CONFIG_META] for an example).
 
 The latter is done by creating a new instance of a class in a section with the
 same information as the `CONFIG_META` attribute.  The section name uses the
-same section it *decorates* appended with `_decorates` in `resources/app.conf`,
+same section it *decorates* appended with `_decorates` in `app.conf`,
 such as:
 ```ini
 [app_decorator]
@@ -292,6 +300,7 @@ employees:
     salary: 5.25
 ```
 
+
 ## User Configuration
 
 So far all the configuration we've seen is tied closely to the code, and not
@@ -306,13 +315,16 @@ have things like paths, user names, parameters to scientific applications etc.
 The framework supports this and non-cyclical two way references: from the
 application context to the user configuration and vice versa.
 
-The framework implements this with the [ConfigurationImporter] class, which is
-just a data class with a method to load the configuration and add it to the
-application context.  It is configured as a *first pass* class, which means it
-is run before the application.
+The framework implements this user configuration injection with the
+[ConfigurationImporter] class, which is just a data class with a method to load
+the configuration and add it to the application context.  It is configured as a
+*first pass* class, which means it is run before the application.
+
 
 ### Two Pass Command Line Parser
 
+Generally speaking, there are many first pass actions that prepare for one of
+many second pass actions indicated by the user using the *action*'s mnemonic.
 The framework parses the command line parameters given by the user in two
 passes:
 
@@ -324,11 +336,341 @@ passes:
    In this phase, all options from all methods are added so we can "fish out"
    the action mnemonic, which is the string used to indicate which method to
    run as we've seen with the `print_employees` method in the [application
-   class](#application-class) example
+   class](#application-class-and-actions) example
    
-2. After the first pass completes, we now know the action to run along with any
-   other positional arguments given.
+1. After the first pass completes, we know the action to run along with any
+   other positional arguments given separated from the command line options.
+   Now we know enough to build a new command line specialized for the *action*
+   given by the user.
 
+The [ConfigurationImporter] is both indicated it should run, and what file to
+load with a `-c/--config` option followed by a file name.  Again, the this
+option can be renamed with an [action decorator](#action-decorators), which
+obviates its [CLASS_META](#ConfigurationImporter.CLASS_META) meta data.  Adding
+this capability is as simple as adding it as an application:
+```ini
+[cli]
+class_name = zensols.cli.ActionCliManager
+apps = list: config_cli, app
+
+[config_cli]
+class_name = zensols.cli.ConfigurationImporter
+```
+
+We've added the section `config_cli` to the list of sections to read, which
+gives a definition for a new class of type [ConfigurationImporter], which in
+turn adds the `-c` option:
+```bash
+Usage: main.py [options]:
+
+Show all employees.
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -d, --dryrun          if given, don't do anything, just act like it
+  -f <short|verbose>, --format=<short|verbose>
+                        the detail of reporting
+  -c FILE, --config=FILE
+                        the path to the configuration file
+```
+
+
+### Split Out the User Configuration
+
+Now we can move what we think the user might edit to the user context
+`payroll.conf`, and we'll add a few defaults while we're at it:
+```ini
+[default]
+age = 32
+high_cost = 11.50
+
+[bob]
+class_name = domain.Person
+age = ${default:age}
+salary = 13.50
+
+[homer]
+class_name = domain.Person
+age = 40
+salary = 5.25
+
+[human_resources]
+class_name = domain.Department
+name = hr
+employees = instance: list: homer, bob
+```
+
+The `high_cost` user configuration option gives what the company determines is
+a high cost employee and needs to be used to separate employees.
+
+
+## Another Second Pass Action
+
+Now we need to report on high salaried employees using the `high_cost` option
+in the user configuration, so let's add that capability to the "database":
+```python
+@dataclass
+class EmployeeDatabase(object):
+    departments: Tuple[Department]
+    high_cost: float
+
+    @property
+    def costly_employees(self) -> Iterable[Person]:
+        return tuple(filter(lambda e: e.salary > self.high_cost,
+                            chain.from_iterable(
+                                map(lambda d: d.employees, self.departments))))
+```
+
+add access it from the main application data class `Tracker`:
+```python
+def report_costly(self):
+    """Report high salaried employees."""
+	emp: Person
+	for emp in self.db.costly_employees:
+		print(emp)
+```
+
+which now yields the following help usage:
+```bash
+Usage: main.py <printemployees|reportcostly> [options]:
+
+Tracks and distributes employee payroll.
+
+Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -c FILE, --config=FILE
+                        the path to the configuration file
+
+Actions:
+printemployees     show all employees
+  -d, --dryrun                         if given, don't do anything, just act like it
+  -f, --format <short|verbose>  short  the detail of reporting
+
+reportcostly       report high salaried employees
+  -d, --dryrun                         if given, don't do anything, just act like it
+```
+
+We now see an `Actions:` section, where we did not before.  Also notice the
+application expects either `printemployees`, `reportcostly` as indicated in the
+first usage line, and called *mnemonics*.  As mentioned, these are used as a
+positional parameter by the user to invoke an *action* in the main class, which
+for us, is in the `Tracker` class.
+
+Before adding this method, we saw no mnemonics or action usage because there
+was only a single second pass action given.  Since the framework had everything
+it needed to know which method to run (the singleton of the class), it made all
+input as a single set of options without requiring the action mnemonic.
+
+Also note that the top level program documentation under the `Usage:` line
+changed from:
+
+`Show all employees.`
+
+to
+
+`Tracks and distributes employee payroll.`
+
+This is because the framework can't decide between which method's documentation
+to use since we have more than one eligible action, so instead it uses the
+class's docstring.
+
+
+### Renaming the Mnemonics
+
+While the help messages look natural for a command line program, the long
+mnemonic names look out of place and would be cumbersome to type.  Again, we'll
+address this with the decorated [ActionCli] class by adding to the *decorated*
+section:
+```ini
+[app_decorator]
+class_name = zensols.cli.ActionCli
+option_excludes = set: db
+mnemonics = dict: {
+    'print_employees': 'show',
+    'report_costly': 'highcost'}
+```
+which has a new entry `mnemonics` as a `dict` with keys as method names and
+mnemonics as values, which produces a better usage:
+```bash
+Usage: main.py <show|highcost> [options]:
+...
+Actions:
+show         show all employees
+  -d, --dryrun                         if given, don't do anything, just act like it
+  -f, --format <short|verbose>  short  the detail of reporting
+
+highcost     report high salaried employees
+  -d, --dryrun                         if given, don't do anything, just act like it
+```
+
+Now we can in run the `report_costly` method with the `highcost` mnemonic and
+user configuration file:
+```bash
+$ ./main.py -c payroll.conf highcost
+Person(name='bob', age=32, salary=13.5)
+```
+
+Note that we now refer from the `Tracker` application's `emp_db` instance
+reference in the application context file `app.conf` to the `human_resources`
+`Department` section in the user configuration file `payroll.conf`.
+Conversely, we link from the `default` section's `high_cost` parameter to the
+"data base" `emp_db` section for the `EmployeeDatabase.high_cost` attribute.
+
+
+## Logging
+
+It would be nice to be able to log some messages instead of print them for our
+application, but only our application.  If we turn on information level logging
+for the entire run time we could eventually get "polluting" logs that just
+bury important information.  We could use the default Python logging system to
+do this, and put our application logger in its own name space, then set the
+level for that name space.  Here's the first part added to `payroll.py`:
+```python
+import logging
+...
+logger = logging.getLogger(__name__)
+...
+class Tracker(object):
+...
+logger.info(f'printing employees using format: {format}')
+```
+
+However, when we run the program, the print statement made in to a logging
+statement won't be seen.  We need only to add a first pass action available in
+the framework as the [LogConfigurator] added to the `cli` section of the
+`app.conf` file.  Part of it's configuration, set as a data class field, is the
+application logger name `payroll` for the `__name__` used in our code.  We
+could add the name to the configuration, but then log messages would
+mysteriously disappear if the file name was changed.  Instead, we make the
+assumption the entire application is in the name space given by the
+[setuptools] and refer to the name space by the package distribution meta data
+we've already given in the `main.py` class.  This can be done with the
+[PackageInfoImporter] class, which provides the name in a new section it
+creates called `package` and refer to it from the [LogConfigurator] section:
+```ini
+[cli]
+class_name = zensols.cli.ActionCliManager
+apps = list: config_cli, package_cli, log_cli, app
+doc = A payroll program.
+
+[package_cli]
+class_name = zensols.cli.PackageInfoImporter
+
+[log_cli]
+class_name = zensols.cli.LogConfigurator
+log_name = ${package:name}
+```
+
+Note that we must add the `package_cli` **before** the `log_cli` in the `apps`
+option since they are processed in order and the log configurator needs the
+`package` section created first.
+
+We also add a `doc` option to the `cli` section to manually provide the
+documentation since we now have more than one class, which doesn't allow for
+taking it from the class docstring.
+
+
+## More Actions
+
+Speaking of the package, perhaps we want to report some information about it.
+Already we have a way of getting it's version with the `--version` option.  But
+we could print out, among other package meta data, the name.  Since it doesn't
+seem to fit as a method in our employee tracking class, we'll add a new class
+to `payroll.py`:
+```python
+@dataclass
+class PackageReporter(object):
+    config: Configurable
+
+    def report(self):
+        """Print package information."""
+        name: str = self.config.get_option('name', section='package')
+        print(f'package: {name}')
+```
+
+The `config` data class field is populated by the configuration factory that
+created it with the configuration used to create it (see the
+[configuration](#config.md) documentation).  We then only need to report it's
+section's contents.
+
+We'll add it to the list of applications:
+```ini
+[cli]
+class_name = zensols.cli.ActionCliManager
+apps = list: config_cli, package_cli, log_cli, app, package_reporter
+
+[package_reporter]
+class_name = payroll.PackageReporter
+```
+which will register it as a second pass action, and thus a separate action and
+mnemonic:
+```bash
+Usage: main.py <show|highcost|report> [options]:
+...
+report       print package information
+```
+and gives the same name of the package as provided in the `main`:
+```bash
+$ ./main.py report -c payroll.conf 
+package: payroll
+```
+
+## Environment
+
+It is important to easily supply environment information to the application,
+for which the framework has two means:
+
+1. Provide environment variables using the [EnvironmentConfig] using the
+   [import ini configuration](config.html#import-ini-configuration) as a
+   section include.
+
+1. Provide it directly to the [ApplicationFactor] in the `main.py` when we
+   create it.
+
+Any sophisticated application will probably involve both, so let's start with
+the first, which is simply to add the following in the `app.conf`:
+```ini
+[import]
+sections = imp_env
+
+[imp_env]
+type = environment
+section_name = env
+includes = set: HOME
+```
+which creates a new section `env` with the indicated environment variable
+`HOME`.  We can add all variables if we don't provide `includes`, but some
+variables that contain dollar signs confuse the `configparser.ConfigParser`
+interpolation system.
+
+Our application factory added to `main.py` includes:
+```python
+from dataclasses import dataclass
+from pathlib import Path
+from zensols.config import DictionaryConfig
+from zensols.cli import ApplicationFactory
+
+
+@dataclass
+class PayrollApplicationFactory(ApplicationFactory):
+    @classmethod
+    def instance(cls: type, root_dir: Path = Path('.'), *args, **kwargs):
+        dconf = DictionaryConfig(
+            {'appenv': {'root_dir': str(root_dir)},
+             'financial': {'salary': 15.}})
+        return cls('payroll', 'app.conf', children_configs=(dconf,))
+
+
+def main():
+    cli = PayrollApplicationFactory.instance()
+    cli.invoke()
+```
+
+This gives the application `appenv` and `financial` sections with data we
+provide.  This is very handy in setting application roots that might have
+different data directories for scientific data, models, etc.
 
 
 ## Complete Examples
@@ -342,3 +684,4 @@ this documentation.
 [example]: https://github.com/plandes/util/tree/master/example/cli
 [configuration]: config.md
 [setuptools]: https://setuptools.readthedocs.io/en/latest/
+[EnvironmentConfig]: ../api/zensols.config.html#zensols.config.envconfig.EnvironmentConfig
