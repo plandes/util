@@ -4,7 +4,7 @@ from enum import Enum, auto
 import logging
 from itertools import chain
 from zensols.config import Configurable
-from domain import Department
+from .domain import Department
 
 logger = logging.getLogger(__name__)
 

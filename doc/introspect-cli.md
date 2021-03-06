@@ -13,6 +13,10 @@ API is build on the [configuration], please read or skim that documentation
 first.  We'll start with a simple application and build it up, with the final
 version being the CLI [example] directory.
 
+The remainder of the tutorial shows by example of how to use the framework.
+The working example code at the end of each sub section can be found in the
+[example] directory `example/cli`.
+
 
 ## Boilerplate
 
@@ -228,11 +232,14 @@ such as:
 class_name = zensols.cli.ActionCli
 option_excludes = set: db
 ```
-which tells the framework to ignore the `db` field.  The `ActionCli` is the
+which tells the framework to ignore the `db` field.  The [ActionCli] is the
 framework's aforementioned plumbing that connects the class and method pair to
 the command line.  Each `ActionCli` describes the class and at least one of
 it's methods, each of which is an action with it's respective command line
 metadata given as an [ActionMetaData].
+
+The format of decorator sections can be modified with
+`decorator_section_format` given to the [ActoinCliManager].
 
 
 ### Domain and Choices
@@ -519,6 +526,13 @@ Conversely, we link from the `default` section's `high_cost` parameter to the
 "data base" `emp_db` section for the `EmployeeDatabase.high_cost` attribute.
 
 
+## Default Action
+
+A `default_action` attribute can be set on the [ActionCliManager] in the `cli`
+section when it is created to use an action by name if the user does not supply
+one.  Usage identifies which action is the default.
+
+
 ## Logging
 
 It would be nice to be able to log some messages instead of print them for our
@@ -673,10 +687,41 @@ provide.  This is very handy in setting application roots that might have
 different data directories for scientific data, models, etc.
 
 
+## Directory Structure
+
+So far, our examples have been small and had a simple flat directory
+structure.  However, in larger applications, we'll want to branch out and
+create a source directory tree and probably another for configuration.  Here
+gives something simple, yet provides room for the application to grow:
+
+* **root**
+  * **resources**: contains files packaged in the distribution
+    * **app.conf**: the application configuration
+  * **etc**: user directory tree (any name works)
+    * **payroll.conf**: user configuration
+  * **mycom**: company module
+    * **payroll**: our source app
+	  * **domain.py**
+	  * **payroll.py**
+
+The final example provides this directory structure and provides a
+comprehensive [example](#complete-examples) of the final product of this
+tutorial.
+
+
+## Conclusion
+
+This tutorial was meant to instruct quickly on how to create applications.
+There are many details and other features not covered, such as the listing
+actions and documentation second pass action given in the last example.
+
+
 ## Complete Examples
 
 See the [example] directory the complete code used to create the examples in
-this documentation.
+this documentation.  There is one directory for each sub heading in this
+document, for example the [boilerplate](#boilerplate) section's steps are in
+the `example/cli/1-boilerplate` directory in the source repository.
 
 
 <!-- links -->
