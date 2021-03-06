@@ -391,9 +391,6 @@ class ApplicationFactory(object):
     :obj:`app_config_resource` from the application package of the client.
 
     """
-    UTIL_PACKAGE = 'zensols.util'
-    """The package name of *this* utility package."""
-
     package_resource: PackageResource = field()
     """Package resource (i.e. ``zensols.someappname``).  This field is converted to
     a package if given as a string during post initialization.
@@ -466,11 +463,15 @@ class ApplicationFactory(object):
         if len(sp_metas) == 1:
             doc = sp_metas[0].doc
             doc = DocUtil.unnormalize(doc)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'using second pass doc: {doc}')
         else:
             actions: Dict[str, ActionCli] = \
                 {c.class_meta.name: c for c in sp_actions}
             if len(actions) == 1:
                 doc = next(iter(actions.values())).class_meta.doc.text
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'using class: {doc}')
         return doc
 
     def _get_app_doc(self, cli_mng: ActionCliManager) -> Optional[str]:
