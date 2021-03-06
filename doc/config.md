@@ -2,7 +2,7 @@
 
 This package provides advanced parsing of INI and YAML files that provide Java
 Spring like mechanism to create in memory Python object instance graphs.  This
-API also works with the [command action library](command-line.md) to easily
+API also works with the [command line library](introspect-cli.md) to easily
 configure command line applications.
 
 There are many configuration options and classes to choose from.  However, the
