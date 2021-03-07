@@ -1,4 +1,4 @@
-# Introspective Command Line
+# Command Line Interface (CLI)
 
 The goal of this API is to require little to no meta data to create a command
 line.  Instead, a complete command line interface is automatically built given
