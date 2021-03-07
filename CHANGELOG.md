@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - A new command line generated from configurables, configuration factories and
   the meta data of `dataclass`s.
+- Tutorial based documentation for the new introspection based command line
+  system.
+### Removed
+- Old (simple) command line documentation.
 
 
 ## [1.3.3] - 2021-02-17
