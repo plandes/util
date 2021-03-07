@@ -224,7 +224,7 @@ contains what to make options, option name changes and mnemonic to method
 mappings (see [LogConfigurator.CONFIG_META] for an example).
 
 The latter is done by creating a new instance of a class in a section with the
-same information as the `CONFIG_META` attribute.  The section name uses the
+same information as the [CONFIG_META] attribute.  The section name uses the
 same section it *decorates* appended with `_decorates` in `app.conf`,
 such as:
 ```ini
@@ -239,7 +239,7 @@ it's methods, each of which is an action with it's respective command line
 metadata given as an [ActionMetaData].
 
 The format of decorator sections can be modified with
-`decorator_section_format` given to the [ActoinCliManager].
+`decorator_section_format` given to the [ActionCliManager].
 
 
 ### Domain and Choices
@@ -526,7 +526,7 @@ Conversely, we link from the `default` section's `high_cost` parameter to the
 "data base" `emp_db` section for the `EmployeeDatabase.high_cost` attribute.
 
 
-## Default Action
+### Default Action
 
 A `default_action` attribute can be set on the [ActionCliManager] in the `cli`
 section when it is created to use an action by name if the user does not supply
@@ -640,7 +640,7 @@ for which the framework has two means:
    [import ini configuration](config.html#import-ini-configuration) as a
    section include.
 
-1. Provide it directly to the [ApplicationFactor] in the `main.py` when we
+1. Provide it directly to the [ApplicationFactory] in the `main.py` when we
    create it.
 
 Any sophisticated application will probably involve both, so let's start with
@@ -729,4 +729,17 @@ the `example/cli/1-boilerplate` directory in the source repository.
 [example]: https://github.com/plandes/util/tree/master/example/cli
 [configuration]: config.md
 [setuptools]: https://setuptools.readthedocs.io/en/latest/
+
 [EnvironmentConfig]: ../api/zensols.config.html#zensols.config.envconfig.EnvironmentConfig
+[ActionCli]: ../api/zensols.cli.html#zensols.cli.action.ActionCli
+[ActionCliManager]: ../api/zensols.cli.html#zensols.cli.action.ActionCliManager
+[ActionCliManager]: ../api/zensols.cli.html#zensols.cli.action.ActionCliManager
+[ActionMetaData]: ../api/zensols.cli.html#zensols.cli.meta.ActionMetaData
+[ApplicationFactory]: ../api/zensols.cli.html#zensols.cli.app.ApplicationFactory
+[ConfigurationImporter]: ../api/zensols.cli.html#zensols.cli.lib.ConfigurationImporter
+[ImportConfigFactory]: ../api/zensols.config.html#zensols.config.factory.ImportConfigFactory
+[LogConfigurator]: ../api/zensols.cli.html#zensols.cli.lib.LogConfigurator
+[PackageInfoImporter]: ../api/zensols.cli.html#zensols.cli.lib.PackageInfoImporter
+[SimpleActionCli]: ../api/zensols.cli.html#zensols.cli.simple.SimpleActionCli
+[CLASS_META]: ../api/zensols.cli.html?zensols.cli.lib.LogConfigurator.CLI_META
+[LogConfigurator.CONFIG_META]: ../api/zensols.cli.html?zensols.cli.lib.LogConfigurator.CLI_META

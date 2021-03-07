@@ -226,9 +226,10 @@ class Application(Dictable):
     then invokes the corresponding action method.
 
     The application has all the first pass actions configured to run and/or
-    given options indicating by the user to run (see :obj:`first_pass_actions).
-    It also has the second pass action given as a mnemonic, or the single
-    second pass action if there is only one (see :obj:`second_pas_action`).
+    given options indicating by the user to run (see
+    :obj:`first_pass_actions`).  It also has the second pass action given as a
+    mnemonic, or the single second pass action if there is only one (see
+    :obj:`second_pas_action`).
 
     """
     WRITABLE__DESCENDANTS = True
