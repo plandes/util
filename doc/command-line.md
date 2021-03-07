@@ -730,6 +730,9 @@ the `example/cli/1-boilerplate` directory in the source repository.
 [configuration]: config.md
 [setuptools]: https://setuptools.readthedocs.io/en/latest/
 
+[Enum]: https://docs.python.org/3/library/enum.html
+[OptionParser]: https://docs.python.org/3/library/optparse.html
+
 [EnvironmentConfig]: ../api/zensols.config.html#zensols.config.envconfig.EnvironmentConfig
 [ActionCli]: ../api/zensols.cli.html#zensols.cli.action.ActionCli
 [ActionCliManager]: ../api/zensols.cli.html#zensols.cli.action.ActionCliManager
@@ -741,5 +744,5 @@ the `example/cli/1-boilerplate` directory in the source repository.
 [LogConfigurator]: ../api/zensols.cli.html#zensols.cli.lib.LogConfigurator
 [PackageInfoImporter]: ../api/zensols.cli.html#zensols.cli.lib.PackageInfoImporter
 [SimpleActionCli]: ../api/zensols.cli.html#zensols.cli.simple.SimpleActionCli
-[CLASS_META]: ../api/zensols.cli.html?zensols.cli.lib.LogConfigurator.CLI_META
+[CONFIG_META]: ../api/zensols.cli.html?zensols.cli.lib.LogConfigurator.CLI_META
 [LogConfigurator.CONFIG_META]: ../api/zensols.cli.html?zensols.cli.lib.LogConfigurator.CLI_META
