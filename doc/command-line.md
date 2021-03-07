@@ -15,7 +15,9 @@ version being the CLI [example] directory.
 
 The remainder of the tutorial shows by example of how to use the framework.
 The working example code at the end of each sub section can be found in the
-[example] directory `example/cli`.
+[example] directory `example/cli`.  A more complete full example is given as a
+template as described in the main documentation [template
+section](../#template).
 
 
 ## Boilerplate
