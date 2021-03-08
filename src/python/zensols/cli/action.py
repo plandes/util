@@ -206,6 +206,11 @@ class ActionCliManager(Dictable):
 
     """
 
+    _CLASS_IMPORTERS = {}
+    """Resolved class cache (see :meth:`_resolve_class`).
+
+    """
+
     config_factory: ConfigFactory = field()
     """The configuration factory used to create :class:`.ActionCli` instances.
 
@@ -319,6 +324,21 @@ class ActionCliManager(Dictable):
                         self._add_field(action.section, arg.name, omd)
         self._actions[action.section] = action
 
+    def _resolve_class(self, class_name: str) -> type:
+        """Resolve a class using the caching those already dynamically resolved.
+
+        """
+        cls_imp: ClassImporter = self._CLASS_IMPORTERS.get(class_name)
+        if cls_imp is None:
+            # resolve the string fully qualified class name to a Python class
+            # type
+            cls_imp = ClassImporter(class_name, reload=False)
+            cls = cls_imp.get_class()
+            self._CLASS_IMPORTERS[class_name] = cls_imp
+        else:
+            cls = cls_imp.get_class()
+        return cls
+
     def _add_app(self, section: str):
         """Add an :class:`.ActionCli` instanced from the configuration given by a
         section.  The application is added to :obj:`._actions`.  The section is
@@ -337,7 +357,7 @@ class ActionCliManager(Dictable):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'building CLI on class: {class_name}')
         # resolve the string fully qualified class name to a Python class type
-        cls = ClassImporter(class_name).get_class()
+        cls = self._resolve_class(class_name)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'resolved to class: {cls}')
         if not dataclasses.is_dataclass(cls):
