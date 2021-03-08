@@ -440,6 +440,8 @@ class ApplicationFactory(object):
         context created in :meth:`_get_app_context`.
 
         """
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'reload: {self.reload_factory}')
         return ImportConfigFactory(config, reload=self.reload_factory)
 
     def _find_app_doc(self, cli_mng: ActionCliManager) -> str:

@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Tuple
+from typing import Any, Tuple, Type
 import logging
 import importlib
 from functools import reduce
@@ -49,7 +49,7 @@ class ClassImporter(object):
         else:
             return module + '.' + cls.__name__
 
-    def parse_module_class(self):
+    def parse_module_class(self) -> Tuple[str, str]:
         """Parse the module and class name part of the fully qualifed class name.
         """
 
@@ -60,7 +60,7 @@ class ClassImporter(object):
                 f'not a fully qualified class name: {cname}')
         return match.groups()
 
-    def get_module_class(self) -> Tuple[object, type]:
+    def get_module_class(self) -> Tuple[Any, Type]:
         """Return the module and class as a tuple of the given class in the
         initializer.
 
