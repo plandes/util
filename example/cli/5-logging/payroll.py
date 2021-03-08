@@ -48,7 +48,7 @@ class Tracker(object):
         logger.info(f'printing employees using format: {format}')
         dept: Department
         for dept in self.db.departments:
-            if format == Format.short:
+            if format is Format.short:
                 print(dept)
             else:
                 dept.write()

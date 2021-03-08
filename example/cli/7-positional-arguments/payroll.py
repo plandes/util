@@ -22,7 +22,7 @@ class EmployeeDatabase(object):
 
 
 class Format(Enum):
-    short = auto()
+    terse = auto()
     verbose = auto()
 
 
@@ -39,7 +39,7 @@ class Tracker(object):
     dry_run: bool = field(default=False)
     """If given, don't do anything, just act like it."""
 
-    def print_employees(self, format: Format = Format.short):
+    def print_employees(self, format: Format):
         """Show all employees.
 
         :param format: the detail of reporting
@@ -48,7 +48,7 @@ class Tracker(object):
         logger.info(f'printing employees using format: {format}')
         dept: Department
         for dept in self.db.departments:
-            if format == Format.short:
+            if format is Format.terse:
                 print(dept)
             else:
                 dept.write()

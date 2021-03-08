@@ -1,4 +1,4 @@
-# Command Line Interface (CLI)
+# Command Line Interface
 
 The goal of this API is to require little to no meta data to create a command
 line.  Instead, a complete command line interface is automatically built given
@@ -607,9 +607,8 @@ class PackageReporter(object):
 ```
 
 The `config` data class field is populated by the configuration factory that
-created it with the configuration used to create it (see the
-[configuration](#config.md) documentation).  We then only need to report it's
-section's contents.
+created it with the configuration used to create it (see the [configuration]
+documentation).  We then only need to report it's section's contents.
 
 We'll add it to the list of applications:
 ```ini
@@ -632,6 +631,37 @@ and gives the same name of the package as provided in the `main`:
 $ ./main.py report -c payroll.conf 
 package: payroll
 ```
+
+
+## Positional Arguments
+
+Let's suppose our formatting for employee printing changes and we no longer
+trust the default given on the command line.  Instead we want to force the user
+to provide the format over specifying it as an option.  To do this, we only
+need remove the default in the keyword argument making it a positional argument
+in the method:
+```python
+def print_employees(self, format: Format):
+	"""Show all employees.
+
+	:param format: the detail of reporting
+
+	"""
+...
+```
+which shows up in the help usage as a positional argument rather than an option:
+```bash
+Actions:
+show <format>     show all employees
+  -d, --dryrun    if given, don't do anything, just act like it
+```
+and to run it:
+```bash
+./main.py show -c payroll.conf terse
+INFO:payroll:printing employees using format: Format.terse
+human_resources: homer, bob
+```
+
 
 ## Environment
 
