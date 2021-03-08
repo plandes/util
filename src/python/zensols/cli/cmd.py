@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, List, Any, Dict, Iterable, Optional
+from typing import Tuple, List, Any, Dict, Iterable
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -15,8 +15,7 @@ from optparse import OptionParser
 from zensols.persist import persisted
 from zensols.config import Dictable
 from . import (
-    ActionCliError, DocUtil,
-    OptionMetaData, PositionalMetaData, ActionMetaData,
+    ActionCliError, OptionMetaData, PositionalMetaData, ActionMetaData,
     UsageActionOptionParser,
 )
 
@@ -247,25 +246,31 @@ class CommandLineParser(Dictable):
         parser = self._get_first_pass_parser(False)
         parser.error(msg)
 
-    def _parse_type(self, s: str, t: type) -> Any:
+    def _parse_type(self, s: str, t: type, name: str) -> Any:
+        tpe = None
         if issubclass(t, Enum):
-            return t.__members__[s]
+            tpe = t.__members__.get(s)
+            choices = ', '.join(map(lambda e: f"'{e.name}'", t))
+            if tpe is None:
+                raise CommandLineError(
+                    f"no choice '{s}' for '{name}' (choose from {choices})")
         else:
             if not isinstance(s, (str, int, bool, Path)):
                 raise CommandLineConfigError(f'unknown parse type: {s}: {t}')
             try:
-                return t(s)
+                tpe = t(s)
             except ValueError as e:
                 raise CommandLineError(f'expecting type {t.__name__}: {e}')
+        return tpe
 
     def _parse_options(self, action_meta: ActionMetaData,
                        op_args: Dict[str, Any]):
-        opts = action_meta.options_by_dest
+        opts: Dict[str, OptionMetaData] = action_meta.options_by_dest
         parsed = {}
         for k, v in op_args.items():
-            opt = opts.get(k)
+            opt: OptionMetaData = opts.get(k)
             if v is not None and opt is not None:
-                v = self._parse_type(v, opt.dtype)
+                v = self._parse_type(v, opt.dtype, opt.long_option)
             parsed[k] = v
         return parsed
 
@@ -273,8 +278,9 @@ class CommandLineParser(Dictable):
                           vals: List[str]) -> Tuple[Any]:
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'parsing positional args: {metas} <--> {vals}')
-        return tuple(map(lambda x: self._parse_type(x[0], x[1].dtype),
-                         zip(vals, metas)))
+        return tuple(
+            map(lambda x: self._parse_type(x[0], x[1].dtype, x[1].name),
+                zip(vals, metas)))
 
     def _parse_first_pass(self, args: List[str],
                           actions: List[CommandAction]) -> \
