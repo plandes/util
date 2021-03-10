@@ -94,7 +94,8 @@ class Writable(ABC):
 
         """
         width = self.WRITABLE_MAX_COL if width is None else width
-        line = char * width
+        width = width - (depth * self.WRITABLE_INDENT_SPACE)
+        line = self._sp(depth) + (char * width)
         writer.write(line)
         self._write_empty(writer)
 
