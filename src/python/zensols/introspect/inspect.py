@@ -245,24 +245,35 @@ class ClassInspector(object):
                 if node.name == self.cls.__name__:
                     return node
 
-    def _map_default(self, def_node: ast.AST):
+    def _map_default(self, item: str, def_node: ast.AST):
         """Map a default from what will be at times an :class:`ast.Name`.  This happens
         when an enum is used as a type, but name.id only give the enum class
         name and not the enum value
 
+        :param item: mapped target string used to create an error message
+
+        :param def_node: the node to map a default
+
         """
-        if isinstance(def_node, ast.Attribute):
-            enum_name: str = def_node.attr
-            cls: type = self.data_type_mapper.map_type(def_node.value.id)
-            default = cls.__members__[enum_name]
-        # ast.Num and ast.Str added for Python 3.7 backward compat
-        elif isinstance(def_node, ast.Num):
-            default = def_node.n
-        elif isinstance(def_node, ast.Str):
-            default = def_node.s
-        else:
-            default = def_node.value
-        return default
+        try:
+            if isinstance(def_node, ast.Attribute):
+                enum_name: str = def_node.attr
+                cls: type = self.data_type_mapper.map_type(def_node.value.id)
+                default = cls.__members__[enum_name]
+            # ast.Num and ast.Str added for Python 3.7 backward compat
+            elif isinstance(def_node, ast.Num):
+                default = def_node.n
+            elif isinstance(def_node, ast.Str):
+                default = def_node.s
+            elif isinstance(def_node, ast.Call):
+                func = def_node.func.id
+                args = map(lambda a: a.value, def_node.args)
+                default = f'{func}({", ".join(args)})'
+            else:
+                default = def_node.value
+            return default
+        except Exception as e:
+            raise ClassError(f'could not map {item}: {def_node}: {e}')
 
     def _get_args(self, node: ast.arguments):
         args = []
@@ -276,7 +287,7 @@ class ClassInspector(object):
                 default = None
                 didx = i - dsidx
                 if didx >= 0:
-                    default = self._map_default(defaults[didx])
+                    default = self._map_default(f'arg {arg}', defaults[didx])
                     is_positional = False
                 if arg.annotation is not None:
                     dtype = arg.annotation.id
@@ -343,9 +354,11 @@ class ClassInspector(object):
                 name: str = node.target.id
                 dtype: str = node.annotation.id
                 dtype: type = self.data_type_mapper.map_type(dtype)
+                item: str = f"kwarg: '{name}'"
                 if node.value is not None:
                     kwlst: List[ast.keyword] = node.value.keywords
-                    kwargs = {k.arg: self._map_default(k.value) for k in kwlst}
+                    kwargs = {k.arg: self._map_default(item, k.value)
+                              for k in kwlst}
                     fields.append(ClassField(name, dtype, None, kwargs))
             # parse documentation string right after the dataclass field
             elif (isinstance(node, ast.Expr) and
