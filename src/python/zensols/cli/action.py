@@ -183,12 +183,14 @@ class ActionCli(Dictable):
             else:
                 # no underscores in the CLI action names
                 name = self._normalize_name(name)
+            # get the action help from the method if available, then class
             if meth.doc is None:
                 doc = self.class_meta.doc
             else:
                 doc = meth.doc
             if doc is not None:
                 doc = DocUtil.normalize(doc.text)
+            # add the meta data
             meta = ActionMetaData(
                 name=name,
                 doc=doc,
