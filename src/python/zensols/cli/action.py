@@ -159,7 +159,9 @@ class ActionCli(Dictable):
             # add positionl arguments from the class meta data
             for arg in meth.args:
                 if arg.is_positional:
-                    opt: Dict[str, str] = self.option_overrides.get(arg.name)
+                    opt: Dict[str, str] = None
+                    if self.option_overrides is not None:
+                        opt = self.option_overrides.get(arg.name)
                     # first try to get it from any mapping from the long name
                     if opt is not None and 'long_name' in opt:
                         pname = opt['long_name']
