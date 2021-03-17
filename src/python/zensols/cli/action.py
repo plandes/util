@@ -152,13 +152,21 @@ class ActionCli(Dictable):
         for name in sorted(self.class_meta.methods.keys()):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'creating method {name}')
-            meth = self.class_meta.methods[name]
-            meth_params = set(field_params)
+            meth: ClassMethod = self.class_meta.methods[name]
+            meth_params: Set[OptionMetaData] = set(field_params)
             pos_args: List[PositionalMetaData] = []
             arg: ClassMethodArg
+            # add positionl arguments from the class meta data
             for arg in meth.args:
                 if arg.is_positional:
-                    pname = self._normalize_name(arg.name)
+                    opt: Dict[str, str] = self.option_overrides.get(arg.name)
+                    # first try to get it from any mapping from the long name
+                    if opt is not None and 'long_name' in opt:
+                        pname = opt['long_name']
+                    else:
+                        # use the argument name in the method but normalize it
+                        # to make it appear in CLI parlance
+                        pname = self._normalize_name(arg.name)
                     pos_args.append(PositionalMetaData(pname, arg.dtype))
                 else:
                     if logger.isEnabledFor(logging.DEBUG):
