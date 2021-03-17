@@ -419,7 +419,7 @@ class ListActions(ApplicationObserver, Dictable):
         return ac_docs
 
     def list(self):
-        """List all actions and, depending on format, their help."""
+        """List all actions and help."""
         def list_json():
             try:
                 self._command_line = True

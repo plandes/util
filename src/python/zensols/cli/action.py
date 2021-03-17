@@ -109,6 +109,10 @@ class ActionCli(Dictable):
     """
 
     def _is_option_enabled(self, name: str) -> bool:
+        """Return ``True`` if the option is enabled and eligible to be added to the
+        command line.
+
+        """
         incs = self.option_includes
         excs = self.option_excludes
         enabled = ((incs is None) or (name in incs)) and (name not in excs)
@@ -117,9 +121,20 @@ class ActionCli(Dictable):
         return enabled
 
     def _add_option(self, name: str, omds: Set[OptionMetaData]):
+        """Add an :class:`.OptionMetaData` from the previously collected options.
+
+        :param name: the name of the option
+
+        :param omds: the set to populate from :obj:`options`
+
+        """
         if self._is_option_enabled(name):
             opt: OptionMetaData = self.options[name]
             omds.add(opt)
+
+    def _normalize_name(self, s: str) -> str:
+        """Normalize text of mneomincs and positional arguments."""
+        return s.replace('_', '')
 
     @property
     @persisted('_methods')
@@ -143,7 +158,8 @@ class ActionCli(Dictable):
             arg: ClassMethodArg
             for arg in meth.args:
                 if arg.is_positional:
-                    pos_args.append(PositionalMetaData(arg.name, arg.dtype))
+                    pname = self._normalize_name(arg.name)
+                    pos_args.append(PositionalMetaData(pname, arg.dtype))
                 else:
                     if logger.isEnabledFor(logging.DEBUG):
                         logger.debug(f'adding option: {name}:{arg.name}')
@@ -156,7 +172,7 @@ class ActionCli(Dictable):
                     continue
             else:
                 # no underscores in the CLI action names
-                name = name.replace('_', '')
+                name = self._normalize_name(name)
             if meth.doc is None:
                 doc = self.class_meta.doc
             else:
