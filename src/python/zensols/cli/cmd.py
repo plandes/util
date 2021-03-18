@@ -356,11 +356,26 @@ class CommandLineParser(Dictable):
             logger.debug(f"action '{action_name}' found: {action_meta}")
         if action_meta is None:
             raise CommandLineError(f'no such action: {action_name}')
-        if len(action_meta.positional) != len(op_args):
+        pos_arg_diff = len(op_args) - len(action_meta.positional)
+        single_sp = None
+        if len(self.config.second_pass_actions) == 1:
+            single_sp = self.config.second_pass_actions[0].name
+        unnecessary_mnemonic = pos_arg_diff == 1 and single_sp == op_args[0]
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'positional arg difference: {pos_arg_diff}, ' +
+                         f'single second pass mnemonic: {single_sp}, ' +
+                         f'unnecessary_mnemonic: {unnecessary_mnemonic}')
+        if unnecessary_mnemonic:
+            raise CommandLineError(
+                f"action '{action_meta.name}' expects " +
+                f"{len(action_meta.positional)} argument(s), but " +
+                f"'{single_sp}' is counted as a positional argument " +
+                'and should be omitted')
+        if pos_arg_diff != 0:
             raise CommandLineError(
                 f"action '{action_meta.name}' expects " +
                 f"{len(action_meta.positional)} " +
-                f'argument(s) but got {len(op_args)}')
+                f'argument(s) but got {len(op_args)}: {op_args}')
         # if there is more than one second pass action, we must re-parse using
         # the specific options and positional argument for that action
         if second_pass:

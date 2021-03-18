@@ -155,7 +155,7 @@ prconfig <file>     a second test action
 
     def test_parse_position(self):
         parser = CommandLineParser(CommandLineConfig((self.test_action,)))
-        with self.assertRaisesRegex(CommandLineError, r"^action 'test' expects 0.*"):
+        with self.assertRaisesRegex(CommandLineError, r"^action 'test' expects 0.*counted as a positional.*"):
             parser.parse(['test'])
         parser = CommandLineParser(CommandLineConfig((self.test_action, self.test_action2)))
         with self.assertRaisesRegex(CommandLineError, r'^no action given$'):
