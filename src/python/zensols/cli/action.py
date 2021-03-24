@@ -71,7 +71,13 @@ class ActionCli(Dictable):
 
     """
 
-    mnemonics: Dict[str, str] = field(default=None)
+    mnemonic_includes: Set[str] = field(default=None)
+    """A list of mnemonicss to include, or all if ``None``."""
+
+    mnemonic_excludes: Set[str] = field(default_factory=set)
+    """A list of mnemonicss to exclude, or none if ``None``."""
+
+    mnemonic_overrides: Dict[str, str] = field(default=None)
     """The name of the action given on the command line, which defaults to the name
     of the action.
 
@@ -118,6 +124,18 @@ class ActionCli(Dictable):
         enabled = ((incs is None) or (name in incs)) and (name not in excs)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'option {name} is enabled: {enabled}')
+        return enabled
+
+    def _is_mnemonic_enabled(self, name: str) -> bool:
+        """Return ``True`` if the action for the mnemonic is enabled and eligible to be
+        added to the command line.
+
+        """
+        incs = self.mnemonic_includes
+        excs = self.mnemonic_excludes
+        enabled = ((incs is None) or (name in incs)) and (name not in excs)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'mnemonic {name} is enabled: {enabled}')
         return enabled
 
     def _add_option(self, name: str, omds: Set[OptionMetaData]):
@@ -176,10 +194,11 @@ class ActionCli(Dictable):
                     self._add_option(arg.name, meth_params)
             # use what's given in the meta, or not present, the munged method
             # name as the mnemonic
-            if self.mnemonics is not None:
-                name = self.mnemonics.get(name)
-                if name is None:
-                    continue
+            if not self._is_mnemonic_enabled(name):
+                continue
+            if self.mnemonic_overrides is not None and \
+               name in self.mnemonic_overrides:
+                name = self.mnemonic_overrides[name]
             else:
                 # no underscores in the CLI action names
                 name = self._normalize_name(name)

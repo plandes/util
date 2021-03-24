@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from enum import Enum, auto
 from zensols.persist import Stash
-from zensols.config import Dictable, Configurable
+from zensols.config import Dictable
 
 
 class Fruit(Enum):
@@ -69,8 +69,9 @@ class TestActionMeta(Dictable):
     """Test action that contains meta data.
 
     """
-    CLI_META = {'mnemonics': {'bad_method_name': 'action3',
-                              'another_pythonic_method': 'act4'}}
+    CLI_META = {'mnemonic_overrides': {'bad_method_name': 'action3',
+                                       'another_pythonic_method': 'act4'},
+                'mnemonic_excludes': {'good_name'}}
 
     def good_name(self):
         return 'good'

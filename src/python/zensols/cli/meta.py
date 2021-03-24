@@ -262,7 +262,8 @@ class ActionMetaData(Dictable):
     def __post_init__(self):
         if self.first_pass and len(self.positional) > 0:
             raise ValueError(
-                'a first pass action can not have positional arguments')
+                'a first pass action can not have positional arguments, ' +
+                f'but got {self.positional} for action: {self.name}')
 
     @property
     @persisted('_options_by_dest')

@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Follow the same pattern with mnemonics as options: includes/excludes.  The
+  `mnemonics` action attribute has changed to `mnemonic_overrides`.  Both
+  `mnemonic_includes`, `mnemonic_excludes` are now optional to more easily
+  select mnemonics in the CLI application class.
+
+
 ## [1.4.1] - 2021-03-10
 ### Changed
 - Bug fix release: enumeration mapping for CLI.

@@ -45,7 +45,8 @@ class LogConfigurator(object):
                 'option_overrides': {'level': {'short_name': None}},
                 # we configure this class, but use a better naming for
                 # debugging
-                'mnemonics': {'config': 'log'},
+                'mnemonic_overrides': {'config': 'log'},
+                'mnemonic_includes': {'config'},
                 # only set 'level' as a command line option so we can configure
                 # the rest in the application context.
                 'option_includes': {'level'}}
@@ -139,7 +140,8 @@ class ConfigurationImporter(ApplicationObserver):
 
     CLI_META = {'first_pass': True,  # not a separate action
                 # the mnemonic must be unique and used to referece the method
-                'mnemonics': {'add': '_add_config_as_import'},
+                'mnemonic_overrides': {'add': '_add_config_as_import'},
+                'mnemonic_includes': {'add'},
                 # better/shorter  long name, and reserve the short name
                 'option_overrides': {CONFIG_PATH_FIELD: {'long_name': 'config',
                                                          'short_name': 'c'}},
@@ -280,7 +282,8 @@ class PackageInfoImporter(ApplicationObserver):
                 # to the CLI that it needs to be called
                 'always_invoke': True,
                 # the mnemonic must be unique and used to referece the method
-                'mnemonics': {'add': '_add_package_info'},
+                'mnemonic_overrides': {'add': '_add_package_info'},
+                'mnemonic_includes': {'add'},
                 # only the path to the configuration should be exposed as a
                 # an option on the comamnd line
                 'option_includes': {}}
