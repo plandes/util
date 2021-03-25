@@ -438,6 +438,10 @@ class ActionCliManager(Dictable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'found configuration section: {conf_sec}')
             action = self.config_factory.instance(conf_sec, **params)
+            if not isinstance(action, ActionCli):
+                raise ActionCliManagerError(
+                    f'section instance {conf_sec} is not a class of ' +
+                    f'type ActionCli, but {type(action)}')
         else:
             if hasattr(cls, self.CLASS_META_ATTRIBUTE):
                 cmconf = getattr(cls, self.CLASS_META_ATTRIBUTE)
