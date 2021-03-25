@@ -7,6 +7,7 @@ from typing import Dict, Tuple, Iterable, Set, List, Any
 from dataclasses import dataclass, field
 import dataclasses
 import logging
+import copy as cp
 from itertools import chain
 from zensols.persist import persisted
 from zensols.introspect import (
@@ -354,10 +355,16 @@ class ActionCliManager(Dictable):
 
         """
         prexist = self._fields.get(name)
-        if prexist is not None and omd != prexist:
-            raise ActionCliManagerError(
-                f'duplicate field {name} -> {omd.long_name} in ' +
-                f'{section} but not equal to {prexist}')
+        if prexist is not None:
+            # we have to skip the short option compare since
+            # ``_create_op_meta_data`` reassigns a new letter for all created
+            # options
+            prexist = cp.deepcopy(prexist)
+            prexist.short_name = omd.short_name
+            if omd != prexist:
+                raise ActionCliManagerError(
+                    f'duplicate field {name} -> {omd} in ' +
+                    f'{section} but not equal to {prexist}')
         self._fields[name] = omd
 
     def _add_action(self, action: ActionCli):
