@@ -3,7 +3,7 @@ from __future__ import annotations
 
 """
 
-from typing import Dict, Tuple, Iterable, Set, List
+from typing import Dict, Tuple, Iterable, Set, List, Any
 from dataclasses import dataclass, field
 import dataclasses
 import logging
@@ -192,13 +192,28 @@ class ActionCli(Dictable):
                     if logger.isEnabledFor(logging.DEBUG):
                         logger.debug(f'adding option: {name}:{arg.name}')
                     self._add_option(arg.name, meth_params)
-            # use what's given in the meta, or not present, the munged method
-            # name as the mnemonic
+            # skip disabled mnemonics (using mnemonic_includes)
             if not self._is_mnemonic_enabled(name):
                 continue
+            # customize mnemonic/action data if given (either string names, or
+            # dictionaries with more information)
             if self.mnemonic_overrides is not None and \
                name in self.mnemonic_overrides:
-                name = self.mnemonic_overrides[name]
+                override: Any = self.mnemonic_overrides[name]
+                if isinstance(override, str):
+                    name = override
+                elif isinstance(override, dict):
+                    o_name: str = override.get('name')
+                    option_includes: Set[str] = override.get('option_includes')
+                    if o_name is not None:
+                        name = o_name
+                    if option_includes is not None:
+                        meth_params: Set[OptionMetaData] = set(
+                            filter(lambda o: o.long_name in option_includes,
+                                   meth_params))
+                else:
+                    raise ActionCliManagerError(
+                        f'unknown override: {override} ({type(override)})')
             else:
                 # no underscores in the CLI action names
                 name = self._normalize_name(name)
