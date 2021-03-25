@@ -302,7 +302,8 @@ class ClassInspector(object):
         method: ClassMethod = None
         name = node.name
         is_priv = name.startswith('_')
-        is_prop = any(map(lambda n: n.id, node.decorator_list))
+        is_prop = any(map(lambda n: hasattr(n, 'id') and n.id,
+                          node.decorator_list))
         # only public methods (not properties) are parsed for now
         if not is_prop and not is_priv:
             args = self._get_args(node.args)
@@ -378,7 +379,11 @@ class ClassInspector(object):
                     last_field.doc = doc
             # parse the method
             elif isinstance(node, ast.FunctionDef):
-                meth = self._get_method(node)
+                try:
+                    meth = self._get_method(node)
+                except Exception as e:
+                    raise ClassError(
+                        f'could not parse method: {meth} in {node}', e)
                 if meth is not None:
                     methods.append(meth)
             else:
