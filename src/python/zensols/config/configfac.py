@@ -78,6 +78,8 @@ class ConfigurableFactory(object):
         m = self.FILE_EXT_REGEX.match(path.name)
         if m is not None:
             ext = m.group(1)
+        else:
+            ext = None
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"using extension to map: '{ext}'")
         class_type = self.EXTENSION_TO_TYPE.get(ext)
