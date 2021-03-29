@@ -383,7 +383,7 @@ class ClassInspector(object):
                     meth = self._get_method(node)
                 except Exception as e:
                     raise ClassError(
-                        f'could not parse method: {meth} in {node}', e)
+                        f'could not parse method in {node}', e)
                 if meth is not None:
                     methods.append(meth)
             else:
