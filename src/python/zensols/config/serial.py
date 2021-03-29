@@ -242,8 +242,9 @@ class Serializer(object):
 
     def resource_filename(self, resource_name: str, module_name: str = None):
         """Return a resource based on a file name.  This uses the ``pkg_resources``
-        package first to find the resources.  If it doesn't find it, it returns
-        a path on the file system.
+        package first to find the resources.  If the resource module does not
+        exist, it defaults to the relateve file given in ``module_name``. If it
+        finds it, it returns a path on the file system.
 
         :param: resource_name the file name of the resource to obtain (or name
                 if obtained from an installed module)
@@ -271,10 +272,14 @@ class Serializer(object):
                     logger.debug(f'resource exists: {res}')
         except ModuleNotFoundError as e:
             logger.warning(f'could not find module: {e}')
-        if res is None:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'defaulting to module name: {resource_name}')
-            res = resource_name
+            res = Path(resource_name)
+            if not res.exists():
+                logger.warning(f'could not find path: {resource_name}')
+                raise e
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'resolved resource to {res}')
-        return Path(res)
+        if not isinstance(res, Path):
+            res = Path(res)
+        return res
