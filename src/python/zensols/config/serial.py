@@ -258,8 +258,23 @@ class Serializer(object):
         """
         if module_name is None:
             module_name = self.DEFAULT_RESOURCE_MODULE
-        if pkg_resources.resource_exists(module_name, resource_name):
-            res = pkg_resources.resource_filename(module_name, resource_name)
-        else:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(
+                f'looking resource mod={module_name}{type(module_name)}, ' +
+                f'resource={resource_name}{type(resource_name)}')
+        res = None
+        try:
+            if module_name is not None and \
+               pkg_resources.resource_exists(module_name, resource_name):
+                res = pkg_resources.resource_filename(module_name, resource_name)
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'resource exists: {res}')
+        except ModuleNotFoundError as e:
+            logger.warning(f'could not find module: {e}')
+        if res is None:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'defaulting to module name: {resource_name}')
             res = resource_name
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'resolved resource to {res}')
         return Path(res)
