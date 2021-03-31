@@ -194,7 +194,7 @@ class ImportIniConfig(IniConfig):
             inst = cf.from_type(tpe)
         elif config_file is not None:
             del params['config_file']
-            inst = cf.from_class_name(Path(config_file))
+            inst = cf.from_path(Path(config_file))
         return inst
 
     def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
