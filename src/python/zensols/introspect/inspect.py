@@ -402,7 +402,10 @@ class ClassInspector(object):
             fields={d.name: d for d in fields},
             methods={m.name: m for m in methods})
 
-    def _get_sub_class(self, cls: Type) -> List[Class]:
+    def _get_super_class(self, cls: Type) -> List[Class]:
+        """Traverse all superclasses of ``cls``.
+
+        """
         supers = filter(lambda c: c is not object and c is not cls, cls.mro())
         classes = []
         for cls in supers:
@@ -424,7 +427,7 @@ class ClassInspector(object):
                 raise ClassError(
                     f'{self.INSPECT_META} must be a dict in {self.cls}' +
                     f'but got type: {type(meta)}')
-            superclasses = self._get_sub_class(self.cls)
+            superclasses = self._get_super_class(self.cls)
             superclasses.reverse()
             superclasses.append(cls)
             for sc in superclasses:
