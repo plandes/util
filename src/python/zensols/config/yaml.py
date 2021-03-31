@@ -3,9 +3,10 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Tuple, Set, Any
+from typing import Dict, Tuple, Set, Any, Union
 import logging
 from pathlib import Path
+from io import TextIOBase
 import copy
 import yaml
 from zensols.config import ConfigurableError, Configurable, Dictable
@@ -24,12 +25,14 @@ class YamlConfig(Configurable, Dictable):
     """
     CLASS_VER = 0
 
-    def __init__(self, config_file: Path = None,
+    def __init__(self, config_file: Union[Path, TextIOBase] = None,
                  default_section: str = None, default_vars: str = None,
                  delimiter: str = '$', sections_name: str = 'sections'):
         """Initialize this instance.
 
-        :param config_file: the ``.yml`` configuration file path to read from
+        :param config_file: the configuration file path to read from; if the
+                            type is an instance of :class:`io.TextIOBase`, then
+                            read it as a file object
 
         :param default_section: default section (defaults to `default`)
 
@@ -61,8 +64,11 @@ class YamlConfig(Configurable, Dictable):
             else:
                 raise ConfigurableError(f'unknown yaml type {type(n)}: {n}')
 
-        with open(self.config_file) as f:
-            content = f.read()
+        if isinstance(self.config_file, TextIOBase):
+            content = self.config_file
+        else:
+            with open(self.config_file) as f:
+                content = f.read()
         struct = yaml.load(content, yaml.FullLoader)
         context = {}
         context.update(self.default_vars)

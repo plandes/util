@@ -198,7 +198,8 @@ class ImportIniConfig(IniConfig):
         return inst
 
     def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
-        if not self.config_file.is_file():
+        if isinstance(self.config_file, Path) and \
+           not self.config_file.is_file():
             raise ConfigurableError('not a file: {self.config_file}')
         conf_sec: str = self.config_section
         parser: _StringIniConfig = self._get_bootstrap_parser()

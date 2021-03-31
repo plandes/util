@@ -4,7 +4,7 @@ parsed from files.
 """
 __author__ = 'Paul Landes'
 
-from typing import Set, Dict, List
+from typing import Set, Dict, List, Union
 from abc import ABCMeta, abstractmethod
 import logging
 import os
@@ -22,12 +22,14 @@ class IniConfig(Configurable):
     returns sets or subsets of options.
 
     """
-    def __init__(self, config_file: Path = None,
+    def __init__(self, config_file: Union[Path, TextIOBase] = None,
                  default_section: str = None,
                  create_defaults: bool = None):
         """Create with a configuration file path.
 
-        :param config_file: the configuration file path to read from
+        :param config_file: the configuration file path to read from; if the
+                            type is an instance of :class:`io.TextIOBase`, then
+                            read it as a file object
 
         :param default_section: default section (defaults to `default`)
 
@@ -71,7 +73,16 @@ class IniConfig(Configurable):
             self._conf.read_file(writer)
 
     def _create_and_load_parser(self) -> ConfigParser:
-        cpath = self.config_file
+        if isinstance(self.config_file, TextIOBase):
+            writer = self.config_file
+            writer.seek(0)
+            parser = self._create_config_parser()
+            parser.read_file(writer)
+            return parser
+        else:
+            return self._create_and_load_parser_from_file(self.config_file)
+
+    def _create_and_load_parser_from_file(self, cpath: Path) -> ConfigParser:
         logger.debug(f'loading config {cpath}')
         if not cpath.exists():
             raise ConfigurableError(f'no such file: {cpath}')

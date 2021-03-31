@@ -4,11 +4,12 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, List, Dict, Iterable, Any, Callable, Optional
+from typing import Tuple, List, Dict, Iterable, Any, Callable, Optional, Union
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 import logging
 import sys
+from io import TextIOBase
 from itertools import chain
 from pathlib import Path
 from zensols.introspect import Class, ClassMethod, ClassField, ClassMethodArg
@@ -398,8 +399,13 @@ class ApplicationFactory(object):
 
     """
 
-    app_config_resource: str = field(default='resources/app.conf')
-    """The relative resource path to the application's context."""
+    app_config_resource: Union[str, TextIOBase] = field(
+        default='resources/app.conf')
+    """The relative resource path to the application's context if :class:`str`.  If
+    the type is an instance of :class:`io.TextIOBase`, then read it as a file
+    object.
+
+    """
 
     children_configs: Tuple[Configurable] = field(default=None)
     """Any children configurations added to the root level configuration."""
@@ -488,13 +494,7 @@ class ApplicationFactory(object):
             doc = self._find_app_doc(cli_mng)
         return doc
 
-    @persisted('_resources')
-    def _create_resources(self) -> \
-            Tuple[ConfigFactory, ActionCliManager, CommandLineParser]:
-        """Create the config factory, the command action line manager, and command line
-        parser resources.  The data is cached and use in property getters.
-
-        """
+    def _get_config_path(self) -> Path:
         path: Path = self.package_resource.get_path(self.app_config_resource)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'path to app specific context: {path.absolute()}')
@@ -502,7 +502,21 @@ class ApplicationFactory(object):
             raise ActionCliError(
                 f"application context resource '{self.app_config_resource}' " +
                 f'not found in {self.package_resource}')
-        config: Configurable = self._create_application_context(path)
+        return path
+
+    @persisted('_resources')
+    def _create_resources(self) -> \
+            Tuple[ConfigFactory, ActionCliManager, CommandLineParser]:
+        """Create the config factory, the command action line manager, and command line
+        parser resources.  The data is cached and use in property getters.
+
+        """
+        if isinstance(self.app_config_resource, str):
+            path = self._get_config_path()
+            config: Configurable = self._create_application_context(path)
+        else:
+            file_obj = self.app_config_resource
+            config: Configurable = self._create_application_context(file_obj)
         fac: ConfigFactory = self._create_config_factory(config)
         cli_mng: ActionCliManager = fac(ActionCliManager.SECTION)
         actions: Tuple[ActionMetaData] = tuple(chain.from_iterable(

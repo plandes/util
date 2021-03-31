@@ -7,6 +7,7 @@ from typing import Union, Dict, Any
 from dataclasses import dataclass
 import logging
 from pathlib import Path
+from io import TextIOBase
 import json
 from zensols.persist import persisted
 from . import ConfigurableError, DictionaryConfig
@@ -25,11 +26,13 @@ class JsonConfig(DictionaryConfig):
     section content is the single dictionary.
 
     """
-    def __init__(self, config_file: Union[str, Path],
+    def __init__(self, config_file: Union[Path, TextIOBase],
                  default_section: str = None):
         """Initialize.
 
-        :param config_file: the configuration file path to read from
+        :param config_file: the configuration file path to read from; if the
+                            type is an instance of :class:`io.TextIOBase`, then
+                            read it as a file object
 
         :param config: configures this instance (see class docs)
 
@@ -51,8 +54,11 @@ class JsonConfig(DictionaryConfig):
 
     @persisted('_config')
     def _get_config(self) -> Dict[str, Dict[str, str]]:
-        with open(self.config_file) as f:
-            conf = json.load(f)
+        if isinstance(self.config_file, TextIOBase):
+            conf = json.load(self.config_file)
+        else:
+            with open(self.config_file) as f:
+                conf = json.load(f)
         conf = self._narrow_root(conf)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'raw json: {conf}')
