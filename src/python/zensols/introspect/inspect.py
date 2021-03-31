@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, Type
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -218,6 +218,13 @@ class ClassInspector(object):
     (field) documentation.
 
     """
+    INSPECT_META = 'CLASS_INSPECTOR'
+    """Attribute to set to indicate to traverse superclasses as well.  This is set
+    as an empty ``dict`` to allow future implementations to filter on what's
+    traversed (i.e. ``include_fields``).
+
+    """
+
     cls: type = field()
     """The class to inspect."""
 
@@ -337,14 +344,13 @@ class ClassInspector(object):
                         arg.doc = ClassDoc(param, None)
         return method
 
-    def get_class(self) -> Class:
+    def _get_class(self, cls: Type) -> Class:
         """Return a dict of attribute (field) to metadata and docstring.
 
         """
         attrs = self.attrs
         if attrs is None:
-            attrs = tuple(filter(lambda i: i[:1] != '_',
-                                 self.cls.__dict__.keys()))
+            attrs = tuple(filter(lambda i: i[:1] != '_', cls.__dict__.keys()))
         cnode: ast.Node = self._get_class_node()
         fields: List[ClassField] = []
         methods: List[ClassMethod] = []
@@ -391,7 +397,37 @@ class ClassInspector(object):
                     logger.debug(f'not processed node: {type(node)}: ' +
                                  f'{node.value}')
         return Class(
-            self.cls,
+            cls,
             ClassDoc(self.cls.__doc__),
             fields={d.name: d for d in fields},
             methods={m.name: m for m in methods})
+
+    def _get_sub_class(self, cls: Type) -> List[Class]:
+        supers = filter(lambda c: c is not object and c is not cls, cls.mro())
+        classes = []
+        for cls in supers:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'traversing super class: {cls}')
+            ci = self.__class__(cls)
+            clmeta = ci.get_class()
+            classes.append(clmeta)
+        return classes
+
+    def get_class(self) -> Class:
+        """Return a dict of attribute (field) to metadata and docstring.
+
+        """
+        cls = self._get_class(self.cls)
+        if hasattr(self.cls, self.INSPECT_META):
+            meta: Dict[str, str] = getattr(self.cls, self.INSPECT_META)
+            if not isinstance(meta, dict):
+                raise ClassError(
+                    f'{self.INSPECT_META} must be a dict in {self.cls}' +
+                    f'but got type: {type(meta)}')
+            superclasses = self._get_sub_class(self.cls)
+            superclasses.reverse()
+            superclasses.append(cls)
+            for sc in superclasses:
+                cls.fields.update(sc.fields)
+                cls.methods.update(sc.methods)
+        return cls
