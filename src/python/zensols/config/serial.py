@@ -20,6 +20,10 @@ logger = logging.getLogger(__name__)
 OBJECT_KEYS = {'_type', '_data'}
 
 
+class ResourceError(Exception):
+    pass
+
+
 class PythonObjectEncoder(JSONEncoder):
     def default(self, obj: Any):
         if isinstance(obj, set):
@@ -274,10 +278,11 @@ class Serializer(object):
             logger.warning(f'could not find module: {e}')
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'defaulting to module name: {resource_name}')
-            res = Path(resource_name)
             if not res.exists():
                 logger.warning(f'could not find path: {resource_name}')
                 raise e
+        if res is None:
+            res = resource_name
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'resolved resource to {res}')
         if not isinstance(res, Path):
