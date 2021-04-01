@@ -115,7 +115,7 @@ class Stash(ABC):
             logger.debug(f'clearing stash {self.__class__}')
         for k in self.keys():
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug('deleting key: {k}')
+                logger.debug(f'deleting key: {k}')
             self.delete(k)
 
     @abstractmethod
@@ -386,7 +386,9 @@ class PreemptiveStash(DelegateStash):
         self._has_data = has_data
 
     def clear(self):
+        logger.debug('PreemptiveStash: clearing')
         if self._calculate_has_data():
+            logger.debug('PreemptiveStash: has data')
             super().clear()
         self._reset_has_data()
 
