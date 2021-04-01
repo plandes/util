@@ -221,6 +221,8 @@ class ImportIniConfig(IniConfig):
         elif config_file is not None:
             del params['config_file']
             inst = cf.from_path(Path(config_file))
+        if isinstance(inst, self.__class__):
+            inst.children = tuple(list(inst.children) + self.children)
         return inst
 
     def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
