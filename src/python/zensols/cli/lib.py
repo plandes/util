@@ -233,7 +233,7 @@ class ConfigurationImporter(ApplicationObserver):
         # configuration (--config) skipping sections that have missing options.
         # Examples of those missing include cyclical dependencies such option
         # references from our app context to the command line context.
-        self.config.copy_sections(cl_config, robust=True)
+        #self.config.copy_sections(cl_config, robust=True)
 
         # copy the command line config to our app context letting it barf with
         # any missing properties this time

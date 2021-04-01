@@ -9,7 +9,9 @@ from itertools import chain
 from collections import ChainMap
 from io import StringIO, TextIOBase
 from pathlib import Path
-from configparser import ConfigParser, ExtendedInterpolation
+from configparser import (
+    ConfigParser, ExtendedInterpolation, InterpolationMissingOptionError
+)
 from . import (
     ConfigurableError, Configurable, ConfigurableFactory, IniConfig
 )
@@ -21,14 +23,24 @@ class _ParserAdapter(object):
     """Adapts a :class:`~configparser.ConfigParser` to a :class:`.Configurable`.
 
     """
-    def __init__(self, conf: Configurable):
+    def __init__(self, conf: Configurable, defs: Dict[str, str]):
         self.conf = conf
+        self.defs = defs
 
     def get(self, section: str, option: str, *args, **kwags):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(
                 f'get ({type(self.conf).__name__}): {section}:{option}')
-        return self.conf.get_option(option, section)
+        if self.conf.has_option(option, section):
+            val = self.conf.get_option(option, section)
+        else:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'option not found, trying defs: {self.defs}')
+            val = self.defs.get(f'{section}:{option}')
+            if val is None:
+                # raise an InterpolationMissingOptionError
+                self.conf.get_option(option, section)
+        return val
 
     def optionxform(self, option: str) -> str:
         return option.lower()
@@ -39,6 +51,9 @@ class _ParserAdapter(object):
     def __str__(self) -> str:
         return str(self.conf.__class__.__name__)
 
+    def __repr__(self) -> str:
+        return self.__str__()
+
 
 class _SharedExtendedInterpolation(ExtendedInterpolation):
     """Adds other :class:`Configurable` instances to available parameter to
@@ -47,16 +62,23 @@ class _SharedExtendedInterpolation(ExtendedInterpolation):
     """
     def __init__(self, children: Tuple[Configurable], robust: bool = False):
         super().__init__()
-        self.children = tuple(map(_ParserAdapter, children))
+        defs = {}
+        for child in children:
+            for sec in child.sections:
+                for k, v in child.get_options(sec).items():
+                    defs[f'{sec}:{k}'] = v
+        self.children = tuple(map(lambda c: _ParserAdapter(c, defs), children))
         self.robust = robust
 
     def before_get(self, parser: ConfigParser, section: str, option: str,
                    value: str, defaults: ChainMap):
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'super: section: {section}:{option}: {value}')
+            logger.debug(f'before_get: section: {section}:{option}: {value}')
         res = value
         last_ex = None
         parsers = tuple(chain.from_iterable([[parser], self.children]))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'defaults: {defaults}')
         for pa in parsers:
             try:
                 if logger.isEnabledFor(logging.DEBUG):
@@ -64,7 +86,7 @@ class _SharedExtendedInterpolation(ExtendedInterpolation):
                 res = super().before_get(pa, section, option, value, defaults)
                 last_ex = None
                 break
-            except Exception as e:
+            except InterpolationMissingOptionError as e:
                 last_ex = e
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'missing option: {e}')
