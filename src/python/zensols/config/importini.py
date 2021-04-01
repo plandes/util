@@ -254,7 +254,6 @@ class ImportIniConfig(IniConfig):
                     logger.debug(f'populating section {sec}, {children}')
                 conf_secs.append(sec)
                 params = parser.populate({}, section=sec)
-                print('PARAMS', params)
                 inst = self._create_config(sec, params, children)
                 parser.append_child(inst)
         return conf_secs, children
