@@ -66,18 +66,22 @@ class ClassImporter(object):
 
         """
         pkg, cname = self.parse_module_class()
-        logger.debug(f'pkg: {pkg}, class: {cname}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'pkg: {pkg}, class: {cname}')
         pkg_s = pkg.split('.')
         mod = reduce(lambda m, n: getattr(m, n), pkg_s[1:], __import__(pkg))
-        logger.debug(f'mod: {mod}, reloading: {self.reload}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'mod: {mod}, reloading: {self.reload}')
         if self.reload:
-            logger.debug(f'reload: cls: {mod}, {cname}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'reload: cls: {mod}, {cname}')
             mod = importlib.reload(mod)
         if not hasattr(mod, cname):
             raise ClassImporterError(
                 f"no class '{cname}' found in module '{mod}'")
         cls = getattr(mod, cname)
-        logger.debug(f'class: {cls}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'class: {cls}')
         return mod, cls
 
     def get_class(self) -> type:
@@ -109,7 +113,8 @@ class ClassImporter(object):
         """
         cls = self.get_class()
         try:
-            logger.debug(f'class importer creating instance of {cls}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'class importer creating instance of {cls}')
             inst = cls(*args, **kwargs)
             inst = self._bless(inst)
         except Exception as e:
@@ -117,7 +122,7 @@ class ClassImporter(object):
             logger.error(msg, e)
             raise e
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'inst: {inst}')
+            logger.debug(f'inst class: {type(inst)}')
         return inst
 
     def set_log_level(self, level: int = logging.INFO):
