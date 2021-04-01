@@ -190,9 +190,14 @@ class ImportIniConfig(IniConfig):
         conf_sec = self.config_section
         parser = IniConfig(self.config_file)
         cparser = parser.parser
-        if parser.has_option(self.SECTIONS_SECTION, conf_sec):
-            secs = set(parser.get_option_list(self.SECTIONS_SECTION, conf_sec))
-            if parser.has_option(self.REFS_SECTION, conf_sec):
+        has_refs = parser.has_option(self.REFS_SECTION, conf_sec)
+        has_secs = parser.has_option(self.SECTIONS_SECTION, conf_sec)
+        if has_secs or has_refs:
+            secs = set()
+            if has_secs:
+                secs.update(set(
+                    parser.get_option_list(self.SECTIONS_SECTION, conf_sec)))
+            if has_refs:
                 csecs = parser.get_option_list(self.REFS_SECTION, conf_sec)
                 secs.update(set(csecs))
             secs.add(conf_sec)
@@ -216,12 +221,12 @@ class ImportIniConfig(IniConfig):
             inst = cf.from_class_name(class_name)
         elif tpe is not None:
             del params['type']
-            if tpe is None:
-                raise ConfigurableError(
-                    f"import section '{section}' has no 'type' parameter")
             inst = cf.from_type(tpe)
         elif config_file is not None:
             del params['config_file']
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(
+                    f'getting instance using config factory: {config_file}')
             inst = cf.from_path(Path(config_file))
         if isinstance(inst, self.__class__):
             new_children = list(inst.children)
@@ -238,12 +243,18 @@ class ImportIniConfig(IniConfig):
         parser: _StringIniConfig = self._get_bootstrap_parser()
         children: List[Configurable] = parser.children
         conf_secs: List[str] = [conf_sec]
+        if parser.has_option(self.CONFIG_FILES, conf_sec):
+            for fname in parser.get_option_list(self.CONFIG_FILES, conf_sec):
+                params = {'config_file': fname}
+                inst = self._create_config('<no section>', params, children)
+                parser.append_child(inst)
         if parser.has_option(self.SECTIONS_SECTION, conf_sec):
             for sec in parser.get_option_list(self.SECTIONS_SECTION, conf_sec):
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'populating section {sec}, {children}')
                 conf_secs.append(sec)
                 params = parser.populate({}, section=sec)
+                print('PARAMS', params)
                 inst = self._create_config(sec, params, children)
                 parser.append_child(inst)
         return conf_secs, children
