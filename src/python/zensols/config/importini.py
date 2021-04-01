@@ -32,11 +32,15 @@ class _ParserAdapter(object):
             logger.debug(
                 f'get ({type(self.conf).__name__}): {section}:{option}')
         if self.conf.has_option(option, section):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug('contains option')
             val = self.conf.get_option(option, section)
         else:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'option not found, trying defs: {self.defs}')
             val = self.defs.get(f'{section}:{option}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'using defaults value: {val}')
             if val is None:
                 # raise an InterpolationMissingOptionError
                 self.conf.get_option(option, section)
@@ -46,7 +50,7 @@ class _ParserAdapter(object):
         return option.lower()
 
     def items(self, section: str, raw: bool = False):
-        return list(self.conf.get_options(section))
+        return self.conf.get_options(section)
 
     def __str__(self) -> str:
         return str(self.conf.__class__.__name__)
