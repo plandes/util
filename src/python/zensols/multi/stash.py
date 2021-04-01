@@ -221,3 +221,8 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
     def keys(self):
         self.prime()
         return super().keys()
+
+    def clear(self):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('clearing')
+        super().clear()

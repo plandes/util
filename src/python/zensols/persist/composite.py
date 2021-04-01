@@ -7,6 +7,7 @@ import logging
 from typing import Any, Set, Tuple
 from functools import reduce
 import collections
+import shutil
 from pathlib import Path
 from . import DirectoryStash
 
@@ -51,7 +52,9 @@ class DirectoryCompositeStash(DirectoryStash):
                  attribute_name: str, load_keys: Set[str] = None):
         """Initialize using the parent class's default pattern.
 
-        :param path: the directory of where to store the files
+        :param path: the directory that will have to subdirectories with the
+                     files, they are named :obj:`INSTANCE_DIRECTORY_NAME` and
+                     :obj:`COMPOSITE_DIRECTORY_NAME`
 
         :param groups: the groups of the ``dict`` composite attribute, which
                         are sets of keys, each of which are persisted to their
@@ -73,6 +76,7 @@ class DirectoryCompositeStash(DirectoryStash):
         super().__init__(path)
         stashes = {}
         comp_path = self.path / self.COMPOSITE_DIRECTORY_NAME
+        self.top_level_dir = self.path
         self.stash_by_group = {}
         self.stash_by_attribute = stashes
         self.path = self.path / self.INSTANCE_DIRECTORY_NAME
@@ -99,6 +103,13 @@ class DirectoryCompositeStash(DirectoryStash):
                         f'duplicate name \'{k}\' in {groups}')
                 stashes[k] = comp_stash
                 self.stash_by_group[name] = comp_stash
+
+    def clear(self):
+        logger.info('DirectoryCompositeStash: clearing')
+        if self.top_level_dir.is_dir():
+            if logger.isEnabledFor(logging.INFO):
+                logger.info(f'deleting subtree: {self.top_level_dir}')
+            shutil.rmtree(self.top_level_dir)
 
     def _to_composite(self, data: dict) -> Tuple[str, Any, Tuple[str, Any]]:
         """Create the composite data used to by the composite stashes to persist.
