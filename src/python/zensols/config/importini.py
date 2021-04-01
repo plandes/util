@@ -142,6 +142,7 @@ class ImportIniConfig(IniConfig):
     """
     IMPORT_SECTION = 'import'
     SECTIONS_SECTION = 'sections'
+    CONFIG_FILES = 'files'
     REFS_SECTION = 'references'
 
     def __init__(self, *args,
@@ -203,7 +204,8 @@ class ImportIniConfig(IniConfig):
         sconf.seek(0)
         return _StringIniConfig(sconf, parser, self.children)
 
-    def _create_config(self, section: str, params: Dict[str, Any]) -> \
+    def _create_config(self, section: str, params: Dict[str, Any],
+                       children: List[Configurable]) -> \
             Configurable:
         cf = ConfigurableFactory(params)
         class_name = params.get('class_name')
@@ -222,7 +224,10 @@ class ImportIniConfig(IniConfig):
             del params['config_file']
             inst = cf.from_path(Path(config_file))
         if isinstance(inst, self.__class__):
-            inst.children = tuple(list(inst.children) + self.children)
+            new_children = list(inst.children)
+            new_children.extend(self.children)
+            new_children.extend(children)
+            inst.children = tuple(new_children)
         return inst
 
     def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
@@ -239,7 +244,7 @@ class ImportIniConfig(IniConfig):
                     logger.debug(f'populating section {sec}, {children}')
                 conf_secs.append(sec)
                 params = parser.populate({}, section=sec)
-                inst = self._create_config(sec, params)
+                inst = self._create_config(sec, params, children)
                 parser.append_child(inst)
         return conf_secs, children
 
