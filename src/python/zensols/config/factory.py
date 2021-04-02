@@ -318,9 +318,10 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         super().__init__(*args, **kwargs, class_resolver=ImportClassResolver())
         self._set_reload(reload)
         if shared:
-            self.shared = {}
+            self._shared = {}
         else:
-            self.shared = None
+            self._shared = None
+        self.shared = shared
         if isinstance(reload_pattern, str):
             self.reload_pattern = re.compile(reload_pattern)
         else:
@@ -328,7 +329,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
 
     def __getstate__(self):
         state = dict(self.__dict__)
-        state['shared'] = None if self.shared is None else {}
+        state['_shared'] = None if self._shared is None else {}
         del state['class_resolver']
         return state
 
@@ -340,15 +341,15 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         """Clear any shared instances.
 
         """
-        if self.shared is not None:
-            self.shared.clear()
+        if self._shared is not None:
+            self._shared.clear()
 
     def clear_instance(self, name: str):
         """Remove a shared (cached) object instance.
 
         """
-        if self.shared is not None:
-            return self.shared.pop(name, None)
+        if self._shared is not None:
+            return self._shared.pop(name, None)
 
     def clone(self) -> Any:
         clone = super().clone()
@@ -357,20 +358,20 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
 
     def deallocate(self):
         super().deallocate()
-        if self.shared is not None:
-            for v in self.shared.values():
+        if self._shared is not None:
+            for v in self._shared.values():
                 if isinstance(v, Deallocatable):
                     v.deallocate()
-            self.shared.clear()
+            self._shared.clear()
 
     def instance(self, name: str = None, *args, **kwargs):
-        if self.shared is None:
+        if self._shared is None:
             inst = super().instance(name, *args, **kwargs)
         else:
-            inst = self.shared.get(name)
+            inst = self._shared.get(name)
             if inst is None:
                 inst = super().instance(name, *args, **kwargs)
-                self.shared[name] = inst
+                self._shared[name] = inst
         return inst
 
     def _set_reload(self, reload: bool):
