@@ -3,6 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
+from typing import List, Union
 import logging
 from logging import Logger
 import sys
@@ -121,11 +122,12 @@ class loglevel(object):
             logger.debug('test')
 
     """
-    def __init__(self, name: str, level: int = logging.DEBUG,
+    def __init__(self, name: Union[List[str], str], level: int = logging.DEBUG,
                  init: int = None):
         """Initialize.
 
-        :param name: the name of the logger to set
+        :param name: the name of the logger to set, or if a list is passed,
+                     configure all loggers in the list
 
         :param level: the logging level, which defaults to :obj:`logging.DEBUG`
 
@@ -134,8 +136,10 @@ class loglevel(object):
                      ``True`` to use :obj:`logging.WARNING`
 
         """
-        self.logger = logging.getLogger(name)
-        self.initial_level = self.logger.level
+        if isinstance(name, str):
+            name = [name]
+        self.loggers = tuple(map(logging.getLogger, name))
+        self.initial_levels = tuple(map(lambda lg: lg.level, self.loggers))
         self.level = level
         if init is not None:
             if init is True:
@@ -143,7 +147,9 @@ class loglevel(object):
             logging.basicConfig(level=init)
 
     def __enter__(self):
-        self.logger.setLevel(self.level)
+        for lg in self.loggers:
+            lg.setLevel(self.level)
 
     def __exit__(self, type, value, traceback):
-        self.logger.setLevel(self.initial_level)
+        for lg, lvl in zip(self.loggers, self.initial_levels):
+            lg.setLevel(lvl)
