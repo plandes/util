@@ -5,7 +5,7 @@ objects and files.
 __author__ = 'Paul Landes'
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any
+from typing import Dict, Any, Union
 from enum import Enum
 import types
 import logging
@@ -118,7 +118,7 @@ class ImportClassResolver(ClassResolver):
     module part.  This is used with the ``register`` method on
     :class:`.ConfigFactory`.
 
-    :see: ConfigFactory.register
+    :see: :meth:`.ConfigFactory.register`
 
     """
     def __init__(self, reload: bool = False):
@@ -299,7 +299,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
     INJECTS = {}
 
     def __init__(self, *args, reload: bool = False, shared: bool = True,
-                 reload_root=None, **kwargs):
+                 reload_pattern: Union[re.Pattern, str] = None, **kwargs):
         """Initialize the configuration factory.
 
         :param reload: whether or not to reload the module when resolving the
@@ -309,10 +309,9 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                         once across sections for the life of this
                         ``ImportConfigFactory`` instance
 
-        :param reload_root: when ``True``, only reload the module of the class
-                            from the configuration indicated in
-                            :meth:`instance` rather than following the instance
-                            dependency tree
+        :param reload_pattern: if set, reload classes that have a fully
+                               qualified name that match the regular expression
+                               regarless of the setting ``reload``
 
         """
         logger.debug(f'creating import config factory with reload: {reload}')
@@ -322,7 +321,10 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             self.shared = {}
         else:
             self.shared = None
-        self.reload_root = reload_root if reload_root is not None else reload
+        if isinstance(reload_pattern, str):
+            self.reload_pattern = re.compile(reload_pattern)
+        else:
+            self.reload_pattern = reload_pattern
 
     def __getstate__(self):
         state = dict(self.__dict__)
@@ -499,9 +501,16 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             self.INJECTS[class_name] = sec_name
 
         initial_reload = self.reload
+        reload = self.reload
+        if self.reload_pattern is not None:
+            m = self.reload_pattern.match(class_name)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'class {class_name} matches reload pattern ' +
+                             f'{self.reload_pattern}: {m}')
+            reload = m is not None
         try:
-            self._set_reload(self.reload_root)
-            if self.reload:
+            self._set_reload(reload)
+            if reload:
                 # we still have to reload at the top level (root in the
                 # instance graph)
                 cresolver: ClassResolver = self.class_resolver
