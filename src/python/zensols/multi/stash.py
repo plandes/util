@@ -41,7 +41,7 @@ class ChunkProcessor(object):
     data: object = field()
     """The data created by the parent to be processed."""
 
-    def _create_stash(self):
+    def _create_stash(self) -> Tuple[ImportConfigFactory, Any]:
         fac = ImportConfigFactory(self.config)
         with time(f'factory inst {self.name} for chunk {self.chunk_id}',
                   logging.INFO):
@@ -49,7 +49,7 @@ class ChunkProcessor(object):
             inst.is_child = True
             return fac, inst
 
-    def process(self):
+    def process(self) -> int:
         """Create the stash used to process the data, then persisted in the stash.
 
         """
@@ -170,8 +170,26 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
             logger.debug(f'creating chunk processor for id {chunk_id}')
         return ChunkProcessor(self.config, self.name, chunk_id, data)
 
-    def _invoke_pool(self, pool: Pool, fn: Callable, data: iter) -> int:
-        return pool.map(fn, data)
+    def _invoke_pool(self, pool: Pool, fn: Callable, data: iter) -> List[int]:
+        if pool is None:
+            return tuple(map(fn, data))
+        else:
+            return pool.map(fn, data)
+
+    def _invoke_work(self, workers: int, chunk_size: int,
+                     data: Iterable[Any]) -> int:
+        fn = self.__class__._process_work
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'{self.name}: spawning work with ' +
+                        f'chunk size {chunk_size} across {workers} workers')
+        if workers == 1:
+            with time('processed chunks'):
+                cnt = self._invoke_pool(None, fn, data)
+        else:
+            with Pool(workers) as p:
+                with time('processed chunks'):
+                    cnt = self._invoke_pool(p, fn, data)
+        return cnt
 
     def _spawn_work(self) -> int:
         """Chunks and invokes a multiprocessing pool to invokes processing on the
@@ -187,12 +205,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
             chunk_size = math.ceil(len(data) / workers)
         data = map(lambda x: self._create_chunk_processor(*x),
                    enumerate(chunks(data, chunk_size)))
-        if logger.isEnabledFor(logging.INFO):
-            logger.info(f'{self.name}: spawning work with ' +
-                        f'chunk size {chunk_size} across {workers} workers')
-        with Pool(workers) as p:
-            with time('processed chunks'):
-                cnt = self._invoke_pool(p, self.__class__._process_work, data)
+        cnt = self._invoke_work(workers, chunk_size, data)
         return cnt
 
     def prime(self):
