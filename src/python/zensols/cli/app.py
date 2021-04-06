@@ -13,7 +13,7 @@ from io import TextIOBase
 from itertools import chain
 from pathlib import Path
 from zensols.introspect import Class, ClassMethod, ClassField, ClassMethodArg
-from zensols.persist import persisted
+from zensols.persist import persisted, PersistedWork
 from zensols.util import PackageResource
 from zensols.config import (
     Serializer, Dictable, Configurable, ConfigFactory,
@@ -180,7 +180,11 @@ class ApplicationResult(Dictable):
 
 class ApplicationObserver(ABC):
     """Extended by application targets to get call backs and information from the
-    controlling :class:`.Application`.
+    controlling :class:`.Application`.  Method :meth:`_application_created`
+    is invoked for each call back.
+
+    .. document private functions
+    .. automethod:: _application_created
 
     """
     @abstractmethod
@@ -421,6 +425,7 @@ class ApplicationFactory(object):
         if isinstance(self.package_resource, str):
             self.package_resource = PackageResource(self.package_resource)
         self._configure_serializer()
+        self._resources = PersistedWork('_resources', self)
 
     def _configure_serializer(self):
         dist_name = self.package_resource.name
@@ -584,6 +589,9 @@ class ApplicationFactory(object):
         :raises ActionCliError: for any missing data or misconfigurations
 
         """
+        # we have to clear previously created resources for multiple calls to
+        # this method for this instance
+        self._resources.clear()
         fac, cli_mng, parser = self._create_resources()
         if args is None:
             args = self._get_default_args()
