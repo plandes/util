@@ -52,10 +52,13 @@ class Settings(object):
     def asjson(self, *args, **kwargs) -> str:
         return json.dumps(self.__dict__, *args, **kwargs)
 
-    def __str__(self):
+    def __eq__(self, other) -> bool:
+        return self.__dict__ == other.__dict__
+
+    def __str__(self) -> str:
         return str(self.__dict__)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.__str__()
 
     def write(self, writer: TextIOBase = sys.stdout):
