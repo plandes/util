@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from enum import Enum, auto
 from zensols.persist import Stash
-from zensols.config import Dictable
+from zensols.config import Dictable, Settings
 
 
 class Fruit(Enum):
@@ -104,3 +104,16 @@ class TestActionDefault(Dictable):
 
     def action2(self, opt2: int = None):
         return 'action2', opt2
+
+
+@dataclass
+class TestActionOverride(Dictable):
+    """Test overriding the command line.
+
+    """
+    basket: Settings
+
+    def override_fruit(self):
+        """Run the test command"""
+        self.invoke_state = (self.basket)
+        return self.invoke_state

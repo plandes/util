@@ -3,7 +3,7 @@ import sys
 import logging
 from io import StringIO
 from zensols.util.log import loglevel
-from zensols.config import ConfigurableError
+from zensols.config import ConfigurableError, Settings
 from zensols.cli import (
     ActionCli, ActionCliError, ActionCliManager,
     OptionMetaData, ActionMetaData,
@@ -332,3 +332,37 @@ class TestActionDefault(LogTestCase):
         res: ActionResult = app_res.second_pass_result
         self.assertEqual('action2', res.action.meta_data.name)
         self.assertEqual(('action2', 4), res.result)
+
+
+class TestOverrideConfig(LogTestCase):
+    def test_override(self):
+        self.cli = ApplicationFactory(
+            'zensols.testapp', 'test-resources/test-app-override.conf')
+        if 0:
+            print()
+            self.cli.parser.write_help()
+            self.config_logging('zensols.cli')
+
+        aset: CommandActionSet = self.cli.create(''.split())
+        self.assertEqual(Application, type(aset))
+        app_res: ApplicationResult = aset.invoke()
+        res: ActionResult = app_res.second_pass_result
+        self.assertEqual('overridefruit', res.action.meta_data.name)
+        self.assertEqual(Settings(first='banana', second='grape'),
+                         res.result)
+
+        aset: CommandActionSet = self.cli.create(
+            '--override=basket.first=apple'.split())
+        app_res: ApplicationResult = aset.invoke()
+        res: ActionResult = app_res.second_pass_result
+        self.assertEqual('overridefruit', res.action.meta_data.name)
+        self.assertEqual(Settings(first='apple', second='grape'),
+                         res.result)
+
+        aset: CommandActionSet = self.cli.create(
+            '--override=basket.first=apple,basket.second=pear'.split())
+        app_res: ApplicationResult = aset.invoke()
+        res: ActionResult = app_res.second_pass_result
+        self.assertEqual('overridefruit', res.action.meta_data.name)
+        self.assertEqual(Settings(first='apple', second='pear'),
+                         res.result)

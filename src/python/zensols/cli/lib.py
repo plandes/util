@@ -14,7 +14,7 @@ from io import TextIOBase
 from pathlib import Path
 from zensols.util import PackageResource
 from zensols.config import (
-    Dictable, Configurable, ConfigurableFactory, DictionaryConfig
+    Dictable, Configurable, ConfigurableFactory, DictionaryConfig, StringConfig
 )
 from . import (
     ActionCliError, ActionCli, ActionCliMethod, OptionMetaData, ActionMetaData,
@@ -261,6 +261,37 @@ class ConfigurationImporter(ApplicationObserver):
                     load_config = False
         if load_config:
             self._load()
+
+
+@dataclass
+class ConfigurationOverrider(object):
+    OVERRIDE_PATH_FIELD = 'override_string'
+    CLI_META = {'first_pass': True,  # not a separate action
+                'mnemonic_includes': {'merge'},
+                # better/shorter  long name, and reserve the short name
+                'option_overrides': {OVERRIDE_PATH_FIELD:
+                                     {'long_name': 'override',
+                                      'short_name': None}},
+                # only the path to the configuration should be exposed as a
+                # an option on the comamnd line
+                'option_includes': {OVERRIDE_PATH_FIELD}}
+
+    config: Configurable = field()
+    """The parent configuration, which is populated from the child configuration
+    (see class docs).
+
+    """
+
+    override_string: str = field(default=None)
+    """A comma delimited section.key=value string."""
+
+    def merge(self):
+        """Merge the string configuration with the application context."""
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'overriding with: {self.override_string}')
+        if self.override_string is not None:
+            sconfig = StringConfig(self.override_string)
+            self.config.merge(sconfig)
 
 
 @dataclass
