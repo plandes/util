@@ -265,12 +265,22 @@ class ConfigurationImporter(ApplicationObserver):
 
 @dataclass
 class ConfigurationOverrider(object):
-    OVERRIDE_PATH_FIELD = 'override_string'
+    """Overrides configuration in the app config.  This is useful for replacing on
+    a per command line invocation basis.  Examples could include changing the
+    number of epochs trained for a model.
+
+    The :obj:`override` field either contains a path to a file that contains
+    the configuration file to use to clobber the given sections/values, or a
+    string to be interpreted by :class:`.StringConfig`.  This determination is
+    made by whether or not the string points to an existing file or directory.
+
+    """
+    OVERRIDE_PATH_FIELD = 'override'
     CLI_META = {'first_pass': True,  # not a separate action
                 'mnemonic_includes': {'merge'},
                 # better/shorter  long name, and reserve the short name
                 'option_overrides': {OVERRIDE_PATH_FIELD:
-                                     {'long_name': 'override',
+                                     {'metavar': '<FILE|DIR|STRING>',
                                       'short_name': None}},
                 # only the path to the configuration should be exposed as a
                 # an option on the comamnd line
@@ -282,16 +292,22 @@ class ConfigurationOverrider(object):
 
     """
 
-    override_string: str = field(default=None)
-    """A comma delimited section.key=value string."""
+    override: str = field(default=None)
+    """A config file/dir or a comma delimited section.key=value string that
+    overrides."""
 
     def merge(self):
         """Merge the string configuration with the application context."""
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'overriding with: {self.override_string}')
-        if self.override_string is not None:
-            sconfig = StringConfig(self.override_string)
-            self.config.merge(sconfig)
+            logger.debug(f'overriding with: {self.override}')
+        if self.override is not None:
+            path = Path(self.override)
+            if path.exists():
+                cf = ConfigurableFactory()
+                overrides = cf.from_path(path)
+            else:
+                overrides = StringConfig(self.override)
+            self.config.merge(overrides)
 
 
 @dataclass
