@@ -404,7 +404,7 @@ class ExportEnvironment(object):
         if self.export_output_format == ExportFormat.bash:
             fmt = 'export {k}="{v}"\n'
         else:
-            fmt = '{k}="{v}"\n'
+            fmt = '{k}={v}\n'
         for k, v in exports.asdict().items():
             writer.write(fmt.format(**{'k': k.upper(), 'v': v}))
 
