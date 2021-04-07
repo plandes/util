@@ -294,7 +294,7 @@ class ConfigurationOverrider(object):
 
     override: str = field(default=None)
     """A config file/dir or a comma delimited section.key=value string that
-    overrides."""
+    overrides configuration."""
 
     def merge(self):
         """Merge the string configuration with the application context."""
