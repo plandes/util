@@ -161,6 +161,9 @@ class ConfigurationImporter(ApplicationObserver):
 
     """
 
+    name: str = field()
+    """The section name."""
+
     config: Configurable = field()
     """The parent configuration, which is populated from the child configuration
     (see class docs).
@@ -174,6 +177,18 @@ class ConfigurationImporter(ApplicationObserver):
 
     config_path_environ_name: str = field(default=None)
     """An environment variable containing the default path to the configuration.
+
+    """
+
+    override: bool = field(default=False)
+    """Override/clobber values from the configuration file in the application
+    configuration.
+
+    """
+
+    config_path_option_name: str = field(default='config_path')
+    """If not ``None``, the name of the option to set in the section defined for
+    this instance (section = :obj:`name`).
 
     """
 
@@ -239,6 +254,11 @@ class ConfigurationImporter(ApplicationObserver):
         # any missing properties this time
         cl_config.copy_sections(self.config)
 
+        # clobber config values
+        if self.override:
+            cl_config = cf.from_path(self.config_path)
+            cl_config.copy_sections(self.config)
+
     def add(self):
         """Add configuration at path to the current configuration.
 
@@ -261,6 +281,11 @@ class ConfigurationImporter(ApplicationObserver):
                     load_config = False
         if load_config:
             self._load()
+            if self.config_path_option_name is not None:
+                self.config.set_option(
+                    self.config_path_option_name,
+                    f'path: {str(self.config_path)}',
+                    section=self.name)
 
 
 @dataclass
