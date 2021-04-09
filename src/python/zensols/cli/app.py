@@ -516,6 +516,8 @@ class ApplicationFactory(object):
         parser resources.  The data is cached and use in property getters.
 
         """
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'create resources for: {type(self)}')
         if isinstance(self.app_config_resource, str):
             path = self._get_config_path()
             config: Configurable = self._create_application_context(path)
@@ -530,6 +532,8 @@ class ApplicationFactory(object):
         parser = CommandLineParser(config, self.package_resource.version,
                                    default_action=cli_mng.default_action,
                                    application_doc=self._get_app_doc(cli_mng))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'created factory: {fac}')
         return fac, cli_mng, parser
 
     @property
