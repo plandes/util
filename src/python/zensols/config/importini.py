@@ -128,12 +128,17 @@ class _StringIniConfig(IniConfig):
 
 @dataclass
 class _ConfigLoader(object):
+    """Loads/creates instances of :class:`.Configurable`.
+
+    :see: :meth:`.ImportIniConfig._get_children`
+
+    """
     section: str
     factory: ConfigurableFactory = field(repr=False)
     method: str
     value: Any
 
-    def __call__(self, children: List[Configurable]):
+    def __call__(self, children: List[Configurable]) -> Configurable:
         meth = getattr(self.factory, self.method)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'invoking {meth} with {self.value}')
@@ -204,6 +209,10 @@ class ImportIniConfig(IniConfig):
                 'import and config section are the same')
 
     def _get_bootstrap_parser(self) -> _StringIniConfig:
+        """Create the config that is used to read only the sections needed to
+        import/load other configuration.
+
+        """
         logger.debug('creating bootstrap parser')
         conf_sec = self.config_section
         parser = IniConfig(self.config_file)
@@ -227,8 +236,9 @@ class ImportIniConfig(IniConfig):
         sconf.seek(0)
         return _StringIniConfig(sconf, parser, self.children)
 
-    def _create_single_loader(self, section: str, params: Dict[str, Any],
-                              children: List[Configurable]) -> _ConfigLoader:
+    def _create_single_loader(self, section: str, params: Dict[str, Any]) -> \
+            _ConfigLoader:
+        """Create a config loader from a section."""
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'section: {section}, params: {params}')
         params = dict(params)
@@ -239,45 +249,42 @@ class ImportIniConfig(IniConfig):
         loader: _ConfigLoader
         if class_name is not None:
             del params['class_name']
-            #inst = cf.from_class_name(class_name)
             loader = _ConfigLoader(section, cf, 'from_class_name', class_name)
         elif tpe is not None:
             del params['type']
-            #inst = cf.from_type(tpe)
             loader = _ConfigLoader(section, cf, 'from_type', tpe)
         elif config_file is not None:
             del params[self.SINGLE_CONFIG_FILE]
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(
                     f'getting instance using config factory: {config_file}')
-            #inst = cf.from_path(Path(config_file))
             loader = _ConfigLoader(section, cf, 'from_path', Path(config_file))
-        # if isinstance(inst, self.__class__):
-        #     new_children = list(inst.children)
-        #     new_children.extend(self.children)
-        #     new_children.extend(children)
-        #     inst.children = tuple(new_children)
         return loader
 
-    def _create_loader(self, section: str, params: Dict[str, Any],
-                       children: List[Configurable]) -> List[_ConfigLoader]:
+    def _create_loader(self, section: str, params: Dict[str, Any]) -> \
+            List[_ConfigLoader]:
+        """Create either a single config loader if the section defines one, or many if
+        a list of files are given in the section.
+
+        """
         conf_files = params.get(self.CONFIG_FILES)
         loaders = []
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating and loading parser: {section}')
         if conf_files is None:
-            loaders.append(self._create_single_loader(section, params, children))
+            loaders.append(self._create_single_loader(section, params))
         else:
             sparams = dict(params)
             del sparams[self.CONFIG_FILES]
             for cf in conf_files:
                 sparams[self.SINGLE_CONFIG_FILE] = cf
-                conf = self._create_single_loader(section, sparams, children)
+                conf = self._create_single_loader(section, sparams)
                 loaders.append(conf)
         return loaders
 
     def _load(self, loaders: List[_ConfigLoader], children: List[Configurable],
               parser: _StringIniConfig):
+        """Load each configuration from the loader."""
         for loader in loaders:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'loading {loader}')
@@ -293,6 +300,14 @@ class ImportIniConfig(IniConfig):
         loaders.clear()
 
     def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
+        """"Get children used for this config instance.  This is done by import each
+        import section and files by delayed loaded for each.
+
+        Order is important as each configuration can refer to previously loaded
+        configurations.  For this reason, the :class:`_ConfigLoader` is needed
+        to defer loading: one for loading sections, and one for loading file.
+
+        """
         logger.debug('get children')
         if isinstance(self.config_file, Path) and \
            not self.config_file.is_file():
@@ -304,21 +319,21 @@ class ImportIniConfig(IniConfig):
         loaders: List[_ConfigLoader] = []
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating children for: {conf_sec}')
+        # first load files given in the import section
         if parser.has_option(self.CONFIG_FILES, conf_sec):
             for fname in parser.get_option_list(self.CONFIG_FILES, conf_sec):
                 params = {self.SINGLE_CONFIG_FILE: fname}
-                loaders.extend(self._create_loader('<no section>', params, children))
+                loaders.extend(self._create_loader('<no section>', params))
                 self._load(loaders, children, parser)
-                #parser.append_children(insts)
+        # load each import section, again in order
         if parser.has_option(self.SECTIONS_SECTION, conf_sec):
             for sec in parser.get_option_list(self.SECTIONS_SECTION, conf_sec):
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'populating section {sec}, {children}')
                 conf_secs.append(sec)
                 params = parser.populate({}, section=sec)
-                loaders.extend(self._create_loader(sec, params, children))
+                loaders.extend(self._create_loader(sec, params))
                 self._load(loaders, children, parser)
-                #parser.append_children(insts)
         return conf_secs, children
 
     def _create_config_parser(self) -> ConfigParser:
