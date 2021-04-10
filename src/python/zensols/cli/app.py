@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 import logging
 import sys
+import re
 from io import TextIOBase
 from itertools import chain
 from pathlib import Path
@@ -421,6 +422,15 @@ class ApplicationFactory(object):
 
     """
 
+    reload_pattern: Union[re.Pattern, str] = field(default=None)
+    """If set, reload classes that have a fully qualified name that match the
+    regular expression regarless of the setting ``reload`` in
+    :class:`.ImportConfigFactory`.
+
+    :see: :meth:`_create_config_factory`
+
+    """
+
     def __post_init__(self):
         if isinstance(self.package_resource, str):
             self.package_resource = PackageResource(self.package_resource)
@@ -453,7 +463,9 @@ class ApplicationFactory(object):
         """
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'reload: {self.reload_factory}')
-        return ImportConfigFactory(config, reload=self.reload_factory)
+        return ImportConfigFactory(config,
+                                   reload=self.reload_factory,
+                                   reload_pattern=self.reload_pattern)
 
     def _find_app_doc(self, cli_mng: ActionCliManager) -> str:
         """Try to find documentation suitable for the program as a fallback if the
