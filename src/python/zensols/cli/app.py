@@ -602,6 +602,10 @@ class ApplicationFactory(object):
     def create(self, args: List[str] = None) -> Application:
         """Create the action CLI application.
 
+        ;param args: the arguments to the application; if this is a string, it
+                     will be converted to a list by splitting on whitespace;
+                     this defaults to the output of :meth:`_get_default_args`
+
         :raises ActionCliError: for any missing data or misconfigurations
 
         """
@@ -614,15 +618,21 @@ class ApplicationFactory(object):
         actions: Tuple[Action] = self._parse(args)
         return Application(fac, self, actions)
 
-    def invoke(self, args: List[str] = None) -> Any:
+    def invoke(self, args: Union[List[str], str] = None) -> Any:
         """Creates and invokes the entire application returning the result of the
         second pass action.
+
+        ;param args: the arguments to the application; if this is a string, it
+                     will be converted to a list by splitting on whitespace;
+                     this defaults to the output of :meth:`_get_default_args`
 
         :raises ActionCliError: for any missing data or misconfigurations
 
         :return: the result of the second pass action
 
         """
+        if isinstance(args, str):
+            args = args.split()
         try:
             app: Application = self.create(args)
             app_res: ApplicationResult = app.invoke()
@@ -630,3 +640,23 @@ class ApplicationFactory(object):
             return act_res
         except ActionCliError as e:
             self.parser.error(str(e))
+
+    def invoke_protect(self, args: Union[List[str], str] = None) -> Any:
+        """Same as :meth:`invoke`, but protect against :class:`Exception` and
+        :class:`SystemExit`.  If an error is raised while invoking, it is
+        logged and returned.
+
+        ;param args: the arguments to the application; if this is a string, it
+                     will be converted to a list by splitting on whitespace;
+                     this defaults to the output of :meth:`_get_default_args`
+
+        :return: the result of the second pass action or the output of
+                 :func:`sys.exec_info`
+
+        """
+        try:
+            return self.invoke(args)
+        except (Exception, SystemExit) as e:
+            exc_info = sys.exc_info()
+            logger.error(f'invocation failed: {e}', exc_info=exc_info)
+            return exc_info
