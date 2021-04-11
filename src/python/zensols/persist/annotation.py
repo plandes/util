@@ -294,16 +294,25 @@ class PersistableContainer(Deallocatable):
     """Classes can extend this that want to persist ``PersistableWork`` instances,
     which otherwise are not persistable.
 
+    If the class level attribute ``PERSITABLE_TRANSIENT_ATTRIBUTES`` is set,
+    all attributes name given in this set will be set to ``None`` when pickled.
+
     """
     def __getstate__(self):
         state = copy(self.__dict__)
-        removes = []
+        removes = set()
+        tran_attribute_name = 'PERSITABLE_TRANSIENT_ATTRIBUTES'
+        if hasattr(self, tran_attribute_name):
+            tran_attribs = getattr(self, tran_attribute_name)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'transient attributes: {tran_attribs}')
+            removes.update(tran_attribs)
         for k, v in state.items():
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'container get state: {k} => {type(v)}')
             if isinstance(v, PersistedWork):
                 if v.transient:
-                    removes.append(v.varname)
+                    removes.add(v.varname)
         for k in removes:
             state[k] = None
         return state
