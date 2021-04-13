@@ -120,7 +120,7 @@ class dealloc(object):
     :class:`Deallocatable``.  The first argument can also be a function, which
     is useful when tracking deallocations when ``track`` is ``True``.
 
-    Example:
+    Example::
         with dealloc(lambda: ImportClassFactory('some/path')) as fac:
             return fac.instance('stash')
 
