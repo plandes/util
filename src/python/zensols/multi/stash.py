@@ -6,15 +6,17 @@ __author__ = 'Paul Landes'
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
 from typing import Iterable, List, Any, Tuple, Callable
+import sys
 import os
 import logging
 import math
 from multiprocessing import Pool
 from zensols.util.time import time
-from zensols.config import Configurable, ImportConfigFactory
+from zensols.config import Configurable, ConfigFactory, ImportConfigFactory
 from zensols.persist import (
     PreemptiveStash, PrimeableStash, chunks, Deallocatable,
 )
+from zensols.cli import LogConfigurator
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +57,8 @@ class ChunkProcessor(object):
         """
         factory, stash = self._create_stash()
         cnt = 0
+        self.config_factory = factory
+        stash._init_child(self)
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'processing chunk {self.chunk_id} ' +
                         f'with stash {stash.__class__}')
@@ -105,6 +109,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
 
     """
     ATTR_EXP_META = ('chunk_size', 'workers')
+    LOG_CONFIG_SECTION = 'multiprocess_log_config'
 
     config: Configurable = field()
     """The application configuration meant to be populated by
@@ -151,16 +156,48 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         """
         pass
 
+    def _init_child(self, processor: ChunkProcessor):
+        """Initialize the child process.
+
+        :param processor: the chunk processor that created this stash in the
+                          child process
+
+        """
+        self._config_child_logging(processor.config_factory)
+
+    def _config_child_logging(self, factory: ConfigFactory):
+        """Initalize the logging system in the child process.
+
+        :param factory: the factory that was used to create this stash and
+                        child app configi environment
+
+        """
+        warn = None
+        config = factory.config
+        if config.has_option('section', self.LOG_CONFIG_SECTION):
+            conf_sec = config.get_option('section', self.LOG_CONFIG_SECTION)
+            if isinstance(factory, ImportConfigFactory):
+                log_conf = factory.instance(conf_sec)
+                if isinstance(log_conf, LogConfigurator):
+                    log_conf.config()
+                else:
+                    warn = f'unknown configuration object: {type(log_conf)}'
+            else:
+                warn = f'with unknown factory type: {type(factory)}',
+        if warn is not None:
+            print(f'warning: can not configure child process logging: {warn}',
+                  file=sys.stderr)
+
     @staticmethod
-    def _process_work(chunk: ChunkProcessor) -> int:
+    def _process_work(processor: ChunkProcessor) -> int:
         """Process a chunk of data in the child process that was created by the parent
         process.
 
         """
         if logger.isEnabledFor(logging.DEBUG):
-            logger.info(f'processing chunk {chunk}')
-        with time(f'processed chunk {chunk}'):
-            return chunk.process()
+            logger.info(f'processing processor {processor}')
+        with time(f'processed processor {processor}'):
+            return processor.process()
 
     def _create_chunk_processor(self, chunk_id: int, data: Any):
         """Factory method to create the ``ChunkProcessor`` instance.

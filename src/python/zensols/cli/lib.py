@@ -59,11 +59,14 @@ class LogConfigurator(object):
     log_name: str = field(default=None)
     """The log name space."""
 
-    default_level: LogLevel = field(default=LogLevel.warn)
+    default_level: LogLevel = field(default=None)
     """The level to set the root logger."""
 
     level: LogLevel = field(default=LogLevel.info)
     """The level to set the application logger."""
+
+    config_file: Path = field(default=None)
+    """If provided, configure the log system with this configuration file."""
 
     format: str = field(default=None)
     """The format string to use for the logging system."""
@@ -73,6 +76,15 @@ class LogConfigurator(object):
 
     debug: bool = field(default=False)
     """Print some logging to standard out to debug this class."""
+
+    def __post_init__(self):
+        if ((self.default_level is not None) or (self.format is not None)) \
+           and (self.config_file is not None):
+            raise ActionCliError(
+                "cannot set 'default_level' or 'format' " +
+                "while setting a log configuration file 'config_file'")
+        if self.default_level is None:
+            self.default_level = LogLevel.warn
 
     def _to_level(self, name: str, level: Any) -> int:
         if isinstance(level, str):
@@ -88,12 +100,14 @@ class LogConfigurator(object):
         if self.debug:
             print(msg)
 
-    def config(self):
-        """Configure the log system.
+    def _config_file(self):
+        import logging.config
+        self._debug(f'configuring from file: {self.config_file}')
+        logging.config.fileConfig(self.config_file,
+                                  disable_existing_loggers=False)
 
-        """
-        self._debug(f'configuring root logger to {self.default_level} ' +
-                    f'and {self.log_name} to {self.level}')
+    def _config_basic(self):
+        self._debug(f'configuring root logger to {self.default_level}')
         level: int = self._to_level('default', self.default_level)
         params = {'level': level}
         if self.format is not None:
@@ -101,6 +115,15 @@ class LogConfigurator(object):
         self._debug(f'config log system with level {level} ' +
                     f'({self.default_level})')
         logging.basicConfig(**params)
+
+    def config(self):
+        """Configure the log system.
+
+        """
+        if self.config_file is not None:
+            self._config_file()
+        else:
+            self._config_basic()
         if self.log_name is not None:
             level: int = self._to_level('app', self.level)
             self._debug(f'setting logger {self.log_name} to {level} ' +
