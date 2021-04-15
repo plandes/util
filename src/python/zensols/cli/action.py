@@ -206,11 +206,16 @@ class ActionCli(Dictable):
                 elif isinstance(override, dict):
                     o_name: str = override.get('name')
                     option_includes: Set[str] = override.get('option_includes')
+                    option_excludes: Set[str] = override.get('option_excludes')
                     if o_name is not None:
                         name = o_name
                     if option_includes is not None:
                         meth_params: Set[OptionMetaData] = set(
                             filter(lambda o: o.long_name in option_includes,
+                                   meth_params))
+                    if option_excludes is not None:
+                        meth_params: Set[OptionMetaData] = set(
+                            filter(lambda o: o.long_name not in option_excludes,
                                    meth_params))
                 else:
                     raise ActionCliManagerError(
