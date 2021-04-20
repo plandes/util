@@ -102,10 +102,10 @@ class OptionMetaData(Dictable):
             tpe = 'choice'
             choices = self.choices
         # use the string value of the default if set from the enum
-        if isinstance(self.default, Enum):
-            default = self.default.name
-        elif (self.default is not None) and (self.dtype != bool):
-            default = str(self.default)
+        if isinstance(default, Enum):
+            default = default.name
+        elif (default is not None) and (self.dtype != bool):
+            default = str(default)
         return tpe, default, choices
 
     @property

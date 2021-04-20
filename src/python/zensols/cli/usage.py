@@ -114,9 +114,9 @@ class UsageWriter(Writable):
             if self.default_action == action_name:
                 action_name = f'{action_name} (default)'
             action_name_len = max(action_name_len, len(action_name))
-            opt: OptionMetaData
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'options for {action.name}: {action.options}')
+            opt: OptionMetaData
             for opt in action.options:
                 sep = '' if opt.short_name is None else ', '
                 if opt.default is not None and opt.dtype != bool:

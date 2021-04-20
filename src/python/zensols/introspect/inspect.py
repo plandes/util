@@ -24,14 +24,19 @@ class ClassError(Exception):
     pass
 
 
+def _create_data_types():
+    types = {t.__name__: t for t in [str, int, float, bool, list, Path]}
+    types['pathlib.Path'] = Path
+    return types
+
+
 @dataclass
 class TypeMapper(object):
     """A utility class to map string types parsed from :class:`.ClassInspector`
     to Python types.
 
     """
-    DEFAULT_DATA_TYPES = {t.__name__: t
-                          for t in [str, int, float, bool, list, Path]}
+    DEFAULT_DATA_TYPES = _create_data_types()
     """Supported data types mapped from data class fields."""
 
     cls: type = field()
@@ -254,14 +259,20 @@ class ClassInspector(object):
 
     def _map_default(self, item: str, def_node: ast.AST):
         """Map a default from what will be at times an :class:`ast.Name`.  This happens
-        when an enum is used as a type, but name.id only give the enum class
-        name and not the enum value
+        when an enum is used as a type, but ``name.id`` only gives the enum
+        class name and not the enum value.
 
         :param item: mapped target string used to create an error message
 
         :param def_node: the node to map a default
 
         """
+        def map_arg(node):
+            if isinstance(node.value, str):
+                return f"'{node.value}'"
+            else:
+                return str(node.value)
+
         try:
             if isinstance(def_node, ast.Attribute):
                 enum_name: str = def_node.attr
@@ -274,10 +285,19 @@ class ClassInspector(object):
                 default = def_node.s
             elif isinstance(def_node, ast.Call):
                 func = def_node.func.id
-                args = map(lambda a: a.value, def_node.args)
+                args = map(map_arg, def_node.args)
                 default = f'{func}({", ".join(args)})'
+                try:
+                    evald = eval(default)
+                    default = evald
+                except Exception as e:
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug(f'could not invoke: {default}: {e}')
             else:
                 default = def_node.value
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'default: {default} ({type(default)})/' +
+                             f'({type(def_node)})')
             return default
         except Exception as e:
             raise ClassError(f'could not map {item}: {def_node}: {e}')
@@ -298,8 +318,10 @@ class ClassInspector(object):
                     is_positional = False
                 if arg.annotation is not None:
                     dtype = arg.annotation.id
-                dtype = self.data_type_mapper.map_type(dtype)
-                arg = ClassMethodArg(name, dtype, None, default, is_positional)
+                mtype = self.data_type_mapper.map_type(dtype)
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'mapped {dtype} -> {mtype}, default={default}')
+                arg = ClassMethodArg(name, mtype, None, default, is_positional)
             except Exception as e:
                 raise ClassError(f'could not map argument {name}: {e}')
             args.append(arg)
