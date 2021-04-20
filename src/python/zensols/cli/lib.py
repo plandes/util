@@ -433,7 +433,7 @@ class ExportEnvironment(object):
                 'option_overrides':
                 {OUTPUT_FORMAT: {'long_name': 'expfmt',
                                  'short_name': None},
-                 OUTPUT_PATH: {'long_name': 'output',
+                 OUTPUT_PATH: {'long_name': 'expoutput',
                                'short_name': None}}}
 
     config: Configurable = field()
