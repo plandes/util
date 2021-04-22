@@ -49,7 +49,7 @@ class JsonConfig(DictionaryConfig):
     def _narrow_root(self, conf: Dict[str, Any]) -> Dict[str, str]:
         if not isinstance(conf, dict):
             raise ConfigurableError(
-                f'expecting a root level dict: {self.config_file}')
+                f'Expecting a root level dict: {self.config_file}')
         return conf
 
     @persisted('_config')

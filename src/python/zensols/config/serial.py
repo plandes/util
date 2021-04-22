@@ -20,10 +20,6 @@ logger = logging.getLogger(__name__)
 OBJECT_KEYS = {'_type', '_data'}
 
 
-class ResourceError(Exception):
-    pass
-
-
 class PythonObjectEncoder(JSONEncoder):
     def default(self, obj: Any):
         if isinstance(obj, set):

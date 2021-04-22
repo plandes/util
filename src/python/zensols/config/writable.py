@@ -13,6 +13,11 @@ from collections import OrderedDict
 import itertools as it
 from io import TextIOBase, StringIO
 from functools import lru_cache
+from zensols.util import APIError
+
+
+class ConfigurationError(APIError):
+    pass
 
 
 @lru_cache(maxsize=50)
@@ -84,7 +89,8 @@ class Writable(ABC):
         elif isinstance(max_len, int):
             s = self._trunc(s, max_len)
         else:
-            raise ValueError('max_len must either be a boolean or integer')
+            raise ConfigurationError(
+                'Max_len must either be a boolean or integer')
         writer.write(s)
         self._write_empty(writer)
 

@@ -155,10 +155,10 @@ prconfig <file>     a second test action
 
     def test_parse_position(self):
         parser = CommandLineParser(CommandLineConfig((self.test_action,)))
-        with self.assertRaisesRegex(CommandLineError, r"^action 'test' expects 0.*counted as a positional.*"):
+        with self.assertRaisesRegex(CommandLineError, r"^Action 'test' expects 0.*counted as a positional.*"):
             parser.parse(['test'])
         parser = CommandLineParser(CommandLineConfig((self.test_action, self.test_action2)))
-        with self.assertRaisesRegex(CommandLineError, r'^no action given$'):
+        with self.assertRaisesRegex(CommandLineError, r'^No action given$'):
             parser.parse([])
         parser = CommandLineParser(CommandLineConfig((self.test_action, self.test_action2)))
         action_set: CommandActionSet = parser.parse(['test'])
@@ -344,5 +344,5 @@ prconfig <file>     a second test action
         self.assertEqual((Path('b.txt'),), action.positional)
         self.assertEqual({'dry_run': True, 'numres': 18}, action.options)
 
-        with self.assertRaisesRegex(CommandLineError, '^no action given$'):
+        with self.assertRaisesRegex(CommandLineError, '^No action given$'):
             parser.parse('-c c.conf'.split())

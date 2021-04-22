@@ -85,7 +85,7 @@ class IniConfig(Configurable):
     def _create_and_load_parser_from_file(self, cpath: Path) -> ConfigParser:
         logger.debug(f'loading config {cpath}')
         if not cpath.exists():
-            raise ConfigurableError(f'no such file: {cpath}')
+            raise ConfigurableError(f'No such file: {cpath}')
         elif cpath.is_file() or cpath.is_dir():
             writer = StringIO()
             self._read_config_content(cpath, writer)
@@ -93,7 +93,7 @@ class IniConfig(Configurable):
             parser = self._create_config_parser()
             parser.read_file(writer)
         else:
-            raise ConfigurableError(f'unknown file type: {cpath}')
+            raise ConfigurableError(f'Unknown file type: {cpath}')
         return parser
 
     @property
@@ -123,11 +123,11 @@ class IniConfig(Configurable):
         conf: ConfigParser = self.parser
         if conf is None:
             if not self.robust:
-                raise ConfigurableError('no configuration given')
+                raise ConfigurableError('No configuration given')
         elif conf.has_section(section):
             opts = {k: conf.get(section, k) for k in conf.options(section)}
         if opts is None:
-            raise ConfigurableError(f'no section: {section}')
+            raise ConfigurableError(f'No section: {section}')
         return opts
 
     def get_option(self, name: str, section: str = None) -> str:
@@ -136,13 +136,13 @@ class IniConfig(Configurable):
         conf: ConfigParser = self.parser
         if conf is None:
             if not self.robust:
-                raise ConfigurableError('no configuration given')
+                raise ConfigurableError('No configuration given')
         elif conf.has_option(section, name):
             opt = conf.get(section, name)
         if opt is None:
             if not conf.has_section(section):
-                raise ConfigurableError(f'no section: {section}')
-            raise ConfigurableError(f'no option: {section}:{name}')
+                raise ConfigurableError(f'No section: {section}')
+            raise ConfigurableError(f'No option: {section}:{name}')
         return opt
 
     @property
@@ -158,7 +158,8 @@ class IniConfig(Configurable):
         try:
             value = self.serializer.format_option(value)
         except TypeError as e:
-            raise TypeError(f'can not serialize {section}:{name}: {e}')
+            raise ConfigurableError(
+                f'Can not serialize {section}:{name}: {e}') from e
         return value
 
     def set_option(self, name: str, value: str, section: str = None):

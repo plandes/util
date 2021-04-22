@@ -141,7 +141,7 @@ class _ConfigLoader(object):
     def __call__(self, children: List[Configurable]) -> Configurable:
         meth = getattr(self.factory, self.method)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'invoking {meth} with {self.value}')
+            logger.debug(f'Invoking {meth} with {self.value}')
         return meth(self.value)
 
 
@@ -205,7 +205,7 @@ class ImportIniConfig(IniConfig):
         if exclude_config_sections and \
            (self.default_section == self.config_section):
             raise ConfigurableError(
-                'you must set exclude_config_sections to False when the ' +
+                'You must set exclude_config_sections to False when the ' +
                 'import and config section are the same')
 
     def _get_bootstrap_parser(self) -> _StringIniConfig:
@@ -311,7 +311,7 @@ class ImportIniConfig(IniConfig):
         logger.debug('get children')
         if isinstance(self.config_file, Path) and \
            not self.config_file.is_file():
-            raise ConfigurableError('not a file: {self.config_file}')
+            raise ConfigurableError('Not a file: {self.config_file}')
         conf_sec: str = self.config_section
         parser: _StringIniConfig = self._get_bootstrap_parser()
         children: List[Configurable] = parser.children

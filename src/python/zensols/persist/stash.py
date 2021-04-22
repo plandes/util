@@ -13,6 +13,7 @@ import pickle
 from pathlib import Path
 import zensols.util.time as time
 from . import (
+    PersistableError,
     Stash,
     ReadOnlyStash,
     DelegateStash,
@@ -186,8 +187,8 @@ class DirectoryStash(Stash):
 
     def __post_init__(self):
         if not isinstance(self.path, Path):
-            raise ValueError(
-                f'expecting pathlib.Path but got: {self.path.__class__}')
+            raise PersistableError(
+                f'Expecting pathlib.Path but got: {self.path.__class__}')
 
     def assert_path_dir(self):
         self.path.mkdir(parents=True, exist_ok=True)

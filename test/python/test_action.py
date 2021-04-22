@@ -194,7 +194,7 @@ class TestActionType(LogTestCase):
         res: Application = insts[0]
         self.assertEqual(('action1', True), res.result)
 
-        msg: str = r"^action 'action2' expects 1.*"
+        msg: str = r"^Action 'action2' expects 1.*"
         with self.assertRaisesRegex(CommandLineError, msg):
             aset: CommandActionSet = self.cli.create('action2'.split())
 
@@ -239,7 +239,7 @@ class TestActionType(LogTestCase):
         self.assertTrue(isinstance(res.instance, ma.TestActionBool))
         self.assertEqual(('action4', 5), res.result)
 
-        with self.assertRaisesRegex(CommandLineError, '^expecting type int.*'):
+        with self.assertRaisesRegex(CommandLineError, '^Expecting type int.*'):
             aset: CommandActionSet = self.cli.create('action4 notint'.split())
 
 
@@ -293,7 +293,7 @@ class TestActionConfigAction(LogTestCase):
             self.config_logging('zensols.cli')
         aset: Application = self.cli.create([])
         self.assertEqual(Application, type(aset))
-        errmsg = r'^missing option --config$'
+        errmsg = r'^Missing option --config$'
         with self.assertRaisesRegex(ActionCliError, errmsg):
             aset.invoke()
 
@@ -306,7 +306,7 @@ class TestActionConfigAction(LogTestCase):
             self.config_logging('zensols.cli')
         aset: Application = self.cli.create([])
         self.assertEqual(Application, type(aset))
-        errmsg = r'^no section: range1_stash$'
+        errmsg = r'^No section: range1_stash$'
         with loglevel('zensols.config.factory', logging.CRITICAL):
             with self.assertRaisesRegex(ConfigurableError, errmsg):
                 aset.invoke()

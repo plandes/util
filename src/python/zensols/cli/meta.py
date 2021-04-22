@@ -14,6 +14,7 @@ import optparse
 from zensols.introspect import TypeMapper
 from zensols.persist import persisted
 from zensols.config import Dictable
+from . import ActionCliError
 
 logger = logging.getLogger(__name__)
 
@@ -261,8 +262,8 @@ class ActionMetaData(Dictable):
 
     def __post_init__(self):
         if self.first_pass and len(self.positional) > 0:
-            raise ValueError(
-                'a first pass action can not have positional arguments, ' +
+            raise ActionCliError(
+                'A first pass action can not have positional arguments, ' +
                 f'but got {self.positional} for action: {self.name}')
 
     @property

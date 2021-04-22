@@ -62,7 +62,7 @@ class YamlConfig(Configurable, Dictable):
                     k = path + '.' + k if len(path) else k
                     flatten(k, v)
             else:
-                raise ConfigurableError(f'unknown yaml type {type(n)}: {n}')
+                raise ConfigurableError(f'Unknown yaml type {type(n)}: {n}')
 
         if isinstance(self.config_file, TextIOBase):
             content = self.config_file
@@ -144,7 +144,7 @@ class """ + class_name + """(Template):
         elif self.default_vars is not None and name in self.default_vars:
             return self.default_vars[name]
         else:
-            raise ConfigurableError('no such option: {}'.format(name))
+            raise ConfigurableError('No such option: {}'.format(name))
 
     def set_option(self, name: str, value: str, section: str = None):
         """This is a no-op for now as client's don't expect an exception."""
@@ -180,7 +180,7 @@ class """ + class_name + """(Template):
             if name in ops:
                 return ops[name]
             else:
-                raise ConfigurableError(f'no such option: {name}')
+                raise ConfigurableError(f'No such option: {name}')
 
     def get_options(self, name: str = None) -> Dict[str, str]:
         name = self.default_section if name is None else name
@@ -193,7 +193,7 @@ class """ + class_name + """(Template):
             elif name in self.default_vars:
                 return self.default_vars[name]
             else:
-                raise ConfigurableError(f'no such option: {name}')
+                raise ConfigurableError(f'No such option: {name}')
 
     @property
     def root(self) -> str:

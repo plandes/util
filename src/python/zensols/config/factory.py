@@ -13,6 +13,7 @@ import inspect
 import re
 import copy as cp
 from time import time
+from zensols.util import APIError
 from zensols.introspect import ClassImporter
 from zensols.config import Configurable
 from zensols.persist import persisted, PersistedWork, Deallocatable
@@ -20,13 +21,13 @@ from zensols.persist import persisted, PersistedWork, Deallocatable
 logger = logging.getLogger(__name__)
 
 
-class RedefinedInjectionError(Exception):
+class RedefinedInjectionError(APIError):
     """Raised when any attempt to redefine or reuse injections for a class
     """
     pass
 
 
-class FactoryError(Exception):
+class FactoryError(APIError):
     """Raised when an object can not be instantianted by a :class:`.ConfigFactory`.
 
     """
@@ -94,7 +95,7 @@ class DictionaryClassResolver(ClassResolver):
         classes.update(self.instance_classes)
         logger.debug(f'looking up class: {class_name}')
         if class_name not in classes:
-            raise ValueError(
+            raise FactoryError(
                 f'class {class_name} is not registered in factory {self}')
         cls = classes[class_name]
         logger.debug(f'found class: {cls}')

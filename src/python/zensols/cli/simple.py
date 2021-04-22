@@ -10,12 +10,14 @@ import sys
 import os
 from optparse import OptionParser
 from pkg_resources import get_distribution, DistributionNotFound
+from zensols.util import APIError
 from zensols.config import Serializer
 
 logger = logging.getLogger(__name__)
 
 
-class ActionCliError(Exception):
+class ActionCliError(APIError):
+    """Thrown for all command line interface errors."""
     pass
 
 

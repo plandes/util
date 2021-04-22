@@ -11,12 +11,13 @@ from pathlib import Path
 import sys
 from io import TextIOBase
 import inspect
-from . import Serializer, Writable, Settings
+from . import ConfigurationError, Serializer, Writable, Settings
 
 logger = logging.getLogger(__name__)
 
 
-class ConfigurableError(Exception):
+class ConfigurableError(ConfigurationError):
+    """Base class raised for any configuration based errors."""
     pass
 
 
@@ -71,7 +72,7 @@ class Configurable(Writable, metaclass=ABCMeta):
             val = opts.get(name)
         if val is None:
             raise ConfigurableError(
-                f"no option '{name}' found in section: {section}")
+                f"No option '{name}' found in section: {section}")
         return val
 
     def reload(self):
@@ -162,7 +163,7 @@ class Configurable(Writable, metaclass=ABCMeta):
         if sec is None:
             # needed for the YamlConfig class
             raise ConfigurableError(
-                f"no section from which to populate: '{section}'")
+                f"No section from which to populate: '{section}'")
         return self.serializer.populate_state(sec, obj, parse_types)
 
     @property

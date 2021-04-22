@@ -9,12 +9,12 @@ from functools import reduce
 import collections
 import shutil
 from pathlib import Path
-from . import DirectoryStash
+from . import PersistableError, DirectoryStash
 
 logger = logging.getLogger(__name__)
 
 
-class MissingDataKeys(ValueError):
+class MissingDataKeys(PersistableError):
     def __init__(self, keys: set):
         super().__init__(f'missing data keys: {keys}')
         self.keys = keys

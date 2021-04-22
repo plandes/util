@@ -305,7 +305,7 @@ class Application(Dictable):
                 name: str = arg.name
                 if name not in cmd_opts:
                     raise ActionCliError(
-                        f'no such option {name} parsed from CLI for ' +
+                        f'No such option {name} parsed from CLI for ' +
                         f'method from {cmd_opts}: {meth_meta.name}')
                 val: str = cmd_opts.get(name)
                 if logger.isEnabledFor(logging.DEBUG):
@@ -313,7 +313,7 @@ class Application(Dictable):
                 meth_params[name] = val
         if pos_arg_count != len(pos_args):
             raise ActionCliError(
-                f'method {meth_meta.name} expects {pos_arg_count} but got ' +
+                f'Method {meth_meta.name} expects {pos_arg_count} but got ' +
                 f'{len(pos_args)} in {action.name}.{meth_meta.name}')
         return pos_args, meth_params
 
@@ -324,7 +324,7 @@ class Application(Dictable):
             if cli_manager.cleanups is not None:
                 for sec in cli_manager.cleanups:
                     if sec not in config.sections:
-                        raise ValueError(f'no section to remove: {sec}')
+                        raise ActionCliError(f'No section to remove: {sec}')
                     config.remove_section(sec)
 
     def _create_invokable(self, action: Action) -> Invokable:
@@ -517,7 +517,7 @@ class ApplicationFactory(object):
             logger.debug(f'path to app specific context: {path.absolute()}')
         if not path.exists():
             raise ActionCliError(
-                f"application context resource '{self.app_config_resource}' " +
+                f"Application context resource '{self.app_config_resource}' " +
                 f'not found in {self.package_resource}')
         return path
 

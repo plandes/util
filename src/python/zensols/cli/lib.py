@@ -81,7 +81,7 @@ class LogConfigurator(object):
         if ((self.default_level is not None) or (self.format is not None)) \
            and (self.config_file is not None):
             raise ActionCliError(
-                "cannot set 'default_level' or 'format' " +
+                "Cannot set 'default_level' or 'format' " +
                 "while setting a log configuration file 'config_file'")
         if self.default_level is None:
             self.default_level = LogLevel.warn
@@ -90,7 +90,7 @@ class LogConfigurator(object):
         if isinstance(level, str):
             obj = LogLevel.__members__.get(level)
             if obj is None:
-                raise ValueError(f'no such level for {name}: {level}')
+                raise ActionCliError(f'No such level for {name}: {level}')
             level = obj
         return level.value
 
@@ -299,7 +299,7 @@ class ConfigurationImporter(ApplicationObserver):
             else:
                 if self.expect:
                     lopt = self._get_config_option()
-                    raise ActionCliError(f'missing option {lopt}')
+                    raise ActionCliError(f'Missing option {lopt}')
                 else:
                     load_config = False
         if load_config:

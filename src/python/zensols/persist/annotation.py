@@ -11,10 +11,16 @@ from copy import copy
 import pickle
 import time as tm
 from pathlib import Path
+from zensols.util import APIError
 import zensols.util.time as time
 from . import Deallocatable
 
 logger = logging.getLogger(__name__)
+
+
+class PersistableError(APIError):
+    """Thrown for any persistable API error"""
+    pass
 
 
 # class level persistance
@@ -165,7 +171,8 @@ class PersistedWork(Deallocatable):
             logger.debug(f'saving in memory value {type(obj)}')
         vname = self.varname
         if self.owner is None:
-            raise ValueError(f'owner is not set for persistable: {vname}')
+            raise PersistableError(
+                f'owner is not set for persistable: {vname}')
         setattr(self.owner, vname, obj)
         if self.cache_global:
             if vname not in globals():

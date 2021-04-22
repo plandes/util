@@ -140,7 +140,7 @@ class CommandLineConfig(Dictable):
             for k, v in action.options_by_dest.items():
                 if k in actions:
                     raise CommandLineConfigError(
-                        f"first pass duplicate option in '{action.name}': {k}")
+                        f"First pass duplicate option in '{action.name}': {k}")
                 actions[k] = action
         return actions
 
@@ -184,7 +184,7 @@ class CommandLineParser(Dictable):
     def __post_init__(self):
         if len(self.config.actions) == 0:
             raise CommandLineConfigError(
-                'must create parser with at least one action')
+                'Must create parser with at least one action')
 
     def _create_parser(self, actions: Tuple[ActionMetaData]) -> OptionParser:
         return UsageActionOptionParser(
@@ -199,7 +199,7 @@ class CommandLineParser(Dictable):
         for opt in options:
             if opt.long_name in opt_names:
                 raise CommandLineConfigError(
-                    f'duplicate option: {opt.long_name}')
+                    f'Duplicate option: {opt.long_name}')
             opt_names.add(opt.long_name)
             op_opt = opt.create_option()
             parser.add_option(op_opt)
@@ -253,14 +253,14 @@ class CommandLineParser(Dictable):
             choices = ', '.join(map(lambda e: f"'{e.name}'", t))
             if tpe is None:
                 raise CommandLineError(
-                    f"no choice '{s}' for '{name}' (choose from {choices})")
+                    f"No choice '{s}' for '{name}' (choose from {choices})")
         else:
             if not isinstance(s, (str, int, bool, Path)):
-                raise CommandLineConfigError(f'unknown parse type: {s}: {t}')
+                raise CommandLineConfigError(f'Unknown parse type: {s}: {t}')
             try:
                 tpe = t(s)
             except ValueError as e:
-                raise CommandLineError(f'expecting type {t.__name__}: {e}')
+                raise CommandLineError(f'Expecting type {t.__name__}: {e}')
         return tpe
 
     def _parse_options(self, action_meta: ActionMetaData,
@@ -329,7 +329,7 @@ class CommandLineParser(Dictable):
             if self.default_action is None:
                 # no positional arguments mean we don't know which action to
                 # use
-                raise CommandLineError('no action given')
+                raise CommandLineError('No action given')
             else:
                 action_name = self.default_action
                 op_args = []
@@ -355,7 +355,7 @@ class CommandLineParser(Dictable):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"action '{action_name}' found: {action_meta}")
         if action_meta is None:
-            raise CommandLineError(f'no such action: {action_name}')
+            raise CommandLineError(f'No such action: {action_name}')
         pos_arg_diff = len(op_args) - len(action_meta.positional)
         single_sp = None
         if len(self.config.second_pass_actions) == 1:
@@ -367,13 +367,13 @@ class CommandLineParser(Dictable):
                          f'unnecessary_mnemonic: {unnecessary_mnemonic}')
         if unnecessary_mnemonic:
             raise CommandLineError(
-                f"action '{action_meta.name}' expects " +
+                f"Action '{action_meta.name}' expects " +
                 f"{len(action_meta.positional)} argument(s), but " +
                 f"'{single_sp}' is counted as a positional argument " +
                 'and should be omitted')
         if pos_arg_diff != 0:
             raise CommandLineError(
-                f"action '{action_meta.name}' expects " +
+                f"Action '{action_meta.name}' expects " +
                 f"{len(action_meta.positional)} " +
                 f"argument(s) but got {len(op_args)}: {', '.join(op_args)}")
         # if there is more than one second pass action, we must re-parse using
@@ -399,7 +399,7 @@ class CommandLineParser(Dictable):
             for action_meta in self.config.second_pass_actions:
                 if len(action_meta.positional) > 0:
                     raise CommandLineConfigError(
-                        'no positional arguments allowed when default ' +
+                        'No positional arguments allowed when default ' +
                         f"action '{self.default_action}' " +
                         f'given for method {action_meta.name}')
 

@@ -8,6 +8,7 @@ from typing import Any, Iterable, Tuple
 from dataclasses import dataclass, field
 from abc import abstractmethod, ABC, ABCMeta
 import itertools as it
+from . import PersistableError
 
 logger = logging.getLogger(__name__)
 
@@ -208,11 +209,13 @@ class ReadOnlyStash(Stash):
 
     def dump(self, name: str, inst):
         if self.strict:
-            raise ValueError('dump not implemented for read only stashes')
+            raise PersistableError(
+                'Dump not implemented for read only stashes')
 
     def delete(self, name: str = None):
         if self.strict:
-            raise ValueError('delete not implemented for read only stashes')
+            raise PersistableError(
+                'Delete not implemented for read only stashes')
 
 
 @dataclass
@@ -261,11 +264,11 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
 
     def __post_init__(self):
         if self.delegate is None:
-            raise ValueError(f'delegate not set')
+            raise PersistableError('Delegate not set')
         if not isinstance(self.delegate, Stash):
             msg = f'not a stash: {self.delegate.__class__} or reloaded'
             if DelegateDefaults.CLASS_CHECK:
-                raise ValueError(msg)
+                raise PersistableError(msg)
             else:
                 logger.warning(msg)
         self.delegate_attr = DelegateDefaults.DELEGATE_ATTR
