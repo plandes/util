@@ -214,7 +214,7 @@ class Invokable(object):
     method: Callable = field()
     """The object method bound to :obj:`instance` to be called."""
 
-    args: Tuple[any] = field()
+    args: Tuple[Any] = field()
     """The arguments used when calling :obj:`method`."""
 
     kwargs: Dict[str, Any] = field()
@@ -602,7 +602,7 @@ class ApplicationFactory(object):
     def create(self, args: List[str] = None) -> Application:
         """Create the action CLI application.
 
-        ;param args: the arguments to the application; if this is a string, it
+        :param args: the arguments to the application; if this is a string, it
                      will be converted to a list by splitting on whitespace;
                      this defaults to the output of :meth:`_get_default_args`
 
