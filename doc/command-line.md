@@ -211,6 +211,10 @@ plumbing that ties the command line to this method is called an *action*.  Each
 action has it's own respective arguments used as fields at the class level, and
 optionally, any arguments given to the method (keyword or positional).
 
+**Note**: By default, only the subclass is used to generate the CLI.  If you
+want to include the sub class for additional actions and options, set the class
+attribute `CLASS_INSPECTOR` (see [INSPECT_META]) to `{}`.
+
 
 ### Action Decorators
 
@@ -778,3 +782,4 @@ the `example/cli/1-boilerplate` directory in the source repository.
 [SimpleActionCli]: ../api/zensols.cli.html#zensols.cli.simple.SimpleActionCli
 [CONFIG_META]: ../api/zensols.cli.html?zensols.cli.lib.LogConfigurator.CLI_META
 [LogConfigurator.CONFIG_META]: ../api/zensols.cli.html?zensols.cli.lib.LogConfigurator.CLI_META
+[INSPECT_META]: ../api/zensols.introspect.html?zensols.introspect.inspect.ClassInspector.INSPECT_META
