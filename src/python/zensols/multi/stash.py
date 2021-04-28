@@ -296,11 +296,13 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         super().clear()
 
 
-@dataclass
+@dataclass(init=False)
 class MultiProcessFactoryStash(MultiProcessStash):
     """Like :class:`~zensols.persist.FactoryStash`, but uses a subordinate factory
     stash to generate the data in a subprocess(es) in the same manner as the
     super class :class:`.MultiProcessStash`.
+
+    Attributes :obj:`chunk_size` and :obj:`workers` both default to ``0``.
 
     """
 
@@ -315,6 +317,21 @@ class MultiProcessFactoryStash(MultiProcessStash):
     calculation.
 
     """
+
+    def __init__(self, config: Configurable, name: str,
+                 factory: Stash, enable_preemptive: bool = False,
+                 **kwargs):
+        """Initialize with attributes :obj:`chunk_size` and :obj:`workers` both
+        defaulting to ``0``.
+
+        """
+        if 'chunk_size' not in kwargs:
+            kwargs['chunk_size'] = 0
+        if 'workers' not in kwargs:
+            kwargs['workers'] = 0
+        super().__init__(config=config, name=name, **kwargs)
+        self.factory = factory
+        self.enable_preemptive = enable_preemptive
 
     def _calculate_has_data(self) -> bool:
         has_data = super()._calculate_has_data()
