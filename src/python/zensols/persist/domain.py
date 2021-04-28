@@ -358,13 +358,13 @@ class PreemptiveStash(DelegateStash):
         self._has_data = None
 
     @property
-    def has_data(self):
+    def has_data(self) -> bool:
         """Return whether or not the stash has any data available or not.
 
         """
         return self._calculate_has_data()
 
-    def _calculate_has_data(self):
+    def _calculate_has_data(self) -> bool:
         """Return ``True`` if the delegate has keys.
 
         """
@@ -382,7 +382,7 @@ class PreemptiveStash(DelegateStash):
         """
         self._has_data = None
 
-    def _set_has_data(self, has_data=True):
+    def _set_has_data(self, has_data: bool = True):
         """Set the state of whether the stash has data or not.
 
         """
@@ -438,7 +438,7 @@ class FactoryStash(PreemptiveStash):
         else:
             return False
 
-    def load(self, name: str):
+    def load(self, name: str) -> Any:
         item = super().load(name)
         if item is None:
             self._reset_has_data()
