@@ -342,11 +342,11 @@ class MultiProcessFactoryStash(MultiProcessStash):
         return has_data
 
     def prime(self):
-        super().prime()
         if isinstance(self.factory, PrimeableStash):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'priming factory: {self.factory}')
             self.factory.prime()
+        super().prime()
 
     def _create_data(self) -> Iterable[Any]:
         return self.factory.keys()
