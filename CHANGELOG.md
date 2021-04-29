@@ -8,11 +8,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.5.0] - 2021-04-29
 ### Changed
 - Follow the same pattern with mnemonics as options: includes/excludes.  The
   `mnemonics` action attribute has changed to `mnemonic_overrides`.  Both
   `mnemonic_includes`, `mnemonic_excludes` are now optional to more easily
   select mnemonics in the CLI application class.
+- Better CLI application usage and support.
+- Upgraded PyYAML library for security fix.
+- Better `ImportIniConfig` option dependency handling support.
+- More conventional capitalized messages for raised errors.
+### Added
+- Multi-processing factory stash.
+- Support for single process stash creation (set `workers=1`).
+- More typehints and documentation.
+- New error class hierarchy.
+- Backward 3.7 compatibility abstract syntax tree compatibility for
+  `ClassInspector`.
+- Support for overriding configuration in application CLI.
 
 
 ## [1.4.1] - 2021-03-10
@@ -159,7 +172,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.4.1...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/plandes/util/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/plandes/util/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/plandes/util/compare/v1.3.3...v1.4.0
 [1.3.3]: https://github.com/plandes/util/compare/v1.3.2...v1.3.3
