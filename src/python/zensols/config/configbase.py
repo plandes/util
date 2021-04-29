@@ -82,7 +82,7 @@ class Configurable(Writable, metaclass=ABCMeta):
         pass
 
     def get_option_list(self, name: str, section: str = None) -> List[str]:
-        """Just like :py:meth:`get_option` but parse as a list using ``split``.
+        """Just like :meth:`get_option` but parse as a list using ``split``.
 
         :param section: section in the ini file to fetch the value; defaults to
                         constructor's ``default_section``
@@ -92,7 +92,7 @@ class Configurable(Writable, metaclass=ABCMeta):
         return self.serializer.parse_list(val)
 
     def get_option_boolean(self, name: str, section: str = None) -> bool:
-        """Just like :py:meth:`get_option` but parse as a boolean (any case `true`).
+        """Just like :meth:`get_option` but parse as a boolean (any case `true`).
 
         :param section: section in the ini file to fetch the value; defaults to
                         constructor's ``default_section``
@@ -105,7 +105,7 @@ class Configurable(Writable, metaclass=ABCMeta):
         return val == 'true'
 
     def get_option_int(self, name: str, section: str = None):
-        """Just like :py:meth:`get_option` but parse as an integer.
+        """Just like :meth:`get_option` but parse as an integer.
 
         :param section: section in the ini file to fetch the value; defaults to
                         constructor's ``default_section``
@@ -116,7 +116,7 @@ class Configurable(Writable, metaclass=ABCMeta):
             return int(val)
 
     def get_option_float(self, name: str, section: str = None):
-        """Just like :py:meth:`get_option` but parse as a float.
+        """Just like :meth:`get_option` but parse as a float.
 
         """
         val = self.get_option(name, section)
@@ -124,7 +124,7 @@ class Configurable(Writable, metaclass=ABCMeta):
             return float(val)
 
     def get_option_path(self, name: str, section: str = None):
-        """Just like :py:meth:`get_option` but return a ``pathlib.Path`` object of the
+        """Just like :meth:`get_option` but return a ``pathlib.Path`` object of the
         string.
 
         """
@@ -135,10 +135,10 @@ class Configurable(Writable, metaclass=ABCMeta):
         return path
 
     def get_option_object(self, name: str, section: str = None):
-        """Just like :py:meth:`get_option` but parse as an object per object syntax
+        """Just like :meth:`get_option` but parse as an object per object syntax
         rules.
 
-        :see: :py:meth:`.parse_object`
+        :see: :meth:`parse_object`
 
         """
         val = self.get_option(name, section)

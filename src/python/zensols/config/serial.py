@@ -197,9 +197,9 @@ class Serializer(object):
                        parse_types: bool = True) -> Union[dict, object]:
         """Populate an object with at string dictionary.  The keys are used for the
         output, and the values are parsed in to Python objects using
-        :py:meth:`.parse_object`.  The keys in the input are used as the same
-        keys if ``obj`` is a ``dict``.  Otherwise, set data as attributes on
-        the object with :py:func:`setattr`.
+        :meth:`parse_object`.  The keys in the input are used as the same keys
+        if ``obj`` is a ``dict``.  Otherwise, set data as attributes on the
+        object with :py:func:`setattr`.
 
         :param state: the data to parse
 

@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class Executor(object):
     """Run a process and log output.  The process is run in the foreground by
     default, or background.  If the later, a process object is returned from
-    :py:meth:`run`.
+    :meth:`run`.
 
     """
     logger: Logger = field()

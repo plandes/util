@@ -152,7 +152,7 @@ class timeprotect(object):
     :param context: an object accessible from the ``timeout_hander`` via
                           ``self``, which defaults to ``None``
 
-    :py:meth:`timeout`
+    :see: :func:`timeout`
 
     """
     def __init__(self, seconds=TIMEOUT_DEFAULT, timeout_handler=None,

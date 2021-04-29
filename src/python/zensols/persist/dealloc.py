@@ -17,10 +17,27 @@ class Deallocatable(ABC):
     for cases where there could be reference cycles or deallocation (i.e. CUDA
     tensors) need happen implicitly and faster.
 
+    .. document private functions
+    .. automethod:: _print_undeallocated
+    .. automethod:: _deallocate_attribute
+
     """
     PRINT_TRACE = False
+    """When ``True``, print the stack trace when deallocating with
+    :meth:`deallocate`.
+
+    """
+
     ALLOCATION_TRACKING = False
+    """Enables allocation tracking.  When this if ``False``, this functionality is
+    not used and disabled.
+
+    """
+
     ALLOCATIONS = {}
+    """The data structure that retains all allocated instances.
+
+    """
 
     def __init__(self):
         super().__init__()
@@ -46,7 +63,7 @@ class Deallocatable(ABC):
     def _mark_deallocated(self, obj: Any = None):
         """Mark ``obj`` as deallocated regardless if it is, or ever will be
         deallocated.  After this is called, it will not be reported in such
-        methods as :py:meth:`.Deallocatable._print_undeallocated`.
+        methods as :meth:`_print_undeallocated`.
 
         """
         if obj is None:
@@ -65,6 +82,14 @@ class Deallocatable(ABC):
 
     @staticmethod
     def _try_deallocate(obj: Any) -> bool:
+        """If ``obj`` is a candidate for deallocation, deallocate it.
+
+        :param obj: the object instance to deallocate
+
+        :return: ``True`` if the object was deallocated, otherwise return
+                 ``False`` indicating it can not and was not deallocated
+
+        """
         cls = globals()['Deallocatable']
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'trying to deallocate: {type(obj)}')
@@ -89,7 +114,7 @@ class Deallocatable(ABC):
 
     def _deallocate_attributes(self, attribs: Tuple[str]) -> int:
         """Deallocates all attributes in ``attribs`` using
-        :py:meth:`.Deallocatable._deallocate_attribute`.
+        :meth:`_deallocate_attribute`.
 
         """
         cnt = 0
@@ -121,23 +146,23 @@ class dealloc(object):
     is useful when tracking deallocations when ``track`` is ``True``.
 
     Example::
+
         with dealloc(lambda: ImportClassFactory('some/path')) as fac:
             return fac.instance('stash')
 
     """
     def __init__(self, inst: Union[Callable, Deallocatable],
                  track: bool = False, include_stack: bool = False):
-        """Initialize.
-
+        """
         :param inst: either an object instance to deallocate or a callable that
                      creates the instance to deallocate
 
         :param track: when ``True``, set
-                      :py:attrib:~`.Deallocatable.ALLOCATION_TRACKING` to
-                      ``True`` to start tracking allocations
+                      :obj:`.Deallocatable.ALLOCATION_TRACKING` to ``True`` to
+                      start tracking allocations
 
         :param include_stack: adds stack traces in the call to
-                              :py:meth:`.Deallocatable._print_undeallocated`
+                              :meth:`.Deallocatable._print_undeallocated`
 
         """
         self.track = track

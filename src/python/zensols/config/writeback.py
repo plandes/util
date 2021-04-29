@@ -30,11 +30,11 @@ class Writeback(FactoryStateObserver, Dictable):
     ``config``'s :class:`.Serializer` instance (either a primitive value string
     or JSON string).
 
-    **Implementation Note:** During initialization, the :py:meth:`__setattr__`
+    **Implementation Note:** During initialization, the :meth:`__setattr__`
     is called by the Python interpreter, and before the instance is completely
     being populated.
 
-    **Important:** The :py:meth:`_is_settable` implementation checks for a
+    **Important:** The :meth:`_is_settable` implementation checks for a
     state (any such as ``CREATED``) to be set on the instance.  To change
     this behavior, you will need to overide this method.
 
@@ -56,7 +56,7 @@ class Writeback(FactoryStateObserver, Dictable):
         """Called to update the object of a new state.  This is currently only called
         by instances of :class:`.ConfigFactory`.
 
-        This is useful when overridding :py:meth:`is_settable` to disallow
+        This is useful when overridding :meth:`is_settable` to disallow
         setting of the configuraiton while the object is being initialized (see
         class docs).
 
@@ -100,8 +100,8 @@ class Writeback(FactoryStateObserver, Dictable):
     def _is_settable(self, name: str, value: Any) -> bool:
         """Return whether or not to allow setting attribute ``name`` with ``value`` on
         the current instance.  This also checks to make sure this instance has
-        completed initialization by check for the existance of the
-        :py:attrib:~`_state` attribute set in :py:meth:`_notify_state`.
+        completed initialization by check for the existance of the :obj:`state`
+        attribute set in :meth:`_notify_state`.
 
         :param name: the name of the attribute
 
@@ -117,7 +117,7 @@ class Writeback(FactoryStateObserver, Dictable):
         return is_created and not is_skip and self._is_allowed_type(value)
 
     def _set_option(self, name: str, value: Any):
-        """Called by :py:meth:`__setattr__` to set the value on the backing ``config``.
+        """Called by :meth:`__setattr__` to set the value on the backing ``config``.
         The backing ``config`` handles the string serialization.
 
         :param name: the name of the attribute

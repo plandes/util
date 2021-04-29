@@ -780,6 +780,6 @@ the `example/cli/1-boilerplate` directory in the source repository.
 [LogConfigurator]: ../api/zensols.cli.html#zensols.cli.lib.LogConfigurator
 [PackageInfoImporter]: ../api/zensols.cli.html#zensols.cli.lib.PackageInfoImporter
 [SimpleActionCli]: ../api/zensols.cli.html#zensols.cli.simple.SimpleActionCli
-[CONFIG_META]: ../api/zensols.cli.html?zensols.cli.lib.LogConfigurator.CLI_META
-[LogConfigurator.CONFIG_META]: ../api/zensols.cli.html?zensols.cli.lib.LogConfigurator.CLI_META
-[INSPECT_META]: ../api/zensols.introspect.html?zensols.introspect.inspect.ClassInspector.INSPECT_META
+[CONFIG_META]: ../api/zensols.cli.html#zensols.cli.lib.LogConfigurator.CLI_META
+[LogConfigurator.CONFIG_META]: ../api/zensols.cli.html#zensols.cli.lib.LogConfigurator.CLI_META
+[INSPECT_META]: ../api/zensols.introspect.html#zensols.introspect.inspect.ClassInspector.INSPECT_META

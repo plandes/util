@@ -118,6 +118,7 @@ class loglevel(object):
     and sets it back.
 
     Example::
+
         with loglevel(__name__):
             logger.debug('test')
 
