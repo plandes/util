@@ -10,9 +10,11 @@ from dataclasses import dataclass, fields, asdict
 from collections import OrderedDict
 import sys
 import logging
+import inspect
 import json
 from io import TextIOBase
-from . import Writable, ClassResolver
+from zensols.introspect import ClassImporter
+from . import ConfigurationError, Writable, ClassResolver
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +75,8 @@ class Dictable(Writable):
         :see: :meth:`asdict`
 
         """
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'from dictable: {type(self)}')
         dct = OrderedDict()
         self._add_class_name_param(class_name_param, dct)
         for readable_name, name in self._get_dictable_attributes():
@@ -81,11 +85,15 @@ class Dictable(Writable):
                 k = readable_name
             else:
                 k = name
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'dict: <{k}> -> {type(v)}')
             dct[k] = self._from_object(v, recurse, readable)
         return dct
 
     def _from_dict(self, obj: dict, recurse: bool, readable: bool) -> \
             Dict[str, Any]:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'from dict: {type(obj)}')
         dct = {}
         for k, v in obj.items():
             dct[str(k)] = self._from_object(v, recurse, readable)
@@ -95,9 +103,13 @@ class Dictable(Writable):
             Dict[str, Any]:
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'from dataclass: {type(obj)}')
+        if not dataclasses.is_dataclass(obj):
+            raise ConfigurationError(f'not a dataclass: {obj.__class__}')
         return self._from_dict(asdict(obj), recurse, readable)
 
     def _format_dictable(self, obj: Any) -> Union[str, None]:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'format dictable: {type(obj)}')
         v = None
         if hasattr(self, '_DICTABLE_FORMATS'):
             fmt_str = self._DICTABLE_FORMATS.get(type(obj))
@@ -120,8 +132,13 @@ class Dictable(Writable):
         return v
 
     def _from_object(self, obj: Any, recurse: bool, readable: bool) -> Any:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'from object: {type(obj)}')
         if recurse:
-            if isinstance(obj, DICTABLE_CLASS):
+            if inspect.isclass(obj):
+                # dataclasses.is_dataclass return True for class objects
+                ret = ClassImporter.full_classname(obj)
+            elif isinstance(obj, DICTABLE_CLASS):
                 ret = obj._from_dictable(recurse, readable)
             elif dataclasses.is_dataclass(obj):
                 ret = self._from_dataclass(obj, recurse, readable)
@@ -154,6 +171,8 @@ class Dictable(Writable):
         :see: :meth:`_from_dictable`
 
         """
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'asdict: {type(self)}')
         return self._from_dictable(recurse, readable, class_name_param)
 
     def asjson(self, writer: TextIOBase = None,
