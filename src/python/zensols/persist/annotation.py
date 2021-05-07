@@ -129,8 +129,7 @@ class PersistedWork(Deallocatable):
         vname = self.varname
         if self.owner is not None and hasattr(self.owner, vname):
             obj = getattr(self.owner, vname)
-            if isinstance(obj, Deallocatable):
-                obj.deallocate()
+            self._try_deallocate(obj)
             delattr(self.owner, vname)
         self.clear_global()
         self.owner = None
@@ -298,8 +297,12 @@ class PersistableContainerMetadata(object):
 
 
 class PersistableContainer(Deallocatable):
-    """Classes can extend this that want to persist ``PersistableWork`` instances,
-    which otherwise are not persistable.
+    """Classes can extend this that want to persist :class:`.PersistableWork`
+    instances, which otherwise are not persistable.
+
+    This class also manages the deallocation of all :class:`.PersistableWork`
+    attributes of the class, which might be another reason to use it even if
+    there isn't a persistence use case.
 
     If the class level attribute ``PERSITABLE_TRANSIENT_ATTRIBUTES`` is set,
     all attributes name given in this set will be set to ``None`` when pickled.
@@ -349,7 +352,9 @@ class PersistableContainer(Deallocatable):
 
 
 class persisted(object):
-    """Class level annotation to further simplify usage with PersistedWork.
+    """Class level annotation to further simplify usage with :class:`.PersistedWork`.
+
+    :see: :class:`.PersistedWork`
 
     For example::
 
@@ -359,8 +364,28 @@ class persisted(object):
             def counter(self):
                 return tuple(range(5))
     """
-    def __init__(self, name, path=None, cache_global=False,
-                 transient=False):
+    def __init__(self, name: str, path: Path = None,
+                 cache_global: bool = False, transient: bool = False,
+                 allocation_track: bool = True):
+        """Initialize.
+
+        :param name: the name of the attribute on the instance to set with the
+                     cached result of the method
+
+        :param: path: if set, the path where to store the cached result on the
+                      file system
+
+        :param cache_global: if ``True``, globally cache the value at the class
+                             definition level
+
+        :param transient: if ``True`` do not persist only in memory, and not on
+                          the file system, which is needed when used with
+                          :class:`.PersistableContainer`
+
+        :param allocation_track: if ``False``, immediately mark the backing
+                                 :class:`PersistedWork` as deallocated
+
+        """
         super().__init__()
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'persisted decorator on attr: {name}, ' +
@@ -369,6 +394,7 @@ class persisted(object):
         self.path = path
         self.cache_global = cache_global
         self.transient = transient
+        self.allocation_track = allocation_track
 
     def __call__(self, fn):
         if logger.isEnabledFor(logging.DEBUG):
@@ -391,6 +417,8 @@ class persisted(object):
                     path, owner=inst, cache_global=self.cache_global,
                     transient=self.transient)
                 setattr(inst, self.attr_name, pwork)
+                if not self.allocation_track:
+                    pwork._mark_deallocated()
             pwork.worker = fn
             return pwork(*argv, **kwargs)
 
