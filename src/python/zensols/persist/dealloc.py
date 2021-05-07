@@ -20,6 +20,7 @@ class Deallocatable(ABC):
     .. document private functions
     .. automethod:: _print_undeallocated
     .. automethod:: _deallocate_attribute
+    .. automethod:: _try_deallocate
 
     """
     PRINT_TRACE = False
