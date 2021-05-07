@@ -8,6 +8,7 @@ from abc import ABC
 import logging
 import traceback
 from io import StringIO
+from zensols.util import APIError
 
 logger = logging.getLogger(__name__)
 
@@ -40,8 +41,11 @@ class Deallocatable(ABC):
 
     """
 
+    _RECURSIVE = False
+
     def __init__(self):
         super().__init__()
+        #print('DEALLOC INIT', self.__class__.__name__)
         if self.ALLOCATION_TRACKING:
             k = id(self)
             sio = StringIO()
@@ -97,6 +101,18 @@ class Deallocatable(ABC):
         if isinstance(obj, cls):
             obj.deallocate()
             return True
+        elif cls._RECURSIVE and isinstance(obj, (tuple, list, set)):
+            for o in obj:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'deallocate tuple item: {type(o)}')
+                cls._try_deallocate(o)
+            return True
+        elif cls._RECURSIVE and isinstance(obj, dict):
+            for o in obj.values():
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'deallocate dict item: {type(o)}')
+                cls._try_deallocate(o)
+            return True
         return False
 
     def _deallocate_attribute(self, attrib: str) -> bool:
@@ -125,20 +141,40 @@ class Deallocatable(ABC):
         return cnt
 
     @classmethod
-    def _print_undeallocated(self, include_stack: bool = False):
+    def _print_undeallocated(cls, include_stack: bool = False,
+                             fail: bool = False):
         """Print all unallocated objects.
 
         """
-        for k, (v, stack) in self.ALLOCATIONS.items():
+        for k, (v, stack) in cls.ALLOCATIONS.items():
             vstr = str(type(v))
             if hasattr(v, 'name'):
                 vstr = f'{vstr} ({v.name})'
             print(f'{k} -> {vstr}')
             if include_stack:
                 print(stack)
+        if fail:
+            cls.assert_dealloc()
 
     def _deallocate_str(self) -> str:
         return str(self.__class__)
+
+    @classmethod
+    def assert_dealloc(cls):
+        cnt = len(cls.ALLOCATIONS)
+        if cnt > 0:
+            raise APIError(f'resource leak with {cnt} intances')
+
+
+class dealloc_recursive(object):
+    def __init__(self):
+        self.org_rec_state = Deallocatable._RECURSIVE
+
+    def __enter__(self):
+        Deallocatable._RECURSIVE = True
+
+    def __exit__(self, type, value, traceback):
+        Deallocatable._RECURSIVE = self.org_rec_state
 
 
 class dealloc(object):
