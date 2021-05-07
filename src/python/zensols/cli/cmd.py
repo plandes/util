@@ -12,7 +12,7 @@ from itertools import chain
 from pathlib import Path
 from io import TextIOBase
 from optparse import OptionParser
-from zensols.persist import persisted
+from zensols.persist import persisted, PersistableContainer, Deallocatable
 from zensols.config import Dictable
 from . import (
     ActionCliError, OptionMetaData, PositionalMetaData, ActionMetaData,
@@ -62,7 +62,7 @@ class CommandAction(Dictable):
 
 
 @dataclass
-class CommandActionSet(Dictable):
+class CommandActionSet(Deallocatable, Dictable):
     """The actions that are parsed by :class:`.CommandLineParser` as the output of
     the parse phase.  This is indexable by command action name and iterable
     across all actions.  Properties :obj:`first_pass_actions` and
@@ -92,6 +92,10 @@ class CommandActionSet(Dictable):
         """Command actions by name keys."""
         return {a.name: a for a in self.actions}
 
+    def deallocate(self):
+        super().deallocate()
+        self._try_deallocate(self.actions)
+
     def __getitem__(self, name: str) -> CommandAction:
         return self.by_name[name]
 
@@ -103,7 +107,7 @@ class CommandActionSet(Dictable):
 
 
 @dataclass
-class CommandLineConfig(Dictable):
+class CommandLineConfig(PersistableContainer, Dictable):
     """Given to configure the :class:`.CommandLineParser`.
 
     """
@@ -144,9 +148,13 @@ class CommandLineConfig(Dictable):
                 actions[k] = action
         return actions
 
+    def deallocate(self):
+        super().deallocate()
+        self._try_deallocate(self.actions)
+
 
 @dataclass
-class CommandLineParser(Dictable):
+class CommandLineParser(Deallocatable, Dictable):
     """Parse the command line.  The parser iterates twice over the command line:
 
         1. The first pass parses only *first pass* actions
@@ -286,8 +294,7 @@ class CommandLineParser(Dictable):
                           actions: List[CommandAction]) -> \
             Tuple[bool, str, Dict[str, Any], Dict[str, Any], Tuple[str]]:
         second_pass = False
-        fp_opts = set(map(lambda o: o.dest,
-                          self.config.first_pass_options))
+        fp_opts = set(map(lambda o: o.dest, self.config.first_pass_options))
         # first fish out the action name (if given) as a positional parameter
         parser: OptionParser = self._get_first_pass_parser(True)
         (options, op_args) = parser.parse_args(args)
@@ -402,6 +409,10 @@ class CommandLineParser(Dictable):
                         'No positional arguments allowed when default ' +
                         f"action '{self.default_action}' " +
                         f'given for method {action_meta.name}')
+
+    def deallocate(self):
+        super().deallocate()
+        self._try_deallocate(self.config)
 
     def parse(self, args: List[str]) -> CommandActionSet:
         """Parse command line arguments.

@@ -14,7 +14,9 @@ from io import TextIOBase
 from itertools import chain
 from pathlib import Path
 from zensols.introspect import Class, ClassMethod, ClassField, ClassMethodArg
-from zensols.persist import persisted, PersistedWork
+from zensols.persist import (
+    persisted, PersistedWork, PersistableContainer, Deallocatable
+)
 from zensols.util import PackageResource
 from zensols.config import (
     Serializer, Dictable, Configurable, ConfigFactory,
@@ -30,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class Action(Dictable):
+class Action(Deallocatable, Dictable):
     """An invokable action from the command line the :class:`.Application` class.
     This class combines the user input from the command line with the meta data
     from the Python classes given in the configuration.
@@ -101,6 +103,10 @@ class Action(Dictable):
 
         """
         return self.method_meta.name
+
+    def deallocate(self):
+        super().deallocate()
+        self._try_deallocate((self.command_action, self.action_cli))
 
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
         return map(lambda f: (f, f),
@@ -392,7 +398,7 @@ class Application(Dictable):
 
 
 @dataclass
-class ApplicationFactory(object):
+class ApplicationFactory(PersistableContainer):
     """Boots the application context from the command line.  This first loads
     resource ``resources/app.conf`` from this package, then adds
     :obj:`app_config_resource` from the application package of the client.
@@ -547,6 +553,11 @@ class ApplicationFactory(object):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'created factory: {fac}')
         return fac, cli_mng, parser
+
+    def deallocate(self):
+        from zensols.persist import dealloc_recursive
+        with dealloc_recursive():
+            super().deallocate()
 
     @property
     def config_factory(self) -> ConfigFactory:

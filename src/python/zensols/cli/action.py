@@ -9,7 +9,7 @@ import dataclasses
 import logging
 import copy as cp
 from itertools import chain
-from zensols.persist import persisted
+from zensols.persist import persisted, PersistableContainer
 from zensols.introspect import (
     Class, ClassField, ClassParam, ClassMethod, ClassMethodArg,
     ClassInspector, ClassImporter,
@@ -51,7 +51,7 @@ class ActionCliMethod(Dictable):
 
 
 @dataclass
-class ActionCli(Dictable):
+class ActionCli(PersistableContainer, Dictable):
     """A set of commands that is invokeable on the command line, one for each
     registered method of a class (usually a :class:`dataclasses.dataclass`.
     This contains meta data necesary to create a full usage command line
@@ -253,7 +253,7 @@ class ActionCli(Dictable):
 
 
 @dataclass
-class ActionCliManager(Dictable):
+class ActionCliManager(PersistableContainer, Dictable):
     """An :class:`.ActionCli` is created from the configuration given by the
     section.  Optionally, another section using :obj:`decorator_section_format`
     will be read to add additional metadata and configuration to instantiated

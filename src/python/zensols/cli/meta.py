@@ -12,7 +12,7 @@ from io import TextIOBase
 from pathlib import Path
 import optparse
 from zensols.introspect import TypeMapper
-from zensols.persist import persisted
+from zensols.persist import persisted, PersistableContainer
 from zensols.config import Dictable
 from . import ActionCliError
 
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(eq=True, order=True, unsafe_hash=True)
-class OptionMetaData(Dictable):
+class OptionMetaData(PersistableContainer, Dictable):
     """A command line option."""
 
     DATA_TYPES = frozenset(TypeMapper.DEFAULT_DATA_TYPES.values())
@@ -123,7 +123,6 @@ class OptionMetaData(Dictable):
         return f'--{self.long_name}'
 
     @property
-    @persisted('_short_option')
     def short_option(self) -> str:
         """The short option string with dash."""
         return None if self.short_name is None else f'-{self.short_name}'
@@ -231,7 +230,7 @@ class OptionFactory(object):
 
 
 @dataclass
-class ActionMetaData(Dictable):
+class ActionMetaData(PersistableContainer, Dictable):
     """An action represents a link between a command line mnemonic *action* and a
     method on a class to invoke.
 
