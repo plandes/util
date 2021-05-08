@@ -6,6 +6,7 @@ __author__ = 'Paul Landes'
 from typing import Any, Union, Callable, Tuple
 from abc import ABC
 import logging
+import collections
 import traceback
 from io import StringIO
 from zensols.util import APIError
@@ -41,11 +42,11 @@ class Deallocatable(ABC):
 
     """
 
+    # when true, recurse through deallocatable instances while freeing
     _RECURSIVE = False
 
     def __init__(self):
         super().__init__()
-        #print('DEALLOC INIT', self.__class__.__name__)
         if self.ALLOCATION_TRACKING:
             k = id(self)
             sio = StringIO()
@@ -143,25 +144,52 @@ class Deallocatable(ABC):
 
     @classmethod
     def _print_undeallocated(cls, include_stack: bool = False,
+                             only_counts: bool = False,
                              fail: bool = False):
         """Print all unallocated objects.
 
         :param include_stack: if ``True`` print out the stack traces of all the
-                              unallocated references
+                              unallocated references; if ``only_counts`` is
+                              ``True``, this is ignored
+
+        :param only_counts: if ``True`` only print the counts of each
+                            unallocated class with counts for each
 
         :param fail: if ``True``, raise an exception if there are any
                      unallocated references found
 
         """
-        for k, (v, stack) in cls.ALLOCATIONS.items():
-            vstr = str(type(v))
-            if hasattr(v, 'name'):
-                vstr = f'{vstr} ({v.name})'
-            print(f'{k} -> {vstr}')
-            if include_stack:
-                print(stack)
+        allocs = cls.ALLOCATIONS
+        if len(allocs) > 0:
+            print(f'total allocations: {len(allocs)}')
+        if only_counts:
+            cls_counts = collections.defaultdict(lambda: 0)
+            for cls in map(lambda o: type(o[0]), allocs.values()):
+                cls_counts[cls] += 1
+            for k in sorted(cls_counts.keys(), key=lambda x: x.__name__):
+                print(f'{k}: {cls_counts[k]}')
+        else:
+            for k, (v, stack) in allocs.items():
+                vstr = str(type(v))
+                if hasattr(v, 'name'):
+                    vstr = f'{vstr} ({v.name})'
+                print(f'{k} -> {vstr}')
+                if include_stack:
+                    print(stack)
         if fail:
             cls.assert_dealloc()
+
+    @classmethod
+    def _deallocate_all(cls):
+        """Deallocate all the objects that have not yet been and clear the data
+        structure.
+
+        """
+        allocs = cls.ALLOCATIONS
+        to_dealloc = tuple(allocs.values())
+        allocs.clear()
+        for obj, trace in to_dealloc:
+            obj.deallocate()
 
     def _deallocate_str(self) -> str:
         return str(self.__class__)
