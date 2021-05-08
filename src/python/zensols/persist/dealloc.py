@@ -146,6 +146,12 @@ class Deallocatable(ABC):
                              fail: bool = False):
         """Print all unallocated objects.
 
+        :param include_stack: if ``True`` print out the stack traces of all the
+                              unallocated references
+
+        :param fail: if ``True``, raise an exception if there are any
+                     unallocated references found
+
         """
         for k, (v, stack) in cls.ALLOCATIONS.items():
             vstr = str(type(v))
