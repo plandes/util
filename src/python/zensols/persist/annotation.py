@@ -44,7 +44,8 @@ class PersistedWork(Deallocatable):
     """
     def __init__(self, path: Union[str, Path], owner: object,
                  cache_global: bool = False, transient: bool = False,
-                 initial_value: Any = None, mkdir: bool = False):
+                 initial_value: Any = None, mkdir: bool = False,
+                 deallocate_recursive: bool = False):
         """Create an instance of the class.
 
         :param path: if type of ``pathlib.Path`` then use disk storage to cache
@@ -87,6 +88,7 @@ class PersistedWork(Deallocatable):
         if initial_value is not None:
             self.set(initial_value)
         self.mkdir = mkdir
+        self.deallocate_recursive = deallocate_recursive
 
     def _info(self, msg, *args):
         if logger.isEnabledFor(logging.DEBUG):
@@ -129,7 +131,7 @@ class PersistedWork(Deallocatable):
         vname = self.varname
         if self.owner is not None and hasattr(self.owner, vname):
             obj = getattr(self.owner, vname)
-            self._try_deallocate(obj)
+            self._try_deallocate(obj, self.deallocate_recursive)
             delattr(self.owner, vname)
         self.clear_global()
         self.owner = None
@@ -366,7 +368,8 @@ class persisted(object):
     """
     def __init__(self, name: str, path: Path = None,
                  cache_global: bool = False, transient: bool = False,
-                 allocation_track: bool = True):
+                 allocation_track: bool = True,
+                 deallocate_recursive: bool = False):
         """Initialize.
 
         :param name: the name of the attribute on the instance to set with the
@@ -395,6 +398,7 @@ class persisted(object):
         self.cache_global = cache_global
         self.transient = transient
         self.allocation_track = allocation_track
+        self.deallocate_recursive = deallocate_recursive
 
     def __call__(self, fn):
         if logger.isEnabledFor(logging.DEBUG):
@@ -415,7 +419,8 @@ class persisted(object):
                     path = Path(self.path)
                 pwork = PersistedWork(
                     path, owner=inst, cache_global=self.cache_global,
-                    transient=self.transient)
+                    transient=self.transient,
+                    deallocate_recursive=self.deallocate_recursive)
                 setattr(inst, self.attr_name, pwork)
                 if not self.allocation_track:
                     pwork._mark_deallocated()

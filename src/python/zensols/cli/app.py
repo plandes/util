@@ -441,7 +441,8 @@ class ApplicationFactory(PersistableContainer):
         if isinstance(self.package_resource, str):
             self.package_resource = PackageResource(self.package_resource)
         self._configure_serializer()
-        self._resources = PersistedWork('_resources', self)
+        self._resources = PersistedWork(
+            '_resources', self, deallocate_recursive=True)
 
     def _configure_serializer(self):
         dist_name = self.package_resource.name
@@ -553,11 +554,6 @@ class ApplicationFactory(PersistableContainer):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'created factory: {fac}')
         return fac, cli_mng, parser
-
-    def deallocate(self):
-        from zensols.persist import dealloc_recursive
-        with dealloc_recursive():
-            super().deallocate()
 
     @property
     def config_factory(self) -> ConfigFactory:

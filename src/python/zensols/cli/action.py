@@ -244,12 +244,13 @@ class ActionCli(PersistableContainer, Dictable):
         return meths
 
     @property
-    @persisted('_meta_datas')
+    @persisted('_meta_datas', deallocate_recursive=True)
     def meta_datas(self) -> Tuple[ActionMetaData]:
         """Return action meta data across all methods.
 
         """
         return tuple(map(lambda m: m.action_meta_data, self.methods.values()))
+
 
 
 @dataclass
@@ -487,7 +488,7 @@ class ActionCliManager(PersistableContainer, Dictable):
         return actions
 
     @property
-    @persisted('_actions_ordered')
+    @persisted('_actions_ordered', deallocate_recursive=True)
     def actions_ordered(self) -> Tuple[ActionCli]:
         """Return all actions in the order they were given in the configuration.
 

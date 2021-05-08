@@ -86,7 +86,7 @@ class Deallocatable(ABC):
                                  f'({self._deallocate_str()})')
 
     @staticmethod
-    def _try_deallocate(obj: Any) -> bool:
+    def _try_deallocate(obj: Any, recursive: bool = False) -> bool:
         """If ``obj`` is a candidate for deallocation, deallocate it.
 
         :param obj: the object instance to deallocate
@@ -96,22 +96,23 @@ class Deallocatable(ABC):
 
         """
         cls = globals()['Deallocatable']
+        recursive = recursive or cls._RECURSIVE
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'trying to deallocate: {type(obj)}')
         if isinstance(obj, cls):
             obj.deallocate()
             return True
-        elif cls._RECURSIVE and isinstance(obj, (tuple, list, set)):
+        elif recursive and isinstance(obj, (tuple, list, set)):
             for o in obj:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'deallocate tuple item: {type(o)}')
-                cls._try_deallocate(o)
+                cls._try_deallocate(o, recursive)
             return True
-        elif cls._RECURSIVE and isinstance(obj, dict):
+        elif recursive and isinstance(obj, dict):
             for o in obj.values():
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'deallocate dict item: {type(o)}')
-                cls._try_deallocate(o)
+                cls._try_deallocate(o, recursive)
             return True
         return False
 
