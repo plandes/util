@@ -209,6 +209,8 @@ class Configurable(Writable, metaclass=ABCMeta):
         if sections is None:
             sections = self.sections
         for sec in sections:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'copying section {sec}')
             try:
                 for k, v in self.get_options(sec).items():
                     to_populate.set_option(k, v, sec)
