@@ -447,7 +447,10 @@ class ActionCliManager(PersistableContainer, Dictable):
                   'options': self._fields}
         conf_sec = self.decorator_section_format.format(**{'section': section})
         # start with class level meta data, allowing it to be overriden at the
-        # application configuration level
+        # application configuration level; note: tested with
+        # `mnemonic_includes`, which appears to merge dictionaries, which is
+        # probably the new 3.9 dictionary set union operations working by
+        # default
         if hasattr(cls, self.CLASS_META_ATTRIBUTE):
             cmconf = getattr(cls, self.CLASS_META_ATTRIBUTE)
             params.update(cmconf)
