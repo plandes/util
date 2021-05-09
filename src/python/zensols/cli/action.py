@@ -136,7 +136,8 @@ class ActionCli(PersistableContainer, Dictable):
         excs = self.mnemonic_excludes
         enabled = ((incs is None) or (name in incs)) and (name not in excs)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'mnemonic {name} is enabled: {enabled}')
+            logger.debug(f'mnemonic {self.section}:{name} is enabled: {enabled} for ' +
+                         f'{self.class_meta.name}: [inc={incs},exc={excs}]')
         return enabled
 
     def _add_option(self, name: str, omds: Set[OptionMetaData]):
@@ -445,6 +446,11 @@ class ActionCliManager(PersistableContainer, Dictable):
                   'class_meta': meta,
                   'options': self._fields}
         conf_sec = self.decorator_section_format.format(**{'section': section})
+        # start with class level meta data, allowing it to be overriden at the
+        # application configuration level
+        if hasattr(cls, self.CLASS_META_ATTRIBUTE):
+            cmconf = getattr(cls, self.CLASS_META_ATTRIBUTE)
+            params.update(cmconf)
         # if we found a decorator action cli config section, use it to set the
         # configuraiton of the CLI interacts
         if conf_sec in self.config.sections:
@@ -456,9 +462,7 @@ class ActionCliManager(PersistableContainer, Dictable):
                     f'section instance {conf_sec} is not a class of ' +
                     f'type ActionCli, but {type(action)}')
         else:
-            if hasattr(cls, self.CLASS_META_ATTRIBUTE):
-                cmconf = getattr(cls, self.CLASS_META_ATTRIBUTE)
-                params.update(cmconf)
+            # use a default with parameters collected
             action = ActionCli(**params)
         logger.debug(f'created action: {action}')
         self._add_action(action)
