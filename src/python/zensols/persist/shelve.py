@@ -26,6 +26,9 @@ class ShelveStash(CloseableStash):
     writeback: bool = field(default=False)
     """The writeback parameter given to ``shelve``."""
 
+    auto_close: bool = field(default=False)
+    """If ``True``, close the shelve for each operation."""
+
     def __post_init__(self):
         self.is_open = False
 
@@ -36,23 +39,38 @@ class ShelveStash(CloseableStash):
 
         """
         logger.debug('creating shelve data')
+        self.path.parent.mkdir(parents=True, exist_ok=True)
         fname = str(self.path.absolute())
         inst = sh.open(fname, writeback=self.writeback)
         self.is_open = True
         return inst
 
+    def _assert_auto_close(self):
+        if self.auto_close:
+            self.close()
+
     def load(self, name: str) -> Any:
+        ret = None
         if self.exists(name):
-            return self.shelve[name]
+            ret = self.shelve[name]
+        self._assert_auto_close()
+        return ret
 
     def dump(self, name, inst):
         self.shelve[name] = inst
+        self._assert_auto_close()
 
     def exists(self, name) -> bool:
-        return name in self.shelve
+        exists = name in self.shelve
+        self._assert_auto_close()
+        return exists
 
     def keys(self) -> Iterable[str]:
-        return self.shelve.keys()
+        ret = self.shelve.keys()
+        if self.auto_close:
+            ret = tuple(ret)
+        self._assert_auto_close()
+        return ret
 
     def delete(self, name: str = None):
         "Delete the shelve data file."
