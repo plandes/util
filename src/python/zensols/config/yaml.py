@@ -25,7 +25,7 @@ class YamlConfig(Configurable, Dictable):
     """
     CLASS_VER = 0
 
-    def __init__(self, config_file: Union[Path, TextIOBase] = None,
+    def __init__(self, config_file: Union[str, Path, TextIOBase] = None,
                  default_section: str = None, default_vars: str = None,
                  delimiter: str = '$', sections_name: str = 'sections'):
         """Initialize this instance.
@@ -38,7 +38,10 @@ class YamlConfig(Configurable, Dictable):
 
         """
         super().__init__(default_section)
-        self.config_file = config_file
+        if isinstance(config_file, str):
+            self.config_file = Path(config_file)
+        else:
+            self.config_file = config_file
         self.default_vars = default_vars if default_vars else {}
         self.delimiter = delimiter
         self.sections_name = sections_name
@@ -64,10 +67,13 @@ class YamlConfig(Configurable, Dictable):
             else:
                 raise ConfigurableError(f'Unknown yaml type {type(n)}: {n}')
 
-        if isinstance(self.config_file, TextIOBase):
-            content = self.config_file
+        cfile = self.config_file
+        if not cfile.is_file():
+            raise ConfigurableError(f'Not a file or does not exist: {cfile}')
+        if isinstance(cfile, TextIOBase):
+            content = cfile
         else:
-            with open(self.config_file) as f:
+            with open(cfile) as f:
                 content = f.read()
         struct = yaml.load(content, yaml.FullLoader)
         context = {}
