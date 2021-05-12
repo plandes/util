@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Switch raw `IniConfig` as default in config factory for `ini` extension files
+  from the `ImportIniConfig`.  This simplifies when using with an
+  `ImportIniConfig`, reduces substitution dependencies and suites most use
+  cases.
+
+
 ## [1.5.0] - 2021-04-29
 ### Changed
 - Follow the same pattern with mnemonics as options: includes/excludes.  The
