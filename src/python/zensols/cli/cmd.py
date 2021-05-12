@@ -263,7 +263,7 @@ class CommandLineParser(Deallocatable, Dictable):
                 raise CommandLineError(
                     f"No choice '{s}' for '{name}' (choose from {choices})")
         else:
-            if not isinstance(s, (str, int, bool, Path)):
+            if not isinstance(s, (str, int, float, bool, Path)):
                 raise CommandLineConfigError(f'Unknown parse type: {s}: {t}')
             try:
                 tpe = t(s)
