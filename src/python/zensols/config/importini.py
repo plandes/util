@@ -160,6 +160,14 @@ class ImportIniConfig(IniConfig):
          :class:`~configparser.ConfigParser` using
          :class:`~configparser.ExtendedInterpolation`.
 
+    A section called ``import`` is used to load other configuration.  This is
+    either done by loading it:
+
+      * ``files`` entry in the section to load a list of files; ``type`` can be
+        given to select the loader (see :class:`.ConfigurableFactory`)
+
+      * ``
+
     """
     IMPORT_SECTION = 'import'
     SECTIONS_SECTION = 'sections'

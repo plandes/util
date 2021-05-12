@@ -20,12 +20,23 @@ class ConfigurableFactory(object):
     """Create instances of :class:`.Configurable` with factory methods.  The
     parameters in :obj:`kwargs` given to the initalizer on instantiation.
 
+    This class often is used to create a factory from just a path, which then
+    uses the extension with the :obj:`EXTENSION_TO_TYPE` mapping to select the
+    class.  Top level/entry point configuration should use ``conf`` as the
+    extension allowing the :class:`.ImportIni` to import other configuration.
+    An example of this is the :class:`.ConfigurationImporter` loading user
+    specific configuration.
+
+    :see: `.ImportIniConfig`
+
     """
     EXTENSION_TO_TYPE = {'conf': 'ini',
                          'ini': 'ini',
                          'yml': 'yaml',
                          'json': 'json'}
-    """The configuration factory extension to clas name."""
+    """The configuration factory extension to clas name.
+
+    """
 
     FILE_EXT_REGEX = re.compile(r'.+\.([a-zA-Z]+?)$')
     """A regular expression to parse out the extension from a file name."""
@@ -88,7 +99,8 @@ class ConfigurableFactory(object):
         return class_type
 
     def from_path(self, path: Path) -> Configurable:
-        """Create a configurable from a path.
+        """Create a configurable from a path.  This updates the :obj:`kwargs` to set
+        ``config_file`` to the given path for the duration of this method.
 
         """
         if path.is_dir():
