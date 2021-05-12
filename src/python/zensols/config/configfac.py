@@ -22,7 +22,7 @@ class ConfigurableFactory(object):
 
     """
     EXTENSION_TO_TYPE = {'conf': 'importini',
-                         'ini': 'importini',
+                         'ini': 'ini',
                          'yml': 'yaml',
                          'json': 'json'}
     """The configuration factory extension to clas name."""
