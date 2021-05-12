@@ -203,6 +203,15 @@ class ConfigurationImporter(ApplicationObserver):
 
     """
 
+    type: str = field(default=None)
+    """The type of :class:`.Configurable` use to create in
+    :class:`.ConfigurableFactory`.  If this is not provided, the factory
+    decides based on the file extension.
+
+    :see: :class:`.ConfigurableFactory`
+
+    """
+
     override: bool = field(default=False)
     """Override/clobber values from the configuration file in the application
     configuration.
@@ -264,8 +273,12 @@ class ConfigurationImporter(ApplicationObserver):
 
         """
         # create the command line specified config
-        cf = ConfigurableFactory()
-        cl_config = cf.from_path(self.config_path)
+        if self.type is None:
+            cf = ConfigurableFactory()
+            cl_config = cf.from_path(self.config_path)
+        else:
+            cf = ConfigurableFactory(kwargs={'config_file': self.config_path})
+            cl_config = cf.from_type(self.type)
 
         # First inject our app context (app.conf) to the command line specified
         # configuration (--config) skipping sections that have missing options.
