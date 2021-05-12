@@ -21,7 +21,7 @@ class ConfigurableFactory(object):
     parameters in :obj:`kwargs` given to the initalizer on instantiation.
 
     """
-    EXTENSION_TO_TYPE = {'conf': 'importini',
+    EXTENSION_TO_TYPE = {'conf': 'ini',
                          'ini': 'ini',
                          'yml': 'yaml',
                          'json': 'json'}

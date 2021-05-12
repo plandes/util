@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ### Changed
-- Switch raw `IniConfig` as default in config factory for `ini` extension files
-  from the `ImportIniConfig`.  This simplifies when using with an
+- Switch to raw `IniConfig` as default in config factory for `ini` extension
+  files from the `ImportIniConfig`.  This simplifies when using with an
   `ImportIniConfig`, reduces substitution dependencies and suites most use
   cases.
 
