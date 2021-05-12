@@ -12,7 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Switch to raw `IniConfig` as default in config factory for `ini` extension
   files from the `ImportIniConfig`.  This simplifies when using with an
   `ImportIniConfig`, reduces substitution dependencies and suites most use
-  cases.
+  cases.  In most cases, it's the `ImportIniConfig` using this setting, which
+  ends up doing the string interpolation after everything is imported, thus
+  creating less start up configuration read issues.
 
 
 ## [1.5.0] - 2021-04-29
