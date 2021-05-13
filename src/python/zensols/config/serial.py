@@ -48,6 +48,10 @@ class Settings(object):
     def asjson(self, *args, **kwargs) -> str:
         return json.dumps(self.__dict__, *args, **kwargs)
 
+    def get(self, name: str) -> str:
+        if hasattr(self, name):
+            return getattr(self, name)
+
     def __eq__(self, other) -> bool:
         return self.__dict__ == other.__dict__
 
