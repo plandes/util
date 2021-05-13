@@ -625,6 +625,16 @@ class ApplicationFactory(PersistableContainer):
         actions: Tuple[Action] = self._parse(args)
         return Application(fac, self, actions)
 
+    def _handle_error(self, ex: Exception):
+        """Handle errors raised during the execution of the application.
+
+        :see: :meth:`invoke`
+        """
+        if isinstance(ex, ActionCliError):
+            self.parser.error(str(ex))
+        else:
+            raise ex
+
     def invoke(self, args: Union[List[str], str] = None) -> Any:
         """Creates and invokes the entire application returning the result of the
         second pass action.
@@ -645,8 +655,8 @@ class ApplicationFactory(PersistableContainer):
             app_res: ApplicationResult = app.invoke()
             act_res: ActionResult = app_res()
             return act_res
-        except ActionCliError as e:
-            self.parser.error(str(e))
+        except Exception as e:
+            self._handle_error(e)
 
     def invoke_protect(self, args: Union[List[str], str] = None) -> Any:
         """Same as :meth:`invoke`, but protect against :class:`Exception` and
