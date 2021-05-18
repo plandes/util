@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, List
 from dataclasses import dataclass, field
 from enum import Enum, auto
 import os
@@ -14,7 +14,8 @@ from io import TextIOBase
 from pathlib import Path
 from zensols.util import PackageResource
 from zensols.config import (
-    Dictable, Configurable, ConfigurableFactory, DictionaryConfig, StringConfig
+    Settings, Dictable, Configurable, ConfigurableFactory,
+    DictionaryConfig, StringConfig
 )
 from . import (
     ActionCliError, ActionCli, ActionCliMethod, OptionMetaData, ActionMetaData,
@@ -62,8 +63,14 @@ class LogConfigurator(object):
     default_level: LogLevel = field(default=None)
     """The level to set the root logger."""
 
-    level: LogLevel = field(default=LogLevel.info)
+    level: LogLevel = field(default=None)
     """The level to set the application logger."""
+
+    default_app_level: LogLevel = field(default=LogLevel.info)
+    """The default log level to set the applicatiohn logger when not given on the
+    command line.
+
+    """
 
     config_file: Path = field(default=None)
     """If provided, configure the log system with this configuration file."""
@@ -125,9 +132,11 @@ class LogConfigurator(object):
         else:
             self._config_basic()
         if self.log_name is not None:
-            level: int = self._to_level('app', self.level)
+            app_level = self.default_app_level \
+                if self.level is None else self.level
+            level: int = self._to_level('app', app_level)
             self._debug(f'setting logger {self.log_name} to {level} ' +
-                        f'({self.level})')
+                        f'({app_level})')
             logging.getLogger(self.log_name).setLevel(level)
         if self.loggers is not None:
             for name, level in self.loggers.items():
@@ -163,8 +172,8 @@ class ConfigurationImporter(ApplicationObserver):
 
     CLI_META = {'first_pass': True,  # not a separate action
                 # the mnemonic must be unique and used to referece the method
-                'mnemonic_overrides': {'add': '_add_config_as_import'},
-                'mnemonic_includes': {'add'},
+                'mnemonic_overrides': {'merge': '_merge_config_as_import'},
+                'mnemonic_includes': {'merge'},
                 # better/shorter  long name, and reserve the short name
                 'option_overrides': {CONFIG_PATH_FIELD: {'long_name': 'config',
                                                          'short_name': 'c'}},
@@ -212,6 +221,14 @@ class ConfigurationImporter(ApplicationObserver):
 
     """
 
+    arguments: Dict[str, Any] = field(default=None)
+    """Additional arguments to pass to the :class:`.ConfigFactory` when created.
+
+    """
+
+    sections: List[str] = field(default=None)
+    """Additional sections to load."""
+
     override: bool = field(default=False)
     """Override/clobber values from the configuration file in the application
     configuration.
@@ -224,7 +241,7 @@ class ConfigurationImporter(ApplicationObserver):
 
     """
 
-    # name of this field must match :obj:`CONFIG_PATH_FIELD`
+    # name of this field must match :obj:`ConfigurationImporter.CONFIG_PATH_FIELD`
     config_path: Path = field(default=None)
     """The path to the configuration file."""
 
@@ -256,7 +273,7 @@ class ConfigurationImporter(ApplicationObserver):
 
     def _application_created(self, app: Application, action: Action):
         """In this call back, set the app and action for using in the invocation
-        :meth:`add`.
+        :meth:`merge`.
 
         """
         if logger.isEnabledFor(logging.DEBUG):
@@ -264,7 +281,7 @@ class ConfigurationImporter(ApplicationObserver):
         self._app = app
         self._action = action
 
-    def _load(self):
+    def _load(self, settings):
         """Once we have the path and the class used to load the configuration, create
         the instance and load it.
 
@@ -273,12 +290,16 @@ class ConfigurationImporter(ApplicationObserver):
 
         """
         # create the command line specified config
-        if self.type is None:
+        if settings.type is None:
             cf = ConfigurableFactory()
-            cl_config = cf.from_path(self.config_path)
+            cl_config = cf.from_path(settings.config_path)
         else:
-            cf = ConfigurableFactory(kwargs={'config_file': self.config_path})
-            cl_config = cf.from_type(self.type)
+            args = {'config_file': settings.config_path}
+            if hasattr(settings, 'arguments') and \
+               settings.arguments is not None:
+                args.update(settings.arguments)
+            cf = ConfigurableFactory(kwargs=args)
+            cl_config = cf.from_type(settings.type)
 
         # First inject our app context (app.conf) to the command line specified
         # configuration (--config) skipping sections that have missing options.
@@ -291,12 +312,24 @@ class ConfigurationImporter(ApplicationObserver):
         cl_config.copy_sections(self.config)
 
         # clobber config values
-        if self.override:
-            cl_config = cf.from_path(self.config_path)
+        if hasattr(settings, 'override') and settings.override:
+            cl_config = cf.from_path(settings.config_path)
             cl_config.copy_sections(self.config)
 
-    def add(self):
-        """Add configuration at path to the current configuration.
+        if hasattr(settings, 'sections') and settings.sections is not None:
+            for sec in settings.sections:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'loading section: {sec}')
+                settings = self.config.populate(section=sec)
+                # allow ImportIniConfig convention; note that replacing
+                # attribute ``config_path`` for ``config_file`` isn't possible
+                # since it conflicts with the ``LogConfigurator``
+                if hasattr(settings, 'config_file'):
+                    settings.config_path = settings.config_file
+                self._load(settings)
+
+    def merge(self):
+        """Merge configuration at path to the current configuration.
 
         :param config_path: the path to the configuration file
 
@@ -316,7 +349,7 @@ class ConfigurationImporter(ApplicationObserver):
                 else:
                     load_config = False
         if load_config:
-            self._load()
+            self._load(self)
             if self.config_path_option_name is not None:
                 self.config.set_option(
                     self.config_path_option_name,
