@@ -160,7 +160,8 @@ class Writable(ABC):
         """
         return isinstance(v, (dict, list, tuple, WRITABLE_CLASS))
 
-    def _write_dict(self, data: dict, depth: int, writer: TextIOBase):
+    def _write_dict(self, data: dict, depth: int, writer: TextIOBase,
+                    inline: bool = False):
         """Write dictionary ``data`` with the correct indentation per ``depth`` to
         ``writer``.
 
@@ -171,7 +172,7 @@ class Writable(ABC):
             keys = sorted(keys)
         for k in keys:
             v = data[k]
-            if self._is_container(v):
+            if not inline and self._is_container(v):
                 writer.write(f'{sp}{k}:\n')
                 self._write_object(v, depth + 1, writer)
             else:
