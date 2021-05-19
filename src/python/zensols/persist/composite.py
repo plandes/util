@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class MissingDataKeys(PersistableError):
-    def __init__(self, keys: set):
+    def __init__(self, keys: Set[str]):
         super().__init__(f'missing data keys: {keys}')
         self.keys = keys
 
@@ -129,7 +129,7 @@ class DirectoryCompositeStash(DirectoryStash):
         context = tuple(data.keys()) if is_ordered else None
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'keys: {data.keys()}, groups: {self.all_keys}')
-        missing_keys = self.all_keys - set(data.keys())
+        missing_keys: Set[str] = self.all_keys - set(data.keys())
         if len(missing_keys) > 0:
             raise MissingDataKeys(missing_keys)
         for k, v in data.items():
