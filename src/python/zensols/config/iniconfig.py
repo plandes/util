@@ -12,7 +12,7 @@ from io import TextIOBase, StringIO
 from pathlib import Path
 from copy import deepcopy
 from configparser import ConfigParser, ExtendedInterpolation
-from . import ConfigurableError, Configurable
+from . import ConfigurableFileNotFoundError, ConfigurableError, Configurable
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,7 @@ class IniConfig(Configurable):
     def _create_and_load_parser_from_file(self, cpath: Path) -> ConfigParser:
         logger.debug(f'loading config {cpath}')
         if not cpath.exists():
-            raise ConfigurableError(f'No such file: {cpath}')
+            raise ConfigurableFileNotFoundError(cpath)
         elif cpath.is_file() or cpath.is_dir():
             writer = StringIO()
             self._read_config_content(cpath, writer)

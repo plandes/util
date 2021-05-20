@@ -9,7 +9,9 @@ from pathlib import Path
 from io import TextIOBase
 import copy
 import yaml
-from zensols.config import ConfigurableError, Configurable, Dictable
+from zensols.config import (
+    ConfigurableError, ConfigurableFileNotFoundError, Configurable, Dictable
+)
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +71,7 @@ class YamlConfig(Configurable, Dictable):
 
         cfile = self.config_file
         if not cfile.is_file():
-            raise ConfigurableError(f'Not a file or does not exist: {cfile}')
+            raise ConfigurableFileNotFoundError(cfile)
         if isinstance(cfile, TextIOBase):
             content = cfile
         else:

@@ -10,7 +10,7 @@ from pathlib import Path
 from io import TextIOBase
 import json
 from zensols.persist import persisted
-from . import ConfigurableError, DictionaryConfig
+from . import ConfigurableError, ConfigurableFileNotFoundError, DictionaryConfig
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +57,8 @@ class JsonConfig(DictionaryConfig):
         if isinstance(self.config_file, TextIOBase):
             conf = json.load(self.config_file)
         else:
+            if not self.config_file.is_file():
+                ConfigurableFileNotFoundError(self.config_file)
             with open(self.config_file) as f:
                 conf = json.load(f)
         conf = self._narrow_root(conf)

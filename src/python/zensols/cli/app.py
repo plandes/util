@@ -19,8 +19,8 @@ from zensols.persist import (
 )
 from zensols.util import PackageResource
 from zensols.config import (
-    Serializer, Dictable, Configurable, ConfigFactory,
-    ImportIniConfig, ImportConfigFactory,
+    ConfigurableFileNotFoundError, Serializer, Dictable,
+    Configurable, ConfigFactory, ImportIniConfig, ImportConfigFactory,
 )
 from . import (
     ActionCliError, DocUtil,
@@ -629,9 +629,15 @@ class ApplicationFactory(PersistableContainer):
         """Handle errors raised during the execution of the application.
 
         :see: :meth:`invoke`
+
         """
-        if isinstance(ex, ActionCliError):
-            self.parser.error(str(ex))
+        if isinstance(ex, ConfigurableFileNotFoundError):
+            # in some cases, the parser can not be created because it needs
+            # configuration that can not be loaded
+            prog = Path(sys.argv[0]).name
+            print(f'{prog}: error: {ex}', file=sys.stderr)
+        elif isinstance(ex, ActionCliError):
+            self.parser.error(ex.message)
         else:
             raise ex
 

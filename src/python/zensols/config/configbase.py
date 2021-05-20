@@ -21,6 +21,16 @@ class ConfigurableError(ConfigurationError):
     pass
 
 
+class ConfigurableFileNotFoundError(ConfigurableError):
+    """Raised when a configuration file is not found for those file based instances
+    of :class:`.Configurable`.
+
+    """
+    def __init__(self, path: Path):
+        super().__init__(f'No such file: {path}')
+        self.path = path
+
+
 class Configurable(Writable, metaclass=ABCMeta):
     """An abstract base class that represents an application specific
     configuration.

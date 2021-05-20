@@ -15,7 +15,8 @@ from configparser import (
     ConfigParser, ExtendedInterpolation, InterpolationMissingOptionError
 )
 from . import (
-    ConfigurableError, Configurable, ConfigurableFactory, IniConfig
+    ConfigurableError, ConfigurableFileNotFoundError,
+    Configurable, ConfigurableFactory, IniConfig
 )
 
 logger = logging.getLogger(__name__)
@@ -319,7 +320,7 @@ class ImportIniConfig(IniConfig):
         logger.debug('get children')
         if isinstance(self.config_file, Path) and \
            not self.config_file.is_file():
-            raise ConfigurableError('Not a file: {self.config_file}')
+            raise ConfigurableFileNotFoundError(self.config_file)
         conf_sec: str = self.config_section
         parser: _StringIniConfig = self._get_bootstrap_parser()
         children: List[Configurable] = parser.children
