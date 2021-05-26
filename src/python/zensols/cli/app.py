@@ -637,7 +637,7 @@ class ApplicationFactory(PersistableContainer):
             prog = Path(sys.argv[0]).name
             print(f'{prog}: error: {ex}', file=sys.stderr)
         elif isinstance(ex, ActionCliError):
-            self.parser.error(ex.message)
+            self.parser.error(str(ex))
         else:
             raise ex
 
