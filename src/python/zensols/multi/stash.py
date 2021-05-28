@@ -324,6 +324,12 @@ class MultiProcessFactoryStash(MultiProcessStash):
         """Initialize with attributes :obj:`chunk_size` and :obj:`workers` both
         defaulting to ``0``.
 
+        :param config: the application configuration meant to be populated by
+                       :class:`zensols.config.factory.ImportClassFactory`
+
+        :param name: the name of the parent stash used to create the chunk, and
+                     subsequently process this chunk
+
         """
         if 'chunk_size' not in kwargs:
             kwargs['chunk_size'] = 0
