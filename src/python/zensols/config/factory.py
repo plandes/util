@@ -139,8 +139,26 @@ class ConfigFactory(object):
 
     """
     NAME_ATTRIBUTE = 'name'
+    """The *name* of the parameter given to ``__init__``.  If a parameter of this
+    name is on the instance being created it will be set from the name of the
+    section.
+
+    """
+
     CONFIG_ATTRIBUTE = 'config'
+    """The *configuration* of the parameter given to ``__init__``.  If a parameter
+    of this name is on the instance being created it will be set as the
+    instance of the configuration given to the initializer of this factory
+    instance.
+
+    """
+
     CONIFG_FACTORY_ATTRIBUTE = 'config_factory'
+    """The *configuration factory* of the parameter given to ``__init__``.  If a
+    parameter of this name is on the instance being created it will be set as
+    the instance of this configuration factory.
+
+    """
 
     def __init__(self, config: Configurable, pattern: str = '{name}',
                  default_name: str = 'default',
@@ -164,7 +182,8 @@ class ConfigFactory(object):
         self.pattern = pattern
         self.default_name = default_name
         if class_resolver is None:
-            self.class_resolver = DictionaryClassResolver(self.INSTANCE_CLASSES)
+            self.class_resolver = DictionaryClassResolver(
+                self.INSTANCE_CLASSES)
         else:
             self.class_resolver = class_resolver
 
@@ -272,6 +291,9 @@ class ConfigFactory(object):
         return inst
 
     def from_config_string(self, v: str) -> Any:
+        """Create an instance from a string used as option values in the configuration.
+
+        """
         try:
             v = eval(v)
         except Exception:
@@ -279,6 +301,10 @@ class ConfigFactory(object):
         return self.instance(v)
 
     def clone(self) -> Any:
+        """Return a copy of this configuration factory that functionally works the
+        same.
+
+        """
         return cp.copy(self)
 
     def __call__(self, *args, **kwargs):
@@ -296,8 +322,14 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
 
     """
     CHILD_REGEXP = re.compile(r'^instance(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
-    # track injections to fail on any attempts to redefine
-    INJECTS = {}
+    """The ``instance`` regular expression used to identify children attributes to
+    set on the object.  The process if creation can chain from parent to
+    children recursively.
+
+    """
+
+    _INJECTS = {}
+    """Track injections to fail on any attempts to redefine."""
 
     def __init__(self, *args, reload: bool = False, shared: bool = True,
                  reload_pattern: Union[re.Pattern, str] = None, **kwargs):
@@ -353,6 +385,11 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             return self._shared.pop(name, None)
 
     def clone(self) -> Any:
+        """Return a copy of this configuration factory that functionally works the
+        same.  However, it does not copy over any resources generated during
+        the life of the factory.
+
+        """
         clone = super().clone()
         clone.clear()
         return clone
@@ -373,6 +410,25 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             if inst is None:
                 inst = super().instance(name, *args, **kwargs)
                 self._shared[name] = inst
+        return inst
+
+    def new_instance(self, name: str = None, *args, **kwargs):
+        """Create a new instance without it being shared.  This only does something
+        different from :meth:`instance` if this is a shared instance factory
+        ith ``shared=True`` given to the initializer.
+
+        :param name: the name of the class (by default) or the key name of the
+                     class used to find the class
+
+        :param args: given to the ``__init__`` method
+
+        :param kwargs: given to the ``__init__`` method
+
+        :see: :meth:`instance`
+
+        """
+        inst = self.instance(name, *args, **kwargs)
+        self.clear_instance(name)
         return inst
 
     def _set_reload(self, reload: bool):
@@ -436,6 +492,10 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         return self._create_instance(section, inst_conf, child_params)
 
     def from_config_string(self, v: str) -> Any:
+        """Create an instance from a string that looks like :obj:`CHILD_REGEXP` used as
+        option values in the configuration.
+
+        """
         m = self.CHILD_REGEXP.match(v)
         if m:
             pconfig, section = m.groups()
@@ -488,7 +548,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         logger.debug(f'import instance: section name: {sec_name}, ' +
                      f'cls={class_name}, args={args}, kwargs={kwargs}')
         pw_injects = self._process_injects(sec_name, kwargs)
-        prev_defined_sec = self.INJECTS.get(class_name)
+        prev_defined_sec = self._INJECTS.get(class_name)
 
         if prev_defined_sec is not None and prev_defined_sec != sec_name:
             # fail when redefining injections, and thus class metadata,
@@ -498,9 +558,9 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                    f'defined in section {prev_defined_sec}')
             raise RedefinedInjectionError(msg)
 
-        if len(pw_injects) > 0 and class_name not in self.INJECTS:
+        if len(pw_injects) > 0 and class_name not in self._INJECTS:
             logger.debug(f'sec assign {sec_name} = {class_name}')
-            self.INJECTS[class_name] = sec_name
+            self._INJECTS[class_name] = sec_name
 
         initial_reload = self.reload
         reload = self.reload
