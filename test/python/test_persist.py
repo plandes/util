@@ -125,6 +125,24 @@ class TransientPickle(PersistableContainer):
         return self.n
 
 
+class Raiser(object):
+    def __getstate__(self):
+        raise ValueError('attempt to pickle transient value')
+
+
+class TransientPickleRaise(PersistableContainer):
+    @property
+    @persisted('_someprop', transient=True)
+    def someprop(self):
+        return Raiser()
+
+
+class TransientPickleRaiseAttr(PersistableContainer):
+    PERSITABLE_TRANSIENT_ATTRIBUTES = {'someattr'}
+    def __init__(self):
+        self.someattr = Raiser()
+
+
 class TransientPickleOverride(TransientPickle):
     def __setstate__(self, state):
         super().__setstate__(state)
@@ -279,6 +297,22 @@ class TestPersistWork(unittest.TestCase):
         # should recalculate from updated value instead of hanging on to old
         sc2.n = 3
         self.assertEqual(13, sc2.someprop)
+
+    def test_pickle_transient_raise(self):
+        sc = TransientPickleRaise()
+        p = sc.someprop
+        self.assertEqual(type(p), Raiser)
+        with self.assertRaises(ValueError):
+            self._freeze_thaw(p)
+        sc2 = self._freeze_thaw(sc)
+        self.assertEqual(type(sc2.someprop), Raiser)
+
+    def test_pickle_transient_raise_attr(self):
+        sc = TransientPickleRaiseAttr()
+        with self.assertRaises(ValueError):
+            self._freeze_thaw(sc.someattr)
+        sc2 = self._freeze_thaw(sc)
+        self.assertEqual(sc2.someattr, None)
 
     def test_pickle_transient_override(self):
         sc = TransientPickleOverride(2)

@@ -137,7 +137,8 @@ class PersistedWork(Deallocatable):
         self.owner = None
 
     def _do_work(self, *argv, **kwargs):
-        t0 = tm.time()
+        if logger.isEnabledFor(logging.INFO):
+            t0 = tm.time()
         obj = self.__do_work__(*argv, **kwargs)
         if logger.isEnabledFor(logging.INFO):
             self._info('created work in {:2f}s, saving to {}'.format(
@@ -410,6 +411,7 @@ class persisted(object):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'wrap: {fn}:{self.attr_name}:{self.path}:' +
                              f'{self.cache_global}')
+            pwork: PersistedWork
             if hasattr(inst, self.attr_name):
                 pwork = getattr(inst, self.attr_name)
             else:
@@ -424,6 +426,9 @@ class persisted(object):
                 setattr(inst, self.attr_name, pwork)
                 if not self.allocation_track:
                     pwork._mark_deallocated()
+            if pwork is None:
+                raise PersistableError(
+                    f'PersistedWork not found: {self.attr_name}')
             pwork.worker = fn
             return pwork(*argv, **kwargs)
 
