@@ -314,8 +314,11 @@ class ConfigurationImporter(ApplicationObserver):
         # clobber config values
         if hasattr(settings, 'override') and settings.override:
             cl_config = cf.from_path(settings.config_path)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'clobbering with {cl_config}')
             cl_config.copy_sections(self.config)
 
+        # recursively source in optional additional sections
         if hasattr(settings, 'sections') and settings.sections is not None:
             for sec in settings.sections:
                 if logger.isEnabledFor(logging.DEBUG):
