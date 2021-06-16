@@ -8,6 +8,7 @@ from zensols.persist import (
     DelegateDefaults,
     DirectoryCompositeStash,
     MissingDataKeys,
+    PersistableError,
 )
 
 
@@ -120,7 +121,7 @@ class TestDirectoryCompStash(unittest.TestCase):
         dat_path = comp_path / 'cat-dog' / '1.dat'
         self.assertTrue(dat_path.is_file())
         dat_path.unlink()
-        self.assertRaises(ValueError, lambda: stash.load('1'))
+        self.assertRaises(PersistableError, lambda: stash.load('1'))
 
     def test_load_comp_skip_load(self):
         path = self.targdir / 'load-comp'
