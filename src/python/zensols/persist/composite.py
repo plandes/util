@@ -103,6 +103,8 @@ class DirectoryCompositeStash(DirectoryStash):
                         f'Duplicate name \'{k}\' in {groups}')
                 stashes[k] = comp_stash
                 self.stash_by_group[name] = comp_stash
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'creating composit hash with groups: {self.groups}')
 
     def clear(self):
         logger.info('DirectoryCompositeStash: clearing')
