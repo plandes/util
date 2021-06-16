@@ -86,12 +86,12 @@ class DirectoryCompositeStash(DirectoryStash):
         self.attribute_name = attribute_name
         comps: Set[str]
         if load_keys is not None and not isinstance(load_keys, set):
-            raise ValueError(
-                f'expecting set but got {load_keys} {type(load_keys)}')
+            raise PersistableError(
+                f'Expecting set but got {load_keys} {type(load_keys)}')
         for group in groups:
             if not isinstance(group, set):
-                raise ValueError(
-                    f'composition not set: {group} ({type(group)})')
+                raise PersistableError(
+                    f'Composition not set: {group} ({type(group)})')
             name = '-'.join(sorted(group))
             path = comp_path / name
             comp_stash = DirectoryStash(path)
@@ -99,8 +99,8 @@ class DirectoryCompositeStash(DirectoryStash):
             comp_stash.group_name = name
             for k in group:
                 if k in stashes:
-                    raise ValueError(
-                        f'duplicate name \'{k}\' in {groups}')
+                    raise PersistableError(
+                        f'Duplicate name \'{k}\' in {groups}')
                 stashes[k] = comp_stash
                 self.stash_by_group[name] = comp_stash
 
@@ -134,8 +134,8 @@ class DirectoryCompositeStash(DirectoryStash):
             raise MissingDataKeys(missing_keys)
         for k, v in data.items():
             if k not in self.stash_by_attribute:
-                raise ValueError(
-                    f'unmapping/grouped attribute: {k} in {self.groups}')
+                raise PersistableError(
+                    f'Unmapping/grouped attribute: {k} in {self.groups}')
             stash = self.stash_by_attribute[k]
             data_group[stash.group_name][k] = v
         data_group = tuple(data_group.items())
@@ -181,8 +181,8 @@ class DirectoryCompositeStash(DirectoryStash):
                 data = stash.load(name)
                 logger.debug(f'loaded: {data}')
                 if data is None:
-                    raise ValueError(
-                        f'missing composite data for id: {name}, ' +
+                    raise PersistableError(
+                        f'Missing composite data for id: {name}, ' +
                         f'stash: {stash.group}, path: {stash.path}, ' +
                         f'attribute: \'{attr_name}\'')
                 if self.load_keys is None:
