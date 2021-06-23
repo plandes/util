@@ -355,7 +355,8 @@ class PersistableContainer(Deallocatable):
 
 
 class persisted(object):
-    """Class level annotation to further simplify usage with :class:`.PersistedWork`.
+    """Class level annotation to further simplify usage with
+    :class:`.PersistedWork`.
 
     :see: :class:`.PersistedWork`
 
@@ -366,6 +367,7 @@ class persisted(object):
             @persisted('_counter', 'tmp.dat')
             def counter(self):
                 return tuple(range(5))
+
     """
     def __init__(self, name: str, path: Path = None,
                  cache_global: bool = False, transient: bool = False,
