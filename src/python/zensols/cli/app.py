@@ -625,6 +625,12 @@ class ApplicationFactory(PersistableContainer):
         actions: Tuple[Action] = self._parse(args)
         return Application(fac, self, actions)
 
+    def _error_to_str(self, ex: Exception) -> str:
+        """Create a command line friendly error message fromt he exception."""
+        s = str(ex)
+        s = s[0].lower() + s[1:]
+        return s
+
     def _handle_error(self, ex: Exception):
         """Handle errors raised during the execution of the application.
 
@@ -635,9 +641,11 @@ class ApplicationFactory(PersistableContainer):
             # in some cases, the parser can not be created because it needs
             # configuration that can not be loaded
             prog = Path(sys.argv[0]).name
-            print(f'{prog}: error: {ex}', file=sys.stderr)
+            msg = self._error_to_str(ex)
+            print(f'{prog}: error: {msg}', file=sys.stderr)
         elif isinstance(ex, ActionCliError):
-            self.parser.error(str(ex))
+            msg = self._error_to_str(ex)
+            self.parser.error(msg)
         else:
             raise ex
 
