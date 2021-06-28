@@ -58,7 +58,7 @@ class JsonConfig(DictionaryConfig):
             conf = json.load(self.config_file)
         else:
             if not self.config_file.is_file():
-                ConfigurableFileNotFoundError(self.config_file)
+                raise ConfigurableFileNotFoundError(self.config_file)
             with open(self.config_file) as f:
                 conf = json.load(f)
         conf = self._narrow_root(conf)

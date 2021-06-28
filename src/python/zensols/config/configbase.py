@@ -224,8 +224,11 @@ class Configurable(Writable, metaclass=ABCMeta):
             try:
                 for k, v in self.get_options(sec).items():
                     to_populate.set_option(k, v, sec)
+            # robust is needed by lib.ConfigurationImporter_load(); but deal
+            # only with interplation errors
+            except ConfigurableError as e:
+                raise e
             except Exception as e:
-                # robust is needed by lib.ConfigurationImporter_load()
                 if not robust:
                     raise e
                 else:
