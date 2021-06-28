@@ -10,7 +10,9 @@ from pathlib import Path
 from io import TextIOBase
 import json
 from zensols.persist import persisted
-from . import ConfigurableError, ConfigurableFileNotFoundError, DictionaryConfig
+from . import (
+    ConfigurableError, ConfigurableFileNotFoundError, DictionaryConfig
+)
 
 logger = logging.getLogger(__name__)
 
