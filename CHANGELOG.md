@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.5.1] - 2021-06-29
 ### Changed
 - Switch to raw `IniConfig` as default in config factory for `ini` extension
   files from the `ImportIniConfig`.  This simplifies when using with an
@@ -15,6 +16,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   cases.  In most cases, it's the `ImportIniConfig` using this setting, which
   ends up doing the string interpolation after everything is imported, thus
   creating less start up configuration read issues.
+- Shelve stash auto closes between client invocations.
+
+### Added
+- Use caught errors in application CLI to generate error messages, including
+  missing configuration files.
+- Allow CLI configuration importer to set the type of importer.
+- Resource de-allocation added to multi-processing stashes.
+- Resource de-allocation added to application CLI.
+- Resource de-alloocation keywords added to `persisted` and `PersistedWork`.
 
 
 ## [1.5.0] - 2021-04-29
@@ -181,7 +191,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.5.1...HEAD
+[1.5.1]: https://github.com/plandes/util/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/plandes/util/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/plandes/util/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/plandes/util/compare/v1.3.3...v1.4.0
