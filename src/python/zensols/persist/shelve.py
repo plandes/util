@@ -23,10 +23,10 @@ class ShelveStash(CloseableStash):
     path: Path = field()
     """A file to be created to store and/or load for the data storage."""
 
-    writeback: bool = field(default=False)
+    writeback: bool = field(default=True)
     """The writeback parameter given to ``shelve``."""
 
-    auto_close: bool = field(default=False)
+    auto_close: bool = field(default=True)
     """If ``True``, close the shelve for each operation."""
 
     def __post_init__(self):
