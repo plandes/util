@@ -89,7 +89,7 @@ class TypeMapper(object):
             except Exception as e:
                 logger.error('could not narrow to enum: {stype}', e)
         if tpe is None:
-            raise ClassError(f'non-supported data type: {stype}')
+            raise ClassError(f'Non-supported data type: {stype}')
         return tpe
 
 
@@ -300,7 +300,7 @@ class ClassInspector(object):
                              f'({type(def_node)})')
             return default
         except Exception as e:
-            raise ClassError(f'could not map {item}: {def_node}: {e}')
+            raise ClassError(f'Could not map {item}: {def_node}: {e}')
 
     def _get_args(self, node: ast.arguments):
         args = []
@@ -323,7 +323,7 @@ class ClassInspector(object):
                     logger.debug(f'mapped {dtype} -> {mtype}, default={default}')
                 arg = ClassMethodArg(name, mtype, None, default, is_positional)
             except Exception as e:
-                raise ClassError(f'could not map argument {name}: {e}')
+                raise ClassError(f'Could not map argument {name}: {e}')
             args.append(arg)
         return args
 
