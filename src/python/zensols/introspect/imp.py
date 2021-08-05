@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Tuple, Type
+from typing import Any, Tuple, Type, Sequence
 import logging
 import importlib
 from functools import reduce
@@ -49,7 +49,7 @@ class ClassImporter(object):
         else:
             return module + '.' + cls.__name__
 
-    def parse_module_class(self) -> Tuple[str, str]:
+    def parse_module_class(self) -> Sequence[str]:
         """Parse the module and class name part of the fully qualifed class name.
         """
 
