@@ -4,7 +4,7 @@ objects and files.
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Any, Union, Type
+from typing import Dict, Any, Union, Type, Optional
 from abc import ABC, abstractmethod
 from enum import Enum
 import types
@@ -68,7 +68,7 @@ class ClassResolver(ABC):
         """
         return ClassImporter.full_classname(cls)
 
-    def find_class(self, class_name: str) -> type:
+    def find_class(self, class_name: str) -> Type:
         """Return a class given the name of the class.
 
         :param class_name: represents the class name, which might or might not
@@ -89,7 +89,7 @@ class DictionaryClassResolver(ClassResolver):
     def __init__(self, instance_classes: Dict[str, type]):
         self.instance_classes = instance_classes
 
-    def find_class(self, class_name):
+    def find_class(self, class_name: str) -> Type:
         classes = {}
         classes.update(globals())
         classes.update(self.instance_classes)
@@ -127,10 +127,10 @@ class ImportClassResolver(ClassResolver):
     def __init__(self, reload: bool = False):
         self.reload = reload
 
-    def create_class_importer(self, class_name):
+    def create_class_importer(self, class_name: str):
         return FactoryClassImporter(class_name, reload=self.reload)
 
-    def find_class(self, class_name):
+    def find_class(self, class_name: str):
         class_importer = self.create_class_importer(class_name)
         return class_importer.get_module_class()[1]
 
@@ -232,7 +232,7 @@ class ConfigFactory(object):
             del params['class_name']
         return class_name, params
 
-    def _has_init_parameter(self, cls, param_name):
+    def _has_init_parameter(self, cls: Type, param_name: str):
         args = inspect.signature(cls.__init__)
         return param_name in args.parameters
 
@@ -264,7 +264,7 @@ class ConfigFactory(object):
             logger.debug(f'inst: {inst.__class__}')
         return inst
 
-    def instance(self, name: str = None, *args, **kwargs):
+    def instance(self, name: Optional[str] = None, *args, **kwargs):
         """Create a new instance using key ``name``.
 
         :param name: the name of the class (by default) or the key name of the
