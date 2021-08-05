@@ -242,7 +242,7 @@ class dealloc(object):
         self.org_track = Deallocatable.ALLOCATION_TRACKING
         if track:
             Deallocatable.ALLOCATION_TRACKING = True
-        if callable(inst):
+        if callable(inst) and not isinstance(inst, Deallocatable):
             inst = inst()
         self.inst = inst
 
