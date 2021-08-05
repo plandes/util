@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import List, Tuple, Dict, Any, Type
+from typing import List, Tuple, Dict, Any, Type, Optional
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -30,6 +30,9 @@ def _create_data_types():
     return types
 
 
+DEFAULT_DATA_TYPES = _create_data_types()
+
+
 @dataclass
 class TypeMapper(object):
     """A utility class to map string types parsed from :class:`.ClassInspector`
@@ -39,13 +42,14 @@ class TypeMapper(object):
     DEFAULT_DATA_TYPES = _create_data_types()
     """Supported data types mapped from data class fields."""
 
-    cls: type = field()
+    cls: Type = field()
     """The class to map."""
 
-    data_types: Dict[str, type] = field(default=None)
+    data_types: Dict[str, Type] = field(
+        default_factory=lambda: DEFAULT_DATA_TYPES)
     """Data type mapping for this instance."""
 
-    default_type: type = field(default=str)
+    default_type: Type = field(default=str)
     """Default type for when no type is given."""
 
     allow_enum: bool = field(default=True)
@@ -55,11 +59,7 @@ class TypeMapper(object):
 
     """
 
-    def __post_init__(self):
-        if self.data_types is None:
-            self.data_types = self.DEFAULT_DATA_TYPES
-
-    def _try_enum(self, stype: str) -> type:
+    def _try_enum(self, stype: str) -> Type:
         """Try to resolve ``stype`` as an :class:`.Enum' class.
 
         """
@@ -78,7 +78,8 @@ class TypeMapper(object):
                 logger.debug(f'mapping {cls} from {stype}')
         return cls
 
-    def map_type(self, stype: str = None) -> type:
+    def map_type(self, stype: str) -> Type:
+        tpe: Optional[Type]
         if stype is None:
             tpe = self.default_type
         else:
@@ -119,7 +120,7 @@ class ClassDoc(object):
     def _parse_params(self, text: str) -> Dict[str, str]:
         doc_lines = []
         params: Dict[str, List[str]] = {}
-        last_param = None
+        last_param: List[str] = None
         param_sec = False
         for line in text.split('\n'):
             line = line.strip()
