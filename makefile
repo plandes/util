@@ -14,3 +14,7 @@ include ./zenbuild/main.mk
 cleanexample:
 			find example -type d -name __pycache__ \
 			  -prune -exec rm -r {} \;
+
+.PHONY:			check
+check:
+			mypy src/python/zensols/introspect/imp.py
