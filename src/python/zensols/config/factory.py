@@ -4,8 +4,8 @@ objects and files.
 """
 __author__ = 'Paul Landes'
 
+from typing import Dict, Any, Union, Type
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Union
 from enum import Enum
 import types
 import logging
@@ -93,12 +93,14 @@ class DictionaryClassResolver(ClassResolver):
         classes = {}
         classes.update(globals())
         classes.update(self.instance_classes)
-        logger.debug(f'looking up class: {class_name}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'looking up class: {class_name}')
         if class_name not in classes:
             raise FactoryError(
                 f'class {class_name} is not registered in factory {self}')
         cls = classes[class_name]
-        logger.debug(f'found class: {cls}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'found class: {cls}')
         return cls
 
 
@@ -188,29 +190,32 @@ class ConfigFactory(object):
             self.class_resolver = class_resolver
 
     @classmethod
-    def register(cls, instance_class, name=None):
+    def register(cls, instance_class: Type, name: str = None):
         """Register a class with the factory.  This method assumes the factory instance
-        was created with a (default) ``DictionaryClassResolver``.
+        was created with a (default) :class:`.DictionaryClassResolver`.
 
         :param instance_class: the class to register with the factory (not a
                                string)
+
         :param name: the name to use as the key for instance class lookups;
                      defaults to the name of the class
 
         """
         if name is None:
             name = instance_class.__name__
-        logger.debug(f'registering: {instance_class} for {cls} -> {name}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'registering: {instance_class} for {cls} -> {name}')
         cls.INSTANCE_CLASSES[name] = instance_class
 
-    def _find_class(self, class_name):
-        "Resolve the class from the name."
+    def _find_class(self, class_name: str) -> Type:
+        """Resolve the class from the name."""
         return self.class_resolver.find_class(class_name)
 
-    def _class_name_params(self, name):
-        "Get the class name and parameters to use for ``__init__``."
+    def _class_name_params(self, name: str):
+        """Get the class name and parameters to use for ``__init__``."""
         sec = self.pattern.format(**{'name': name})
-        logger.debug(f'section: {sec}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'section: {sec}')
         params = {}
         try:
             params.update(self.config.populate({}, section=sec))
@@ -231,8 +236,10 @@ class ConfigFactory(object):
         args = inspect.signature(cls.__init__)
         return param_name in args.parameters
 
-    def _instance(self, cls_desc, cls, *args, **kwargs):
+    def _instance(self, cls_desc: str, cls: Type, *args, **kwargs):
         """Return the instance.
+
+        :param cls_desc: a description of the class (i.e. section name)
 
         :param cls: the class to create the instance from
 
@@ -241,9 +248,11 @@ class ConfigFactory(object):
         :param kwargs: given to the ``__init__`` method
 
         """
-        logger.debug(f'args: {args}, kwargs: {kwargs}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'args: {args}, kwargs: {kwargs}')
         try:
-            logger.debug(f'config factory creating instance of {cls}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'config factory creating instance of {cls}')
             inst = cls(*args, **kwargs)
             if isinstance(inst, FactoryStateObserver):
                 inst._notify_state(FactoryState.CREATED)
@@ -259,17 +268,20 @@ class ConfigFactory(object):
         """Create a new instance using key ``name``.
 
         :param name: the name of the class (by default) or the key name of the
-                     class used to find the class
+                     class used to find the class; this is the section name for
+                     the :class:`.ImportConfigFactory`
 
         :param args: given to the ``__init__`` method
 
         :param kwargs: given to the ``__init__`` method
 
         """
-        logger.debug(f'new instance of {name}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'new instance of {name}')
         t0 = time()
         name = self.default_name if name is None else name
-        logger.debug(f'creating instance of {name}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'creating instance of {name}')
         class_name, params = self._class_name_params(name)
         cls = self._find_class(class_name)
         params.update(kwargs)
@@ -282,12 +294,13 @@ class ConfigFactory(object):
         if self._has_init_parameter(cls, self.CONIFG_FACTORY_ATTRIBUTE):
             logger.debug('found config factory parameter')
             params['config_factory'] = self
-        if logger.level >= logging.DEBUG:
+        if logger.isEnabledFor(logging.DEBUG):
             for k, v in params.items():
                 logger.debug(f'populating {k} -> {v} ({type(v)})')
         inst = self._instance(name, cls, *args, **params)
-        logger.debug(f'created {name} instance of {cls.__name__} ' +
-                     f'in {(time() - t0):.2f}s')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'created {name} instance of {cls.__name__} ' +
+                         f'in {(time() - t0):.2f}s')
         return inst
 
     def from_config_string(self, v: str) -> Any:
@@ -347,7 +360,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                                regarless of the setting ``reload``
 
         """
-        logger.debug(f'creating import config factory with reload: {reload}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'creating import config factory, reload: {reload}')
         super().__init__(*args, **kwargs, class_resolver=ImportClassResolver())
         self._set_reload(reload)
         if shared:
@@ -545,8 +559,9 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         sec_name = cls_desc
         reset_props = False
         class_name = ClassResolver.full_classname(cls)
-        logger.debug(f'import instance: section name: {sec_name}, ' +
-                     f'cls={class_name}, args={args}, kwargs={kwargs}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'import instance: section name: {sec_name}, ' +
+                         f'cls={class_name}, args={args}, kwargs={kwargs}')
         pw_injects = self._process_injects(sec_name, kwargs)
         prev_defined_sec = self._INJECTS.get(class_name)
 
@@ -559,7 +574,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             raise RedefinedInjectionError(msg)
 
         if len(pw_injects) > 0 and class_name not in self._INJECTS:
-            logger.debug(f'sec assign {sec_name} = {class_name}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'sec assign {sec_name} = {class_name}')
             self._INJECTS[class_name] = sec_name
 
         initial_reload = self.reload
@@ -586,15 +602,19 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
 
         cls = inst.__class__
 
-        logger.debug(f'adding injects: {len(pw_injects)}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'adding injects: {len(pw_injects)}')
         for pw_name, prop_name, inject in pw_injects:
-            logger.debug(f'inject: {pw_name}, {prop_name}, {inject}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'inject: {pw_name}, {prop_name}, {inject}')
             init_val = inject.pop('initial_value')
             pw = PersistedWork(owner=inst, **inject)
-            logger.debug(f'set: {pw.is_set()}: {pw}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'set: {pw.is_set()}: {pw}')
             if not pw.is_set():
                 pw.set(init_val)
-            logger.debug(f'setting member {pw_name}={pw} on {cls}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'setting member {pw_name}={pw} on {cls}')
             setattr(inst, pw_name, pw)
             if reset_props or not hasattr(cls, prop_name):
                 logger.debug(f'setting property {prop_name}={pw_name}')
@@ -602,7 +622,9 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 setter = eval(f"lambda s, v: hasattr(s, '{pw_name}') " +
                               f"and getattr(s, '{pw_name}').set(v)")
                 prop = property(getter, setter)
-                logger.debug(f'set property: {prop}')
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'set property: {prop}')
                 setattr(cls, prop_name, prop)
-        logger.debug(f'create instance {cls}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'create instance {cls}')
         return inst
