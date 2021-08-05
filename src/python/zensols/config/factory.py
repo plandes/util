@@ -303,6 +303,21 @@ class ConfigFactory(object):
                          f'in {(time() - t0):.2f}s')
         return inst
 
+    def get_class(self, name: str) -> Type:
+        """Return a class by name.
+
+        :param name: the name of the class (by default) or the key name of the
+                     class used to find the class; this is the section name for
+                     the :class:`.ImportConfigFactory`
+        """
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'new instance of {name}')
+        name = self.default_name if name is None else name
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'creating instance of {name}')
+        class_name, params = self._class_name_params(name)
+        return self._find_class(class_name)
+
     def from_config_string(self, v: str) -> Any:
         """Create an instance from a string used as option values in the configuration.
 
@@ -344,8 +359,10 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
     _INJECTS = {}
     """Track injections to fail on any attempts to redefine."""
 
-    def __init__(self, *args, reload: bool = False, shared: bool = True,
-                 reload_pattern: Union[re.Pattern, str] = None, **kwargs):
+    def __init__(self, *args, reload: Optional[bool] = False,
+                 shared: Optional[bool] = True,
+                 reload_pattern: Optional[Union[re.Pattern, str]] = None,
+                 **kwargs):
         """Initialize the configuration factory.
 
         :param reload: whether or not to reload the module when resolving the
