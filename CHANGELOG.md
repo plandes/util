@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.5.2] - 2021-08-07
+### Added
+- Class resolution in config factories.
+
+### Changed
+- Better de-allocation handling in de-allocation monitor.
+- Shelve stash defaults to write back and auto close on, which is the expected
+  and conforming behavior to most other stashes.
+
+
 ## [1.5.1] - 2021-06-29
 ### Changed
 - Switch to raw `IniConfig` as default in config factory for `ini` extension
@@ -191,7 +201,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.5.1...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.5.2...HEAD
+[1.5.2]: https://github.com/plandes/util/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/plandes/util/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/plandes/util/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/plandes/util/compare/v1.4.0...v1.4.1
