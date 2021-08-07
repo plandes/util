@@ -32,7 +32,8 @@ jobs:
 
       - name: Prepare tests
         run: 'make info deps'
-        env: NO_TEST_MULTI_PROC_PIDS=1
+        env:
+          NO_TEST_MULTI_PROC_PIDS: 1
 
       - name: Run tests
         run: 'make test'
