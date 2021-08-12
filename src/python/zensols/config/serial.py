@@ -247,7 +247,8 @@ class Serializer(object):
             v = 'json: ' + self._json_dump(obj)
         return v
 
-    def resource_filename(self, resource_name: str, module_name: str = None):
+    def resource_filename(self, resource_name: str, module_name: str = None) \
+            -> Path:
         """Return a resource based on a file name.  This uses the ``pkg_resources``
         package first to find the resources.  If the resource module does not
         exist, it defaults to the relateve file given in ``module_name``. If it
