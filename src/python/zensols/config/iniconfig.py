@@ -150,9 +150,8 @@ class IniConfig(Configurable):
         """All sections of the INI file.
 
         """
-        secs = self.parser.sections()
-        if secs:
-            return set(secs)
+        secs = self.parser.sections() or ()
+        return set(secs)
 
     def _format_option(self, name: str, value: str, section: str) -> str:
         try:
