@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- `DelegateStash` and `PreemptiveStash` now only calls the delegate `clear()`
+  method when their `clear()` method.  This is a pretty big change since
+  before, the delegate would call the super method to delete all data by key.
+  This would chain from the `PreemptiveStash` to calculate where there is any
+  data at all.  Now, the delegate is trusted to simply clear all data from the
+  stash.
+
 
 ## [1.5.2] - 2021-08-07
 ### Added
