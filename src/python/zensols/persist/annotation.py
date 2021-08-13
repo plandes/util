@@ -100,7 +100,7 @@ class PersistedWork(Deallocatable):
         """
         vname = self.varname
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'global clearning {vname}')
+            logger.debug(f'global clearing {vname}')
         if vname in globals():
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug('removing global instance var: {}'.format(vname))
