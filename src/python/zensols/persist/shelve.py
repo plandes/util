@@ -38,7 +38,8 @@ class ShelveStash(CloseableStash):
         """Return an opened shelve object.
 
         """
-        logger.debug('creating shelve data')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('creating shelve data')
         self.path.parent.mkdir(parents=True, exist_ok=True)
         fname = str(self.path.absolute())
         inst = sh.open(fname, writeback=self.writeback)
@@ -74,11 +75,13 @@ class ShelveStash(CloseableStash):
 
     def delete(self, name: str = None):
         "Delete the shelve data file."
-        logger.debug('clearing shelve data')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'deleting: {name}')
         self.close()
         for path in (Path(self.path.parent, self.path.name),
                      Path(self.path.parent, self.path.name + '.db')):
-            logger.debug(f'clearing {path} if exists: {path.exists()}')
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'clearing {path} if exists: {path.exists()}')
             if path.exists():
                 path.unlink()
                 break
@@ -94,6 +97,8 @@ class ShelveStash(CloseableStash):
                 self.is_open = False
 
     def clear(self):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('clearing shelve data')
         if self.path.exists():
             self.path.unlink()
 
