@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- A simple download with scroll bar utility class (`zensols.util.Downloader`).
+
 ### Changed
 - `DelegateStash` and `PreemptiveStash` now only calls the delegate `clear()`
   method when their `clear()` method.  This is a pretty big change since

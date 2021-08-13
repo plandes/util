@@ -15,5 +15,6 @@ class APIError(Exception):
 from .std import *
 from .time import *
 from .log import *
+from .download import *
 from .executor import *
 from .pkgres import *
