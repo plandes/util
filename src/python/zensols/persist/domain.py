@@ -393,6 +393,8 @@ class PreemptiveStash(DelegateStash):
         if self._calculate_has_data():
             logger.debug('PreemptiveStash: has data')
             super().clear()
+        else:
+            logger.debug('PreemptiveStash: has no data')
         self._reset_has_data()
 
 
