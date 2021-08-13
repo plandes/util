@@ -217,6 +217,11 @@ class ReadOnlyStash(Stash):
             raise PersistableError(
                 'Delete not implemented for read only stashes')
 
+    def clear(self):
+        if self.strict:
+            raise PersistableError(
+                'Clear not implemented for read only stashes')
+
 
 @dataclass
 class CloseableStash(Stash):
@@ -260,7 +265,8 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
     :see: :py:obj:`delegate_attr`
 
     """
-    delegate: Stash
+    delegate: Stash = field()
+    """The stash to delegate method invocations."""
 
     def __post_init__(self):
         if self.delegate is None:
@@ -317,9 +323,6 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
         return ()
 
     def clear(self):
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'delegate clear in {self.__class__}')
-        super().clear()
         if self.delegate is not None:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(
@@ -389,12 +392,9 @@ class PreemptiveStash(DelegateStash):
         self._has_data = has_data
 
     def clear(self):
-        logger.debug('PreemptiveStash: clearing')
-        if self._calculate_has_data():
-            logger.debug('PreemptiveStash: has data')
-            super().clear()
-        else:
-            logger.debug('PreemptiveStash: has no data')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('PreemptiveStash: not clearing--has no data')
+        super().clear()
         self._reset_has_data()
 
 
