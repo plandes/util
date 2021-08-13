@@ -69,6 +69,11 @@ class OneShotFactoryStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         self.prime()
         return super().keys()
 
+    def clear(self):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('OneShotFactoryStash: clear')
+        super().clear()
+
 
 @dataclass
 class SortedStash(DelegateStash):
