@@ -12,6 +12,7 @@ import parse
 import pickle
 from pathlib import Path
 import zensols.util.time as time
+from zensols.util import APIError
 from . import (
     PersistableError,
     Stash,
@@ -35,16 +36,37 @@ class OneShotFactoryStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
     class extended and ``worker`` be a property.
 
     """
+    def _get_worker_type(self) -> str:
+        """Return the type of worker.  This default implementation returns *unknown*.
+        If not implemented, when :meth:`_process_work` is called, the API has
+        use :func:`callable` to determine if the worker is a method or
+        property.  Doing so accessing the property invoking potentially
+        unecessary work.
+
+        :return: ``u`` for unknown, ``m`` for method (callable), or ``a`` for
+                 attribute or a property
+
+        """
+        return 'u'
+
     def _process_work(self):
         """Invoke the worker to generate the data and dump it to the delegate.
 
         """
+        wt = self._get_worker_type()
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'processing with {type(self.worker)}')
-        if callable(self.worker):
+            logger.debug(f'processing with {type(self.worker)}: type={wt}')
+        if wt == 'u':
+            if callable(self.worker):
+                wt = 'm'
+            else:
+                wt = 'a'
+        if wt == 'm':
             itr = self.worker()
-        else:
+        elif wt == 'a':
             itr = self.worker
+        else:
+            raise APIError(f'Unknown worker type: {wt}')
         for id, obj in itr:
             self.delegate.dump(id, obj)
 
