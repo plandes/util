@@ -7,8 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [1.5.3] - 2021-08-16
 ### Added
 - A simple download with scroll bar utility class (`zensols.util.Downloader`).
+- Additional logging.
+- Speed `OneShotFactoryStash` by declaring worker type.
 
 ### Changed
 - `DelegateStash` and `PreemptiveStash` now only calls the delegate `clear()`
@@ -17,6 +21,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   This would chain from the `PreemptiveStash` to calculate where there is any
   data at all.  Now, the delegate is trusted to simply clear all data from the
   stash.
+- Fixed empty INI error, and instead, return empty section set for empty INI
+  files.
 
 
 ## [1.5.2] - 2021-08-07
@@ -212,7 +218,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.5.2...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.5.3...HEAD
+[1.5.3]: https://github.com/plandes/util/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/plandes/util/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/plandes/util/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/plandes/util/compare/v1.4.1...v1.5.0
