@@ -76,3 +76,6 @@ class DictionaryConfig(Configurable):
         else:
             dct = self._dict_config[section]
         dct[name] = value
+
+    def remove_section(self, section: str):
+        self._get_config().pop(section)
