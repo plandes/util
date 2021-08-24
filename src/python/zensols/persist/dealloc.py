@@ -37,7 +37,7 @@ class Deallocatable(ABC):
 
     """
 
-    ALLOCATIONS = {}
+    _ALLOCATIONS = {}
     """The data structure that retains all allocated instances.
 
     """
@@ -53,7 +53,7 @@ class Deallocatable(ABC):
             traceback.print_stack(file=sio)
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'adding allocated key: {k} -> {type(self)}')
-            self.ALLOCATIONS[k] = (self, sio.getvalue())
+            self._ALLOCATIONS[k] = (self, sio.getvalue())
 
     def deallocate(self):
         """Deallocate all resources for this instance.
@@ -66,6 +66,11 @@ class Deallocatable(ABC):
             logger.debug(f'deallocating {k}: {self._deallocate_str()}')
         self._mark_deallocated(k)
 
+    @classmethod
+    def _num_deallocations(cls) -> int:
+        """Return the number of objects currently allocated."""
+        return len(cls._ALLOCATIONS)
+
     def _mark_deallocated(self, obj: Any = None):
         """Mark ``obj`` as deallocated regardless if it is, or ever will be
         deallocated.  After this is called, it will not be reported in such
@@ -77,10 +82,10 @@ class Deallocatable(ABC):
         else:
             k = obj
         if self.ALLOCATION_TRACKING:
-            if k in self.ALLOCATIONS:
+            if k in self._ALLOCATIONS:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'removing allocated key: {k}')
-                del self.ALLOCATIONS[k]
+                del self._ALLOCATIONS[k]
             else:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'no key to deallocate: {k} ' +
@@ -159,7 +164,7 @@ class Deallocatable(ABC):
                      unallocated references found
 
         """
-        allocs = cls.ALLOCATIONS
+        allocs = cls._ALLOCATIONS
         if len(allocs) > 0:
             print(f'total allocations: {len(allocs)}')
         if only_counts:
@@ -185,7 +190,7 @@ class Deallocatable(ABC):
         structure.
 
         """
-        allocs = cls.ALLOCATIONS
+        allocs = cls._ALLOCATIONS
         to_dealloc = tuple(allocs.values())
         allocs.clear()
         for obj, trace in to_dealloc:
@@ -196,7 +201,7 @@ class Deallocatable(ABC):
 
     @classmethod
     def assert_dealloc(cls):
-        cnt = len(cls.ALLOCATIONS)
+        cnt = len(cls._ALLOCATIONS)
         if cnt > 0:
             raise APIError(f'resource leak with {cnt} intances')
 
