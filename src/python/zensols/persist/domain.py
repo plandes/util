@@ -87,7 +87,7 @@ class Stash(ABC):
     def exists(self, name: str) -> bool:
         """Return ``True`` if data with key ``name`` exists.
 
-        *Implementation note*: This :meth:`.Stash.exist` method is very
+        **Implementation note**: This :meth:`.Stash.exist` method is very
         inefficient and should be overriden.
 
         """
@@ -112,7 +112,7 @@ class Stash(ABC):
     def clear(self):
         """Delete all data from the from the stash.
 
-        *Important*: Exercise caution with this method, of course.
+        **Important**: Exercise caution with this method, of course.
 
         """
         if logger.isEnabledFor(logging.DEBUG):
