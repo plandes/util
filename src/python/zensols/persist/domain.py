@@ -72,6 +72,9 @@ class Stash(ABC):
     def get(self, name: str, default=None) -> Any:
         """Load an object or a default if key ``name`` doesn't exist.
 
+        **Implementation Note**: This default :meth:`.Stash.get` implementation
+        invokes :meth:`dump` after :meth:`load` if the item does not exist.
+
         """
         exists = self.exists(name)
         item = self.load(name)
