@@ -168,7 +168,7 @@ class Stash(ABC):
 @dataclass
 class ReadOnlyStash(Stash):
     """An abstract base class for subclasses that do not support write methods
-    (i.e. :meth:`load`).  This class is useful to extend for factory type
+    (i.e. :meth:`dump`).  This class is useful to extend for factory type
     classes that generate data.  Paired with container classes such as
     :class:`.DictionaryStash` provide persistence in a reusable way.
 
@@ -423,7 +423,8 @@ class PrimeableStash(Stash, Primeable):
 
 @dataclass
 class FactoryStash(PreemptiveStash):
-    """A stash that defers to creation of new items to another ``factory`` stash.
+    """A stash that defers to creation of new items to another :obj:`factory`
+    stash.
 
     """
     ATTR_EXP_META = ('enable_preemptive',)
