@@ -41,7 +41,7 @@ class CommandAction(Dictable):
     """The output of the :class:`.CommandLineParser` for each parsed action.
 
     """
-    WRITABLE__DESCENDANTS = True
+    _DICTABLE_WRITABLE_DESCENDANTS = True
 
     meta_data: ActionMetaData = field()
     """The action parsed from the command line."""
@@ -70,7 +70,7 @@ class CommandActionSet(Deallocatable, Dictable):
     types of actions.
 
     """
-    WRITABLE__DESCENDANTS = True
+    _DICTABLE_WRITABLE_DESCENDANTS = True
 
     actions: Tuple[CommandAction] = field()
     """The actions parsed.  The first N actions are first pass where as the last is

@@ -235,7 +235,7 @@ class ActionMetaData(PersistableContainer, Dictable):
     method on a class to invoke.
 
     """
-    WRITABLE__DESCENDANTS = True
+    _DICTABLE_WRITABLE_DESCENDANTS = True
 
     name: str = field(default=None)
     """The name of the action, which is also the mnemonic used on the command line.

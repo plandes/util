@@ -46,7 +46,7 @@ class Action(Deallocatable, Dictable):
     class's properties.
 
     """
-    WRITABLE__DESCENDANTS = True
+    _DICTABLE_WRITABLE_DESCENDANTS = True
 
     command_action: CommandAction = field()
     """The result of the command line parsing of the action.  It contains the data
@@ -244,7 +244,7 @@ class Application(Dictable):
     :obj:`second_pas_action`).
 
     """
-    WRITABLE__DESCENDANTS = True
+    _DICTABLE_WRITABLE_DESCENDANTS = True
 
     config_factory: ConfigFactory = field(repr=False)
     """The factory used to create the application and its components."""
