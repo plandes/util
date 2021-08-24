@@ -217,6 +217,8 @@ class DirectoryStash(Stash):
                 f'Expecting pathlib.Path but got: {self.path.__class__}')
 
     def assert_path_dir(self):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'path {self.path}: {self.path.exists()}')
         self.path.mkdir(parents=True, exist_ok=True)
 
     def key_to_path(self, name: str) -> Path:
@@ -224,8 +226,6 @@ class DirectoryStash(Stash):
 
         """
         fname = self.pattern.format(**{'name': name})
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'path {self.path}: {self.path.exists()}')
         self.assert_path_dir()
         return Path(self.path, fname)
 
