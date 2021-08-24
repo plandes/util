@@ -133,7 +133,7 @@ class Dictable(Writable):
     def _format(self, obj: Any) -> str:
         v = None
         if obj is not None:
-            if isinstance(obj, DICTABLE_CLASS):
+            if isinstance(obj, _DICTABLE_CLASS):
                 v = obj._format_dictable(obj)
             else:
                 v = self._format_dictable(obj)
@@ -151,7 +151,7 @@ class Dictable(Writable):
             if inspect.isclass(obj):
                 # dataclasses.is_dataclass return True for class objects
                 ret = ClassImporter.full_classname(obj)
-            elif isinstance(obj, DICTABLE_CLASS):
+            elif isinstance(obj, _DICTABLE_CLASS):
                 ret = obj._from_dictable(recurse, readable)
             elif dataclasses.is_dataclass(obj):
                 ret = self._from_dataclass(obj, recurse, readable)
@@ -265,4 +265,4 @@ class Dictable(Writable):
         return self._get_description(True)
 
 
-DICTABLE_CLASS = Dictable
+_DICTABLE_CLASS = Dictable

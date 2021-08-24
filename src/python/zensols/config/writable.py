@@ -127,7 +127,7 @@ class Writable(ABC):
             self._write_dict(obj, depth, writer)
         elif isinstance(obj, (list, tuple, set)):
             self._write_iterable(obj, depth, writer)
-        elif isinstance(obj, WRITABLE_CLASS):
+        elif isinstance(obj, _WRITABLE_CLASS):
             obj.write(depth, writer)
         else:
             self._write_line(str(obj), depth, writer)
@@ -158,7 +158,7 @@ class Writable(ABC):
         ``tuple`` or a this class.
 
         """
-        return isinstance(v, (dict, list, tuple, WRITABLE_CLASS))
+        return isinstance(v, (dict, list, tuple, _WRITABLE_CLASS))
 
     def _write_dict(self, data: dict, depth: int, writer: TextIOBase,
                     inline: bool = False):
@@ -212,4 +212,4 @@ class Writable(ABC):
             logger.log(level, line)
 
 
-WRITABLE_CLASS = Writable
+_WRITABLE_CLASS = Writable
