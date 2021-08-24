@@ -307,14 +307,14 @@ class PersistableContainer(Deallocatable):
     attributes of the class, which might be another reason to use it even if
     there isn't a persistence use case.
 
-    If the class level attribute ``PERSITABLE_TRANSIENT_ATTRIBUTES`` is set,
+    If the class level attribute ``_PERSITABLE_TRANSIENT_ATTRIBUTES`` is set,
     all attributes name given in this set will be set to ``None`` when pickled.
 
     """
     def __getstate__(self):
         state = copy(self.__dict__)
         removes = set()
-        tran_attribute_name = 'PERSITABLE_TRANSIENT_ATTRIBUTES'
+        tran_attribute_name = '_PERSITABLE_TRANSIENT_ATTRIBUTES'
         if hasattr(self, tran_attribute_name):
             tran_attribs = getattr(self, tran_attribute_name)
             if logger.isEnabledFor(logging.DEBUG):

@@ -138,7 +138,8 @@ class TransientPickleRaise(PersistableContainer):
 
 
 class TransientPickleRaiseAttr(PersistableContainer):
-    PERSITABLE_TRANSIENT_ATTRIBUTES = {'someattr'}
+    _PERSITABLE_TRANSIENT_ATTRIBUTES = {'someattr'}
+
     def __init__(self):
         self.someattr = Raiser()
 
