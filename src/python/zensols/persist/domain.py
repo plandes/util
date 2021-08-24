@@ -84,8 +84,8 @@ class Stash(ABC):
     def exists(self, name: str) -> bool:
         """Return ``True`` if data with key ``name`` exists.
 
-        *Implementation note*: This (in ``Stash``) method is very inefficient
-         and should be overriden.
+        *Implementation note*: This :meth:`.Stash.exist` method is very
+        inefficient and should be overriden.
 
         """
         for k in self.keys():
