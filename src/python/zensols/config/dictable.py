@@ -230,13 +230,12 @@ class Dictable(Writable):
             else:
                 self._write_key_value(readable_name, v, depth, writer)
 
-    def _write_asdict(self, depth: int = 0, writer: TextIOBase = sys.stdout):
-        """Write this instance by first creating a ``dict`` recursively using
-        :meth:`asdict`, then formatting the output.
-
-        """
-        self._write_dict(self.asdict(recurse=True, readable=True),
-                         depth, writer)
+    def _writable_dict(self) -> Dict[str, Any]:
+        dct = self._from_dictable(True, True)
+        if hasattr(self, '_DICTABLE_WRITE_EXCLUDES'):
+            for attr in getattr(self, '_DICTABLE_WRITE_EXCLUDES'):
+                del dct[attr]
+        return dct
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         """Write this instance as either a :class:`Writable` or as a :class:`Dictable`.
@@ -255,7 +254,7 @@ class Dictable(Writable):
         if hasattr(self, name) and (getattr(self, name) is True):
             self._write_descendants(depth, writer)
         else:
-            self._write_asdict(depth, writer)
+            self._write_dict(self._writable_dict(), depth, writer)
 
     def _write_key_value(self, k: Any, v: Any, depth: int, writer: TextIOBase):
         sp = self._sp(depth)
