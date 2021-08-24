@@ -5,11 +5,12 @@ primitives handy for creating JSON.
 __author__ = 'Paul Landes'
 
 from typing import Dict, Any, Iterable, Union, Tuple
-import dataclasses
 from dataclasses import dataclass, fields, asdict
-from collections import OrderedDict
+import dataclasses
 import sys
 import logging
+from collections import OrderedDict
+from itertools import chain
 import inspect
 import json
 from io import TextIOBase
@@ -27,6 +28,10 @@ class Dictable(Writable):
     To override the default behavior of creating a dict from a
     :class:`dataclass`, override the :meth:`_from_dictable` method.
 
+    In addition to the fields from the dataclass, if the attribute
+    ``_DICTABLE_ATTRIBUTES`` is set, those are added as well (see
+    :meth:`_get_dictable_attributes`).
+
     See :meth:`write` for how a dictable writes itself as a sublcass of
     :class:`.Writable`.
 
@@ -36,6 +41,8 @@ class Dictable(Writable):
     .. automethod:: _write_descendants
     .. automethod:: _write_asdict
 
+    :see: :meth:`write`
+
     """
     def _get_dictable_attributes(self) -> Iterable[Tuple[str, str]]:
         """Return human readable and attribute names.
@@ -43,10 +50,16 @@ class Dictable(Writable):
         :return: tuples of (<human readable name>, <attribute name>)
 
         """
-        return map(lambda f: (f.name, f.name),
-                   filter(lambda f: f.repr, fields(self)))
+        attrs = map(lambda f: (f.name, f.name),
+                    filter(lambda f: f.repr, fields(self)))
+        if hasattr(self, '_DICTABLE_ATTRIBUTES'):
+            add_attrs = getattr(self, '_DICTABLE_ATTRIBUTES')
+            attrs = chain.from_iterable(
+                [attrs, map(lambda a: (a, a), add_attrs)])
+        return attrs
 
-    def _split_str_to_attributes(self, attrs: str) -> Iterable[Tuple[str, str]]:
+    def _split_str_to_attributes(self, attrs: str) -> \
+            Iterable[Tuple[str, str]]:
         return map(lambda s: (s, s), attrs.split())
 
     def _add_class_name_param(self, class_name_param: str,
