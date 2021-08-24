@@ -64,21 +64,33 @@ class Stash(ABC):
     """
     @abstractmethod
     def load(self, name: str) -> Any:
-        """Load a data value from the pickled data with key ``name``.
+        """Load a data value from the pickled data with key ``name``.  Semantically,
+        this method loads the using the stash's implementation.  For example
+        :class:`.DirectoryStash` loads the data from a file if it exists, but
+        factory type stashes will always re-generate the data.
+
+        :see: :meth:`get`
 
         """
         pass
 
     def get(self, name: str, default=None) -> Any:
-        """Load an object or a default if key ``name`` doesn't exist.
+        """Load an object or a default if key ``name`` doesn't exist.  Semantically,
+        this method tries not to re-create the data if it already exists.  This
+        means that if a stash has built-in caching mechanisms, this method uses
+        it.
 
         **Implementation Note**: This default :meth:`.Stash.get` implementation
         invokes :meth:`dump` after :meth:`load` if the item does not exist.
+
+        :see: :meth:`load`
 
         """
         exists = self.exists(name)
         item = self.load(name)
         if not exists:
+            if logger.isEnabledFor(logging.DEBUG):
+                self._debug(f'get: does not exist so dumping {name} -> {item}')
             self.dump(name, item)
         if item is None:
             item = default
@@ -116,10 +128,10 @@ class Stash(ABC):
 
         """
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'clearing stash {self.__class__}')
+            self._debug(f'clearing stash {self.__class__}')
         for k in self.keys():
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'deleting key: {k}')
+                self._debug(f'deleting key: {k}')
             self.delete(k)
 
     @abstractmethod
@@ -142,6 +154,16 @@ class Stash(ABC):
     def items(self) -> Tuple[str, Any]:
         """Return an iterable of all stash items."""
         return map(lambda k: (k, self.__getitem__(k)), self.keys())
+
+    def _debug(self, msg: str):
+        """Utility debugging method that adds the class name to the message to document
+        the source stash.
+
+        This makes no checks for if debugging is enabled since it is assumed
+        the caller will do so for avoiding double checks of the logger level.
+
+        """
+        logger.debug(f'[{self.__class__.__name__}] {msg}')
 
     def __getitem__(self, key):
         exists = self.exists(key)
@@ -296,43 +318,64 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
         else:
             return super().__getattribute__(attr)
 
+    def _debug_meth(self, meth: str):
+        if logger.isEnabledFor(logging.DEBUG):
+            self._debug(
+                f'calling method <{meth}> on delegate {type(self.delegate)}')
+
     def load(self, name: str) -> Any:
+        self._debug_meth('load')
         if self.delegate is not None:
             return self.delegate.load(name)
 
     def get(self, name: str, default=None) -> Any:
+        """Load an object or a default if key ``name`` doesn't exist.
+
+        **Implementation note:** sub classes will probably want to override
+        this method given the super method is cavalier about calling
+        :meth:`exists:` and :meth:`load`.  Based on the implementation, this
+        can be problematic.
+
+        """
+        self._debug_meth('get')
         if self.delegate is None:
             return super().get(name, default)
         else:
             return self.delegate.get(name, default)
 
     def exists(self, name: str) -> bool:
+        self._debug_meth('exists')
         if self.delegate is not None:
             return self.delegate.exists(name)
         else:
             return False
 
     def dump(self, name: str, inst):
+        self._debug_meth('dump')
         if self.delegate is not None:
             return self.delegate.dump(name, inst)
 
     def delete(self, name=None):
+        self._debug_meth('delete')
         if self.delegate is not None:
             self.delegate.delete(name)
 
     def keys(self) -> Iterable[str]:
+        self._debug_meth('keys')
         if self.delegate is not None:
             return self.delegate.keys()
         return ()
 
     def clear(self):
+        self._debug_meth('clear')
         if self.delegate is not None:
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(
+                self._debug(
                     f'calling super clear on {self.delegate.__class__}')
             self.delegate.clear()
 
     def close(self):
+        self._debug_meth('close')
         if self.delegate is not None:
             return self.delegate.close()
 
@@ -396,7 +439,7 @@ class PreemptiveStash(DelegateStash):
 
     def clear(self):
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('PreemptiveStash: not clearing--has no data')
+            self._debug('not clearing--has no data')
         super().clear()
         self._reset_has_data()
 
@@ -446,14 +489,32 @@ class FactoryStash(PreemptiveStash):
 
     def load(self, name: str) -> Any:
         item = super().load(name)
+        if logger.isEnabledFor(logging.DEBUG):
+            self._debug(f'loaded item {name} -> {type(item)}')
         if item is None:
-            self._reset_has_data()
+            if logger.isEnabledFor(logging.DEBUG):
+                self._debug(f'resetting data and loading from factory: {name}')
             item = self.factory.load(name)
+            if logger.isEnabledFor(logging.DEBUG):
+                self._debug(f'dumping {name} -> {type(item)}')
+            super().dump(name, item)
+            self._reset_has_data()
+            if logger.isEnabledFor(logging.DEBUG):
+                self._debug(f'reset data: has_data={self.has_data}')
         return item
+
+    def get(self, name: str, default=None) -> Any:
+        if logger.isEnabledFor(logging.DEBUG):
+            self._debug(f'get {name}')
+        return Stash.get(self, name, default)
 
     def keys(self) -> Iterable[str]:
         if self.has_data:
+            if logger.isEnabledFor(logging.DEBUG):
+                self._debug('super (delegate) keys')
             ks = super().keys()
         else:
+            if logger.isEnabledFor(logging.DEBUG):
+                self._debug('factory keys')
             ks = self.factory.keys()
         return ks

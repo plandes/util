@@ -65,7 +65,7 @@ class ChunkProcessor(object):
         with time('processed {cnt} items for chunk {self.chunk_id}'):
             for i, (id, inst) in enumerate(stash._process(self.data)):
                 if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'dumping {id} -> {inst.__class__}')
+                    self._debug(f'dumping {id} -> {inst.__class__}')
                 stash.delegate.dump(id, inst)
                 Deallocatable._try_deallocate(inst)
                 cnt += 1
@@ -222,7 +222,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
 
         """
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'creating chunk processor for id {chunk_id}')
+            self._debug(f'creating chunk processor for id {chunk_id}')
         return ChunkProcessor(self.config, self.name, chunk_id, data)
 
     def _invoke_pool(self, pool: Pool, fn: Callable, data: iter) -> List[int]:
@@ -269,10 +269,10 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
 
         """
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'multi prime, is child: {self.is_child}')
+            self._debug(f'multi prime, is child: {self.is_child}')
         has_data = self.has_data
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'has data: {has_data}')
+            self._debug(f'has data: {has_data}')
         if not has_data:
             with time('completed work in {self.__class__.__name__}'):
                 self._spawn_work()
@@ -292,7 +292,7 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
 
     def clear(self):
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('clearing')
+            self._debug('clearing')
         super().clear()
 
 
@@ -350,7 +350,7 @@ class MultiProcessFactoryStash(MultiProcessStash):
     def prime(self):
         if isinstance(self.factory, PrimeableStash):
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'priming factory: {self.factory}')
+                self._debug(f'priming factory: {self.factory}')
             self.factory.prime()
         super().prime()
 
@@ -362,6 +362,6 @@ class MultiProcessFactoryStash(MultiProcessStash):
         for k in chunk:
             if logger.isEnabledFor(logging.DEBUG):
                 pid = os.getpid()
-                logger.debug(f'processing key {k} in {pid}')
+                self._debug(f'processing key {k} in {pid}')
             val: Any = self.factory.load(k)
             yield (k, val)

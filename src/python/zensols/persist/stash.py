@@ -55,7 +55,7 @@ class OneShotFactoryStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
         """
         wt = self._get_worker_type()
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'processing with {type(self.worker)}: type={wt}')
+            self._debug(f'processing with {type(self.worker)}: type={wt}')
         if wt == 'u':
             if callable(self.worker):
                 wt = 'm'
@@ -73,7 +73,7 @@ class OneShotFactoryStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
     def prime(self):
         has_data = self.has_data
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'asserting data: {has_data}')
+            self._debug(f'asserting data: {has_data}')
         if not has_data:
             with time('processing work in OneShotFactoryStash'):
                 self._process_work()
@@ -93,7 +93,7 @@ class OneShotFactoryStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
 
     def clear(self):
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('OneShotFactoryStash: clear')
+            self._debug('clear')
         super().clear()
 
 
@@ -218,7 +218,7 @@ class DirectoryStash(Stash):
 
     def assert_path_dir(self):
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'path {self.path}: {self.path.exists()}')
+            self._debug(f'path {self.path}: {self.path.exists()}')
         self.path.mkdir(parents=True, exist_ok=True)
 
     def key_to_path(self, name: str) -> Path:
@@ -234,11 +234,11 @@ class DirectoryStash(Stash):
         inst = None
         if path.exists():
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'loading instance from {path}')
+                self._debug(f'loading instance from {path}')
             with open(path, 'rb') as f:
                 inst = pickle.load(f)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'loaded instance: {inst}')
+            self._debug(f'loaded instance: {name} -> {type(inst)}')
         return inst
 
     def exists(self, name) -> bool:
@@ -255,7 +255,7 @@ class DirectoryStash(Stash):
                     return p['name']
 
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'checking path {self.path} ({type(self)})')
+            self._debug(f'checking path {self.path} ({type(self)})')
         if not self.path.is_dir():
             keys = ()
         else:
@@ -265,14 +265,14 @@ class DirectoryStash(Stash):
 
     def dump(self, name: str, inst: Any):
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'saving instance: {name} -> {type(inst)}')
+            self._debug(f'saving instance: {name} -> {type(inst)}')
         path = self.key_to_path(name)
         with open(path, 'wb') as f:
             pickle.dump(inst, f)
 
     def delete(self, name: str):
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'deleting instance: {name}')
+            self._debug(f'deleting instance: {name}')
         path = self.key_to_path(name)
         if path.exists():
             path.unlink()
@@ -332,7 +332,7 @@ class IncrementKeyDirectoryStash(DirectoryStash):
             key = name_or_inst
         path = self.key_to_path(key)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'dumping result {self.name} to {path}')
+            self._debug(f'dumping result {self.name} to {path}')
         super().dump(key, inst)
 
     def load(self, name: str = None) -> Any:
