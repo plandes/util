@@ -211,7 +211,6 @@ class DirectoryStash(Stash):
     value.
 
     """
-
     def __post_init__(self):
         if not isinstance(self.path, Path):
             raise PersistableError(
