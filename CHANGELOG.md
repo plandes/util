@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [Unreleased]
+### Changed
+- Fix GitHub workflows continuous integration.
+
+- Make private data structures that are private and subclass private
+  respectfully: `Dealloc.ALLOCATIONS` and
+  `PersistableContainer.PERSISTABLE_TRANSIENT_ATTRIBUTE`.
 
 
 ## [1.5.3] - 2021-08-16
