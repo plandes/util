@@ -404,7 +404,7 @@ class ApplicationFactory(PersistableContainer):
     :obj:`app_config_resource` from the application package of the client.
 
     """
-    package_resource: PackageResource = field()
+    package_resource: Union[str, PackageResource] = field()
     """Package resource (i.e. ``zensols.someappname``).  This field is converted to
     a package if given as a string during post initialization.
 
