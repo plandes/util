@@ -41,7 +41,7 @@ class Writeback(FactoryStateObserver, Dictable):
     """
     DEFAULT_SKIP_ATTRIBUTES = set([ConfigFactory.NAME_ATTRIBUTE,
                                    ConfigFactory.CONFIG_ATTRIBUTE,
-                                   ConfigFactory.CONIFG_FACTORY_ATTRIBUTE])
+                                   ConfigFactory.CONFIG_FACTORY_ATTRIBUTE])
     name: str = field()
     """The name of the section given in the configuration.
 

@@ -155,7 +155,7 @@ class ConfigFactory(object):
 
     """
 
-    CONIFG_FACTORY_ATTRIBUTE = 'config_factory'
+    CONFIG_FACTORY_ATTRIBUTE = 'config_factory'
     """The *configuration factory* of the parameter given to ``__init__``.  If a
     parameter of this name is on the instance being created it will be set as
     the instance of this configuration factory.
@@ -285,14 +285,17 @@ class ConfigFactory(object):
         class_name, params = self._class_name_params(name)
         cls = self._find_class(class_name)
         params.update(kwargs)
-        if self._has_init_parameter(cls, self.CONFIG_ATTRIBUTE):
-            logger.debug('found config parameter')
+        if self._has_init_parameter(cls, self.CONFIG_ATTRIBUTE) \
+           and self.CONFIG_ATTRIBUTE not in params:
+            logger.debug('setting config parameter')
             params['config'] = self.config
-        if self._has_init_parameter(cls, self.NAME_ATTRIBUTE):
-            logger.debug('found name parameter')
+        if self._has_init_parameter(cls, self.NAME_ATTRIBUTE) \
+           and self.NAME_ATTRIBUTE not in params:
+            logger.debug('setting name parameter')
             params['name'] = name
-        if self._has_init_parameter(cls, self.CONIFG_FACTORY_ATTRIBUTE):
-            logger.debug('found config factory parameter')
+        if self._has_init_parameter(cls, self.CONFIG_FACTORY_ATTRIBUTE) \
+           and self.CONFIG_FACTORY_ATTRIBUTE not in params:
+            logger.debug('setting config factory parameter')
             params['config_factory'] = self
         if logger.isEnabledFor(logging.DEBUG):
             for k, v in params.items():

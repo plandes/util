@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   `PersistableContainer.PERSISTABLE_TRANSIENT_ATTRIBUTE`.
 - Fix to `FactoryStash` for persisting `None` to file system instead of using
   the factory stash to create the item.
+- When created instances with a `ConfigFactory`, attributes `name`, `config`
+  and `config_factory` are only set when passed keyword arguments do not have
+  them set.
+### Removed
+- Removed `zensols.util.Downloader`, which now is relocated to the
+  [zensols.install] package.
 
 
 ## [1.5.3] - 2021-08-16
@@ -242,3 +248,6 @@ Major release.
 [1.2.2]: https://github.com/plandes/util/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/plandes/util/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/plandes/util/compare/v0.0.0...v1.2.0
+
+
+[zensols.install]: https://github.com/plandes/install
