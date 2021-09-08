@@ -39,7 +39,7 @@ class Dictable(Writable):
     .. automethod:: _get_dictable_attributes
     .. automethod:: _from_dictable
     .. automethod:: _write_descendants
-    .. automethod:: _write_asdict
+    .. automethod:: _writable_dict
 
     :see: :meth:`write`
 
@@ -231,6 +231,10 @@ class Dictable(Writable):
                 self._write_key_value(readable_name, v, depth, writer)
 
     def _writable_dict(self) -> Dict[str, Any]:
+        """Return a :class:`dict` that contains what will be output when :meth:`write`
+        is called.
+
+        """
         dct = self._from_dictable(True, True)
         if hasattr(self, '_DICTABLE_WRITE_EXCLUDES'):
             for attr in getattr(self, '_DICTABLE_WRITE_EXCLUDES'):
@@ -244,6 +248,9 @@ class Dictable(Writable):
         writing the generated dictionary.  Otherwise, write this instance by
         first creating a ``dict`` recursively using :meth:`asdict`, then
         formatting the output.
+
+        If the attribute ``_DICTABLE_WRITE_EXCLUDES`` is set, those attributes
+        are removed from what is written in the :meth:`write` method.
 
         Note that this attribute will need to be set in all descendants in the
         instance hierarchy since writing the object instance graph is done
