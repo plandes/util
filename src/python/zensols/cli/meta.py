@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, Type
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -190,7 +190,7 @@ class PositionalMetaData(Dictable):
 
     """
 
-    dtype: type = field(default=str)
+    dtype: Type = field(default=str)
     """The type of the positional argument.
 
     :see: :obj:`.Option.dtype`

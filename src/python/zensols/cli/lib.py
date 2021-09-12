@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Dict, Union, List
+from typing import Any, Dict, Union, List, Type
 from dataclasses import dataclass, field
 from enum import Enum, auto
 import os
@@ -543,6 +543,10 @@ class ListActions(ApplicationObserver, Dictable):
     list_output_format: ListFormat = field(default=ListFormat.text)
     """The output format for the action listing."""
 
+    type_to_string: Dict[Type, str] = field(
+        default_factory=lambda: {Path: 'path'})
+    """Map Python type to a string used in the JSON formatted list output."""
+
     def __post_init__(self):
         self._command_line = False
 
@@ -575,10 +579,15 @@ class ListActions(ApplicationObserver, Dictable):
     def list(self):
         """List all actions and help."""
         class ActionEncoder(JSONEncoder):
-            def default(self, obj: Any):
+            def default(self, obj: Any) -> str:
                 if isinstance(obj, EnumMeta) or inspect.isclass(obj):
-                    return ClassImporter.full_classname(obj)
+                    val = tm.get(obj)
+                    if val is None:
+                        val = ClassImporter.full_classname(obj)
+                    return val
                 return JSONEncoder.default(self, obj)
+
+        tm = self.type_to_string
 
         def list_json():
             try:
