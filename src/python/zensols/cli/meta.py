@@ -162,7 +162,7 @@ class OptionMetaData(PersistableContainer, Dictable):
 
     def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
         dct = super()._from_dictable(*args, **kwargs)
-        dct['dtype'] = self.dtype.__name__
+        dct['dtype'] = self.dtype
         if not self.is_choice:
             del dct['choices']
         else:

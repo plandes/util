@@ -567,10 +567,22 @@ class ListActions(ApplicationObserver, Dictable):
 
     def list(self):
         """List all actions and help."""
+
+        from json import JSONEncoder
+        from enum import EnumMeta
+        import inspect
+        from zensols.introspect import ClassImporter
+
+        class EnumEncoder(JSONEncoder):
+            def default(self, obj: Any):
+                if isinstance(obj, EnumMeta) or inspect.isclass(obj):
+                    return ClassImporter.full_classname(obj)
+                return JSONEncoder.default(self, obj)
+
         def list_json():
             try:
                 self._command_line = True
-                print(self.asjson(indent=4))
+                print(self.asjson(indent=4, cls=EnumEncoder))
             finally:
                 self._command_line = False
 

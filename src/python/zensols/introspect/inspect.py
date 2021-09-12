@@ -303,7 +303,7 @@ class ClassInspector(object):
         except Exception as e:
             raise ClassError(f'Could not map {item}: {def_node}: {e}')
 
-    def _get_args(self, node: ast.arguments):
+    def _get_args(self, node: ast.arguments) -> List[ClassMethodArg]:
         args = []
         defaults = node.defaults
         dsidx = len(node.args) - len(defaults)
@@ -321,7 +321,8 @@ class ClassInspector(object):
                     dtype = arg.annotation.id
                 mtype = self.data_type_mapper.map_type(dtype)
                 if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'mapped {dtype} -> {mtype}, default={default}')
+                    logger.debug(f'mapped {name}:{dtype} -> {mtype}, ' +
+                                 f'default={default}')
                 arg = ClassMethodArg(name, mtype, None, default, is_positional)
             except Exception as e:
                 raise ClassError(f'Could not map argument {name}: {e}')
@@ -382,9 +383,11 @@ class ClassInspector(object):
             if isinstance(node, ast.AnnAssign) and \
                isinstance(node.annotation, ast.Name):
                 name: str = node.target.id
-                dtype: str = node.annotation.id
-                dtype: type = self.data_type_mapper.map_type(dtype)
+                str_dtype: str = node.annotation.id
+                dtype: type = self.data_type_mapper.map_type(str_dtype)
                 item: str = f"kwarg: '{name}'"
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'mapped dtype {name} {str_dtype} -> {dtype}')
                 if node.value is not None:
                     kwlst: List[ast.keyword] = node.value.keywords
                     kwargs = {k.arg: self._map_default(item, k.value)
