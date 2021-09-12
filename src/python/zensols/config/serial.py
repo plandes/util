@@ -282,6 +282,9 @@ class Serializer(object):
             logger.warning(f'could not find module: {e}')
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'defaulting to module name: {resource_name}')
+            if res is None:
+                logger.warning('missing resource')
+                raise e
             if not res.exists():
                 logger.warning(f'could not find path: {resource_name}')
                 raise e
