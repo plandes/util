@@ -149,8 +149,9 @@ class Dictable(Writable):
             logger.debug(f'from object: {type(obj)}')
         if recurse:
             if inspect.isclass(obj):
-                # dataclasses.is_dataclass return True for class objects
-                ret = ClassImporter.full_classname(obj)
+                # leave classes in tact and use JSONEncoder to convert in
+                # ``asjson`` if necessary
+                ret = obj
             elif isinstance(obj, _DICTABLE_CLASS):
                 ret = obj._from_dictable(recurse, readable)
             elif dataclasses.is_dataclass(obj):
