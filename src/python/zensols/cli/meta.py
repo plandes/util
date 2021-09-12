@@ -197,6 +197,11 @@ class PositionalMetaData(Dictable):
 
     """
 
+    doc: str = field(default=None)
+    """The documentation of the positional metadata or ``None`` if missing.
+
+    """
+
 
 class OptionFactory(object):
     """Creates commonly used options.

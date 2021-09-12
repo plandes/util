@@ -529,6 +529,9 @@ class ListFormat(Enum):
 
 @dataclass
 class ListActions(ApplicationObserver, Dictable):
+    """List command line actions with their help information.
+
+    """
     # we can't use "output_format" because ExportEnvironment would use the same
     # causing a name collision
     OUTPUT_FORMAT = 'list_output_format'
@@ -571,7 +574,7 @@ class ListActions(ApplicationObserver, Dictable):
 
     def list(self):
         """List all actions and help."""
-        class EnumEncoder(JSONEncoder):
+        class ActionEncoder(JSONEncoder):
             def default(self, obj: Any):
                 if isinstance(obj, EnumMeta) or inspect.isclass(obj):
                     return ClassImporter.full_classname(obj)
@@ -580,7 +583,7 @@ class ListActions(ApplicationObserver, Dictable):
         def list_json():
             try:
                 self._command_line = True
-                print(self.asjson(indent=4, cls=EnumEncoder))
+                print(self.asjson(indent=4, cls=ActionEncoder))
             finally:
                 self._command_line = False
 

@@ -189,7 +189,9 @@ class ActionCli(PersistableContainer, Dictable):
                         # use the argument name in the method but normalize it
                         # to make it appear in CLI parlance
                         pname = self._normalize_name(arg.name)
-                    pos_args.append(PositionalMetaData(pname, arg.dtype))
+                    pdoc = None if arg.doc is None else arg.doc.text
+                    pmeta = PositionalMetaData(pname, arg.dtype, pdoc)
+                    pos_args.append(pmeta)
                 else:
                     if logger.isEnabledFor(logging.DEBUG):
                         logger.debug(f'adding option: {name}:{arg.name}')
