@@ -4,8 +4,11 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, List, Dict, Iterable, Any, Callable, Optional, Union
+from typing import (
+    Tuple, List, Dict, Iterable, Any, Callable, Optional, Union, Type
+)
 from dataclasses import dataclass, field
+import traceback
 from abc import ABC, abstractmethod
 import logging
 import sys
@@ -405,8 +408,8 @@ class ApplicationFactory(PersistableContainer):
 
     """
     package_resource: Union[str, PackageResource] = field()
-    """Package resource (i.e. ``zensols.someappname``).  This field is converted to
-    a package if given as a string during post initialization.
+    """The application package resource (i.e. ``zensols.someappname``).  This field
+    is converted to a package if given as a string during post initialization.
 
     """
 
@@ -649,7 +652,7 @@ class ApplicationFactory(PersistableContainer):
         else:
             raise ex
 
-    def invoke(self, args: Union[List[str], str] = None) -> Any:
+    def invoke(self, args: Union[List[str], str] = None) -> ActionResult:
         """Creates and invokes the entire application returning the result of the
         second pass action.
 
@@ -672,7 +675,8 @@ class ApplicationFactory(PersistableContainer):
         except Exception as e:
             self._handle_error(e)
 
-    def invoke_protect(self, args: Union[List[str], str] = None) -> Any:
+    def invoke_protect(self, args: Union[List[str], str] = None) -> \
+            Union[ActionResult, Tuple[Type, Exception, traceback]]:
         """Same as :meth:`invoke`, but protect against :class:`Exception` and
         :class:`SystemExit`.  If an error is raised while invoking, it is
         logged and returned.
@@ -682,7 +686,8 @@ class ApplicationFactory(PersistableContainer):
                      this defaults to the output of :meth:`_get_default_args`
 
         :return: the result of the second pass action or the output of
-                 :func:`sys.exec_info`
+                 :func:`sys.exec_info` when :class:`Exception` or
+                 :class:`SystemExit` is raised
 
         """
         try:
