@@ -136,6 +136,9 @@ in how it reads data, which uses the following rules:
   [Evaluation Parameters](#evaluation-parameters) section).
 * A string starting with `instance:` an object instance (see the [Configuration
   Factory] and [Instance Parameters](#instance-parameters) sections).
+* A string starting with `object:` an object specified by class name (see the
+  [Configuration Factory] and [Instance Parameters](#instance-parameters)
+  sections).
 * Anything else as a string.
 
 
@@ -277,6 +280,19 @@ class_name = domain.Organization
 boss = instance({'param': {'age': 69}}): homer
 ```
 
+A shorthand using `object:` and specifying the class name inline is useful in
+cases where you don't want to create an additional section and/or don't want to
+share the instance.  The equivalent configuration for not sharing the `homer`
+object is:
+```ini
+[bobs_senior_center]
+class_name = domain.Organization
+boss = object({'param':
+                 {'age': 69,
+                  'aliases': ['Homer', 'Homer Simpson']}}):
+         domain.Person
+```
+
 We then create the new *company* object and print with:
 ```python
 senior_company: domain.Organization = factory('bobs_senior_center')
@@ -296,6 +312,7 @@ class_name = domain.Organization
 boss = instance({'param': {'age': 69}}): homer
 employees = instance: tuple: bob, bart
 ```
+
 
 ### Import INI Configuration
 

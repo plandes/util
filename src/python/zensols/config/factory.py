@@ -4,7 +4,7 @@ objects and files.
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Any, Union, Type, Optional
+from typing import Dict, Any, Union, Type, Optional, Tuple
 from abc import ABC, abstractmethod
 from enum import Enum
 import types
@@ -352,10 +352,18 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
     parameter.
 
     """
-    CHILD_REGEXP = re.compile(r'^instance(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
+    _INSTANCE_REGEXP = re.compile(r'^instance(?:\((.+)\))?:\s*(.+)$',
+                                  re.DOTALL)
     """The ``instance`` regular expression used to identify children attributes to
     set on the object.  The process if creation can chain from parent to
     children recursively.
+
+    """
+
+    _OBJECT_REGEXP = re.compile(r'^object(?:\((.+)\))?:\s*(.+)$',
+                                re.DOTALL)
+    """The ``object`` regular expression used to instantiate non-shared singleton
+    instances tied to the outside instance..
 
     """
 
@@ -500,11 +508,11 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                          f'with {params}, config: {config_params}')
         return inst
 
-    def _populate_instances(self, pconfig: str, section: str):
+    def _parse_child_params(self, pconfig: str) -> Tuple[Dict[str, str], bool]:
         child_params = {}
+        inst_conf = None
         reload = False
         defined_directives = set('param reload type'.split())
-        inst_conf = None
         if pconfig is not None:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'parsing param config: {pconfig}')
@@ -523,17 +531,31 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'applying param config: {inst_conf}')
         self._set_reload(reload)
+        return child_params, inst_conf
+
+    def _populate_instances(self, pconfig: str, section: str):
+        child_params, inst_conf = self._parse_child_params(pconfig)
         return self._create_instance(section, inst_conf, child_params)
 
+    def _object_instance(self, pconfig: str, class_name: str):
+        params, inst_conf = self._parse_child_params(pconfig)
+        cls = self._find_class(class_name)
+        desc = f'object instance {class_name}'
+        return super()._instance(desc, cls, **params)
+
     def from_config_string(self, v: str) -> Any:
-        """Create an instance from a string that looks like :obj:`CHILD_REGEXP` used as
-        option values in the configuration.
+        """Create an instance from a string that looks like :obj:`_INSTANCE_REGEXP` or
+        :obj:`_OBJECT_REGEXP` used as option values in the configuration.
 
         """
-        m = self.CHILD_REGEXP.match(v)
-        if m:
+        m = self._INSTANCE_REGEXP.match(v)
+        if m is not None:
             pconfig, section = m.groups()
             v = self._populate_instances(pconfig, section)
+        else:
+            m = self._OBJECT_REGEXP.match(v)
+            if m is not None:
+                v = self._object_instance(pconfig, section)
         return v
 
     def _class_name_params(self, name):
@@ -543,10 +565,15 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         try:
             for k, v in params.items():
                 if isinstance(v, str):
-                    m = self.CHILD_REGEXP.match(v)
-                    if m:
+                    m = self._INSTANCE_REGEXP.match(v)
+                    if m is not None:
                         pconfig, section = m.groups()
                         insts[k] = self._populate_instances(pconfig, section)
+                    else:
+                        m = self._OBJECT_REGEXP.match(v)
+                        if m:
+                            pconfig, section = m.groups()
+                            insts[k] = self._object_instance(pconfig, section)
         finally:
             self._set_reload(initial_reload)
         params.update(insts)

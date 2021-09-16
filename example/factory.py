@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-from zensols.config import ExtendedInterpolationEnvConfig, ImportConfigFactory
+from zensols.config import ImportIniConfig, ImportConfigFactory
 import domain
 
-factory = ImportConfigFactory(ExtendedInterpolationEnvConfig('obj.conf'))
+factory = ImportConfigFactory(ImportIniConfig('obj.conf'))
 bob: domain.Person = factory('bob')
 company: domain.Organization = factory('bob_co')
 print(bob)
