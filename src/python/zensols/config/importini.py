@@ -46,7 +46,11 @@ class _ParserAdapter(object):
                 logger.debug(f'using defaults value: {val}')
             if val is None:
                 # raise an InterpolationMissingOptionError
-                self.conf.get_option(option, section)
+                try:
+                    self.conf.get_option(option, section)
+                except ConfigurableError as e:
+                    raise ConfigurableError(
+                        f'Can not get option {option}:{section}') from e
         return val
 
     def optionxform(self, option: str) -> str:
@@ -164,16 +168,14 @@ class ImportIniConfig(IniConfig):
     A section called ``import`` is used to load other configuration.  This is
     either done by loading it:
 
-      * ``files`` entry in the section to load a list of files; ``type`` can be
-        given to select the loader (see :class:`.ConfigurableFactory`)
-
-      * ``
+      * ``config_files`` entry in the section to load a list of files; ``type``
+        can be given to select the loader (see :class:`.ConfigurableFactory`)
 
     """
     IMPORT_SECTION = 'import'
     SECTIONS_SECTION = 'sections'
     SINGLE_CONFIG_FILE = 'config_file'
-    CONFIG_FILES = 'files'
+    CONFIG_FILES = 'config_files'
     REFS_SECTION = 'references'
 
     def __init__(self, *args,
@@ -268,6 +270,9 @@ class ImportIniConfig(IniConfig):
                 logger.debug(
                     f'getting instance using config factory: {config_file}')
             loader = _ConfigLoader(section, cf, 'from_path', Path(config_file))
+        else:
+            raise ConfigurableError(
+                f"No loader information for '{section}': {params}")
         return loader
 
     def _create_loader(self, section: str, params: Dict[str, Any]) -> \
