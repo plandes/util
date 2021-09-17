@@ -174,14 +174,21 @@ class CacheStash(DelegateStash):
 
     def load(self, name: str):
         if self.cache_stash.exists(name):
+            if logger.isEnabledFor(logging.DEBUG):
+                self._debug(f'loading cached: {name}')
             return self.cache_stash.load(name)
         else:
             obj = self.delegate.load(name)
+            if logger.isEnabledFor(logging.DEBUG):
+                self._debug(f'loading from delegate, dumping to cache: {name}')
             self.cache_stash.dump(name, obj)
             return obj
 
-    def exists(self, name: str):
-        return self.cache_stash.exists(name) or self.delegate.exists(name)
+    def get(self, name: str, default: Any = None) -> Any:
+        item = self.load(name)
+        if item is None:
+            item = default
+        return item
 
     def delete(self, name=None):
         if self.cache_stash.exists(name):

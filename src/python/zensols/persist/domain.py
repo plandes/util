@@ -74,25 +74,18 @@ class Stash(ABC):
         """
         pass
 
-    def get(self, name: str, default=None) -> Any:
+    def get(self, name: str, default: Any = None) -> Any:
         """Load an object or a default if key ``name`` doesn't exist.  Semantically,
         this method tries not to re-create the data if it already exists.  This
         means that if a stash has built-in caching mechanisms, this method uses
         it.
 
-        **Implementation Note**: This default :meth:`.Stash.get` implementation
-        invokes :meth:`dump` after :meth:`load` if the item does not exist.
-
         :see: :meth:`load`
 
         """
-        exists = self.exists(name)
-        item = self.load(name)
-        if not exists:
-            if logger.isEnabledFor(logging.DEBUG):
-                self._debug(f'get: does not exist so dumping {name} -> {item}')
-            self.dump(name, item)
-        if item is None:
+        if self.exists(name):
+            item = self.load(name)
+        else:
             item = default
         return item
 
@@ -166,10 +159,7 @@ class Stash(ABC):
         logger.debug(f'[{self.__class__.__name__}] {msg}')
 
     def __getitem__(self, key):
-        exists = self.exists(key)
-        item = self.load(key)
-        if not exists:
-            self.dump(key, item)
+        item = self.get(key)
         if item is None:
             raise KeyError(key)
         return item
@@ -399,12 +389,25 @@ class KeyLimitStash(DelegateStash):
 
 @dataclass
 class PreemptiveStash(DelegateStash):
-    """Provide support for preemptively creating data in a stash.
+    """Provide support for preemptively creating data in a stash.  It provides this
+    with :obj:`has_data` and provides a means of keeping track if the data has
+    yet been created.
+
+    **Implementation note**: This stash retrieves data from the delegate
+    without checking to see if it exists first since the data might not have
+    been (preemptively) yet created.
 
     """
     def __post_init__(self):
         super().__post_init__()
         self._has_data = None
+
+    def get(self, name: str, default: Any = None) -> Any:
+        """See class doc's implementation note."""
+        item = self.load(name)
+        if item is None:
+            item = default
+        return item
 
     @property
     def has_data(self) -> bool:
@@ -466,11 +469,34 @@ class PrimeableStash(Stash, Primeable):
            isinstance(self.delegate, PrimeableStash):
             self.delegate.prime()
 
+    def get(self, name: str, default=None):
+        self.prime()
+        return super().get(name, default)
+
+    def load(self, name: str):
+        self.prime()
+        return super().load(name)
+
+    def keys(self):
+        self.prime()
+        return super().keys()
+
+
+@dataclass
+class PrimablePreemptiveStash(PrimeableStash, PreemptiveStash):
+    """A stash that's primable and preemptive.
+
+    """
+
 
 @dataclass
 class FactoryStash(PreemptiveStash):
     """A stash that defers to creation of new items to another :obj:`factory`
-    stash.
+    stash.  It does this by calling first getting the data from the
+    :obj:`delegate` stash, then when it does not exist, it uses the the
+    :obj:`factory` to create the data when loading with :meth:`load`.
+    Similarly, when accessing with :meth:`get` or indexing, the factory created
+    item is dumped back to the delegate when the delegate does not have it.
 
     """
     ATTR_EXP_META = ('enable_preemptive',)
@@ -502,11 +528,6 @@ class FactoryStash(PreemptiveStash):
             if logger.isEnabledFor(logging.DEBUG):
                 self._debug(f'reset data: has_data={self.has_data}')
         return item
-
-    def get(self, name: str, default=None) -> Any:
-        if logger.isEnabledFor(logging.DEBUG):
-            self._debug(f'get {name}')
-        return Stash.get(self, name, default)
 
     def keys(self) -> Iterable[str]:
         if self.has_data:

@@ -14,7 +14,7 @@ from multiprocessing import Pool
 from zensols.util.time import time
 from zensols.config import Configurable, ConfigFactory, ImportConfigFactory
 from zensols.persist import (
-    Stash, PreemptiveStash, PrimeableStash, chunks, Deallocatable,
+    Stash, PrimablePreemptiveStash, chunks, Deallocatable,
 )
 from zensols.cli import LogConfigurator
 
@@ -85,7 +85,7 @@ class ChunkProcessor(object):
 
 
 @dataclass
-class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
+class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     """A stash that forks processes to process data in a distributed fashion.  The
     stash is typically created by a
     :class:`zensols.config.factory.ImportConfigFactory` in the child process.
@@ -277,23 +277,6 @@ class MultiProcessStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
             with time('completed work in {self.__class__.__name__}'):
                 self._spawn_work()
             self._reset_has_data()
-
-    def get(self, name: str, default=None):
-        self.prime()
-        return super().get(name, default)
-
-    def load(self, name: str):
-        self.prime()
-        return super().load(name)
-
-    def keys(self):
-        self.prime()
-        return super().keys()
-
-    def clear(self):
-        if logger.isEnabledFor(logging.DEBUG):
-            self._debug('clearing')
-        super().clear()
 
 
 @dataclass(init=False)
