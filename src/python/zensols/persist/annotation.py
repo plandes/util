@@ -158,6 +158,9 @@ class PersistedWork(Deallocatable):
             self._info('saving work to {}'.format(self.path))
             if self.mkdir:
                 self.path.parent.mkdir(parents=True, exist_ok=True)
+            if not self.path.parent.is_dir():
+                raise PersistableError(
+                    f'Parent directory does not exist: {self.path.parent}')
             with open(self.path, 'wb') as f:
                 obj = self._do_work(*argv, **kwargs)
                 pickle.dump(obj, f)
@@ -174,7 +177,7 @@ class PersistedWork(Deallocatable):
         vname = self.varname
         if self.owner is None:
             raise PersistableError(
-                f'owner is not set for persistable: {vname}')
+                f'Owner is not set for persistable: {vname}')
         setattr(self.owner, vname, obj)
         if self.cache_global:
             if vname not in globals():
