@@ -357,6 +357,10 @@ class TestPersistWork(unittest.TestCase):
         self.assertEqual(obj, o2)
         s.delete('tmp5')
         self.assertFalse(file_path.exists())
+        file_path = path / 'tmp6.dat'
+        with self.assertRaises(KeyError):
+            s['tmp6']
+        self.assertFalse(file_path.exists())
 
     def test_increment_key_directory_stash(self):
         path = self.targdir / 'ids'
