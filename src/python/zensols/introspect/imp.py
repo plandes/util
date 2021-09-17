@@ -39,7 +39,7 @@ class ClassImporter(object):
         self.reload = reload
 
     @staticmethod
-    def full_classname(cls: type) -> str:
+    def full_classname(cls: Type) -> str:
         """Return a fully qualified class name string for class ``cls``.
 
         """
@@ -84,7 +84,7 @@ class ClassImporter(object):
             logger.debug(f'class: {cls}')
         return mod, cls
 
-    def get_class(self) -> type:
+    def get_class(self) -> Type:
         """Return the given class in the initializer.
 
         """
