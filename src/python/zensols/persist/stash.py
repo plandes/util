@@ -79,7 +79,7 @@ class OneShotFactoryStash(PreemptiveStash, PrimeableStash, metaclass=ABCMeta):
                 self._process_work()
             self._reset_has_data()
 
-    def get(self, name: str, default=None):
+    def get(self, name: str, default: Any = None):
         self.prime()
         return super().get(name, default)
 
@@ -141,7 +141,7 @@ class DictionaryStash(Stash):
     def load(self, name: str) -> Any:
         return self.data.get(name)
 
-    def get(self, name: str, default=None) -> Any:
+    def get(self, name: str, default: Any = None) -> Any:
         return self.data.get(name, default)
 
     def exists(self, name: str) -> bool:
@@ -362,7 +362,7 @@ class UnionStash(ReadOnlyStash):
                 break
         return item
 
-    def get(self, name: str, default=None) -> Any:
+    def get(self, name: str, default: Any = None) -> Any:
         return self.load(name)
 
     def values(self) -> Iterable[Any]:
