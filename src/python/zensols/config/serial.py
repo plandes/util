@@ -15,6 +15,7 @@ from io import TextIOBase
 import re
 import pkg_resources
 from pathlib import Path
+from zensols.introspect import ClassImporter
 
 logger = logging.getLogger(__name__)
 OBJECT_KEYS = {'_type', '_data'}
@@ -80,6 +81,7 @@ class Serializer(object):
     LIST_REGEXP = re.compile(r'^(list|set|tuple)(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     EVAL_REGEXP = re.compile(r'^(?:eval|dict)(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     JSON_REGEXP = re.compile(r'^json:\s*(.+)$', re.DOTALL)
+    CLASS_REGEXP = re.compile(r'^class:\s*(.+)$')
     PRIMITIVES = set([bool, float, int, None.__class__])
     DEFAULT_RESOURCE_MODULE = None
 
@@ -188,6 +190,11 @@ class Serializer(object):
                 if m:
                     pconfig, evalstr = m.groups()
                     parsed = self._parse_eval(pconfig, evalstr)
+            if parsed is None:
+                m = self.CLASS_REGEXP.match(v)
+                if m:
+                    class_name = m.group(1)
+                    parsed = ClassImporter(class_name, False).get_class()
             if parsed is None:
                 m = self.JSON_REGEXP.match(v)
                 if m:
