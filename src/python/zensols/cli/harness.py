@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import List, Dict, Any, Union
+from typing import List, Dict, Any, Union, Type
 from dataclasses import dataclass, field
 import sys
 import logging
@@ -44,6 +44,10 @@ class CliHarness(object):
     app_config_context: Dict[str, Dict[str, str]] = field(default_factory=dict)
     """More context given to the application context on app creation."""
 
+    app_factory_class: Type[ApplicationFactory] = field(
+        default=ApplicationFactory)
+    """The application factory used to create thye application."""
+
     proto_args: Union[str, List[str]] = field(default_factory=list)
     """The command line arguments."""
 
@@ -83,7 +87,7 @@ class CliHarness(object):
         ctx = self.app_config_context
         ctx['appenv'] = {'root_dir': str(entry_path.parent)}
         dconf = DictionaryConfig(ctx)
-        return ApplicationFactory(
+        return self.app_factory_class(
             package_resource=self.package_resource,
             app_config_resource=self.app_config_resource,
             children_configs=(dconf,), **factory_kwargs)
