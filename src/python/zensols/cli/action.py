@@ -254,7 +254,6 @@ class ActionCli(PersistableContainer, Dictable):
         """
         return tuple(map(lambda m: m.action_meta_data, self.methods.values()))
 
-
 
 @dataclass
 class ActionCliManager(PersistableContainer, Dictable):
