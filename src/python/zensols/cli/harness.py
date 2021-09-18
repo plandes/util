@@ -73,14 +73,14 @@ class CliHarness(object):
         import __main__ as mmod
         return not hasattr(mmod, '__file__')
 
-    def configure_logging(self):
+    def configure_logging(self, level: int = logging.INFO):
         """Convenience method to configure the logging package system for early stage
         (bootstrap) debugging.  However, the "right" way to configure logging
         is in the application configuration.
 
         """
         fmt = '%(asctime)-15s [%(name)s] %(message)s'
-        logging.basicConfig(format=fmt, level=logging.INFO)
+        logging.basicConfig(format=fmt, level=level)
 
     def _create_cli(self, entry_path: Path, factory_kwargs: Dict[str, Any]) \
             -> ApplicationFactory:
