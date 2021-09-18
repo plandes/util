@@ -500,9 +500,14 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 v = self.instance(v, **params)
                 inst[k] = v
         elif isinstance(secs, str):
-            inst = self.instance(secs, **params)
+            try:
+                inst = self.instance(secs, **params)
+            except Exception as e:
+                raise FactoryError(
+                    f"Could not create instance from section '{section}'") \
+                    from e
         else:
-            raise FactoryError(f'unknown instance type {type(secs)}: {secs}')
+            raise FactoryError(f'Unknown instance type {type(secs)}: {secs}')
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating instance in section {section} ' +
                          f'with {params}, config: {config_params}')

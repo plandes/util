@@ -3,7 +3,7 @@ import sys
 import logging
 from io import StringIO
 from zensols.util.log import loglevel
-from zensols.config import ConfigurableError, Settings
+from zensols.config import ConfigurableError, Settings, FactoryError
 from zensols.cli import (
     ActionCli, ActionCliError, ActionCliManager,
     OptionMetaData, ActionMetaData,
@@ -306,9 +306,9 @@ class TestActionConfigAction(LogTestCase):
             self.config_logging('zensols.cli')
         aset: Application = self.cli.create([])
         self.assertEqual(Application, type(aset))
-        errmsg = r'^No section: range1_stash$'
+        errmsg = r"^Could not create instance from section 'range1_stash"
         with loglevel('zensols.config.factory', logging.CRITICAL):
-            with self.assertRaisesRegex(ConfigurableError, errmsg):
+            with self.assertRaisesRegex(FactoryError, errmsg):
                 aset.invoke()
 
 
