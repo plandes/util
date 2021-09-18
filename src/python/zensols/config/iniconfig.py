@@ -83,7 +83,8 @@ class IniConfig(Configurable):
             return self._create_and_load_parser_from_file(self.config_file)
 
     def _create_and_load_parser_from_file(self, cpath: Path) -> ConfigParser:
-        logger.debug(f'loading config {cpath}')
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'loading config: {cpath}')
         if not cpath.exists():
             raise ConfigurableFileNotFoundError(cpath)
         elif cpath.is_file() or cpath.is_dir():
