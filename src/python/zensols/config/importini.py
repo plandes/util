@@ -50,7 +50,7 @@ class _ParserAdapter(object):
                     self.conf.get_option(option, section)
                 except ConfigurableError as e:
                     raise ConfigurableError(
-                        f'Can not get option {option}:{section}') from e
+                        f'Can not get option {section}:{option}') from e
         return val
 
     def optionxform(self, option: str) -> str:
@@ -291,7 +291,10 @@ class ImportIniConfig(IniConfig):
             sparams = dict(params)
             del sparams[self.CONFIG_FILES]
             for cf in conf_files:
-                sparams[self.SINGLE_CONFIG_FILE] = cf
+                parsed_cf = self.serializer.parse_object(cf)
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'file: {cf} -> {parsed_cf}')
+                sparams[self.SINGLE_CONFIG_FILE] = parsed_cf
                 conf = self._create_single_loader(section, sparams)
                 loaders.append(conf)
         return loaders
