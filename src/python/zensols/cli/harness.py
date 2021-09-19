@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import List, Dict, Any, Union, Type
+from typing import List, Dict, Any, Union, Type, Optional
 from dataclasses import dataclass, field
 import sys
 import logging
@@ -12,7 +12,7 @@ from io import TextIOBase
 from pathlib import Path
 from zensols.util import PackageResource
 from zensols.config import DictionaryConfig
-from zensols.cli import ApplicationFactory
+from zensols.cli import ActionResult, ApplicationFactory
 
 logger = logging.getLogger(__name__)
 
@@ -65,13 +65,26 @@ class CliHarness(object):
     """The log formatting used in :meth:`configure_logging`."""
 
     @property
-    def is_repl(self) -> bool:
-        """``True`` if the program is being called from the Python REPL, ``False`` if
-        calling from the command line as a program.
+    def invoke_method(self) -> str:
+        """Return how the program was invoked.
+
+        :return: one of ``eval`` for re-evaluating the file, ``repl`` from the
+                 REPL or ``main`` for invocation from the main command line
 
         """
-        import __main__ as mmod
-        return not hasattr(mmod, '__file__')
+        meth = None
+        finf: inspect.FrameInfo = inspect.stack()[-1]
+        mod_name = finf.frame.f_globals['__name__']
+        if mod_name == '__main__':
+            if finf.filename == '<stdin>':
+                meth = 'repl'
+            elif finf.filename == '<string>':
+                meth = 'eval'
+        meth = 'main' if meth is None else meth
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'module name: {mod_name}, file: {finf.filename}, ' +
+                         f'method: {meth}')
+        return meth
 
     def configure_logging(self, level: int = logging.INFO):
         """Convenience method to configure the logging package system for early stage
@@ -82,10 +95,14 @@ class CliHarness(object):
         fmt = '%(asctime)-15s [%(name)s] %(message)s'
         logging.basicConfig(format=fmt, level=level)
 
+    def _create_context(self, root_dir: Path) -> Dict[str, Dict[str, str]]:
+        ctx = dict(self.app_config_context)
+        ctx['appenv'] = {'root_dir': str(root_dir)}
+        return ctx
+
     def _create_cli(self, entry_path: Path, factory_kwargs: Dict[str, Any]) \
             -> ApplicationFactory:
-        ctx = self.app_config_context
-        ctx['appenv'] = {'root_dir': str(entry_path.parent)}
+        ctx = self._create_context(entry_path.parent)
         dconf = DictionaryConfig(ctx)
         return self.app_factory_class(
             package_resource=self.package_resource,
@@ -142,20 +159,14 @@ class CliHarness(object):
         except SystemExit as e:
             print(f'exit: {e}')
 
-    @classmethod
-    def run(cls, *args, **kwargs):
+    def run(self) -> Optional[ActionResult]:
         """The command line script entry point."""
-        frame = inspect.stack()[1]
-        mod = inspect.getmodule(frame[0])
-        self = cls(*args, **kwargs)
-        invoke_main = False
-        if mod is not None and (mod.__name__ == '__main__'):
-            import __main__ as mmod
-            if hasattr(mmod, '__file__'):
-                invoke_main = True
-        if invoke_main:
+        invoke_method = self.invoke_method
+        if invoke_method == 'main':
             # when running from a shell, run the CLI entry point
             return self.invoke()
-        else:
+        elif invoke_method == 'repl':
             # otherwise, assume a Python REPL and run the prototyping method
             return self.proto()
+        else:
+            logger.debug('skipping re-entry from interpreter re-evaluation')
