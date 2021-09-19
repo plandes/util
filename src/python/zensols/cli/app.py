@@ -541,7 +541,7 @@ class ApplicationFactory(PersistableContainer):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'create resources for: {type(self)}')
         if isinstance(self.app_config_resource, str):
-            path = self._get_config_path()
+            path: Path = self._get_config_path()
             config: Configurable = self._create_application_context(path)
         else:
             file_obj = self.app_config_resource
