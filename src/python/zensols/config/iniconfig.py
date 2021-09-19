@@ -78,6 +78,7 @@ class IniConfig(Configurable):
             writer.seek(0)
             parser = self._create_config_parser()
             parser.read_file(writer)
+            writer.seek(0)
             return parser
         else:
             return self._create_and_load_parser_from_file(self.config_file)
