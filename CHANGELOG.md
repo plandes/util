@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.6.2] - 2021-09-21
+
+### Changed
+- CLI: configuration file option `--config` expected for list action.
+
+
 ## [1.6.1] - 2021-09-21
 
 ### Changed
@@ -249,7 +255,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.6.1...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.6.2...HEAD
+[1.6.2]: https://github.com/plandes/util/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/plandes/util/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/plandes/util/compare/v1.5.3...v1.6.0
 [1.5.3]: https://github.com/plandes/util/compare/v1.5.2...v1.5.3
