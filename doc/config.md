@@ -264,8 +264,28 @@ In case the program isn't automatically configured with the module to find the
 resource, you may add it in the configuration declaration itself.  For example,
 if our [setuptools] name is `zensols.someproj`, configure the resource as:
 ```ini
-fake_path = resource(zensols.someproj): resources/fake.txt
+fake_path = resource(zensols.someproj): resources/obj.txt
 ```
+
+
+### Resource Libraries
+
+Resource libraries are just a collection of files that are deployed with a
+library and accessible when that library is installed.  These are useful when a
+lot of configuration is needed to make a library useful, such as the [Zensols
+deep learning natural language processing library].  The convention if to have
+a top level `obj.conf` for the package that imports everything else that is
+needed.  For example, to import the [zensols.deepnlp resource library] use:
+```ini
+[import]
+sections = imp_conf
+
+[imp_conf]
+type = importini
+config_files = list: resource(zensols.nlp): resources/obj.conf
+```
+The `type = importini` tells it to use a [ImportIniConfig] (see the [Configuration
+Implementations](#configuration-implementations) section).
 
 
 ### Instance Parameters
@@ -434,6 +454,9 @@ this documentation.
 [Java Spring]: https://spring.io
 [setuptools]: https://setuptools.readthedocs.io/en/latest/
 [pkg_resources]: https://setuptools.readthedocs.io/en/latest/pkg_resources.html
+
+[Zensols natural language processing library]: https://github.com/plandes/deepnlp
+[zensols.deepnlp resource library]: https://github.com/plandes/deepnlp/tree/master/resources
 
 [test_yaml.py]: https://github.com/plandes/util/blob/master/test/python/test_yaml.py
 [Configuration Factory]: #configuration-factory
