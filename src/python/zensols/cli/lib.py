@@ -211,6 +211,9 @@ class ConfigurationImporter(ApplicationObserver):
 
     """
 
+    default: Path = field(default=None)
+    """Use this file as the efault when given on the command line."""
+
     config_path_environ_name: str = field(default=None)
     """An environment variable containing the default path to the configuration.
 
@@ -349,6 +352,8 @@ class ConfigurationImporter(ApplicationObserver):
             val: str = os.environ.get(name)
             if val is not None:
                 self.config_path = Path(val)
+            if self.default is not None:
+                self.config_path = val
             else:
                 if self.expect:
                     lopt = self._get_config_option()
