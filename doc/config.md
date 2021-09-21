@@ -139,6 +139,7 @@ in how it reads data, which uses the following rules:
 * A string starting with `object:` an object specified by class name (see the
   [Configuration Factory] and [Instance Parameters](#instance-parameters)
   sections).
+* A string starting with `class:` a class/type specified by a class name.
 * Anything else as a string.
 
 

@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.6.1] - 2021-09-21
+
+### Changed
+- Fix option field mapping and JSON of CLI metadata for list app.
+- Do not stringify class in `Dictable.asdict`.
+- Move dump on load `Stash` to `PreemptiveStash` and create a
+  `PrimablePreemptiveStash` to replace previously dual merged behavior.
+- Fix entry point infinite loop call in multi-process in `CliHarness`.
+
+### Added
+- Positional documentation was added to metadata and list action app output.
+- Add a `class:` configuration type to create new classes.
+- Can now load resources on multiple config files in `ImportIniConfig`.
+
+
 ## [1.6.0] - 2021-09-07
 ### Changed
 - Fix GitHub workflows continuous integration.
@@ -234,7 +249,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/plandes/util/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/plandes/util/compare/v1.5.3...v1.6.0
 [1.5.3]: https://github.com/plandes/util/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/plandes/util/compare/v1.5.1...v1.5.2
