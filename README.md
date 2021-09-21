@@ -8,10 +8,15 @@
 
 Command line, configuration and persistence utilities generally used for any
 more than basic application.  This general purpose library is small, has few
-dependencies, and helpful across many applications.  Some features include:
+dependencies, and helpful across many applications.
 
-* A [Java Spring] like application level support for [configuration] than
-  [configparser].
+* See the [full documentation].
+* Paper on [arXiv](http://arxiv.org/abs/2109.03383).
+
+Some features include:
+
+* A [Hydra] or [Java Spring] like application level support for [configuration]
+  than [configparser].
   * Construct objects using configuration files (both INI and YAML).
   * Parse primitives, dictionaries, file system objects, instances of classes.
 * A [command action library] using an action mnemonic to invocation of a
@@ -27,7 +32,13 @@ factory](doc/config.md).
 
 ## Documentation
 
-See the [full documentation].
+* [Full](https://plandes.github.io/util/) documentation
+* [Configuration](https://plandes.github.io/util/doc/config.html): powerful but
+  simple configuration system much like [Hydra] or [Java Spring]
+* [Command line](https://plandes.github.io/util/doc/command-line.html)
+* [Persistence](https://plandes.github.io/util/doc/persist.html): cache
+  intermediate data(structures) to the file system
+* [API reference](https://plandes.github.io/install/api.html)
 
 
 ## Obtaining
@@ -64,6 +75,22 @@ If you don't want to bother installing this program, the following sections
 have generated code as examples from which you can copy/paste.
 
 
+## Citation
+
+If you use this project in your research please use the following BibTeX entry:
+```
+@article{Landes_DiEugenio_Caragea_2021,
+  title={DeepZensols: Deep Natural Language Processing Framework},
+  url={http://arxiv.org/abs/2109.03383},
+  note={arXiv: 2109.03383},
+  journal={arXiv:2109.03383 [cs]},
+  author={Landes, Paul and Di Eugenio, Barbara and Caragea, Cornelia},
+  year={2021},
+  month={Sep}
+}
+```
+
+
 ## Changelog
 
 An extensive changelog is available [here](CHANGELOG.md).
@@ -90,6 +117,7 @@ Copyright (c) 2020 - 2021 Paul Landes
 [build-link]: https://github.com/plandes/util/actions
 
 [Java Spring]: https://spring.io
+[Hydra]: https://github.com/facebookresearch/hydra
 [Java installation]: https://java.com/en/download/
 
 [full documentation]: https://plandes.github.io/util/
