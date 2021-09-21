@@ -294,6 +294,9 @@ class ClassInspector(object):
                 except Exception as e:
                     if logger.isEnabledFor(logging.DEBUG):
                         logger.debug(f'could not invoke: {default}: {e}')
+            elif isinstance(def_node, ast.UnaryOp):
+                op = def_node.operand
+                default = op.value
             else:
                 default = def_node.value
             if logger.isEnabledFor(logging.DEBUG):
