@@ -3,7 +3,7 @@
 # type of project
 PROJ_TYPE=		python
 PROJ_MODULES=		git python-doc python-doc-deploy python-resources
-CLEAN_ALL_DEPS +=	cleanexample
+CLEAN_DEPS +=		cleanexample
 
 #PY_SRC_TEST_PAT ?=	'test_action.py'
 
