@@ -177,6 +177,7 @@ class ImportIniConfig(IniConfig):
     SINGLE_CONFIG_FILE = 'config_file'
     CONFIG_FILES = 'config_files'
     REFS_SECTION = 'references'
+    TYPE_NAME = 'type'
 
     def __init__(self, *args,
                  config_section: str = IMPORT_SECTION,
@@ -255,14 +256,14 @@ class ImportIniConfig(IniConfig):
         params = dict(params)
         cf = ConfigurableFactory(params)
         class_name = params.get('class_name')
-        tpe = params.get('type')
+        tpe = params.get(self.TYPE_NAME)
         config_file = params.get(self.SINGLE_CONFIG_FILE)
         loader: _ConfigLoader
         if class_name is not None:
             del params['class_name']
             loader = _ConfigLoader(section, cf, 'from_class_name', class_name)
         elif tpe is not None:
-            del params['type']
+            del params[self.TYPE_NAME]
             loader = _ConfigLoader(section, cf, 'from_type', tpe)
         elif config_file is not None:
             del params[self.SINGLE_CONFIG_FILE]
