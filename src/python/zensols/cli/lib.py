@@ -468,8 +468,10 @@ class PackageInfoImporter(ApplicationObserver):
         pkg_res: PackageResource = self._app.factory.package_resource
         params = {'name': pkg_res.name,
                   'version': pkg_res.version}
-        dconf = DictionaryConfig({self.section: params})
-        dconf.copy_sections(self.config)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'adding package section: {self.section}={params}')
+        d_conf = DictionaryConfig({self.section: params})
+        d_conf.copy_sections(self.config)
 
 
 class ExportFormat(Enum):
