@@ -35,7 +35,9 @@ factory](doc/config.md).
 * [Full](https://plandes.github.io/util/) documentation
 * [Configuration](https://plandes.github.io/util/doc/config.html): powerful but
   simple configuration system much like [Hydra] or [Java Spring]
-* [Command line](https://plandes.github.io/util/doc/command-line.html)
+* [Command line](https://plandes.github.io/util/doc/command-line.html):
+  automagically creates a fully functional command with help from a Python
+  [dataclass](https://docs.python.org/3/library/dataclasses.html)
 * [Persistence](https://plandes.github.io/util/doc/persist.html): cache
   intermediate data(structures) to the file system
 * [API reference](https://plandes.github.io/install/api.html)
