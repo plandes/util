@@ -138,7 +138,7 @@ class TestActionInvoke(LogTestCase):
         self.cli = ApplicationFactory(
             'zensols.testapp', 'test-resources/test-app-first-pass.conf')
 
-    def Xtest_first_pass_invoke(self):
+    def test_first_pass_invoke(self):
         if 0:
             self.config_logging('zensols.cli')
             self.cli.parser.write_help()
