@@ -287,6 +287,8 @@ config_files = list: resource(zensols.nlp): resources/obj.conf
 The `type = importini` tells it to use a [ImportIniConfig] (see the [Configuration
 Implementations](#configuration-implementations) section).
 
+For an example of how to use a resource library, see the [nlparse example].
+
 
 ### Instance Parameters
 
@@ -457,6 +459,7 @@ this documentation.
 
 [Zensols natural language processing library]: https://github.com/plandes/deepnlp
 [zensols.deepnlp resource library]: https://github.com/plandes/deepnlp/tree/master/resources
+[nlparse example]: https://github.com/plandes/nlparse/blob/master/example/simple.py
 
 [test_yaml.py]: https://github.com/plandes/util/blob/master/test/python/test_yaml.py
 [Configuration Factory]: #configuration-factory
