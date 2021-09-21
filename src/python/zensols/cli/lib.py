@@ -352,7 +352,7 @@ class ConfigurationImporter(ApplicationObserver):
             val: str = os.environ.get(name)
             if val is not None:
                 self.config_path = Path(val)
-            if self.default is not None:
+            elif self.default is not None:
                 self.config_path = val
             else:
                 if self.expect:
