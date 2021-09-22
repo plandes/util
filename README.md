@@ -32,7 +32,7 @@ factory](doc/config.md).
 
 ## Documentation
 
-* [Full](https://plandes.github.io/util/) documentation
+* [Full documentation](https://plandes.github.io/util/)
 * [Configuration](https://plandes.github.io/util/doc/config.html): powerful but
   simple configuration system much like [Hydra] or [Java Spring]
 * [Command line](https://plandes.github.io/util/doc/command-line.html):
