@@ -625,6 +625,8 @@ class ApplicationFactory(PersistableContainer):
         fac, cli_mng, parser = self._create_resources()
         if args is None:
             args = self._get_default_args()
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'application arguments: {args}')
         actions: Tuple[Action] = self._parse(args)
         return Application(fac, self, actions)
 
