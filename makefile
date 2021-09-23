@@ -3,17 +3,12 @@
 # type of project
 PROJ_TYPE=		python
 PROJ_MODULES=		git python-doc python-doc-deploy python-resources
-CLEAN_DEPS +=		cleanexample
+CLEAN_DEPS +=		pycleancache
 
 #PY_SRC_TEST_PAT ?=	'test_action.py'
 
 include ./zenbuild/main.mk
 
-
-.PHONY:			cleanexample
-cleanexample:
-			find example -type d -name __pycache__ \
-			  -prune -exec rm -r {} \;
 
 .PHONY:			check
 check:
