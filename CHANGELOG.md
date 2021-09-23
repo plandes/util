@@ -8,14 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
-## [1.6.2] - 2021-09-21
+### Changed
+- `CliHarness` uses `LogConfigurator` to configure the logging system instead
+  of `logging.basicConfig`.
 
+
+## [1.6.2] - 2021-09-21
 ### Changed
 - CLI: configuration file option `--config` expected for list action.
 
 
 ## [1.6.1] - 2021-09-21
-
 ### Changed
 - Fix option field mapping and JSON of CLI metadata for list app.
 - Do not stringify class in `Dictable.asdict`.

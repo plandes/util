@@ -13,6 +13,7 @@ from pathlib import Path
 from zensols.util import PackageResource
 from zensols.config import DictionaryConfig
 from zensols.cli import ActionResult, ApplicationFactory
+from . import LogConfigurator
 
 logger = logging.getLogger(__name__)
 
@@ -86,14 +87,18 @@ class CliHarness(object):
                          f'method: {meth}')
         return meth
 
-    def configure_logging(self, level: int = logging.INFO):
+    def configure_logging(self, *args, **kwargs):
         """Convenience method to configure the logging package system for early stage
         (bootstrap) debugging.  However, the "right" way to configure logging
         is in the application configuration.
 
+        The arguments provided are given to the initializer of
+        :class:`.LogConfigurator`, which is then used to configure the logging
+        system.
+
         """
-        fmt = '%(asctime)-15s [%(name)s] %(message)s'
-        logging.basicConfig(format=fmt, level=level)
+        log_conf = LogConfigurator(*args, **kwargs)
+        log_conf.config()
 
     def _create_context(self, root_dir: Path) -> Dict[str, Dict[str, str]]:
         ctx = dict(self.app_config_context)

@@ -12,5 +12,5 @@ from .usage import *
 from .cmd import *
 from .action import *
 from .app import *
-from .harness import *
 from .lib import *
+from .harness import *
