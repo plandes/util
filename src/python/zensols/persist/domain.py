@@ -318,7 +318,7 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
         if self.delegate is not None:
             return self.delegate.load(name)
 
-    def get(self, name: str, default=None) -> Any:
+    def get(self, name: str, default: Any = None) -> Any:
         """Load an object or a default if key ``name`` doesn't exist.
 
         **Implementation note:** sub classes will probably want to override
@@ -469,7 +469,7 @@ class PrimeableStash(Stash, Primeable):
            isinstance(self.delegate, PrimeableStash):
             self.delegate.prime()
 
-    def get(self, name: str, default=None):
+    def get(self, name: str, default: Any = None) -> Any:
         self.prime()
         return super().get(name, default)
 
