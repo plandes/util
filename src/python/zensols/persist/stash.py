@@ -34,6 +34,9 @@ class OneShotFactoryStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     To use this class, this worker must be set as attribute ``worker`` or this
     class extended and ``worker`` be a property.
 
+    .. document private functions
+    .. automethod:: _get_worker_type
+
     """
     def _get_worker_type(self) -> str:
         """Return the type of worker.  This default implementation returns *unknown*.
