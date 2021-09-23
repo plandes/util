@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - `CliHarness` uses `LogConfigurator` to configure the logging system instead
   of `logging.basicConfig`.
+- `OneShotFactoryStash` inherits from `PrimablePreemptiveStash` and uses its
+  overridden methods to preempt data creation
 
 
 ## [1.6.2] - 2021-09-21
