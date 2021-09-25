@@ -524,11 +524,11 @@ class ApplicationFactory(PersistableContainer):
     def _get_config_path(self) -> Path:
         path: Path = self.package_resource.get_path(self.app_config_resource)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'path to app specific context: {path.absolute()}')
+            logger.debug(f'path to app specific context: {path}')
         if not path.exists():
             raise ActionCliError(
                 f"Application context resource '{self.app_config_resource}' " +
-                f'not found in {self.package_resource}')
+                f'not found in {self.package_resource} at {path}')
         return path
 
     @persisted('_resources')
@@ -698,3 +698,26 @@ class ApplicationFactory(PersistableContainer):
             exc_info = sys.exc_info()
             logger.error(f'invocation failed: {e}', exc_info=exc_info)
             return exc_info
+
+    def get_instance(self, args: Union[List[str], str] = None) -> Any:
+        """Create the invokable instance of the application.
+
+        ;param args: the arguments to the application; if this is a string, it
+                     will be converted to a list by splitting on whitespace;
+                     this defaults to the output of :meth:`_get_default_args`
+
+        :raises ActionCliError: for any missing data or misconfigurations
+
+        :return: the invokable instance of the application
+
+        """
+        if isinstance(args, str):
+            args = args.split()
+        try:
+            app: Application = self.create(args)
+            app_res: ApplicationResult
+            invokable: Invokable
+            app_res, invokable = app.invoke_but_second_pass()
+            return invokable.instance
+        except Exception as e:
+            self._handle_error(e)

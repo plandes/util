@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import List, Dict, Any, Union, Type, Optional
+from typing import List, Dict, Any, Union, Type, Optional, Tuple
 from dataclasses import dataclass, field
 import sys
 import logging
@@ -25,10 +25,13 @@ class CliHarness(object):
 
     """
     src_dir_name: str = field(default='src')
-    """The directory to add to the Python path containing the source files."""
+    """The directory (relative to :obj:`root_dir` to add to the Python path
+    containing the source files.
+
+    """
 
     package_resource: Union[str, PackageResource] = field(default='app')
-    """The application package resource
+    """The application package resource.
 
     :see: :obj:`.ApplicationFactory.package_resource`
 
@@ -36,7 +39,9 @@ class CliHarness(object):
 
     app_config_resource: Union[str, TextIOBase] = field(
         default='resources/app.conf')
-    """The relative resource path to the application's context.
+    """The relative resource path to the application's context.  If set as an
+    instance of :class:`io.TextIOBase` then read from that resource instead of
+    trying to find a resource file.
 
     :see: :obj:`.ApplicationFactory.app_config_resource`
 
@@ -44,6 +49,13 @@ class CliHarness(object):
 
     app_config_context: Dict[str, Dict[str, str]] = field(default_factory=dict)
     """More context given to the application context on app creation."""
+
+    root_dir: Path = field(default=None)
+    """The entry point directory where to make all files relative.  If not given,
+    it is resolved from the parent of the entry point program path in the
+    (i.e. :obj:`sys.argv`) arguments.
+
+    """
 
     app_factory_class: Type[ApplicationFactory] = field(
         default=ApplicationFactory)
@@ -103,16 +115,51 @@ class CliHarness(object):
     def _create_context(self, root_dir: Path) -> Dict[str, Dict[str, str]]:
         ctx = dict(self.app_config_context)
         ctx['appenv'] = {'root_dir': str(root_dir)}
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'creating initial context with {ctx}')
         return ctx
 
-    def _create_cli(self, entry_path: Path, factory_kwargs: Dict[str, Any]) \
+    def _create_cli(self, root_dir: Path, factory_kwargs: Dict[str, Any]) \
             -> ApplicationFactory:
-        ctx = self._create_context(entry_path.parent)
+        ctx = self._create_context(root_dir)
         dconf = DictionaryConfig(ctx)
         return self.app_factory_class(
             package_resource=self.package_resource,
             app_config_resource=self.app_config_resource,
             children_configs=(dconf,), **factory_kwargs)
+
+    def create_application_factory(self, args: List[str] = (),
+                                   **factory_kwargs: Dict[str, Any]) -> \
+            Tuple[Tuple[str], ApplicationFactory]:
+        """Create and return the application factory.
+
+        :param args: the command line arguments as given from :obj:`sys.argv`,
+                     including the program name
+
+        :param factory_kwargs: arguments passed to :class:`.ApplicationFactory`
+
+        :return: the application factory on which to call
+                 :meth:`.ApplicationFactory.invoke`
+
+        """
+        entry_path = None
+        if len(args) > 0:
+            args = args[1:]
+            if len(args) > 1:
+                entry_path = Path(args[0])
+        if entry_path is None:
+            entry_path = Path('.')
+        if self.root_dir is None:
+            root_dir = entry_path.parent
+        else:
+            root_dir = self.root_dir
+        src_path = root_dir
+        if self.src_dir_name is not None:
+            src_path = src_path / self.src_dir_name
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'adding source path: {src_path} to python path')
+        sys.path.append(str(src_path))
+        return self._create_cli(root_dir, factory_kwargs)
 
     def invoke(self, args: List[str] = sys.argv,
                **factory_kwargs: Dict[str, Any]) -> Any:
@@ -124,19 +171,9 @@ class CliHarness(object):
         :param factory_kwargs: arguments given to the command line factory
 
         """
-        entry_path = None
-        if len(args) > 0:
-            args = args[1:]
-            if len(args) > 1:
-                entry_path = Path(args[0])
-        if entry_path is None:
-            entry_path = Path('.')
-        src_path = entry_path.parent
-        if self.src_dir_name is not None:
-            src_path = src_path / self.src_dir_name
-        sys.path.append(str(src_path))
-        cli: ApplicationFactory = self._create_cli(entry_path, factory_kwargs)
-        return cli.invoke(args)
+        cli: ApplicationFactory = self.create_application_factory(
+            args, **factory_kwargs)
+        return cli.invoke(args[1:])
 
     def _proto(self, args: List[str], **factory_kwargs: Dict[str, Any]):
         """Invoke the prototype.
@@ -175,3 +212,67 @@ class CliHarness(object):
             return self.proto()
         else:
             logger.debug('skipping re-entry from interpreter re-evaluation')
+
+
+@dataclass
+class NotebookHarness(object):
+    """A harness used in Jupyter notebooks.  This class has default configuration
+    useful to having a single directory with one or more notebooks off the
+    project root ditectory.
+
+    For this reason :obj:`root_dir` is the parent directory, which is used to
+    add :obj:`src_dir_name` to the Python path.
+
+    """
+    package_resource: Union[str, PackageResource] = field(default='app')
+    """The application package resource.
+
+    :see: :obj:`.ApplicationFactory.package_resource`
+
+    """
+
+    app_config_resource: str = field(default='resources/app.conf')
+    """The relative resource path to the application's context."""
+
+    root_dir: Union[Path, str] = field(default=Path('..'))
+    """The entry point directory where to make all files relative.  If not given,
+    it is resolved from the parent of the entry point program path in the
+    (i.e. :obj:`sys.argv`) arguments.
+
+    """
+
+    src_dir_name: Union[Path, str] = field(default=Path('src/python'))
+    """The directory (relative to :obj:`root_dir`) to add to the Python path
+    containing the source files.
+
+    """
+
+    def __post_init__(self):
+        if isinstance(self.root_dir, str):
+            self.root_dir = Path(self.root_dir)
+        self._init_cli()
+
+    def _init_cli(self):
+        self.cli = CliHarness(
+            package_resource=self.package_resource,
+            app_config_resource=f'{self.root_dir}/{self.app_config_resource}',
+            src_dir_name=self.src_dir_name,
+            root_dir=self.root_dir,
+        )
+        self.application_factory = self.cli.create_application_factory()
+        self.set_browser_width()
+
+    @staticmethod
+    def set_browser_width(width: int = 95):
+        """Use the entire width of the browser to create more real estate.
+
+        :param width: the width as a percent (``[0, 100]``) to use as the width
+                      in the notebook
+
+        """
+        from IPython.core.display import display, HTML
+        html = f'<style>.container {{ width:{width}% !important; }}</style>'
+        display(HTML(html))
+
+    def __call__(self, args: str) -> Any:
+        return self.application_factory.get_instance(args)
