@@ -24,7 +24,7 @@ class CliHarness(object):
     :class:`.Application` from either the command line or a Python REPL.
 
     """
-    src_dir_name: str = field(default='src')
+    src_dir_name: str = field(default='src/python')
     """The directory (relative to :obj:`root_dir` to add to the Python path
     containing the source files.
 
