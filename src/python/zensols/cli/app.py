@@ -457,6 +457,8 @@ class ApplicationFactory(PersistableContainer):
     """
 
     def __post_init__(self):
+        if self.package_resource is None:
+            raise ActionCliError('Missing package resource')
         if isinstance(self.package_resource, str):
             self.package_resource = PackageResource(self.package_resource)
         self._configure_serializer()
@@ -464,6 +466,8 @@ class ApplicationFactory(PersistableContainer):
             '_resources', self, deallocate_recursive=True)
 
     def _configure_serializer(self):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'configuring serilaizer: {self.package_resource}')
         dist_name = self.package_resource.name
         Serializer.DEFAULT_RESOURCE_MODULE = dist_name
 

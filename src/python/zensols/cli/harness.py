@@ -43,7 +43,7 @@ class CliHarness(object):
 
     """
 
-    package_resource: Union[str, PackageResource] = field(default=None)
+    package_resource: Union[str, PackageResource] = field(default='app')
     """The application package resource.
 
     :see: :obj:`.ApplicationFactory.package_resource`
@@ -156,6 +156,7 @@ class CliHarness(object):
         """
         entry_path: Path = None
         cur_path = Path('.')
+        src_path = None
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'args: {args}')
         if len(args) > 0:
@@ -191,10 +192,16 @@ class CliHarness(object):
         ctx = self._create_context(env.root_dir)
         dconf = DictionaryConfig(ctx)
         cls = self._get_app_factory_class()
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'creating {cls}: ' +
+                         f'package resource: {self.package_resource}, ' +
+                         f'config resource: {env.app_config_resource}, ' +
+                         f'context: {ctx}')
         return cls(
             package_resource=self.package_resource,
             app_config_resource=env.app_config_resource,
-            children_configs=(dconf,), **factory_kwargs)
+            children_configs=(dconf,),
+            **factory_kwargs)
 
     def create_application_factory(self, args: List[str] = (),
                                    **factory_kwargs: Dict[str, Any]) -> \
