@@ -136,9 +136,10 @@ class CliHarness(object):
         log_conf = LogConfigurator(*args, **kwargs)
         log_conf.config()
 
-    def _create_context(self, root_dir: Path) -> Dict[str, Dict[str, str]]:
+    def _create_context(self, env: _HarnessEnviron) -> \
+            Dict[str, Dict[str, str]]:
         ctx = dict(self.app_config_context)
-        ctx['appenv'] = {'root_dir': str(root_dir)}
+        ctx['appenv'] = {'root_dir': str(env.root_dir)}
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating initial context with {ctx}')
         return ctx
@@ -212,7 +213,7 @@ class CliHarness(object):
 
     def _create_app_fac(self, env: _HarnessEnviron,
                         factory_kwargs: Dict[str, Any]) -> ApplicationFactory:
-        ctx = self._create_context(env.root_dir)
+        ctx = self._create_context(env)
         dconf = DictionaryConfig(ctx)
         cls = self._get_app_factory_class()
         if logger.isEnabledFor(logging.DEBUG):
