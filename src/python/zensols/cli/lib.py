@@ -157,7 +157,7 @@ class ConfigurationImporter(ApplicationObserver):
          option.
 
       2. If the option doesn't exist, attempt to get the path to load from an
-         environment variable (see :meth:`_get_environ_var_from_app`).
+         environment variable (see :meth:`get_environ_var_from_app`).
 
       3. Loads the *child* configuration.
 
@@ -252,7 +252,7 @@ class ConfigurationImporter(ApplicationObserver):
     config_path: Path = field(default=None)
     """The path to the configuration file."""
 
-    def _get_environ_var_from_app(self) -> str:
+    def get_environ_var_from_app(self) -> str:
         """Return the environment variable based on the name of the application.  This
         returns the :obj:`config_path_environ_name` if set, otherwise, it
         generates it based on the name returned from the packge + ``RC`` and
@@ -346,7 +346,7 @@ class ConfigurationImporter(ApplicationObserver):
         """
         load_config = True
         if self.config_path is None:
-            name: str = self._get_environ_var_from_app()
+            name: str = self.get_environ_var_from_app()
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f"attempting load config from env var '{name}'")
             val: str = os.environ.get(name)

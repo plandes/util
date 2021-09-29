@@ -6,6 +6,7 @@ __author__ = 'Paul Landes'
 from typing import List, Dict, Any, Union, Type, Optional, Tuple
 from dataclasses import dataclass, field
 import sys
+import os
 import logging
 import inspect
 from io import TextIOBase
@@ -13,10 +14,21 @@ from pathlib import Path
 from zensols.util import PackageResource
 from zensols.config import DictionaryConfig
 from zensols.introspect import ClassImporter
-from zensols.cli import ActionResult, ApplicationFactory
+from zensols.cli import (
+    Action, ActionResult, OptionMetaData,
+    Application, ApplicationFactory, ConfigurationImporter
+)
 from . import LogConfigurator
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class _HarnessEnviron(object):
+    args: List[str]
+    src_path: Path
+    root_dir: Path
+    app_config_resource: Union[str, TextIOBase]
 
 
 @dataclass
@@ -25,13 +37,13 @@ class CliHarness(object):
     :class:`.Application` from either the command line or a Python REPL.
 
     """
-    src_dir_name: str = field(default='src/python')
+    src_dir_name: str = field(default=None)
     """The directory (relative to :obj:`root_dir` to add to the Python path
     containing the source files.
 
     """
 
-    package_resource: Union[str, PackageResource] = field(default='app')
+    package_resource: Union[str, PackageResource] = field(default=None)
     """The application package resource.
 
     :see: :obj:`.ApplicationFactory.package_resource`
@@ -77,6 +89,9 @@ class CliHarness(object):
 
     log_format: str = field(default='%(asctime)-15s [%(name)s] %(message)s')
     """The log formatting used in :meth:`configure_logging`."""
+
+    def __post_init__(self):
+        pass
 
     @property
     def invoke_method(self) -> str:
@@ -128,22 +143,65 @@ class CliHarness(object):
             cls = self.app_factory_class
         return cls
 
-    def _create_cli(self, root_dir: Path, factory_kwargs: Dict[str, Any]) \
-            -> ApplicationFactory:
-        ctx = self._create_context(root_dir)
+    def _create_harness_environ(self, args: List[str]) -> _HarnessEnviron:
+        """Process paths and configure the Python path necessary to execute the
+        application.
+
+        :param args: all command line arguments as given from :obj:`sys.argv`,
+                     including the program name
+
+        :return: the application factory on which to call
+                 :meth:`.ApplicationFactory.invoke`
+
+        """
+        entry_path: Path = None
+        cur_path = Path('.')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'args: {args}')
+        if len(args) > 0:
+            entry_path = Path(args[0]).parents[0]
+            args = args[1:]
+        if entry_path is None:
+            entry_path = cur_path
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'entry path: {entry_path}')
+        if self.root_dir is None:
+            root_dir = entry_path
+        else:
+            root_dir = entry_path / self.root_dir
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'root dir: {root_dir}')
+        if self.src_dir_name is not None:
+            src_path = root_dir / self.src_dir_name
+            src_path_str = str(src_path)
+            if logger.isEnabledFor(logging.INFO):
+                logger.info(f'adding source path: {src_path} to python path')
+            if src_path_str not in sys.path:
+                sys.path.append(src_path_str)
+        app_conf_res = self.app_config_resource
+        if isinstance(app_conf_res, str):
+            if entry_path != cur_path:
+                app_conf_res = str(Path(root_dir / app_conf_res))
+                if logger.isEnabledFor(logging.INFO):
+                    logger.info(f'update app config resource: {app_conf_res}')
+        return _HarnessEnviron(args, src_path, root_dir, app_conf_res)
+
+    def _create_app_fac(self, env: _HarnessEnviron,
+                        factory_kwargs: Dict[str, Any]) -> ApplicationFactory:
+        ctx = self._create_context(env.root_dir)
         dconf = DictionaryConfig(ctx)
         cls = self._get_app_factory_class()
         return cls(
             package_resource=self.package_resource,
-            app_config_resource=self.app_config_resource,
+            app_config_resource=env.app_config_resource,
             children_configs=(dconf,), **factory_kwargs)
 
     def create_application_factory(self, args: List[str] = (),
                                    **factory_kwargs: Dict[str, Any]) -> \
-            Tuple[Tuple[str], ApplicationFactory]:
+            ApplicationFactory:
         """Create and return the application factory.
 
-        :param args: the command line arguments as given from :obj:`sys.argv`,
+        :param args: all command line arguments as given from :obj:`sys.argv`,
                      including the program name
 
         :param factory_kwargs: arguments passed to :class:`.ApplicationFactory`
@@ -152,31 +210,16 @@ class CliHarness(object):
                  :meth:`.ApplicationFactory.invoke`
 
         """
-        entry_path = None
-        if len(args) > 0:
-            args = args[1:]
-            if len(args) > 1:
-                entry_path = Path(args[0])
-        if entry_path is None:
-            entry_path = Path('.')
-        if self.root_dir is None:
-            root_dir = entry_path.parent
-        else:
-            root_dir = self.root_dir
-        src_path = root_dir
-        if self.src_dir_name is not None:
-            src_path = src_path / self.src_dir_name
-        if logger.isEnabledFor(logging.INFO):
-            logger.info(f'adding source path: {src_path} to python path')
-        sys.path.append(str(src_path))
-        return self._create_cli(root_dir, factory_kwargs)
+        env: _HarnessEnviron = self._create_harness_environ(args)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('environ: {env}')
+        return self._create_app_fac(env, factory_kwargs)
 
     def invoke(self, args: List[str] = sys.argv,
                **factory_kwargs: Dict[str, Any]) -> Any:
         """Invoke the application.
 
-        :param args: the command line arguments without the first argument (the
-                     program name)
+        :param args: all command line arguments including the program name
 
         :param factory_kwargs: arguments given to the command line factory
 
@@ -189,9 +232,11 @@ class CliHarness(object):
                      **factory_kwargs: Dict[str, Any]) -> Any:
         """Create the invokable instance of the application.
 
-        ;param args: the arguments to the application; if this is a string, it
-                     will be converted to a list by splitting on whitespace;
-                     this defaults to the output of :meth:`_get_default_args`
+        ;param args: the arguments to the application not including the program
+                     name (as it makes no sense in the context of this call);
+                     if this is a string, it will be converted to a list by
+                     splitting on whitespace; this defaults to the output of
+                     :meth:`_get_default_args`
 
         :param factory_kwargs: arguments passed to :class:`.ApplicationFactory`
 
@@ -242,6 +287,71 @@ class CliHarness(object):
 
 
 @dataclass
+class ConfigurationImporterCliHarness(CliHarness):
+    """A harness that adds command line argument for the configuration file when
+    they are available.  It does this by finding an instance of
+    :class:`.ConfigurationImporter` in the command line metadata.  When it
+    finds it, if not set from the given set of arguments it:
+
+      1. Uses :obj:`config_path`
+
+      2. Gets the path from the environment variable set using
+      :class:`.ConfigurationImporter`
+
+    """
+    config_path: Union[str, Path] = field(default=None)
+
+    def __post_init__(self):
+        super().__post_init__()
+        if isinstance(self.config_path, str):
+            self.config_path = Path(self.config_path)
+
+    def _get_config_path_args(self, env: _HarnessEnviron,
+                              app: Application) -> List[str]:
+        args: List[str] = []
+        capp: Action = tuple(filter(
+            lambda a: a.class_meta.class_type == ConfigurationImporter,
+            app.first_pass_actions))
+        capp = capp[0] if len(capp) > 0 else None
+        if capp is not None:
+            ci: ConfigurationImporter = app.get_invokable(capp.name).instance
+            if ci.config_path is None:
+                op: OptionMetaData = capp.command_action.meta_data.options[0]
+                lnop: str = f'--{op.long_name}'
+                envvar: str = ci.get_environ_var_from_app()
+                envval: str = os.environ.get(envvar)
+                config_path: Path = None
+                if self.config_path is not None:
+                    config_path = self.config_path
+                elif envval is not None:
+                    config_path = Path(envval)
+                if config_path is not None:
+                    config_path = env.root_dir / config_path
+                    args.extend((lnop, str(config_path)))
+        return args
+
+    def _update_args(self, args: List[str],
+                     **factory_kwargs: Dict[str, Any]) -> \
+            Tuple[str, ApplicationFactory]:
+        env: _HarnessEnviron = self._create_harness_environ(args)
+        cli: ApplicationFactory = self._create_app_fac(env, factory_kwargs)
+        app: Application = cli.create(env.args)
+        args = list(env.args)
+        args.extend(self._get_config_path_args(env, app))
+        return cli, args
+
+    def invoke(self, args: List[str] = sys.argv,
+               **factory_kwargs: Dict[str, Any]) -> Any:
+        cli, args = self._update_args(args, **factory_kwargs)
+        return cli.invoke(args)
+
+    def get_instance(self, args: Union[List[str], str] = None,
+                     **factory_kwargs: Dict[str, Any]) -> Any:
+        cli, args = self._update_args(args, **factory_kwargs)
+        return cli.get_instance(args)
+
+
+@dataclass
 class NotebookHarness(object):
     """A harness used in Jupyter notebooks.  This class has default configuration
     useful to having a single directory with one or more notebooks off the
@@ -282,7 +392,7 @@ class NotebookHarness(object):
     def _init_cli(self):
         self.cli = CliHarness(
             package_resource=self.package_resource,
-            app_config_resource=f'{self.root_dir}/{self.app_config_resource}',
+            app_config_resource=self.app_config_resource,
             src_dir_name=self.src_dir_name,
             root_dir=self.root_dir,
         )

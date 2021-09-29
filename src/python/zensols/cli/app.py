@@ -346,6 +346,22 @@ class Application(Dictable):
             logger.debug(f'invoking {meth}')
         return Invokable(action, inst, meth, pos_args, meth_params)
 
+    def get_invokable(self, action_name: str) -> Invokable:
+        """Create an invokable.
+
+        :param action_name: the name of the action, which is also the section
+                            name in the configuration
+
+        """
+        action: Action = self.actions_by_name[action_name]
+        return self._create_invokable(action)
+
+    @property
+    @persisted('_actions_by_name')
+    def actions_by_name(self) -> Dict[str, Action]:
+        """A dictionary of actions by their name."""
+        return {a.name: a for a in self.actions}
+
     @property
     def first_pass_actions(self) -> Iterable[Action]:
         """All first pass actions registered in the application and/or indicated by the
@@ -636,6 +652,11 @@ class ApplicationFactory(PersistableContainer):
         s = s[0].lower() + s[1:]
         return s
 
+    def _dump_error(self, ex: Exception):
+        """Output an exception message using the parser error API."""
+        msg = self._error_to_str(ex)
+        self.parser.error(msg)
+
     def _handle_error(self, ex: Exception):
         """Handle errors raised during the execution of the application.
 
@@ -649,8 +670,7 @@ class ApplicationFactory(PersistableContainer):
             msg = self._error_to_str(ex)
             print(f'{prog}: error: {msg}', file=sys.stderr)
         elif isinstance(ex, ActionCliError):
-            msg = self._error_to_str(ex)
-            self.parser.error(msg)
+            self._dump_error(ex)
         else:
             raise ex
 
