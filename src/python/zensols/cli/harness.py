@@ -12,6 +12,7 @@ from io import TextIOBase
 from pathlib import Path
 from zensols.util import PackageResource
 from zensols.config import DictionaryConfig
+from zensols.introspect import ClassImporter
 from zensols.cli import ActionResult, ApplicationFactory
 from . import LogConfigurator
 
@@ -57,7 +58,7 @@ class CliHarness(object):
 
     """
 
-    app_factory_class: Type[ApplicationFactory] = field(
+    app_factory_class: Union[str, Type[ApplicationFactory]] = field(
         default=ApplicationFactory)
     """The application factory used to create thye application."""
 
@@ -119,11 +120,20 @@ class CliHarness(object):
             logger.debug(f'creating initial context with {ctx}')
         return ctx
 
+    def _get_app_factory_class(self) -> Type[ApplicationFactory]:
+        if isinstance(self.app_factory_class, str):
+            ci = ClassImporter(self.app_factory_class)
+            cls = ci.get_class()
+        else:
+            cls = self.app_factory_class
+        return cls
+
     def _create_cli(self, root_dir: Path, factory_kwargs: Dict[str, Any]) \
             -> ApplicationFactory:
         ctx = self._create_context(root_dir)
         dconf = DictionaryConfig(ctx)
-        return self.app_factory_class(
+        cls = self._get_app_factory_class()
+        return cls(
             package_resource=self.package_resource,
             app_config_resource=self.app_config_resource,
             children_configs=(dconf,), **factory_kwargs)
@@ -174,6 +184,23 @@ class CliHarness(object):
         cli: ApplicationFactory = self.create_application_factory(
             args, **factory_kwargs)
         return cli.invoke(args[1:])
+
+    def get_instance(self, args: Union[List[str], str] = None,
+                     **factory_kwargs: Dict[str, Any]) -> Any:
+        """Create the invokable instance of the application.
+
+        ;param args: the arguments to the application; if this is a string, it
+                     will be converted to a list by splitting on whitespace;
+                     this defaults to the output of :meth:`_get_default_args`
+
+        :param factory_kwargs: arguments passed to :class:`.ApplicationFactory`
+
+        :see: :meth:`.ApplicationFactory.get_instance`
+
+        """
+        cli: ApplicationFactory = self.create_application_factory(
+            args, **factory_kwargs)
+        return cli.get_instance(args)
 
     def _proto(self, args: List[str], **factory_kwargs: Dict[str, Any]):
         """Invoke the prototype.
