@@ -1,4 +1,3 @@
-
 """Main entry point for applications that use the :mod:`.app` API.
 
 """
@@ -75,6 +74,14 @@ class CliHarness(object):
         default=ApplicationFactory)
     """The application factory used to create thye application."""
 
+    relocate: bool = field(default=True)
+    """Whether or not to make :obj:`source_dir_name` and :obj:`app_config_resource`
+    relative to :obj:`root_dir` (when non-``None``).  This should be set to
+    ``False`` when used to create an application that is installed (i.e. with
+    pip).
+
+    """
+
     proto_args: Union[str, List[str]] = field(default_factory=list)
     """The command line arguments."""
 
@@ -144,15 +151,11 @@ class CliHarness(object):
             cls = self.app_factory_class
         return cls
 
-    def _create_harness_environ(self, args: List[str]) -> _HarnessEnviron:
-        """Process paths and configure the Python path necessary to execute the
-        application.
+    def _relocate_harness_environ(self, args: List[str]) -> _HarnessEnviron:
+        """Create a relocated harness environment.
 
         :param args: all command line arguments as given from :obj:`sys.argv`,
                      including the program name
-
-        :return: the application factory on which to call
-                 :meth:`.ApplicationFactory.invoke`
 
         """
         entry_path: Path = None
@@ -190,6 +193,22 @@ class CliHarness(object):
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'update app config resource: {app_conf_res}')
         return _HarnessEnviron(args, src_path, root_dir, app_conf_res)
+
+    def _create_harness_environ(self, args: List[str]) -> _HarnessEnviron:
+        """Process paths and configure the Python path necessary to execute the
+        application.
+
+        :param args: all command line arguments as given from :obj:`sys.argv`,
+                     including the program name
+
+        """
+        if self.relocate:
+            return self._relocate_harness_environ(args)
+        else:
+            if len(args) > 0:
+                args = args[1:]
+            return _HarnessEnviron(
+                args, None, Path('.'), self.app_config_resource)
 
     def _create_app_fac(self, env: _HarnessEnviron,
                         factory_kwargs: Dict[str, Any]) -> ApplicationFactory:
@@ -254,9 +273,13 @@ class CliHarness(object):
         :see: :meth:`.ApplicationFactory.get_instance`
 
         """
+        if isinstance(args, str):
+            args = f'_ {args}'
+        else:
+            args = ['_'] + args
         cli: ApplicationFactory = self.create_application_factory(
             args, **factory_kwargs)
-        return cli.get_instance(args)
+        return cli.get_instance(args[1:])
 
     def _proto(self, args: List[str], **factory_kwargs: Dict[str, Any]):
         """Invoke the prototype.
