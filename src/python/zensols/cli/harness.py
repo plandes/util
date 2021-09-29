@@ -1,3 +1,4 @@
+
 """Main entry point for applications that use the :mod:`.app` API.
 
 """
@@ -181,10 +182,13 @@ class CliHarness(object):
                 sys.path.append(src_path_str)
         app_conf_res = self.app_config_resource
         if isinstance(app_conf_res, str):
-            if entry_path != cur_path:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'app conf res: {app_conf_res}, ' +
+                             f'entry path: {entry_path}')
+            if root_dir != cur_path:
                 app_conf_res = str(Path(root_dir / app_conf_res))
-                if logger.isEnabledFor(logging.INFO):
-                    logger.info(f'update app config resource: {app_conf_res}')
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'update app config resource: {app_conf_res}')
         return _HarnessEnviron(args, src_path, root_dir, app_conf_res)
 
     def _create_app_fac(self, env: _HarnessEnviron,
@@ -219,7 +223,7 @@ class CliHarness(object):
         """
         env: _HarnessEnviron = self._create_harness_environ(args)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('environ: {env}')
+            logger.debug(f'environ: {env}')
         return self._create_app_fac(env, factory_kwargs)
 
     def invoke(self, args: List[str] = sys.argv,
@@ -359,7 +363,7 @@ class ConfigurationImporterCliHarness(CliHarness):
 
 
 @dataclass
-class NotebookHarness(object):
+class NotebookHarness(CliHarness):
     """A harness used in Jupyter notebooks.  This class has default configuration
     useful to having a single directory with one or more notebooks off the
     project root ditectory.
@@ -368,43 +372,10 @@ class NotebookHarness(object):
     add :obj:`src_dir_name` to the Python path.
 
     """
-    package_resource: Union[str, PackageResource] = field(default='app')
-    """The application package resource.
-
-    :see: :obj:`.ApplicationFactory.package_resource`
-
-    """
-
-    app_config_resource: str = field(default='resources/app.conf')
-    """The relative resource path to the application's context."""
-
-    root_dir: Union[Path, str] = field(default=Path('..'))
-    """The entry point directory where to make all files relative.  If not given,
-    it is resolved from the parent of the entry point program path in the
-    (i.e. :obj:`sys.argv`) arguments.
-
-    """
-
-    src_dir_name: Union[Path, str] = field(default=Path('src/python'))
-    """The directory (relative to :obj:`root_dir`) to add to the Python path
-    containing the source files.
-
-    """
-
     def __post_init__(self):
-        if isinstance(self.root_dir, str):
-            self.root_dir = Path(self.root_dir)
-        self._init_cli()
-
-    def _init_cli(self):
-        self.cli = CliHarness(
-            package_resource=self.package_resource,
-            app_config_resource=self.app_config_resource,
-            src_dir_name=self.src_dir_name,
-            root_dir=self.root_dir,
-        )
-        self.application_factory = self.cli.create_application_factory()
+        super().__post_init__()
         self.set_browser_width()
+        self.application_factory = self.create_application_factory()
 
     @staticmethod
     def set_browser_width(width: int = 95):
@@ -419,4 +390,5 @@ class NotebookHarness(object):
         display(HTML(html))
 
     def __call__(self, args: str) -> Any:
+        """Return the invokable instance."""
         return self.application_factory.get_instance(args)
