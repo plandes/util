@@ -19,6 +19,14 @@ from . import ActionCliError
 logger = logging.getLogger(__name__)
 
 
+class ApplicationError(ActionCliError):
+    """Thrown for any application error that should result in a user error rather
+    than produce a full stack trace.
+
+    """
+    pass
+
+
 @dataclass(eq=True, order=True, unsafe_hash=True)
 class OptionMetaData(PersistableContainer, Dictable):
     """A command line option."""

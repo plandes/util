@@ -26,7 +26,7 @@ from zensols.config import (
     Configurable, ConfigFactory, ImportIniConfig, ImportConfigFactory,
 )
 from . import (
-    ActionCliError, DocUtil,
+    ActionCliError, ApplicationError, DocUtil,
     ActionCliManager, ActionCli, ActionCliMethod, ActionMetaData,
     CommandAction, CommandActionSet, CommandLineConfig, CommandLineParser,
  )
@@ -673,7 +673,7 @@ class ApplicationFactory(PersistableContainer):
             prog = Path(sys.argv[0]).name
             msg = self._error_to_str(ex)
             print(f'{prog}: error: {msg}', file=sys.stderr)
-        elif isinstance(ex, ActionCliError):
+        elif isinstance(ex, ApplicationError):
             self._dump_error(ex)
         else:
             raise ex

@@ -18,7 +18,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Added jupyter notebook harness.
-
+- New CLI `ApplicationError` to differentiate between types of errors and
+  when to print the stack trace by having the application factory handle the
+  exception.
 
 
 ## [1.6.2] - 2021-09-21

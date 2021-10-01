@@ -15,7 +15,7 @@ from zensols.util import PackageResource
 from zensols.config import DictionaryConfig
 from zensols.introspect import ClassImporter
 from zensols.cli import (
-    Action, ActionResult, OptionMetaData,
+    ApplicationError, Action, ActionResult, OptionMetaData,
     Application, ApplicationFactory, ConfigurationImporter
 )
 from . import LogConfigurator
@@ -372,21 +372,26 @@ class ConfigurationImporterCliHarness(CliHarness):
                      **factory_kwargs: Dict[str, Any]) -> \
             Tuple[str, ApplicationFactory]:
         env: _HarnessEnviron = self._create_harness_environ(args)
-        cli: ApplicationFactory = self._create_app_fac(env, factory_kwargs)
-        app: Application = cli.create(env.args)
-        args = list(env.args)
-        args.extend(self._get_config_path_args(env, app))
-        return cli, args
+        app_fac: ApplicationFactory = self._create_app_fac(env, factory_kwargs)
+        try:
+            app: Application = app_fac.create(env.args)
+            args = list(env.args)
+            args.extend(self._get_config_path_args(env, app))
+            return app_fac, args
+        except ApplicationError as ex:
+            app_fac._dump_error(ex)
 
     def invoke(self, args: List[str] = sys.argv,
                **factory_kwargs: Dict[str, Any]) -> Any:
-        cli, args = self._update_args(args, **factory_kwargs)
-        return cli.invoke(args)
+        app_fac, args = self._update_args(args, **factory_kwargs)
+        if app_fac is not None:
+            return app_fac.invoke(args)
 
     def get_instance(self, args: Union[List[str], str] = None,
                      **factory_kwargs: Dict[str, Any]) -> Any:
-        cli, args = self._update_args(args, **factory_kwargs)
-        return cli.get_instance(args)
+        app_fac, args = self._update_args(args, **factory_kwargs)
+        if app_fac is not None:
+            return app_fac.get_instance(args)
 
 
 @dataclass

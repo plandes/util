@@ -382,7 +382,7 @@ class ActionCliManager(PersistableContainer, Dictable):
         """
         if action.section in self._actions:
             raise ActionCliError(
-                f'duplicate action for section: {action.section}')
+                f'Duplicate action for section: {action.section}')
         # for each dataclass field used to create OptionMetaData's
         for name, fmd in action.class_meta.fields.items():
             omd = self._create_op_meta_data(fmd, None, action)
@@ -519,7 +519,7 @@ class ActionCliManager(PersistableContainer, Dictable):
             meta: Tuple[ActionMetaData]
             for meta in action.meta_datas:
                 if meta.name in actions:
-                    raise ActionCliError(f'duplicate meta data: {meta.name}')
+                    raise ActionCliError(f'Duplicate meta data: {meta.name}')
                 actions[meta.name] = action
         return actions
 

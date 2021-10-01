@@ -15,14 +15,14 @@ from optparse import OptionParser
 from zensols.persist import persisted, PersistableContainer, Deallocatable
 from zensols.config import Dictable
 from . import (
-    ActionCliError, OptionMetaData, PositionalMetaData, ActionMetaData,
+    ApplicationError, OptionMetaData, PositionalMetaData, ActionMetaData,
     UsageActionOptionParser,
 )
 
 logger = logging.getLogger(__name__)
 
 
-class CommandLineError(ActionCliError):
+class CommandLineError(ApplicationError):
     """Raised when command line parameters can not be parsed.
 
     """

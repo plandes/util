@@ -22,7 +22,8 @@ from zensols.config import (
     DictionaryConfig, StringConfig
 )
 from . import (
-    ActionCliError, ActionCli, ActionCliMethod, OptionMetaData, ActionMetaData,
+    ActionCliError, ApplicationError, ActionCli, ActionCliMethod,
+    OptionMetaData, ActionMetaData,
     ApplicationObserver, Action, Application,
 )
 
@@ -101,7 +102,7 @@ class LogConfigurator(object):
         if isinstance(level, str):
             obj = LogLevel.__members__.get(level)
             if obj is None:
-                raise ActionCliError(f'No such level for {name}: {level}')
+                raise ApplicationError(f'No such level for {name}: {level}')
             level = obj
         return level.value
 
@@ -207,7 +208,7 @@ class ConfigurationImporter(ApplicationObserver):
     """
 
     expect: bool = field(default=True)
-    """If ``True``, raise an :class:`.ActionCliError` if the option is not given.
+    """If ``True``, raise an :class:`.ApplicationError` if the option is not given.
 
     """
 
@@ -357,7 +358,7 @@ class ConfigurationImporter(ApplicationObserver):
             else:
                 if self.expect:
                     lopt = self._get_config_option()
-                    raise ActionCliError(f'Missing option {lopt}')
+                    raise ApplicationError(f'Missing option {lopt}')
                 else:
                     load_config = False
         if load_config:
