@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   of `logging.basicConfig`.
 - `OneShotFactoryStash` inherits from `PrimablePreemptiveStash` and uses its
   overridden methods to preempt data creation
+- `CliHarness` is now more robust, and the default entry point class for large
+  and small Python templates.
+
+### Added
+- Added jupyter notebook harness.
+
 
 
 ## [1.6.2] - 2021-09-21
