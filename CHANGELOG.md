@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.6.3] - 2021-10-03
 ### Changed
 - `CliHarness` uses `LogConfigurator` to configure the logging system instead
   of `logging.basicConfig`.
@@ -268,7 +269,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.6.2...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.6.3...HEAD
+[1.6.3]: https://github.com/plandes/util/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/plandes/util/compare/v1.6.1...v1.6.2
 [1.6.1]: https://github.com/plandes/util/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/plandes/util/compare/v1.5.3...v1.6.0
