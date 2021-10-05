@@ -3,9 +3,9 @@
 """
 __author__ = 'Paul Landes'
 
+from typing import Iterable, List, Any, Tuple, Callable, Union
 from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass, field
-from typing import Iterable, List, Any, Tuple, Callable
 import sys
 import os
 import logging
@@ -66,7 +66,7 @@ class ChunkProcessor(object):
         with time('processed {cnt} items for chunk {self.chunk_id}'):
             for i, (id, inst) in enumerate(stash._process(self.data)):
                 if logger.isEnabledFor(logging.DEBUG):
-                    self._debug(f'dumping {id} -> {inst.__class__}')
+                    logger.debug(f'dumping {id} -> {inst.__class__}')
                 stash.delegate.dump(id, inst)
                 Deallocatable._try_deallocate(inst)
                 cnt += 1
@@ -136,18 +136,19 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
 
     """
 
-    workers: int = field()
+    workers: Union[int, float] = field()
     """The number of processes spawned to accomplish the work; if this is a
     negative number, add the number of CPU processors with this number, so -1
     would result in one fewer works utilized than the number of CPUs, which is
     a good policy for a busy server.
 
+    If the number is a float, then it is taken to be the percentage of the
+    number of processes.  If it is a float, the value must be in range (0, 1].
+
     """
 
     def __post_init__(self):
         super().__post_init__()
-        if self.workers < 1:
-            self.workers = os.cpu_count() + self.workers
         self.is_child = False
 
     @abstractmethod
@@ -253,16 +254,22 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
 
         """
         chunk_size, workers = self.chunk_size, self.workers
-        if workers < 1:
+        if workers <= 0:
             workers = os.cpu_count() + workers
+        elif isinstance(workers, float):
+            percent = workers
+            avail = os.cpu_count()
+            workers = math.ceil(percent * avail)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'calculating as {percent} of ' +
+                             f'total {avail}: {workers}')
         data = self._create_data()
-        if chunk_size < 1:
+        if chunk_size == 0:
             data = tuple(data)
             chunk_size = math.ceil(len(data) / workers)
         data = map(lambda x: self._create_chunk_processor(*x),
                    enumerate(chunks(data, chunk_size)))
-        cnt = self._invoke_work(workers, chunk_size, data)
-        return cnt
+        return self._invoke_work(workers, chunk_size, data)
 
     def prime(self):
         """If the delegate stash data does not exist, use this implementation to
