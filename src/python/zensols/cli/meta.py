@@ -11,6 +11,7 @@ import sys
 from io import TextIOBase
 from pathlib import Path
 import optparse
+from frozendict import frozendict
 from zensols.introspect import TypeMapper
 from zensols.persist import persisted, PersistableContainer
 from zensols.config import Dictable
@@ -281,7 +282,7 @@ class ActionMetaData(PersistableContainer, Dictable):
     @property
     @persisted('_options_by_dest')
     def options_by_dest(self) -> Dict[str, OptionMetaData]:
-        return {m.dest: m for m in self.options}
+        return frozendict({m.dest: m for m in self.options})
 
     def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
         dct = super()._from_dictable(*args, **kwargs)

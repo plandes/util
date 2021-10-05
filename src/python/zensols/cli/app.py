@@ -16,6 +16,7 @@ import re
 from io import TextIOBase
 from itertools import chain
 from pathlib import Path
+from frozendict import frozendict
 from zensols.introspect import Class, ClassMethod, ClassField, ClassMethodArg
 from zensols.persist import (
     persisted, PersistedWork, PersistableContainer, Deallocatable
@@ -165,7 +166,7 @@ class ApplicationResult(Dictable):
     @persisted('_by_name')
     def by_name(self) -> Dict[str, ActionResult]:
         """Per action results keyed by action name (obj:`.Action.name`)."""
-        return {a.name: a for a in self}
+        return frozendict({a.name: a for a in self})
 
     @property
     def second_pass_result(self) -> ActionResult:
@@ -360,7 +361,7 @@ class Application(Dictable):
     @persisted('_actions_by_name')
     def actions_by_name(self) -> Dict[str, Action]:
         """A dictionary of actions by their name."""
-        return {a.name: a for a in self.actions}
+        return frozendict({a.name: a for a in self.actions})
 
     @property
     def first_pass_actions(self) -> Iterable[Action]:

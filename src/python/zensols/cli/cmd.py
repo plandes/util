@@ -12,6 +12,7 @@ from itertools import chain
 from pathlib import Path
 from io import TextIOBase
 from optparse import OptionParser
+from frozendict import frozendict
 from zensols.persist import persisted, PersistableContainer, Deallocatable
 from zensols.config import Dictable
 from . import (
@@ -128,7 +129,7 @@ class CommandLineConfig(PersistableContainer, Dictable):
     @property
     @persisted('_actions_by_name')
     def actions_by_name(self) -> Dict[str, ActionMetaData]:
-        return {a.name: a for a in self.actions}
+        return frozendict({a.name: a for a in self.actions})
 
     @property
     @persisted('_first_pass_options')

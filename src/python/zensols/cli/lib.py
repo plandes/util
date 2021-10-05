@@ -41,6 +41,24 @@ class LogLevel(Enum):
     err = logging.ERROR
 
 
+class ExportFormat(Enum):
+    """The format for the environment export with the :class:`.ExportEnvironment`
+    first pass application.
+
+    """
+    bash = auto()
+    make = auto()
+
+
+class ListFormat(Enum):
+    """Options for outputing the action list in :class:`.ListActions`.
+
+    """
+    text = auto()
+    json = auto()
+    name = auto()
+
+
 @dataclass
 class LogConfigurator(object):
     """A simple log configuration utility.
@@ -99,12 +117,16 @@ class LogConfigurator(object):
             self.default_level = LogLevel.warn
 
     def _to_level(self, name: str, level: Any) -> int:
-        if isinstance(level, str):
+        if isinstance(level, LogLevel):
+            level = level.value
+        elif isinstance(level, str):
             obj = LogLevel.__members__.get(level)
             if obj is None:
                 raise ApplicationError(f'No such level for {name}: {level}')
-            level = obj
-        return level.value
+            level = obj.value
+        elif not isinstance(level, int):
+            raise ActionCliError(f'Unknown level: {level}({type(level)})')
+        return level
 
     def _debug(self, msg: str):
         if logger.isEnabledFor(logging.DEBUG):
@@ -147,6 +169,9 @@ class LogConfigurator(object):
             for name, level in self.loggers.items():
                 level = self._to_level(name, level)
                 logging.getLogger(name).setLevel(level)
+
+    def __call__(self):
+        self.config()
 
 
 @dataclass
@@ -369,6 +394,9 @@ class ConfigurationImporter(ApplicationObserver):
                     f'path: {str(self.config_path)}',
                     section=self.name)
 
+    def __call__(self):
+        self.merge()
+
 
 @dataclass
 class ConfigurationOverrider(object):
@@ -415,6 +443,9 @@ class ConfigurationOverrider(object):
             else:
                 overrides = StringConfig(self.override)
             self.config.merge(overrides)
+
+    def __call__(self):
+        self.merge()
 
 
 @dataclass
@@ -474,10 +505,8 @@ class PackageInfoImporter(ApplicationObserver):
         d_conf = DictionaryConfig({self.section: params})
         d_conf.copy_sections(self.config)
 
-
-class ExportFormat(Enum):
-    bash = auto()
-    make = auto()
+    def __call__(self):
+        self.add()
 
 
 @dataclass
@@ -525,14 +554,8 @@ class ExportEnvironment(object):
             with open(self.output_path, 'w') as f:
                 self._write(f)
 
-
-class ListFormat(Enum):
-    """Options for outputing the action list in :class:`.ListActions`.
-
-    """
-    text = auto()
-    json = auto()
-    name = auto()
+    def __call__(self):
+        self.export()
 
 
 @dataclass
@@ -609,3 +632,6 @@ class ListActions(ApplicationObserver, Dictable):
             ListFormat.text: lambda: self.write(),
             ListFormat.json: list_json,
         }[self.list_output_format]()
+
+    def __call__(self):
+        self.list()

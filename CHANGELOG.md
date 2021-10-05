@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- Added `frozendict` as a dependency.
+
+### Changed
+- Fixed argument splitting in `CliHarness`.
+- Changed many cached `dict` to type `frozendict` to guard against
+  unintentional modification of immutable data structures.
+
+
 ## [1.6.3] - 2021-10-03
 ### Changed
 - `CliHarness` uses `LogConfigurator` to configure the logging system instead
