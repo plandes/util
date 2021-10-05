@@ -14,7 +14,8 @@ from multiprocessing import Pool
 from zensols.util.time import time
 from zensols.config import Configurable, ConfigFactory, ImportConfigFactory
 from zensols.persist import (
-    Stash, PrimablePreemptiveStash, chunks, Deallocatable,
+    Stash, PrimablePreemptiveStash, PreemptiveStash, PrimeableStash,
+    chunks, Deallocatable,
 )
 from zensols.cli import LogConfigurator
 
@@ -288,7 +289,6 @@ class MultiProcessFactoryStash(MultiProcessStash):
     Attributes :obj:`chunk_size` and :obj:`workers` both default to ``0``.
 
     """
-
     factory: Stash = field()
     """The stash that creates the data, which is not to be confused with the
     :obj:`delegate`, which persists the data.
@@ -300,7 +300,6 @@ class MultiProcessFactoryStash(MultiProcessStash):
     calculation.
 
     """
-
     def __init__(self, config: Configurable, name: str,
                  factory: Stash, enable_preemptive: bool = False,
                  **kwargs):
