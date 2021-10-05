@@ -389,6 +389,7 @@ class ConfigurationImporterCliHarness(CliHarness):
 
     def get_instance(self, args: Union[List[str], str] = None,
                      **factory_kwargs: Dict[str, Any]) -> Any:
+        args = args.split() if isinstance(args, str) else args
         app_fac, args = self._update_args(args, **factory_kwargs)
         if app_fac is not None:
             return app_fac.get_instance(args)
