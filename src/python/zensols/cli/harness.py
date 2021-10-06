@@ -190,10 +190,10 @@ class CliHarness(object):
                 logger.debug(f'app conf res: {app_conf_res}, ' +
                              f'entry path: {entry_path}')
             if root_dir != cur_path:
-                app_conf_res = str(Path(root_dir / app_conf_res))
+                app_conf_res = root_dir / app_conf_res
                 # absolute paths do not work with package_resource as it
                 # removes the leading slash when resolving resource paths
-                app_conf_res = app_conf_res.relative_to(Path.cwd())
+                app_conf_res = str(app_conf_res.relative_to(Path.cwd()))
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'update app config resource: {app_conf_res}')
         return _HarnessEnviron(args, src_path, root_dir, app_conf_res)
