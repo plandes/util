@@ -7,6 +7,7 @@ from zensols.persist import (
     CacheStash,
     ReadOnlyStash,
     UnionStash,
+    ProtectiveStash,
 )
 
 
@@ -49,12 +50,23 @@ class RangeStash(ReadOnlyStash):
         return True
 
 
+class ExStash(DictionaryStash):
+    def __init__(self, error_val: str):
+        super().__init__()
+        self.error_val = error_val
+
+    def dump(self, name: str, inst: Any):
+        if inst == self.error_val:
+            raise ValueError(f'Test exception for name {name}')
+        else:
+            super().dump(name, inst)
+
+
 class TestStash(unittest.TestCase):
     def setUp(self):
         DelegateDefaults.CLASS_CHECK = True
 
-    def test_dict(self):
-        ds = DictionaryStash()
+    def _test_dump(self, ds):
         self.assertEqual(0, len(ds.keys()))
         self.assertFalse(ds.exists('a'))
         ds.dump('a', 1)
@@ -66,6 +78,10 @@ class TestStash(unittest.TestCase):
         ds.delete('a')
         self.assertEqual(0, len(ds.keys()))
         self.assertFalse(ds.exists('a'))
+
+    def test_dict(self):
+        ds = DictionaryStash()
+        self._test_dump(ds)
 
     def test_caching(self):
         ins = IncStash()
@@ -113,9 +129,9 @@ class TestStash(unittest.TestCase):
         # still has all the members since a caching stash is a read only stash
         self.assertEqual(5, len(stash))
 
-    def test_delegate_to_delegate(self):
-        stash1 = RangeStash(3)
-        stash2 = RangeStash(3, 5)
+    def _test_delegate(self, stash1, stash2):
+        #stash1 = RangeStash(3)
+        #stash2 = RangeStash(3, 5)
         stash3 = UnionStash((stash1, stash2))
         self.assertEqual(3, len(stash1))
         self.assertEqual(2, len(stash2))
@@ -136,3 +152,27 @@ class TestStash(unittest.TestCase):
         self.assertTrue(stash2.exists(3))
         self.assertTrue(stash2.exists(4))
         self.assertFalse(stash2.exists(5))
+
+    def test_delegate_to_delegate(self):
+        stash1 = RangeStash(3)
+        stash2 = RangeStash(3, 5)
+        self._test_delegate(stash1, stash2)
+
+    def test_protective_happy(self):
+        stash1 = RangeStash(3)
+        stash2 = RangeStash(3, 5)
+        pstash = ProtectiveStash(stash2, True)
+        self._test_delegate(stash1, pstash)
+        ds = ExStash(None)
+        ps = ProtectiveStash(ds, True)
+        self._test_dump(ps)
+
+    def test_protective_exception(self):
+        err_val = '<error value>'
+        ds = ExStash(err_val)
+        ps = ProtectiveStash(ds, False)
+        self._test_dump(ps)
+        ps.dump('b', err_val)
+        ex = ps['b']
+        self.assertEqual(ValueError, type(ex))
+        self.assertEqual('Test exception for name b', str(ex))

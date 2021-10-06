@@ -490,6 +490,25 @@ class PrimablePreemptiveStash(PrimeableStash, PreemptiveStash):
 
 
 @dataclass
+class ProtectiveStash(DelegateStash):
+    """A stash that guards :meth:`dump` so that when :class:`Exception` is raised,
+    the instance of the exception is dumped instead the instance data.
+
+    """
+    log_errors: bool = field()
+    """When ``True`` log caught exceptions as warnings."""
+
+    def dump(self, name: str, inst: Any):
+        try:
+            super().dump(name, inst)
+        except Exception as e:
+            if self.log_errors:
+                logger.warning(f"Could not dump '{name}', using as value: {e}",
+                               exc_info=True)
+            super().dump(name, e)
+
+
+@dataclass
 class FactoryStash(PreemptiveStash):
     """A stash that defers to creation of new items to another :obj:`factory`
     stash.  It does this by calling first getting the data from the
