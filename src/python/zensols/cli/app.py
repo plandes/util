@@ -721,7 +721,7 @@ class ApplicationFactory(PersistableContainer):
             return self.invoke(args)
         except (Exception, SystemExit) as e:
             exc_info = sys.exc_info()
-            logger.error(f'invocation failed: {e}', exc_info=exc_info)
+            logger.error(f'Invocation failed: {e}', exc_info=exc_info)
             return exc_info
 
     def get_instance(self, args: Union[List[str], str] = None) -> Any:
