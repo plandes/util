@@ -56,6 +56,8 @@ class JsonConfig(DictionaryConfig):
 
     @persisted('_config')
     def _get_config(self) -> Dict[str, Dict[str, str]]:
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'loading config: {self.config_file}')
         if isinstance(self.config_file, TextIOBase):
             conf = json.load(self.config_file)
         else:

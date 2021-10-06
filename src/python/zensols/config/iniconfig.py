@@ -85,7 +85,7 @@ class IniConfig(Configurable):
 
     def _create_and_load_parser_from_file(self, cpath: Path) -> ConfigParser:
         if logger.isEnabledFor(logging.INFO):
-            logger.info(f'loading config: {cpath}')
+            logger.info(f'loading ini config: {cpath}')
         if not cpath.exists():
             raise ConfigurableFileNotFoundError(cpath)
         elif cpath.is_file() or cpath.is_dir():
@@ -125,12 +125,17 @@ class IniConfig(Configurable):
         conf: ConfigParser = self.parser
         if conf is None:
             if not self.robust:
-                raise ConfigurableError('No configuration given')
+                raise self._raise('No configuration given')
         elif conf.has_section(section):
             opts = {k: conf.get(section, k) for k in conf.options(section)}
         if opts is None:
-            raise ConfigurableError(f'No section: {section}')
+            self._raise(f"No section: '{section}'")
         return opts
+
+    def _raise(self, msg: str):
+        if isinstance(self.config_file, Path):
+            msg = f'{msg} in file {self.config_file}'
+        raise ConfigurableError(msg)
 
     def get_option(self, name: str, section: str = None) -> str:
         opt = None
@@ -138,13 +143,13 @@ class IniConfig(Configurable):
         conf: ConfigParser = self.parser
         if conf is None:
             if not self.robust:
-                raise ConfigurableError('No configuration given')
+                self._raise('No configuration given')
         elif conf.has_option(section, name):
             opt = conf.get(section, name)
         if opt is None:
             if not conf.has_section(section):
-                raise ConfigurableError(f'No section: {section}')
-            raise ConfigurableError(f'No option: {section}:{name}')
+                self._raise(f"No section: '{section}'")
+            self._raise(f"No option: '{section}:{name}'")
         return opt
 
     @property

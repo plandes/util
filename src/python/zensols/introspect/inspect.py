@@ -88,7 +88,8 @@ class TypeMapper(object):
             try:
                 tpe = self._try_enum(stype)
             except Exception as e:
-                logger.error('could not narrow to enum: {stype}', e)
+                logger.error(f'Could not narrow to enum: {stype}: {e}',
+                             exc_info=True)
         if tpe is None:
             raise ClassError(f'Non-supported data type: {stype}')
         return tpe
