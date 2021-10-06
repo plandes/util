@@ -20,7 +20,7 @@ class TestConfig(unittest.TestCase):
         self.assertRaises(ConfigurableError, run_conf_create)
 
     def test_no_default(self):
-        with self.assertRaisesRegex(ConfigurableError, r'No section: default$'):
+        with self.assertRaisesRegex(ConfigurableError, r'No section: default'):
             conf = IniConfig('test-resources/config-test-nodef.conf')
             self.assertEqual({}, conf.options)
 
