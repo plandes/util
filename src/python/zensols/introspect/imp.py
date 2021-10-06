@@ -118,8 +118,8 @@ class ClassImporter(object):
             inst = cls(*args, **kwargs)
             inst = self._bless(inst)
         except Exception as e:
-            msg = f'can not instantiate {cls}({args}, {kwargs})'
-            logger.error(msg, e)
+            msg = f'Can not instantiate {cls}({args}, {kwargs})'
+            logger.error(msg)
             raise e
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'inst class: {type(inst)}')
