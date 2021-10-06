@@ -168,6 +168,8 @@ class LogConfigurator(object):
         if self.loggers is not None:
             for name, level in self.loggers.items():
                 level = self._to_level(name, level)
+                assert isinstance(level, int)
+                self._debug(f'setting logger: {name} -> {level}')
                 logging.getLogger(name).setLevel(level)
 
     def __call__(self):
