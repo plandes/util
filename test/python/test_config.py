@@ -20,7 +20,7 @@ class TestConfig(unittest.TestCase):
         self.assertRaises(ConfigurableError, run_conf_create)
 
     def test_no_default(self):
-        with self.assertRaisesRegex(ConfigurableError, r'No section: default'):
+        with self.assertRaisesRegex(ConfigurableError, r'No section: \'default'):
             conf = IniConfig('test-resources/config-test-nodef.conf')
             self.assertEqual({}, conf.options)
 
@@ -37,9 +37,9 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(True, conf.get_option_boolean('param3'))
         self.assertEqual(True, conf.get_option_boolean('param4'))
         self.assertEqual(False, conf.get_option_boolean('param5'))
-        with self.assertRaisesRegex(ConfigurableError, '^No option: default:no_such_param.*'):
+        with self.assertRaisesRegex(ConfigurableError, '^No option: \'default:no_such_param.*'):
             conf.get_option_boolean('no_such_param')
-        with self.assertRaisesRegex(ConfigurableError, '^No option: default:no_such_param.*'):
+        with self.assertRaisesRegex(ConfigurableError, '^No option: \'default:no_such_param.*'):
             self.assertEqual([], conf.get_option_list('no_such_param'))
 
     def test_has_option(self):

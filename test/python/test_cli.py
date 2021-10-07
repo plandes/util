@@ -73,7 +73,7 @@ class TestActionCli(unittest.TestCase):
         global good_val, good_conf
         good_val = 'test1'
         good_conf = IniConfig
-        with self.assertRaisesRegex(ConfigurableError, r'^No such file: test-resources.*'):
+        with self.assertRaisesRegex(ConfigurableError, r"^No such file: 'test-resources"):
             AppCommandLine('test-resources/actioncli-test.confDNE').invoke(
                 'info -o test1'.split(' '))
         good_val = 'conf-test1'
