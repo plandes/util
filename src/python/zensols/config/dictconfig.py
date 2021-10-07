@@ -79,3 +79,9 @@ class DictionaryConfig(Configurable):
 
     def remove_section(self, section: str):
         self._get_config().pop(section)
+
+    def __str__(self):
+        return f'{self.__class__.__name__}: sections: {self.sections}'
+
+    def __repr__(self):
+        return self.__str__()

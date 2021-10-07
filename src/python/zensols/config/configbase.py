@@ -26,9 +26,13 @@ class ConfigurableFileNotFoundError(ConfigurableError):
     of :class:`.Configurable`.
 
     """
-    def __init__(self, path: Path):
-        super().__init__(f'No such file: {path}')
+    def __init__(self, path: Path, source: Union[Path, Any] = None):
+        msg = f"No such file: '{path}'"
+        if isinstance(source, Path):
+            msg += f' loading from {source}'
+        super().__init__(msg)
         self.path = path
+        self.source = source
 
 
 class Configurable(Writable, metaclass=ABCMeta):
