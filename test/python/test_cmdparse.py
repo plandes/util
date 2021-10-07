@@ -10,7 +10,6 @@ from zensols.cli import (
 
 class TestArgumentParse(LogTestCase):
     def setUp(self):
-        #self.config_logging('zensols.cli')
         wo = OptionMetaData('whine', 'w', dtype=int,
                             doc='the level to set for the program logging')
 
