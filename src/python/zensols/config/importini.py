@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Iterable, Tuple, List, Dict, Any
+from typing import Iterable, Tuple, List, Dict, Any, Set
 from dataclasses import dataclass, field
 import logging
 from itertools import chain
@@ -178,6 +178,8 @@ class ImportIniConfig(IniConfig):
     CONFIG_FILES = 'config_files'
     REFS_SECTION = 'references'
     TYPE_NAME = 'type'
+    _IMPORT_SECTION_FIELDS = {SECTIONS_SECTION, SINGLE_CONFIG_FILE,
+                              CONFIG_FILES, REFS_SECTION}
 
     def __init__(self, *args,
                  config_section: str = IMPORT_SECTION,
@@ -319,6 +321,22 @@ class ImportIniConfig(IniConfig):
             parser.append_child(inst)
         loaders.clear()
 
+    def _validate_parser(self, config: Configurable):
+        conf_sec: str = self.config_section
+        if conf_sec in config.sections:
+            import_sec: Dict[str, str] = config.get_options(conf_sec)
+            import_props: Set[str] = set(import_sec.keys())
+            file_props: Set[str] = {self.SINGLE_CONFIG_FILE, self.CONFIG_FILES}
+            aliens = import_props - self._IMPORT_SECTION_FIELDS
+            if len(aliens) > 0:
+                props = ', '.join(map(lambda p: f"'{p}'", aliens))
+                self._raise(f"Invalid options in section '{conf_sec}'" +
+                            f": {props}")
+            if len(file_props & import_props) == 2:
+                self._raise(
+                    f"Cannot have both '{self.SINGLE_CONFIG_FILE}' " +
+                    f"and '{self.CONFIG_FILES}' in section '{conf_sec}'")
+
     def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
         """"Get children used for this config instance.  This is done by import each
         import section and files by delayed loaded for each.
@@ -337,6 +355,7 @@ class ImportIniConfig(IniConfig):
         children: List[Configurable] = parser.children
         conf_secs: List[str] = [conf_sec]
         loaders: List[_ConfigLoader] = []
+        self._validate_parser(parser)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating children for: {conf_sec}')
         # first load files given in the import section

@@ -3,7 +3,7 @@ import os
 from io import StringIO, BytesIO
 import pickle
 from pathlib import Path
-from zensols.config import StringConfig, ImportIniConfig
+from zensols.config import StringConfig, ImportIniConfig, ConfigurableError
 
 
 class TestImportConfig(unittest.TestCase):
@@ -65,3 +65,13 @@ class TestImportConfig(unittest.TestCase):
         sio_unp = StringIO()
         unp.write(writer=sio_unp)
         self.assertEqual(sio.getvalue(), sio_unp.getvalue())
+
+    def test_bad_property(self):
+        self.conf = ImportIniConfig('test-resources/import-config-bad-sec.conf')
+        with self.assertRaisesRegex(ConfigurableError, r"^Invalid options in section 'import"):
+            self.conf.sections
+
+    def test_multiconfig(self):
+        self.conf = ImportIniConfig('test-resources/import-config-multi-config.conf')
+        with self.assertRaisesRegex(ConfigurableError, r"^Cannot have both 'config_file' and 'config_files' in section 'import' in file"):
+            self.conf.sections
