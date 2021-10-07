@@ -322,6 +322,7 @@ class ImportIniConfig(IniConfig):
         loaders.clear()
 
     def _validate_parser(self, config: Configurable):
+        """Validate that the import section doesn't have bad configuration."""
         conf_sec: str = self.config_section
         if conf_sec in config.sections:
             import_sec: Dict[str, str] = config.get_options(conf_sec)
