@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Various utility command line actions.
 
 """
@@ -16,6 +17,7 @@ import re
 from io import TextIOBase
 from pathlib import Path
 from zensols.util import PackageResource
+from zensols.config import Settings, ImportIniConfig
 from zensols.introspect import ClassImporter
 from zensols.config import (
     Dictable, Configurable, ConfigurableFactory,
@@ -224,7 +226,6 @@ class ConfigurationImporter(ApplicationObserver):
     (i.e. ``APPNAMERC``).
 
     """
-
     name: str = field()
     """The section name."""
 
@@ -267,6 +268,12 @@ class ConfigurationImporter(ApplicationObserver):
     override: bool = field(default=False)
     """Override/clobber values from the configuration file in the application
     configuration.
+
+    """
+
+    add_children: bool = field(default=False)
+    """If ``True``, then add the children configurations from the application
+    factories :class:`.ImportIniConfig`.
 
     """
 
@@ -316,7 +323,7 @@ class ConfigurationImporter(ApplicationObserver):
         self._app = app
         self._action = action
 
-    def _load(self, settings):
+    def _load(self, settings: Union[Settings, LogConfigurator], section: str):
         """Once we have the path and the class used to load the configuration, create
         the instance and load it.
 
@@ -324,10 +331,15 @@ class ConfigurationImporter(ApplicationObserver):
         propogate.
 
         """
+        if section is not None and logger.isEnabledFor(logging.INFO):
+            logger.info(f"configurator loading section: '{section}'")
+
         # create the command line specified config
-        if settings.type is None:
+        if not hasattr(settings, 'type') or settings.type is None:
             cf = ConfigurableFactory()
             cl_config = cf.from_path(settings.config_path)
+            logger.info(f'config loaded {settings.config_path} as ' +
+                        f'type {cl_config.__class__.__name__}')
         else:
             args = {'config_file': settings.config_path}
             if hasattr(settings, 'arguments') and \
@@ -335,6 +347,20 @@ class ConfigurationImporter(ApplicationObserver):
                 args.update(settings.arguments)
             cf = ConfigurableFactory(kwargs=args)
             cl_config = cf.from_type(settings.type)
+            logger.info(f'configurator loading {settings.config_path} from ' +
+                        f'section {section} as type {settings.type}')
+
+        # add ImportIniConfig children for configuraiton such as application
+        # root directory
+        add_ch = hasattr(settings, 'add_children') and settings.add_children
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'children: {self._app.factory.children_configs}, ' +
+                         f'add_children: {add_ch}, type: {type(cl_config)} ' +
+                         f'in {settings}')
+        if add_ch and isinstance(cl_config, ImportIniConfig):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug('adding children to factory')
+            cl_config.children.extend(self._app.factory.children_configs)
 
         # First inject our app context (app.conf) to the command line specified
         # configuration (--config) skipping sections that have missing options.
@@ -364,7 +390,7 @@ class ConfigurationImporter(ApplicationObserver):
                 # since it conflicts with the ``LogConfigurator``
                 if hasattr(settings, 'config_file'):
                     settings.config_path = settings.config_file
-                self._load(settings)
+                self._load(settings, sec)
 
     def merge(self):
         """Merge configuration at path to the current configuration.
@@ -389,7 +415,7 @@ class ConfigurationImporter(ApplicationObserver):
                 else:
                     load_config = False
         if load_config:
-            self._load(self)
+            self._load(self, self.name)
             if self.config_path_option_name is not None:
                 self.config.set_option(
                     self.config_path_option_name,

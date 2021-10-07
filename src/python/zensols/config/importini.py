@@ -212,7 +212,7 @@ class ImportIniConfig(IniConfig):
         super().__init__(*args, **kwargs)
         self.config_section = config_section
         self.exclude_config_sections = exclude_config_sections
-        self.children = children
+        self.children = list(children)
         self.use_interpolation = use_interpolation
         if exclude_config_sections and \
            (self.default_section == self.config_section):
@@ -313,7 +313,9 @@ class ImportIniConfig(IniConfig):
                 new_children = list(inst.children)
                 new_children.extend(self.children)
                 new_children.extend(children)
-                inst.children = tuple(new_children)
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'adding children {new_children} to {inst}')
+                inst.children = new_children
             parser.append_child(inst)
         loaders.clear()
 
