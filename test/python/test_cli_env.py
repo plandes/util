@@ -36,9 +36,13 @@ class ConfAppCommandLine(OneConfPerActionOptionsCliEnv):
             cnf, config_env_name=conf_var,
             config_type=ExtendedInterpolationConfig)
 
+    def _config_logging(self, level: int):
+        pass
+
 
 class TestActionCliEnvironment(LogTestCase):
     def setUp(self):
+        super().setUp()
         global current_test, good_val
         current_test = self
 
