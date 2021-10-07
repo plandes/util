@@ -392,6 +392,12 @@ class ConfigurationImporter(ApplicationObserver):
                     settings.config_path = settings.config_file
                 self._load(settings, sec)
 
+    def _reset(self):
+        """Reset the Python logger configuration."""
+        root = logging.getLogger()
+        tuple(map(root.removeHandler, root.handlers[:]))
+        tuple(map(root.removeFilter, root.filters[:]))
+
     def merge(self):
         """Merge configuration at path to the current configuration.
 
