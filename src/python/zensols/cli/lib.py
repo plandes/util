@@ -11,7 +11,6 @@ import os
 import sys
 import logging
 from string import Template
-from io import StringIO
 from json import JSONEncoder
 import inspect
 import re
@@ -345,23 +344,18 @@ class ConfigurationImporter(ApplicationObserver):
         vals = self.__dict__
         for k, v in sec.items():
             populated_sec[k] = v.format(**vals)
-        if 0:
-            secs[self.section] = populated_sec
-            secs[ImportIniConfig.IMPORT_SECTION] = {
-                ImportIniConfig.SECTIONS_SECTION: self.section}
-        else:
-            secs[ImportIniConfig.IMPORT_SECTION] = populated_sec
-            if ImportIniConfig.SECTIONS_SECTION in populated_sec:
-                sub_secs: List[str] = self.config.serializer.parse_object(
-                    self.config.get_option(
-                        ImportIniConfig.SECTIONS_SECTION, self.section))
-                for sec in sub_secs:
-                    repl_sec = {}
-                    secs[sec] = repl_sec
-                    with raw_ini_config(config):
-                        for k, v in config.get_options(sec).items():
-                            tpl = ConfiguratorImporterTemplate(v)
-                            repl_sec[k] = tpl.substitute(vals)
+        secs[ImportIniConfig.IMPORT_SECTION] = populated_sec
+        if ImportIniConfig.SECTIONS_SECTION in populated_sec:
+            sub_secs: List[str] = self.config.serializer.parse_object(
+                self.config.get_option(
+                    ImportIniConfig.SECTIONS_SECTION, self.section))
+            for sec in sub_secs:
+                repl_sec = {}
+                secs[sec] = repl_sec
+                with raw_ini_config(config):
+                    for k, v in config.get_options(sec).items():
+                        tpl = ConfiguratorImporterTemplate(v)
+                        repl_sec[k] = tpl.substitute(vals)
         return DictionaryConfig(secs)
 
     def _load(self):
