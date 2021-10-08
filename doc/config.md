@@ -279,7 +279,7 @@ a top level `obj.conf` for the package that imports everything else that is
 needed.  For example, to import the [zensols.deepnlp resource library] use:
 ```ini
 [import]
-sections = imp_conf
+sections = list: imp_conf
 
 [imp_conf]
 type = importini
@@ -379,8 +379,8 @@ age = 22
 dom_path = obj.conf
 
 [import]
-sections = import_domain
-references = imp_defaults
+sections = list: import_domain
+references = list: imp_defaults
 
 [import_domain]
 type = ini

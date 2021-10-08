@@ -123,12 +123,14 @@ class _StringIniConfig(IniConfig):
         for c in self.children:
             c.copy_sections(self)
 
-    def _create_and_load_parser(self) -> ConfigParser:
+    def _create_config_parser(self) -> ConfigParser:
         parser = ConfigParser(
-            defaults=self.create_defaults,
             interpolation=_SharedExtendedInterpolation(self.children))
         parser.read_file(self.config)
         return parser
+
+    def _create_and_load_parser(self, parser: ConfigParser):
+        pass
 
 
 @dataclass
@@ -165,21 +167,19 @@ class ImportIniConfig(IniConfig):
          :class:`~configparser.ConfigParser` using
          :class:`~configparser.ExtendedInterpolation`.
 
-    A section called ``import`` is used to load other configuration.  This is
-    either done by loading it:
-
-      * ``config_files`` entry in the section to load a list of files; ``type``
-        can be given to select the loader (see :class:`.ConfigurableFactory`)
+    See the `API documentation
+    <https://plandes.github.io/util/doc/config.html#import-ini-configuration>`_
+    for more information.
 
     """
     IMPORT_SECTION = 'import'
     SECTIONS_SECTION = 'sections'
     SINGLE_CONFIG_FILE = 'config_file'
     CONFIG_FILES = 'config_files'
-    REFS_SECTION = 'references'
+    REFS_NAME = 'references'
     TYPE_NAME = 'type'
     _IMPORT_SECTION_FIELDS = {SECTIONS_SECTION, SINGLE_CONFIG_FILE,
-                              CONFIG_FILES, REFS_SECTION}
+                              CONFIG_FILES, REFS_NAME}
 
     def __init__(self, *args,
                  config_section: str = IMPORT_SECTION,
@@ -196,10 +196,6 @@ class ImportIniConfig(IniConfig):
         :param robust: if `True`, then don't raise an error when the
                        configuration file is missing
 
-        :param create_defaults: used to initialize the configuration parser,
-                                and useful for when substitution values are
-                                baked in to the configuration file
-
         :param config_section: the name of the section that has the
                                configuration (i.e. the ``sections`` entry)
 
@@ -210,12 +206,14 @@ class ImportIniConfig(IniConfig):
         :param children: additional configurations used both before and after
                          bootstrapping
 
+        :param use_interpolation: if ``True``, interpolate variables using
+                                  :class:`~configparser.ExtendedInterpolation`
+
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, use_interpolation=use_interpolation, **kwargs)
         self.config_section = config_section
         self.exclude_config_sections = exclude_config_sections
-        self.children = list(children)
-        self.use_interpolation = use_interpolation
+        self.children = children
         if exclude_config_sections and \
            (self.default_section == self.config_section):
             raise ConfigurableError(
@@ -231,16 +229,18 @@ class ImportIniConfig(IniConfig):
         conf_sec = self.config_section
         parser = IniConfig(self.config_file)
         cparser = parser.parser
-        has_refs = parser.has_option(self.REFS_SECTION, conf_sec)
+        has_refs = parser.has_option(self.REFS_NAME, conf_sec)
         has_secs = parser.has_option(self.SECTIONS_SECTION, conf_sec)
         if has_secs or has_refs:
             secs = set()
             if has_secs:
-                secs.update(set(
-                    parser.get_option_list(self.SECTIONS_SECTION, conf_sec)))
+                sec_lst: List[str] = self.serializer.parse_object(
+                    parser.get_option(self.SECTIONS_SECTION, conf_sec))
+                secs.update(set(sec_lst))
             if has_refs:
-                csecs = parser.get_option_list(self.REFS_SECTION, conf_sec)
-                secs.update(set(csecs))
+                refs: List[str] = self.serializer.parse_object(
+                    parser.get_option(self.REFS_NAME, conf_sec))
+                secs.update(set(refs))
             secs.add(conf_sec)
             to_remove = set(parser.sections) - secs
             for r in to_remove:
@@ -317,7 +317,7 @@ class ImportIniConfig(IniConfig):
                 new_children.extend(children)
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'adding children {new_children} to {inst}')
-                inst.children = new_children
+                inst.children = tuple(new_children)
             parser.append_child(inst)
         loaders.clear()
 
@@ -325,8 +325,10 @@ class ImportIniConfig(IniConfig):
         """Validate that the import section doesn't have bad configuration."""
         conf_sec: str = self.config_section
         if conf_sec in config.sections:
-            import_sec: Dict[str, str] = config.get_options(conf_sec)
+            #import_sec: Dict[str, str] = config.get_options(conf_sec)
+            import_sec: Dict[str, str] = config.populate({}, conf_sec)
             import_props: Set[str] = set(import_sec.keys())
+            refs: List[str] = import_sec.get(self.REFS_NAME)
             file_props: Set[str] = {self.SINGLE_CONFIG_FILE, self.CONFIG_FILES}
             aliens = import_props - self._IMPORT_SECTION_FIELDS
             if len(aliens) > 0:
@@ -337,6 +339,11 @@ class ImportIniConfig(IniConfig):
                 self._raise(
                     f"Cannot have both '{self.SINGLE_CONFIG_FILE}' " +
                     f"and '{self.CONFIG_FILES}' in section '{conf_sec}'")
+            if refs is not None:
+                for ref in refs:
+                    if ref not in config.sections:
+                        self._raise(f"Reference '{ref}' in section " +
+                                    f"'{conf_sec}' not found, got: '{refs}'")
 
     def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
         """"Get children used for this config instance.  This is done by import each
@@ -347,7 +354,6 @@ class ImportIniConfig(IniConfig):
         to defer loading: one for loading sections, and one for loading file.
 
         """
-        logger.debug('get children')
         if isinstance(self.config_file, Path) and \
            not self.config_file.is_file():
             raise ConfigurableFileNotFoundError(self.config_file)
@@ -356,18 +362,24 @@ class ImportIniConfig(IniConfig):
         children: List[Configurable] = parser.children
         conf_secs: List[str] = [conf_sec]
         loaders: List[_ConfigLoader] = []
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'parsing section: {conf_sec}')
         self._validate_parser(parser)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating children for: {conf_sec}')
         # first load files given in the import section
         if parser.has_option(self.CONFIG_FILES, conf_sec):
-            for fname in parser.get_option_list(self.CONFIG_FILES, conf_sec):
+            fnames: List[str] = self.serializer.parse_object(
+                parser.get_option(self.CONFIG_FILES, conf_sec))
+            for fname in fnames:
                 params = {self.SINGLE_CONFIG_FILE: fname}
                 loaders.extend(self._create_loader('<no section>', params))
                 self._load(loaders, children, parser)
         # load each import section, again in order
         if parser.has_option(self.SECTIONS_SECTION, conf_sec):
-            for sec in parser.get_option_list(self.SECTIONS_SECTION, conf_sec):
+            secs: List[str] = self.serializer.parse_object(
+                parser.get_option(self.SECTIONS_SECTION, conf_sec))
+            for sec in secs:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'populating section {sec}, {children}')
                 conf_secs.append(sec)
@@ -376,30 +388,35 @@ class ImportIniConfig(IniConfig):
                 self._load(loaders, children, parser)
         return conf_secs, children
 
-    def _create_config_parser(self) -> ConfigParser:
-        logger.debug('createing loader parser')
+    def _load_imports(self, parser: ConfigParser):
+        logger.debug('loading imported configuration')
         csecs, children = self._get_children()
-        if self.use_interpolation:
-            parser = ConfigParser(
-                defaults=self.create_defaults,
-                interpolation=ExtendedInterpolation())
-        else:
-            parser = ConfigParser(defaults=self.create_defaults)
+        c: Configurable
         for c in children:
             par_secs = parser.sections()
+            if logger.isEnabledFor(logging.INFO):
+                if hasattr(c, 'config_file') and \
+                   isinstance(c.config_file, (str, Path)):
+                    desc = f'{c.__class__.__name__}: {c.config_file}'
+                else:
+                    desc = c.__class__.__name__
             for sec in c.sections:
+                if logger.isEnabledFor(logging.INFO):
+                    logger.info(f'importing section {desc}:[{sec}]')
                 if sec not in par_secs:
                     parser.add_section(sec)
                 for k, v in c.get_options(sec).items():
-                    v = self._format_option(k, v, sec)
-                    parser.set(sec, k, v)
+                    fv = self._format_option(k, v, sec)
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug(f'{k}: {v} -> {fv}')
+                    parser.set(sec, k, fv)
         if self.exclude_config_sections:
             self._config_sections = csecs
-        return parser
 
-    def _create_and_load_parser(self) -> ConfigParser:
+    def _create_and_load_parser(self, parser: ConfigParser):
         logger.debug('creating and loading parser')
-        parser = super()._create_and_load_parser()
+        super()._create_and_load_parser(parser)
+        self._load_imports(parser)
         if hasattr(self, '_config_sections'):
             for sec in self._config_sections:
                 parser.remove_section(sec)

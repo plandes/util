@@ -10,8 +10,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Added `frozendict` as a dependency.
+- App config configuration have a new type (`import`), which allows a
+  `^{config_path}` to be substituted with the `--config` file name giving more
+  control over the start up load process.
 
 ### Changed
+- All options in the `import` section of `ImportIniConfig` must now be proper
+  config data types, which are all lists prefixed with `list: `.
 - Fixed argument splitting in `CliHarness`.
 - Changed many cached `dict` to type `frozendict` to guard against
   unintentional modification of immutable data structures.

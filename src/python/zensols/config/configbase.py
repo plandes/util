@@ -185,7 +185,7 @@ class Configurable(Writable, metaclass=ABCMeta):
         """All sections of the configuration file.
 
         """
-        return ()
+        return frozenset()
 
     def set_option(self, name: str, value: str, section: str = None):
         """Set an option on this configurable.
@@ -228,8 +228,8 @@ class Configurable(Writable, metaclass=ABCMeta):
             try:
                 for k, v in self.get_options(sec).items():
                     to_populate.set_option(k, v, sec)
-            # robust is needed by lib.ConfigurationImporter_load(); but deal
-            # only with interplation errors
+            # robust is needed by lib.ConfigurationImporter._load(); but deal
+            # only with interpolation errors
             except ConfigurableError as e:
                 raise e
             except Exception as e:

@@ -257,9 +257,8 @@ class ConfigFactory(object):
             if isinstance(inst, FactoryStateObserver):
                 inst._notify_state(FactoryState.CREATED)
         except Exception as e:
-            logger.error(f'Can not create \'{cls_desc}\' for class ' +
-                         f'{cls}({args})({kwargs}): {e}')
-            raise e
+            raise FactoryError(f'Can not create \'{cls_desc}\' for class ' +
+                               f'{cls}({args})({kwargs}): {e}') from e
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'inst: {inst.__class__}')
         return inst

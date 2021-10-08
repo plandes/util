@@ -1,3 +1,4 @@
+from typing import Sequence
 import unittest
 import logging
 
@@ -17,6 +18,7 @@ class LogTestCase(unittest.TestCase):
     def tearDown(self):
         LogUtil.reset()
 
-    def config_logging(self, name: str):
+    def config_logging(self, *names: Sequence[str]):
         logging.basicConfig(level=logging.ERROR)
-        logging.getLogger(name).setLevel(logging.DEBUG)
+        for lv in names:
+            logging.getLogger(lv).setLevel(logging.DEBUG)

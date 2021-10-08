@@ -6,18 +6,19 @@ __author__ = 'Paul Landes'
 
 from typing import Any, Dict, Union, List, Type
 from dataclasses import dataclass, field
-from enum import Enum, auto
+from enum import Enum, auto, EnumMeta
 import os
 import sys
 import logging
+from string import Template
+from io import StringIO
 from json import JSONEncoder
-from enum import EnumMeta
 import inspect
 import re
 from io import TextIOBase
 from pathlib import Path
 from zensols.util import PackageResource
-from zensols.config import Settings, ImportIniConfig
+from zensols.config import IniConfig, ImportIniConfig, raw_ini_config
 from zensols.introspect import ClassImporter
 from zensols.config import (
     Dictable, Configurable, ConfigurableFactory,
@@ -126,7 +127,7 @@ class LogConfigurator(object):
             if obj is None:
                 raise ApplicationError(f'No such level for {name}: {level}')
             level = obj.value
-        elif not isinstance(level, int):
+        if not isinstance(level, int):
             raise ActionCliError(f'Unknown level: {level}({type(level)})')
         return level
 
@@ -178,6 +179,10 @@ class LogConfigurator(object):
         self.config()
 
 
+class ConfiguratorImporterTemplate(Template):
+    delimiter = '^'
+
+
 @dataclass
 class ConfigurationImporter(ApplicationObserver):
     """This class imports a child configuration in to the application context.  It
@@ -220,6 +225,12 @@ class ConfigurationImporter(ApplicationObserver):
 
     """
 
+    IMPORT_TYPE = 'import'
+    """The string value of the ``type`` parameter in the section config identifying
+    an :class:`.ImportIniConfig` import section.
+
+    """
+
     ENVIRON_VAR_REGEX = re.compile(r'^.+\.([a-z]+?)$')
     """A regular expression to parse the name from the package name for the
     environment variable that might hold the configuration
@@ -241,7 +252,7 @@ class ConfigurationImporter(ApplicationObserver):
     """
 
     default: Path = field(default=None)
-    """Use this file as the efault when given on the command line."""
+    """Use this file as the default when given on the command line."""
 
     config_path_environ_name: str = field(default=None)
     """An environment variable containing the default path to the configuration.
@@ -262,18 +273,16 @@ class ConfigurationImporter(ApplicationObserver):
 
     """
 
-    sections: List[str] = field(default=None)
-    """Additional sections to load."""
+    section: str = field(default=None)
+    """Additional which section to load as an import.  This is only valid and used
+    when :obj:`type` is set to `import`.  When it is, the section will replace
+    the string ``^{config_apth}`` (and any other field in this instance using
+    the same syntax) and load indicated remaining configuration using
+    :class:`~zensols.config.ImportIniConfig`.
 
-    override: bool = field(default=False)
-    """Override/clobber values from the configuration file in the application
-    configuration.
-
-    """
-
-    add_children: bool = field(default=False)
-    """If ``True``, then add the children configurations from the application
-    factories :class:`.ImportIniConfig`.
+    See the `API documentation
+    <https://plandes.github.io/util/doc/config.html#import-ini-configuration>`_
+    for more information.
 
     """
 
@@ -323,7 +332,39 @@ class ConfigurationImporter(ApplicationObserver):
         self._app = app
         self._action = action
 
-    def _load(self, settings: Union[Settings, LogConfigurator], section: str):
+    def _validate(self):
+        # the section attribute is only useful for ImportIniConfig imports
+        if self.type != self.IMPORT_TYPE and self.section is not None:
+            raise ActionCliError("Cannot have a 'section' entry " +
+                                 f"without type of '{self.IMPORT_TYPE}'")
+
+    def _populate_import_sections(self, config: Configurable) -> Configurable:
+        sec: Dict[str, str] = self.config.get_options(self.section)
+        secs = {}
+        populated_sec = {}
+        vals = self.__dict__
+        for k, v in sec.items():
+            populated_sec[k] = v.format(**vals)
+        if 0:
+            secs[self.section] = populated_sec
+            secs[ImportIniConfig.IMPORT_SECTION] = {
+                ImportIniConfig.SECTIONS_SECTION: self.section}
+        else:
+            secs[ImportIniConfig.IMPORT_SECTION] = populated_sec
+            if ImportIniConfig.SECTIONS_SECTION in populated_sec:
+                sub_secs: List[str] = self.config.serializer.parse_object(
+                    self.config.get_option(
+                        ImportIniConfig.SECTIONS_SECTION, self.section))
+                for sec in sub_secs:
+                    repl_sec = {}
+                    secs[sec] = repl_sec
+                    with raw_ini_config(config):
+                        for k, v in config.get_options(sec).items():
+                            tpl = ConfiguratorImporterTemplate(v)
+                            repl_sec[k] = tpl.substitute(vals)
+        return DictionaryConfig(secs)
+
+    def _load(self):
         """Once we have the path and the class used to load the configuration, create
         the instance and load it.
 
@@ -331,66 +372,66 @@ class ConfigurationImporter(ApplicationObserver):
         propogate.
 
         """
-        if section is not None and logger.isEnabledFor(logging.INFO):
-            logger.info(f"configurator loading section: '{section}'")
+        if logger.isEnabledFor(logging.INFO):
+            logger.info('configurator loading section: ' +
+                        f'{self.config.config_file}:[{self.name}]')
 
+        self._validate()
         # create the command line specified config
-        if not hasattr(settings, 'type') or settings.type is None:
-            cf = ConfigurableFactory()
-            cl_config = cf.from_path(settings.config_path)
-            logger.info(f'config loaded {settings.config_path} as ' +
-                        f'type {cl_config.__class__.__name__}')
-        else:
-            args = {'config_file': settings.config_path}
-            if hasattr(settings, 'arguments') and \
-               settings.arguments is not None:
-                args.update(settings.arguments)
+        do_back_copy = True
+        # create a configuration factory using the configuration file extension
+        if self.type is None:
+            args = {} if self.arguments is None else self.arguments
             cf = ConfigurableFactory(kwargs=args)
-            cl_config = cf.from_type(settings.type)
-            logger.info(f'configurator loading {settings.config_path} from ' +
-                        f'section {section} as type {settings.type}')
+            cl_config = cf.from_path(self.config_path)
+            logger.info(f'config loaded {self.config_path} as ' +
+                        f'type {cl_config.__class__.__name__}')
+        # import using ImportIniConfig as a section
+        elif self.type == self.IMPORT_TYPE:
+            args: dict = {} if self.arguments is None else self.arguments
+            ini: IniConfig = IniConfig(self.config)
+            dconf: Configurable = self._populate_import_sections(ini)
+            dconf.copy_sections(ini)
+            with raw_ini_config(ini):
+                cl_config = ImportIniConfig(
+                    config_file=ini,
+                    children=self._app.factory.children_configs,
+                    **args)
+            with raw_ini_config(cl_config):
+                cl_config.copy_sections(self.config)
+            do_back_copy = False
+        # otherwise, use the type to tell the configuraiton factory how to
+        # create it
+        else:
+            args = {'config_file': self.config_path}
+            if self.arguments is not None:
+                args.update(self.arguments)
+            cf = ConfigurableFactory(kwargs=args)
+            cl_config = cf.from_type(self.type)
+            logger.info(f'configurator loading {self.config_path} from ' +
+                        f'type {self.type}')
 
-        # add ImportIniConfig children for configuraiton such as application
-        # root directory
-        add_ch = hasattr(settings, 'add_children') and settings.add_children
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'children: {self._app.factory.children_configs}, ' +
-                         f'add_children: {add_ch}, type: {type(cl_config)} ' +
-                         f'in {settings}')
-        if add_ch and isinstance(cl_config, ImportIniConfig):
+        # For non-import configs, first inject our app context (app.conf) to
+        # the command line specified configuration (--config) skipping sections
+        # that have missing options.  Examples of those missing include
+        # cyclical dependencies such option references from our app context to
+        # the command line context.
+        if do_back_copy:
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug('adding children to factory')
-            cl_config.children.extend(self._app.factory.children_configs)
-
-        # First inject our app context (app.conf) to the command line specified
-        # configuration (--config) skipping sections that have missing options.
-        # Examples of those missing include cyclical dependencies such option
-        # references from our app context to the command line context.
-        self.config.copy_sections(cl_config, robust=True)
+                logger.debug(f'copying app config to {cl_config}')
+            #self.config.copy_sections(cl_config, robust=True)
+            with raw_ini_config(self.config):
+                self.config.copy_sections(cl_config)
 
         # copy the command line config to our app context letting it barf with
         # any missing properties this time
-        cl_config.copy_sections(self.config)
-
-        # clobber config values
-        if hasattr(settings, 'override') and settings.override:
-            cl_config = cf.from_path(settings.config_path)
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'clobbering with {cl_config}')
-            cl_config.copy_sections(self.config)
-
-        # recursively source in optional additional sections
-        if hasattr(settings, 'sections') and settings.sections is not None:
-            for sec in settings.sections:
-                if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'loading section: {sec}')
-                settings = self.config.populate(section=sec)
-                # allow ImportIniConfig convention; note that replacing
-                # attribute ``config_path`` for ``config_file`` isn't possible
-                # since it conflicts with the ``LogConfigurator``
-                if hasattr(settings, 'config_file'):
-                    settings.config_path = settings.config_file
-                self._load(settings, sec)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'copying to app config: {cl_config}')
+        #with raw_ini_config(cl_config):
+        if do_back_copy:
+            with raw_ini_config(cl_config):
+                cl_config.copy_sections(self.config)
+        #print(self.config.get_raw_str())
 
     def _reset(self):
         """Reset the Python logger configuration."""
@@ -421,7 +462,7 @@ class ConfigurationImporter(ApplicationObserver):
                 else:
                     load_config = False
         if load_config:
-            self._load(self, self.name)
+            self._load()
             if self.config_path_option_name is not None:
                 self.config.set_option(
                     self.config_path_option_name,

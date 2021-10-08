@@ -388,6 +388,11 @@ Options:
                         the path to the configuration file
 ```
 
+Note the `config_cli` section can type a `type` parameter to indicate what kind
+of configuration type, such as `ini`, `importini`, `json`, etc.  A special type
+is `import`, which requires a `section` property.  The section is then loaded
+just like the `[import]` of an [import ini configuration].
+
 
 ### Split Out the User Configuration
 
@@ -673,8 +678,7 @@ It is important to easily supply environment information to the application,
 for which the framework has two means:
 
 1. Provide environment variables using the [EnvironmentConfig] using the
-   [import ini configuration](config.html#import-ini-configuration) as a
-   section include.
+   [import ini configuration] as a section include.
 
 1. Provide it directly to the [ApplicationFactory] in the `main.py` when we
    create it.
@@ -769,6 +773,7 @@ the `example/cli/1-boilerplate` directory in the source repository.
 [Enum]: https://docs.python.org/3/library/enum.html
 [OptionParser]: https://docs.python.org/3/library/optparse.html
 
+[import ini configuration]: config.html#import-ini-configuration
 [EnvironmentConfig]: ../api/zensols.config.html#zensols.config.envconfig.EnvironmentConfig
 [ActionCli]: ../api/zensols.cli.html#zensols.cli.action.ActionCli
 [ActionCliManager]: ../api/zensols.cli.html#zensols.cli.action.ActionCliManager

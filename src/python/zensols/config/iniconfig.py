@@ -23,8 +23,7 @@ class IniConfig(Configurable):
 
     """
     def __init__(self, config_file: Union[Path, TextIOBase] = None,
-                 default_section: str = None,
-                 create_defaults: bool = None):
+                 default_section: str = None, use_interpolation: bool = False):
         """Create with a configuration file path.
 
         :param config_file: the configuration file path to read from; if the
@@ -33,12 +32,11 @@ class IniConfig(Configurable):
 
         :param default_section: default section (defaults to `default`)
 
+        :param use_interpolation: if ``True``, interpolate variables using
+                                  :class:`~configparser.ExtendedInterpolation`
+
         :param robust: if `True`, then don't raise an error when the
                        configuration file is missing
-
-        :param create_defaults: used to initialize the configuration parser,
-                                and useful for when substitution values are
-                                baked in to the configuration file
 
         """
 
@@ -47,69 +45,92 @@ class IniConfig(Configurable):
             self.config_file = Path(config_file).expanduser()
         else:
             self.config_file = config_file
-        self.create_defaults = self._munge_create_defaults(create_defaults)
+        self.use_interpolation = use_interpolation
         self.nascent = deepcopy(self.__dict__)
         self._cached_sections = {}
-
-    def _munge_create_defaults(self, vars):
-        return vars
+        self._raw = False
+        self._conf = None
 
     def _create_config_parser(self) -> ConfigParser:
         "Factory method to create the ConfigParser."
-        return ConfigParser(defaults=self.create_defaults)
+        if self.use_interpolation:
+            parser = ConfigParser(interpolation=ExtendedInterpolation())
+        else:
+            parser = ConfigParser()
+        return parser
 
-    def _read_config_content(self, cpath: Path, writer: TextIOBase):
+    def _read_config_content(self, cpath: Path, parser: ConfigParser):
         if cpath.is_file():
             with open(cpath) as f:
-                writer.write(f.read())
+                parser.read_file(f)
         elif cpath.is_dir():
+            writer = StringIO()
             for fpath in cpath.iterdir():
                 if fpath.is_file():
                     with open(fpath) as f:
                         writer.write(f.read())
                     writer.write('\n')
-            self._conf = self._create_config_parser()
             writer.seek(0)
-            self._conf.read_file(writer)
-
-    def _create_and_load_parser(self) -> ConfigParser:
-        if isinstance(self.config_file, TextIOBase):
-            writer = self.config_file
-            writer.seek(0)
-            parser = self._create_config_parser()
             parser.read_file(writer)
-            writer.seek(0)
-            return parser
-        else:
-            return self._create_and_load_parser_from_file(self.config_file)
 
-    def _create_and_load_parser_from_file(self, cpath: Path) -> ConfigParser:
+    def _create_and_load_parser_from_file(self, cpath: Path,
+                                          parser: ConfigParser):
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'{self.__class__.__name__}: loading config: {cpath}')
         if not cpath.exists():
             raise ConfigurableFileNotFoundError(cpath)
         elif cpath.is_file() or cpath.is_dir():
-            writer = StringIO()
-            self._read_config_content(cpath, writer)
-            writer.seek(0)
-            parser = self._create_config_parser()
-            parser.read_file(writer)
+            self._read_config_content(cpath, parser)
         else:
             raise ConfigurableError(f'Unknown file type: {cpath}')
         return parser
+
+    def _create_and_load_parser(self, parser: ConfigParser):
+        if isinstance(self.config_file, (str, Path)):
+            self._create_and_load_parser_from_file(self.config_file, parser)
+        elif isinstance(self.config_file, TextIOBase):
+            writer = self.config_file
+            writer.seek(0)
+            parser.read_file(writer)
+            writer.seek(0)
+        elif isinstance(self.config_file, Configurable):
+            is_ini = isinstance(self.config_file, IniConfig)
+            src: Configurable = self.config_file
+            sec: str = None
+            if is_ini:
+                self.config_file._raw = True
+            try:
+                for sec in src.sections:
+                    parser.add_section(sec)
+                    for k, v in src.get_options(sec).items():
+                        parser.set(sec, k, v)
+            finally:
+                if is_ini:
+                    self.config_file._raw = False
+        elif self.config_file is None:
+            pass
+        else:
+            raise ConfigurableError(
+                f'Unknown create type: {type(self.config_file)}')
 
     @property
     def parser(self) -> ConfigParser:
         """Load the configuration file.
 
         """
-        if not hasattr(self, '_conf'):
-            self._conf = self._create_and_load_parser()
+        if self._conf is None:
+            parser: ConfigParser = self._create_config_parser()
+            self._create_and_load_parser(parser)
+            self._conf = parser
         return self._conf
 
     def reload(self):
-        if hasattr(self, '_conf'):
-            del self._conf
+        self._conf = None
+
+    def _raise(self, msg: str):
+        if isinstance(self.config_file, Path):
+            msg = f'{msg} in file {self.config_file}'
+        raise ConfigurableError(msg)
 
     def has_option(self, name: str, section: str = None) -> bool:
         section = self.default_section if section is None else section
@@ -127,15 +148,10 @@ class IniConfig(Configurable):
             if not self.robust:
                 raise self._raise('No configuration given')
         elif conf.has_section(section):
-            opts = {k: conf.get(section, k) for k in conf.options(section)}
+            opts = dict(conf.items(section, raw=self._raw))
         if opts is None:
             self._raise(f"No section: '{section}'")
         return opts
-
-    def _raise(self, msg: str):
-        if isinstance(self.config_file, Path):
-            msg = f'{msg} in file {self.config_file}'
-        raise ConfigurableError(msg)
 
     def get_option(self, name: str, section: str = None) -> str:
         opt = None
@@ -145,7 +161,7 @@ class IniConfig(Configurable):
             if not self.robust:
                 self._raise('No configuration given')
         elif conf.has_option(section, name):
-            opt = conf.get(section, name)
+            opt = conf.get(section, name, raw=self._raw)
         if opt is None:
             if not conf.has_section(section):
                 self._raise(f"No section: '{section}'")
@@ -157,8 +173,7 @@ class IniConfig(Configurable):
         """All sections of the INI file.
 
         """
-        secs = self.parser.sections() or ()
-        return set(secs)
+        return frozenset(self.parser.sections() or ())
 
     def _format_option(self, name: str, value: str, section: str) -> str:
         try:
@@ -175,10 +190,23 @@ class IniConfig(Configurable):
             logger.debug(f'setting option {name}: {section}:{value}')
         if not self.parser.has_section(section):
             self.parser.add_section(section)
-        self.parser.set(section, name, value)
+        try:
+            self.parser.set(section, name, value)
+        except Exception as e:
+            raise ConfigurableError(
+                f'Cannot set {section}:{name} = {value}: {e}') from e
 
     def remove_section(self, section: str):
         self.parser.remove_section(section)
+
+    def get_raw_str(self) -> str:
+        """"Return the contents of the configuration parser with no interpolated
+        values.
+
+        """
+        sio = StringIO()
+        self.parser.write(sio)
+        return sio.getvalue()
 
     def derive_from_resource(self, path: str, copy_sections=()) -> \
             Configurable:
@@ -197,10 +225,24 @@ class IniConfig(Configurable):
         return conf
 
     def __str__(self):
-        return f'file: {self.config_file}, section: {self.sections}'
+        return f'file: {self.config_file}, sections: {" ".join(self.sections)}'
 
     def __repr__(self):
         return self.__str__()
+
+
+class raw_ini_config(object):
+    def __init__(self, config: IniConfig):
+        if not isinstance(config, IniConfig):
+            raise ConfigurableError(
+                f'Expecting IniConfig but got {type(config)}')
+        self.config = config
+
+    def __enter__(self):
+        self.config._raw = True
+
+    def __exit__(self, type, value, traceback):
+        self.config._raw = False
 
 
 class ExtendedInterpolationConfig(IniConfig):
@@ -208,9 +250,9 @@ class ExtendedInterpolationConfig(IniConfig):
     :class:`~configparser.ExtendedInterpolation`.
 
     """
-    def _create_config_parser(self) -> ConfigParser:
-        inter = ExtendedInterpolation()
-        return ConfigParser(defaults=self.create_defaults, interpolation=inter)
+    def __init__(self, *args, **kwargs):
+        kwargs['use_interpolation'] = True
+        super().__init__(*args, **kwargs)
 
 
 class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
