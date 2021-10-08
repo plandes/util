@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Dict, Union, List, Type
+from typing import Any, Dict, Union, List, Type, Set
 from dataclasses import dataclass, field
 from enum import Enum, auto, EnumMeta
 import os
@@ -355,7 +355,10 @@ class ConfigurationImporter(ApplicationObserver):
                 with raw_ini_config(config):
                     for k, v in config.get_options(sec).items():
                         tpl = ConfiguratorImporterTemplate(v)
-                        repl_sec[k] = tpl.substitute(vals)
+                        vr = tpl.substitute(vals)
+                        if logger.isEnabledFor(logging.DEBUG):
+                            logger.debug(f'{sec}:{k}: {v} -> {vr}')
+                        repl_sec[k] = vr
         return DictionaryConfig(secs)
 
     def _load(self):
@@ -370,6 +373,7 @@ class ConfigurationImporter(ApplicationObserver):
             logger.info('configurator loading section: ' +
                         f'{self.config.config_file}:[{self.name}]')
 
+        secs_to_del = set()
         self._validate()
         # create the command line specified config
         do_back_copy = True
@@ -385,14 +389,20 @@ class ConfigurationImporter(ApplicationObserver):
             args: dict = {} if self.arguments is None else self.arguments
             ini: IniConfig = IniConfig(self.config)
             dconf: Configurable = self._populate_import_sections(ini)
+            secs_to_del.update(dconf.sections)
             dconf.copy_sections(ini)
             with raw_ini_config(ini):
                 cl_config = ImportIniConfig(
                     config_file=ini,
                     children=self._app.factory.children_configs,
                     **args)
+                cl_config.parser
             with raw_ini_config(cl_config):
                 cl_config.copy_sections(self.config)
+            # remove sections that were removed
+            removed_secs: Set[str] = self.config.sections - cl_config.sections
+            secs_to_del.update(removed_secs)
+            # avoid the two way copy that happens later
             do_back_copy = False
         # otherwise, use the type to tell the configuraiton factory how to
         # create it
@@ -413,7 +423,6 @@ class ConfigurationImporter(ApplicationObserver):
         if do_back_copy:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'copying app config to {cl_config}')
-            #self.config.copy_sections(cl_config, robust=True)
             with raw_ini_config(self.config):
                 self.config.copy_sections(cl_config)
 
@@ -421,11 +430,14 @@ class ConfigurationImporter(ApplicationObserver):
         # any missing properties this time
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'copying to app config: {cl_config}')
-        #with raw_ini_config(cl_config):
         if do_back_copy:
             with raw_ini_config(cl_config):
                 cl_config.copy_sections(self.config)
-        #print(self.config.get_raw_str())
+        # if we imported, we created ImportIniConfig sections we need to remove
+        for sec in secs_to_del:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'removing (added) section: {sec}')
+            self.config.remove_section(sec)
 
     def _reset(self):
         """Reset the Python logger configuration."""

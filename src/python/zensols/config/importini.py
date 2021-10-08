@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Iterable, Tuple, List, Dict, Any, Set
+from typing import Iterable, Tuple, List, Dict, Any, Set, Sequence
 from dataclasses import dataclass, field
 import logging
 from itertools import chain
@@ -146,10 +146,14 @@ class _ConfigLoader(object):
     value: Any
 
     def __call__(self, children: List[Configurable]) -> Configurable:
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'loading: {self}')
         meth = getattr(self.factory, self.method)
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'Invoking {meth} with {self.value}')
         return meth(self.value)
+
+    def __str__(self):
+        desc = self.factory.kwargs.get('config_file', self.factory.kwargs)
+        return f'{self.value}({desc})'
 
 
 class ImportIniConfig(IniConfig):
@@ -177,9 +181,10 @@ class ImportIniConfig(IniConfig):
     SINGLE_CONFIG_FILE = 'config_file'
     CONFIG_FILES = 'config_files'
     REFS_NAME = 'references'
+    CLEANUPS_NAME = 'cleanups'
     TYPE_NAME = 'type'
     _IMPORT_SECTION_FIELDS = {SECTIONS_SECTION, SINGLE_CONFIG_FILE,
-                              CONFIG_FILES, REFS_NAME}
+                              CONFIG_FILES, REFS_NAME, CLEANUPS_NAME}
 
     def __init__(self, *args,
                  config_section: str = IMPORT_SECTION,
@@ -287,7 +292,7 @@ class ImportIniConfig(IniConfig):
         conf_files = params.get(self.CONFIG_FILES)
         loaders = []
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'creating and loading parser: {section}')
+            logger.debug(f'creating and loading parser section: [{section}]')
         if conf_files is None:
             loaders.append(self._create_single_loader(section, params))
         else:
@@ -307,7 +312,7 @@ class ImportIniConfig(IniConfig):
         """Load each configuration from the loader."""
         for loader in loaders:
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'loading {loader}')
+                logger.debug(f"loading '{loader}'")
             inst = loader(children)
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'created instance: {type(inst)}')
@@ -360,7 +365,7 @@ class ImportIniConfig(IniConfig):
         conf_sec: str = self.config_section
         parser: _StringIniConfig = self._get_bootstrap_parser()
         children: List[Configurable] = parser.children
-        conf_secs: List[str] = [conf_sec]
+        conf_secs: Set[str] = {conf_sec}
         loaders: List[_ConfigLoader] = []
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'parsing section: {conf_sec}')
@@ -382,10 +387,15 @@ class ImportIniConfig(IniConfig):
             for sec in secs:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'populating section {sec}, {children}')
-                conf_secs.append(sec)
+                conf_secs.add(sec)
                 params = parser.populate({}, section=sec)
                 loaders.extend(self._create_loader(sec, params))
                 self._load(loaders, children, parser)
+        # allow the user to remove more sections after import
+        if parser.has_option(self.CLEANUPS_NAME, conf_sec):
+            cleanups: Sequence[str] = self.serializer.parse_object(
+                parser.get_option(self.CLEANUPS_NAME, conf_sec))
+            conf_secs.update(cleanups)
         return conf_secs, children
 
     def _load_imports(self, parser: ConfigParser):
@@ -394,15 +404,15 @@ class ImportIniConfig(IniConfig):
         c: Configurable
         for c in children:
             par_secs = parser.sections()
-            if logger.isEnabledFor(logging.INFO):
+            if logger.isEnabledFor(logging.DEBUG):
                 if hasattr(c, 'config_file') and \
                    isinstance(c.config_file, (str, Path)):
                     desc = f'{c.__class__.__name__}: {c.config_file}'
                 else:
                     desc = c.__class__.__name__
             for sec in c.sections:
-                if logger.isEnabledFor(logging.INFO):
-                    logger.info(f'importing section {desc}:[{sec}]')
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'importing section {desc}:[{sec}]')
                 if sec not in par_secs:
                     parser.add_section(sec)
                 for k, v in c.get_options(sec).items():
