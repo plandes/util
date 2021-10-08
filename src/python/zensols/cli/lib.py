@@ -291,6 +291,9 @@ class ConfigurationImporter(ApplicationObserver):
 
     """
 
+    debug: bool = field(default=False)
+    """Printn the configuration after the merge operation."""
+
     # name of this field must match :obj:`ConfigurationImporter.CONFIG_PATH_FIELD`
     config_path: Path = field(default=None)
     """The path to the configuration file."""
@@ -438,6 +441,8 @@ class ConfigurationImporter(ApplicationObserver):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'removing (added) section: {sec}')
             self.config.remove_section(sec)
+        if self.debug:
+            print(self.config.get_raw_str())
 
     def _reset(self):
         """Reset the Python logger configuration."""
