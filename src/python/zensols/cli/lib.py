@@ -399,11 +399,12 @@ class ConfigurationImporter(ApplicationObserver):
                     config_file=ini,
                     children=self._app.factory.children_configs,
                     **args)
-                cl_config.parser
             with raw_ini_config(cl_config):
                 cl_config.copy_sections(self.config)
             # remove sections that were removed
             removed_secs: Set[str] = self.config.sections - cl_config.sections
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'removing additional sections: {removed_secs}')
             secs_to_del.update(removed_secs)
             # avoid the two way copy that happens later
             do_back_copy = False
