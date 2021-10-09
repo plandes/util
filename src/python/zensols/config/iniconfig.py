@@ -224,11 +224,22 @@ class IniConfig(Configurable):
         self.copy_sections(conf, copy_sections)
         return conf
 
+    @property
+    def container_desc(self) -> str:
+        mod = ''
+        if isinstance(self.config_file, (str, Path)):
+            mod = f'file={self.config_file.name}'
+        elif isinstance(self.config_file, Configurable):
+            mod = f'cnf=[{self.config_file}]'
+        return mod
+
     def __str__(self):
-        return f'file: {self.config_file}, sections: {" ".join(self.sections)}'
+        s = super().__str__()
+        return f'{s}, {self.container_desc}'
 
     def __repr__(self):
-        return self.__str__()
+        s = super().__repr__()
+        return f'{s}, {self.container_desc}'
 
 
 class raw_ini_config(object):

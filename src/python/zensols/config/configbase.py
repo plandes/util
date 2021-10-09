@@ -295,3 +295,12 @@ class Configurable(Writable, metaclass=ABCMeta):
             if mod is not None:
                 module_name = mod.__name__
         return self.serializer.resource_filename(resource_name, module_name)
+
+    def _short_sec_str(self) -> str:
+        return next(iter(self.sections))
+
+    def __str__(self):
+        return f'{self.__class__.__name__}: secs={self._short_sec_str()}'
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self._short_sec_str()})'
