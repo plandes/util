@@ -222,3 +222,5 @@ class """ + class_name + """(Template):
         sec_key = f'{self.root}.{self.sections_name}'
         if self.has_option(sec_key):
             return tuple(self.get_option_list(sec_key))
+        else:
+            return ()

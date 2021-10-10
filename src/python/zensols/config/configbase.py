@@ -297,7 +297,10 @@ class Configurable(Writable, metaclass=ABCMeta):
         return self.serializer.resource_filename(resource_name, module_name)
 
     def _get_section_short_str(self):
-        return next(iter(self.sections))
+        try:
+            return next(iter(self.sections))
+        except StopIteration:
+            return ''
 
     def _get_short_str(self) -> str:
         sec = self._get_section_short_str()
