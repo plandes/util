@@ -296,8 +296,11 @@ class Configurable(Writable, metaclass=ABCMeta):
                 module_name = mod.__name__
         return self.serializer.resource_filename(resource_name, module_name)
 
+    def _get_section_short_str(self):
+        return next(iter(self.sections))
+
     def _get_short_str(self) -> str:
-        sec = next(iter(self.sections))
+        sec = self._get_section_short_str()
         return f'{self.__class__.__name__}({sec})'
 
     def __str__(self):

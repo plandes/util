@@ -26,6 +26,7 @@ class TestConfig(unittest.TestCase):
 
     def test_print(self):
         conf = IniConfig('test-resources/config-test.conf')
+        conf.prime()
         s = str(conf)
         self.assertEqual("<IniConfig(default),f=config-test.conf>", s)
 

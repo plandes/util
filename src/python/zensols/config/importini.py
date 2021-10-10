@@ -138,31 +138,6 @@ class _StringIniConfig(IniConfig):
         pass
 
 
-@dataclass
-class _ConfigLoader(object):
-    """Loads/creates instances of :class:`.Configurable`.
-
-    :see: :meth:`.ImportIniConfig._get_children`
-
-    """
-    section: str
-    factory: ConfigurableFactory = field(repr=False)
-    method: str
-    value: Any
-
-    def __call__(self) -> Configurable:
-        meth = getattr(self.factory, self.method)
-        cfg: Configurable = meth(self.value)
-        return cfg
-
-    def __str__(self):
-        desc = self.factory.kwargs.get('config_file', self.factory.kwargs)
-        if isinstance(desc, Path):
-            parts = desc.parts
-            desc = Path(*parts[len(parts)-3:])
-        return f'{self.value}({desc})'
-
-
 class ImportIniConfig(IniConfig):
     """A configuration that uses other :class:`.Configurable` classes to load other
     sections.  A special ``config`` section is given that indicates what other
@@ -285,8 +260,8 @@ class ImportIniConfig(IniConfig):
                         self._raise(f"Reference '{ref}' in section " +
                                     f"'{conf_sec}' not found, got: '{refs}'")
 
-    def _create_single_loader(self, section: str, params: Dict[str, Any]) -> \
-            _ConfigLoader:
+    def _create_config(self, section: str,
+                       params: Dict[str, Any]) -> Configurable:
         """Create a config loader from a section."""
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'section: {section}, params: {params}')
@@ -295,36 +270,37 @@ class ImportIniConfig(IniConfig):
         class_name = params.get('class_name')
         tpe = params.get(self.TYPE_NAME)
         config_file = params.get(self.SINGLE_CONFIG_FILE)
-        loader: _ConfigLoader
+        config: Configurable
         if class_name is not None:
             del params['class_name']
-            loader = _ConfigLoader(section, cf, 'from_class_name', class_name)
+            config = cf.from_class_name(class_name)
         elif tpe is not None:
             del params[self.TYPE_NAME]
-            loader = _ConfigLoader(section, cf, 'from_type', tpe)
+            config = cf.from_type(tpe)
         elif config_file is not None:
             del params[self.SINGLE_CONFIG_FILE]
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(
                     f'getting instance using config factory: {config_file}')
-            loader = _ConfigLoader(section, cf, 'from_path', Path(config_file))
+            config = cf.from_path(Path(config_file))
         else:
             raise ConfigurableError(
                 f"No loader information for '{section}': {params}")
-        return loader
+        return config
 
-    def _create_loader(self, section: str, params: Dict[str, Any]) -> \
-            List[_ConfigLoader]:
+    def _create_configs(self, section: str, params: Dict[str, Any],
+                        bs_config: _StringIniConfig) -> List[Configurable]:
         """Create either a single config loader if the section defines one, or many if
         a list of files are given in the section.
 
         """
-        conf_files = params.get(self.CONFIG_FILES)
-        loaders = []
+        configs: List[Configurable] = []
+        children: List[Configurable] = bs_config.children
+        conf_files: List[str] = params.get(self.CONFIG_FILES)
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'create loader from section: [{section}]')
         if conf_files is None:
-            loaders.append(self._create_single_loader(section, params))
+            configs.append(self._create_config(section, params))
         else:
             sparams = dict(params)
             del sparams[self.CONFIG_FILES]
@@ -333,38 +309,11 @@ class ImportIniConfig(IniConfig):
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'file: {cf} -> {parsed_cf}')
                 sparams[self.SINGLE_CONFIG_FILE] = parsed_cf
-                conf = self._create_single_loader(section, sparams)
-                loaders.append(conf)
-        return loaders
-
-    def _create_configs(self, loaders: List[_ConfigLoader],
-                        bs_config: _StringIniConfig):
-        """Generates a new :class:`~zensols.config.Configurable` instances from each
-        loader in ``loaders`` using a
-        :class:`~zensols.config.ConfigurationFactory`.  This is called once to
-        create all configuration files for obj:`CONFIG_FILES` and again for
-        each section for :obj:`SECTIONS_SECTION`.
-
-        :param loaders: a list of an invocation on a configuration factory
-
-        :param children: the children :class:`~zensols.config.Configurable`
-                         used to resolve the properties to be interpolated
-                         later
-
-        :param bs_config: the bootstrap loader created in
-                       :meth:`_get_bootstrap_config`
-
-        """
-        children: List[Configurable] = bs_config.children
-        loader: _ConfigLoader
-        for loader in loaders:
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"loading '{loader}'")
-            # use the ConfigFactory created in a previous step to create the
-            # Configurable
-            cfg: Configurable = loader()
+                conf = self._create_config(section, sparams)
+                configs.append(conf)
+        for cfg in configs:
             if logger.isEnabledFor(logging.INFO):
-                logger.info(f'create instance: {type(cfg).__name__} from {loader}')
+                logger.info(f'create instance: {type(cfg).__name__}')
             # recursively create new import ini configs and add the children
             # we've created thus far for forward interpolation capability
             if isinstance(cfg, ImportIniConfig):
@@ -375,7 +324,7 @@ class ImportIniConfig(IniConfig):
                 cfg.children = tuple(new_children)
             # add the configurable to the bootstrap config
             bs_config.append_child(cfg)
-        loaders.clear()
+        return configs
 
     def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
         """"Get children used for this config instance.  This is done by import each
@@ -395,7 +344,6 @@ class ImportIniConfig(IniConfig):
         bs_config: _StringIniConfig = self._get_bootstrap_config()
         conf_sec: str = self.config_section
         conf_secs: Set[str] = {conf_sec}
-        loaders: List[_ConfigLoader] = []
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'parsing section: {conf_sec}')
         # look for bad configuration in the import section
@@ -408,8 +356,7 @@ class ImportIniConfig(IniConfig):
                 bs_config.get_option(self.CONFIG_FILES, conf_sec))
             for fname in fnames:
                 params = {self.SINGLE_CONFIG_FILE: fname}
-                loaders.extend(self._create_loader('<no section>', params))
-                self._create_configs(loaders, bs_config)
+                self._create_configs('<no section>', params, bs_config)
         # load each import section, again in order
         if bs_config.has_option(self.SECTIONS_SECTION, conf_sec):
             secs: List[str] = self.serializer.parse_object(
@@ -420,8 +367,7 @@ class ImportIniConfig(IniConfig):
                         f"populating section '{sec}', {bs_config.children}")
                 conf_secs.add(sec)
                 params = bs_config.populate({}, section=sec)
-                loaders.extend(self._create_loader(sec, params))
-                self._create_configs(loaders, bs_config)
+                self._create_configs(sec, params, bs_config)
         # allow the user to remove more sections after import
         if bs_config.has_option(self.CLEANUPS_NAME, conf_sec):
             cleanups: Sequence[str] = self.serializer.parse_object(

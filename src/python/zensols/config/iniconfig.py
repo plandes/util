@@ -12,6 +12,7 @@ from io import TextIOBase, StringIO
 from pathlib import Path
 from copy import deepcopy
 from configparser import ConfigParser, ExtendedInterpolation
+from ..persist.domain import Primeable
 from . import ConfigurableFileNotFoundError, ConfigurableError, Configurable
 
 logger = logging.getLogger(__name__)
@@ -224,6 +225,9 @@ class IniConfig(Configurable):
         self.copy_sections(conf, copy_sections)
         return conf
 
+    def prime(self):
+        self.parser
+
     @property
     def container_desc(self) -> str:
         mod = ''
@@ -235,7 +239,12 @@ class IniConfig(Configurable):
             mod = f'c=[{self.config_file}]'
         return mod
 
+    def _get_section_short_str(self):
+        return next(iter(self.parser.sections()))
+
     def _get_short_str(self) -> str:
+        if self._conf is None:
+            return f'Not yet initialized {type(self)}: {self.container_desc}'
         return f'{super()._get_short_str()},{self.container_desc}'
 
 
