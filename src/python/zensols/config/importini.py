@@ -262,7 +262,7 @@ class ImportIniConfig(IniConfig):
 
     def _create_config(self, section: str,
                        params: Dict[str, Any]) -> Configurable:
-        """Create a config loader from a section."""
+        """Create a config from a section."""
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'section: {section}, params: {params}')
         params = dict(params)
@@ -290,8 +290,19 @@ class ImportIniConfig(IniConfig):
 
     def _create_configs(self, section: str, params: Dict[str, Any],
                         bs_config: _StringIniConfig) -> List[Configurable]:
-        """Create either a single config loader if the section defines one, or many if
-        a list of files are given in the section.
+        """Create one or more :class:`~zensols.config.Configuration` instance depending
+        on if one or more configuration files are given.  Configurations are
+        created with using a :class:`~zensols.config.ConfigurationFactory` in
+        :meth:`_create_config`.  This method is called once to create all
+        configuration files for obj:`CONFIG_FILES` and again for each section
+        for :obj:`SECTIONS_SECTION`.
+
+        :param section: the import ini section to load
+
+        :param params: the section options/properties
+
+        :param bs_config: the bootstrap loader created in
+                          :meth:`_get_bootstrap_config`
 
         """
         configs: List[Configurable] = []
