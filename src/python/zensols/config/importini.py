@@ -153,14 +153,13 @@ class _ConfigLoader(object):
     def __call__(self) -> Configurable:
         meth = getattr(self.factory, self.method)
         cfg: Configurable = meth(self.value)
-        if logger.isEnabledFor(logging.INFO):
-            logger.info(f'created configurable: {type(cfg)} from {self}')
         return cfg
 
     def __str__(self):
         desc = self.factory.kwargs.get('config_file', self.factory.kwargs)
         if isinstance(desc, Path):
-            desc = desc.name
+            parts = desc.parts
+            desc = Path(*parts[len(parts)-3:])
         return f'{self.value}({desc})'
 
 
@@ -323,7 +322,7 @@ class ImportIniConfig(IniConfig):
         conf_files = params.get(self.CONFIG_FILES)
         loaders = []
         if logger.isEnabledFor(logging.INFO):
-            logger.info(f'creating loader from section: [{section}]')
+            logger.info(f'create loader from section: [{section}]')
         if conf_files is None:
             loaders.append(self._create_single_loader(section, params))
         else:
@@ -364,8 +363,8 @@ class ImportIniConfig(IniConfig):
             # use the ConfigFactory created in a previous step to create the
             # Configurable
             cfg: Configurable = loader()
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'created instance: {type(cfg)}')
+            if logger.isEnabledFor(logging.INFO):
+                logger.info(f'create instance: {type(cfg).__name__} from {loader}')
             # recursively create new import ini configs and add the children
             # we've created thus far for forward interpolation capability
             if isinstance(cfg, ImportIniConfig):
@@ -432,7 +431,7 @@ class ImportIniConfig(IniConfig):
 
     def _load_imports(self, bs_config: ConfigParser):
         if logger.isEnabledFor(logging.INFO):
-            logger.info(f'loading imported configuration pre-exist children: {self.children}')
+            logger.info(f'importing {self.container_desc}, children={self.children}')
         # pre_exist_children = set(map(id, self.children))
         csecs, children = self._get_children()
         c: Configurable

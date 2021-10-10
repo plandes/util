@@ -228,7 +228,9 @@ class IniConfig(Configurable):
     def container_desc(self) -> str:
         mod = ''
         if isinstance(self.config_file, (str, Path)):
-            mod = f'f={self.config_file.name}'
+            parts = self.config_file.parts
+            path = Path(*parts[len(parts)-3:])
+            mod = f'f={path}'
         elif isinstance(self.config_file, Configurable):
             mod = f'c=[{self.config_file}]'
         return mod
