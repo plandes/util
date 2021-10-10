@@ -116,12 +116,15 @@ class _BootstrapConfig(IniConfig):
 
     """
     def __init__(self, parent: IniConfig, children: Tuple[Configurable]):
-        """Init.
+        """Initialize.
 
-        :param config: the string configuration having only the import,
-                       reference and import sections, which is 
+        :param parent: the initial config having only the import, load and
+                       reference sections
 
-        :param parent: 
+        :param children: the children initialized with
+                         :class:`.ImportIniConfig`, which are later used to
+                         copy forward configuration as configurations are
+                         loaded
 
         """
         super().__init__(parent, parent.default_section)
@@ -144,6 +147,7 @@ class _BootstrapConfig(IniConfig):
         return parser
 
     def _create_and_load_parser(self, parser: ConfigParser):
+        # skip reloading, as that was done when the parser was created
         pass
 
 
@@ -154,7 +158,7 @@ class ImportIniConfig(IniConfig):
     import are processed in order by:
 
       1. Creating the delegate child :class:`Configurable` given in the
-         section,
+         section.
 
       2. Copying all sections from child instance to the parent.
 
@@ -344,9 +348,14 @@ class ImportIniConfig(IniConfig):
                 if logger.isEnabledFor(logging.INFO):
                     logger.info(f'descending: {config}')
                 if logger.isEnabledFor(logging.INFO):
-                    logger.info(f'adding bootstrap {bs_config.children} + self {self.children} to {config}')
+                    logger.info(f'adding bootstrap {bs_config.children} + ' +
+                                f'self {self.children} to {config}')
+                # add children bootstrap config that aren't add duplicates
+                # children created with this instance
+                ids: Set[int] = set(map(lambda c: id(c), bs_config.children))
                 new_children = list(bs_config.children)
-                new_children.extend(self.children)
+                new_children.extend(
+                    tuple(filter(lambda c: id(c) not in ids, self.children)))
                 config.children = tuple(new_children)
             # add the configurable to the bootstrap config
             bs_config.append_child(config)
@@ -406,17 +415,23 @@ class ImportIniConfig(IniConfig):
             logger.info(f'importing {self._get_container_desc()}, ' +
                         f'children={self.children}')
         csecs, children = self._get_children()
-        overwrites = set()
+        overwrites: Set = set()
+        # copy each configuration added to the bootstrap loader in the order we
+        # added them.
         c: Configurable
         for c in children:
             if logger.isEnabledFor(logging.INFO):
                 logger.info(f'loading configuration {c} -> {self}')
-            par_secs = parser.sections()
+            par_secs: List[str] = parser.sections()
+            sec: str
+            # copy every section from the child to target our new parser
             for sec in c.sections:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'importing section {c}:[{sec}]')
                 if sec not in par_secs:
                     parser.add_section(sec)
+                # assume everything is resolvable as this is the last step in
+                # the loading of this instance
                 try:
                     opts = c.get_options(sec)
                 except InterpolationMissingOptionError as e:
