@@ -115,17 +115,16 @@ class _BootstrapConfig(IniConfig):
     includes nested configruation imports when we *descend* recursively.
 
     """
-    def __init__(self, config: TextIOBase, parent: IniConfig,
-                 children: Tuple[Configurable]):
+    def __init__(self, parent: IniConfig, children: Tuple[Configurable]):
         """Init.
 
         :param config: the string configuration having only the import,
-                       reference and import sections
+                       reference and import sections, which is 
 
-        :param parent:
+        :param parent: 
 
         """
-        super().__init__(config, parent.default_section)
+        super().__init__(parent, parent.default_section)
         self.children = [parent] + list(children)
 
     def append_child(self, child: Configurable):
@@ -137,7 +136,11 @@ class _BootstrapConfig(IniConfig):
     def _create_config_parser(self) -> ConfigParser:
         parser = ConfigParser(
             interpolation=_SharedExtendedInterpolation(self.children))
-        parser.read_file(self.config_file)
+        with rawconfig(self.config_file):
+            for sec in self.config_file.sections:
+                parser.add_section(sec)
+                for k, v in self.config_file.get_options(sec).items():
+                    parser.set(sec, k, v)
         return parser
 
     def _create_and_load_parser(self, parser: ConfigParser):
@@ -250,11 +253,7 @@ class ImportIniConfig(IniConfig):
             to_remove = set(bs_config.sections) - secs
             for r in to_remove:
                 cparser.remove_section(r)
-        # create a temporary configuration with import load and references only
-        sconf = StringIO()
-        cparser.write(sconf)
-        sconf.seek(0)
-        return _BootstrapConfig(sconf, bs_config, self.children)
+        return _BootstrapConfig(bs_config, self.children)
 
     def _validate_bootstrap_config(self, config: Configurable):
         """Validate that the import section doesn't have bad configuration."""
