@@ -228,32 +228,31 @@ class IniConfig(Configurable):
     def container_desc(self) -> str:
         mod = ''
         if isinstance(self.config_file, (str, Path)):
-            mod = f'file={self.config_file.name}'
+            mod = f'f={self.config_file.name}'
         elif isinstance(self.config_file, Configurable):
-            mod = f'cnf=[{self.config_file}]'
+            mod = f'c=[{self.config_file}]'
         return mod
 
-    def __str__(self):
-        s = super().__str__()
-        return f'{s}, {self.container_desc}'
-
-    def __repr__(self):
-        s = super().__repr__()
-        return f'{s}, {self.container_desc}'
+    def _get_short_str(self) -> str:
+        return f'{super()._get_short_str()},{self.container_desc}'
 
 
-class raw_ini_config(object):
-    def __init__(self, config: IniConfig):
-        if not isinstance(config, IniConfig):
-            raise ConfigurableError(
-                f'Expecting IniConfig but got {type(config)}')
-        self.config = config
+class rawconfig(object):
+    """Treat all option fetching on ``config`` as raw, or without interpolation.
+    This is usually used when ``config`` is the target of section copying with
+    :meth:`.Configuration.copy_sections`,
+
+    """
+    def __init__(self, config: Configurable):
+        self.config = config if isinstance(config, IniConfig) else None
 
     def __enter__(self):
-        self.config._raw = True
+        if self.config is not None:
+            self.config._raw = True
 
     def __exit__(self, type, value, traceback):
-        self.config._raw = False
+        if self.config is not None:
+            self.config._raw = False
 
 
 class ExtendedInterpolationConfig(IniConfig):

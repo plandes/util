@@ -17,7 +17,7 @@ import re
 from io import TextIOBase
 from pathlib import Path
 from zensols.util import PackageResource
-from zensols.config import IniConfig, ImportIniConfig, raw_ini_config
+from zensols.config import IniConfig, ImportIniConfig, rawconfig
 from zensols.introspect import ClassImporter
 from zensols.config import (
     Dictable, Configurable, ConfigurableFactory,
@@ -355,7 +355,7 @@ class ConfigurationImporter(ApplicationObserver):
             for sec in sub_secs:
                 repl_sec = {}
                 secs[sec] = repl_sec
-                with raw_ini_config(config):
+                with rawconfig(config):
                     for k, v in config.get_options(sec).items():
                         tpl = ConfiguratorImporterTemplate(v)
                         vr = tpl.substitute(vals)
@@ -394,12 +394,12 @@ class ConfigurationImporter(ApplicationObserver):
             dconf: Configurable = self._populate_import_sections(ini)
             secs_to_del.update(dconf.sections)
             dconf.copy_sections(ini)
-            with raw_ini_config(ini):
+            with rawconfig(ini):
                 cl_config = ImportIniConfig(
                     config_file=ini,
                     children=self._app.factory.children_configs,
                     **args)
-            with raw_ini_config(cl_config):
+            with rawconfig(cl_config):
                 cl_config.copy_sections(self.config)
             # remove sections that were removed
             removed_secs: Set[str] = self.config.sections - cl_config.sections
@@ -427,7 +427,7 @@ class ConfigurationImporter(ApplicationObserver):
         if do_back_copy:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'copying app config to {cl_config}')
-            with raw_ini_config(self.config):
+            with rawconfig(self.config):
                 self.config.copy_sections(cl_config)
 
         # copy the command line config to our app context letting it barf with
@@ -435,7 +435,7 @@ class ConfigurationImporter(ApplicationObserver):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'copying to app config: {cl_config}')
         if do_back_copy:
-            with raw_ini_config(cl_config):
+            with rawconfig(cl_config):
                 cl_config.copy_sections(self.config)
         # if we imported, we created ImportIniConfig sections we need to remove
         for sec in secs_to_del:

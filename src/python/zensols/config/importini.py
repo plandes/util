@@ -16,7 +16,7 @@ from configparser import (
 )
 from . import (
     ConfigurableError, ConfigurableFileNotFoundError,
-    Configurable, ConfigurableFactory, IniConfig
+    Configurable, ConfigurableFactory, IniConfig, rawconfig,
 )
 
 logger = logging.getLogger(__name__)
@@ -117,11 +117,16 @@ class _StringIniConfig(IniConfig):
         super().__init__(None, parent.default_section)
         self.config = config
         self.children = [parent] + list(children)
+        # self.children = list(children)
+        # self.children.append(parent)
 
     def append_child(self, child: Configurable):
         self.children.append(child)
         for c in self.children:
             c.copy_sections(self)
+        # for c in self.children:
+        #     with rawconfig(c):
+        #         c.copy_sections(self)
 
     def _create_config_parser(self) -> ConfigParser:
         parser = ConfigParser(
@@ -146,10 +151,11 @@ class _ConfigLoader(object):
     value: Any
 
     def __call__(self) -> Configurable:
-        if logger.isEnabledFor(logging.INFO):
-            logger.info(f'loading: {self}')
         meth = getattr(self.factory, self.method)
-        return meth(self.value)
+        cfg: Configurable = meth(self.value)
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'created configurable: {type(cfg)} from {self}')
+        return cfg
 
     def __str__(self):
         desc = self.factory.kwargs.get('config_file', self.factory.kwargs)
@@ -227,37 +233,37 @@ class ImportIniConfig(IniConfig):
                 'You must set exclude_config_sections to False when the ' +
                 'import and config section are the same')
 
-    def _get_bootstrap_parser(self) -> _StringIniConfig:
+    def _get_bootstrap_config(self) -> _StringIniConfig:
         """Create the config that is used to read only the sections needed to
         import/load other configuration.
 
         """
         logger.debug('creating bootstrap parser')
         conf_sec = self.config_section
-        parser = IniConfig(self.config_file)
-        cparser = parser.parser
-        has_refs = parser.has_option(self.REFS_NAME, conf_sec)
-        has_secs = parser.has_option(self.SECTIONS_SECTION, conf_sec)
+        bs_config = IniConfig(self.config_file)
+        cparser = bs_config.parser
+        has_refs = bs_config.has_option(self.REFS_NAME, conf_sec)
+        has_secs = bs_config.has_option(self.SECTIONS_SECTION, conf_sec)
         if has_secs or has_refs:
             secs = set()
             if has_secs:
                 sec_lst: List[str] = self.serializer.parse_object(
-                    parser.get_option(self.SECTIONS_SECTION, conf_sec))
+                    bs_config.get_option(self.SECTIONS_SECTION, conf_sec))
                 secs.update(set(sec_lst))
             if has_refs:
                 refs: List[str] = self.serializer.parse_object(
-                    parser.get_option(self.REFS_NAME, conf_sec))
+                    bs_config.get_option(self.REFS_NAME, conf_sec))
                 secs.update(set(refs))
             secs.add(conf_sec)
-            to_remove = set(parser.sections) - secs
+            to_remove = set(bs_config.sections) - secs
             for r in to_remove:
                 cparser.remove_section(r)
         sconf = StringIO()
         cparser.write(sconf)
         sconf.seek(0)
-        return _StringIniConfig(sconf, parser, self.children)
+        return _StringIniConfig(sconf, bs_config, self.children)
 
-    def _validate_parser(self, config: Configurable):
+    def _validate_bootstrap_config(self, config: Configurable):
         """Validate that the import section doesn't have bad configuration."""
         conf_sec: str = self.config_section
         if conf_sec in config.sections:
@@ -316,8 +322,8 @@ class ImportIniConfig(IniConfig):
         """
         conf_files = params.get(self.CONFIG_FILES)
         loaders = []
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'creating and loading parser section: [{section}]')
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'creating loader from section: [{section}]')
         if conf_files is None:
             loaders.append(self._create_single_loader(section, params))
         else:
@@ -332,36 +338,44 @@ class ImportIniConfig(IniConfig):
                 loaders.append(conf)
         return loaders
 
-    def _load(self, loaders: List[_ConfigLoader], parser: _StringIniConfig):
-        """Load each configuration from the loader.  This generates a new
-        :class:`.Configurable` from each loader in ``loaders``.  This is called
-        once to create all configuration files for obj:`self.CONFIG_FILES` and
-        again for each section for :obj:`self.SECTIONS_SECTION`.
+    def _create_configs(self, loaders: List[_ConfigLoader],
+                        bs_config: _StringIniConfig):
+        """Generates a new :class:`~zensols.config.Configurable` instances from each
+        loader in ``loaders`` using a
+        :class:`~zensols.config.ConfigurationFactory`.  This is called once to
+        create all configuration files for obj:`CONFIG_FILES` and again for
+        each section for :obj:`SECTIONS_SECTION`.
 
         :param loaders: a list of an invocation on a configuration factory
 
-        :param children: the ``parser's
+        :param children: the children :class:`~zensols.config.Configurable`
+                         used to resolve the properties to be interpolated
+                         later
 
-        :param parser: the bootstrap loader created in
-                       :meth:`_get_bootstrap_parser`
+        :param bs_config: the bootstrap loader created in
+                       :meth:`_get_bootstrap_config`
 
         """
-        children: List[Configurable] = parser.children
+        children: List[Configurable] = bs_config.children
         loader: _ConfigLoader
         for loader in loaders:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f"loading '{loader}'")
+            # use the ConfigFactory created in a previous step to create the
+            # Configurable
             cfg: Configurable = loader()
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'created instance: {type(cfg)}')
+            # recursively create new import ini configs and add the children
+            # we've created thus far for forward interpolation capability
             if isinstance(cfg, ImportIniConfig):
                 new_children = list(children)
                 new_children.extend(self.children)
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'add {new_children} to {cfg}')
                 cfg.children = tuple(new_children)
-            # add the configurable to the parser
-            parser.append_child(cfg)
+            # add the configurable to the bootstrap config
+            bs_config.append_child(cfg)
         loaders.clear()
 
     def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
@@ -373,71 +387,77 @@ class ImportIniConfig(IniConfig):
         to defer loading: one for loading sections, and one for loading file.
 
         """
+        # guard on OS level config file since the super class allows different
+        # types such as directory; we only deal with files in this class
         if isinstance(self.config_file, Path) and \
            not self.config_file.is_file():
             raise ConfigurableFileNotFoundError(self.config_file)
+        # create the bootstrap config used to start the import process
+        bs_config: _StringIniConfig = self._get_bootstrap_config()
         conf_sec: str = self.config_section
-        parser: _StringIniConfig = self._get_bootstrap_parser()
         conf_secs: Set[str] = {conf_sec}
         loaders: List[_ConfigLoader] = []
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'parsing section: {conf_sec}')
-        self._validate_parser(parser)
+        # look for bad configuration in the import section
+        self._validate_bootstrap_config(bs_config)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating children for: {conf_sec}')
         # first load files given in the import section
-        if parser.has_option(self.CONFIG_FILES, conf_sec):
+        if bs_config.has_option(self.CONFIG_FILES, conf_sec):
             fnames: List[str] = self.serializer.parse_object(
-                parser.get_option(self.CONFIG_FILES, conf_sec))
+                bs_config.get_option(self.CONFIG_FILES, conf_sec))
             for fname in fnames:
                 params = {self.SINGLE_CONFIG_FILE: fname}
                 loaders.extend(self._create_loader('<no section>', params))
-                self._load(loaders, parser)
+                self._create_configs(loaders, bs_config)
         # load each import section, again in order
-        if parser.has_option(self.SECTIONS_SECTION, conf_sec):
+        if bs_config.has_option(self.SECTIONS_SECTION, conf_sec):
             secs: List[str] = self.serializer.parse_object(
-                parser.get_option(self.SECTIONS_SECTION, conf_sec))
+                bs_config.get_option(self.SECTIONS_SECTION, conf_sec))
             for sec in secs:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(
-                        f"populating section '{sec}', {parser.children}")
+                        f"populating section '{sec}', {bs_config.children}")
                 conf_secs.add(sec)
-                params = parser.populate({}, section=sec)
+                params = bs_config.populate({}, section=sec)
                 loaders.extend(self._create_loader(sec, params))
-                self._load(loaders, parser)
+                self._create_configs(loaders, bs_config)
         # allow the user to remove more sections after import
-        if parser.has_option(self.CLEANUPS_NAME, conf_sec):
+        if bs_config.has_option(self.CLEANUPS_NAME, conf_sec):
             cleanups: Sequence[str] = self.serializer.parse_object(
-                parser.get_option(self.CLEANUPS_NAME, conf_sec))
+                bs_config.get_option(self.CLEANUPS_NAME, conf_sec))
             conf_secs.update(cleanups)
-        return conf_secs, parser.children
+        return conf_secs, bs_config.children
 
-    def _load_imports(self, parser: ConfigParser):
+    def _load_imports(self, bs_config: ConfigParser):
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'loading imported configuration pre-exist children: {self.children}')
         # pre_exist_children = set(map(id, self.children))
         csecs, children = self._get_children()
         c: Configurable
-        if logger.isEnabledFor(logging.INFO):
-            logger.info(f'created children: {children}')
+        # if logger.isEnabledFor(logging.INFO):
+        #     logger.info(f'created children: {children}')
         # puts = set()
         for c in children:
+            if logger.isEnabledFor(logging.INFO):
+                logger.info(f'loading configuration from: {c}')
             # pre_exist = id(c) in pre_exist_children
-            par_secs = parser.sections()
+            par_secs = bs_config.sections()
             for sec in c.sections:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'importing section {c}:[{sec}]')
                 if sec not in par_secs:
-                    parser.add_section(sec)
+                    bs_config.add_section(sec)
                 for k, v in c.get_options(sec).items():
                     fv = self._format_option(k, v, sec)
-                    # has = parser.has_option(sec, k)
+                    # has = bs_config.has_option(sec, k)
                     # clobber = not pre_exist or not has
                     # if has and sec == 'vectorizer_manager_set':
                     #     print(f'overwriting {c.__class__.__name__}:{self.config_file}:{sec}:{k} {v} -> [{self.container_desc}]:{fv} pe={pre_exist}, has={has}, clobber={clobber}')
                     if logger.isEnabledFor(logging.DEBUG):
                         logger.debug(f'{sec}:{k}: {v} -> {fv}')
-                    parser.set(sec, k, fv)
+                    bs_config.set(sec, k, fv)
         if self.exclude_config_sections:
             self._config_sections = csecs
 
