@@ -301,7 +301,7 @@ class Configurable(Writable, metaclass=ABCMeta):
 
     def _get_short_str(self) -> str:
         sec = self._get_section_short_str()
-        return f'{self.__class__.__name__}({sec})'
+        return f'{self.__class__.__name__}{{{sec}}}'
 
     def __str__(self):
         return f'<{self._get_short_str()}>'

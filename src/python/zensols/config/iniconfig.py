@@ -18,7 +18,7 @@ from . import ConfigurableFileNotFoundError, ConfigurableError, Configurable
 logger = logging.getLogger(__name__)
 
 
-class IniConfig(Configurable):
+class IniConfig(Configurable, Primeable):
     """Application configuration utility.  This reads from a configuration and
     returns sets or subsets of options.
 
@@ -228,24 +228,29 @@ class IniConfig(Configurable):
     def prime(self):
         self.parser
 
-    @property
-    def container_desc(self) -> str:
+    def _get_container_desc(self, include_type: bool = True,
+                            max_path_len: int = 3) -> str:
         mod = ''
         if isinstance(self.config_file, (str, Path)):
             parts = self.config_file.parts
-            path = Path(*parts[len(parts)-3:])
-            mod = f'f={path}'
+            path = Path(*parts[max(0, len(parts)-max_path_len):])
+            tpe = 'f=' if include_type else ''
+            mod = f'{tpe}{path}'
         elif isinstance(self.config_file, Configurable):
-            mod = f'c=[{self.config_file}]'
+            tpe = 'c=' if include_type else ''
+            mod = f'{tpe}[{self.config_file}]'
         return mod
 
     def _get_section_short_str(self):
+        if self._conf is None:
+            # getting sections invokes parsing, which causes issues if used in
+            # a debugging statement when we're not yet ready to parse
+            return ''
         return next(iter(self.parser.sections()))
 
     def _get_short_str(self) -> str:
-        if self._conf is None:
-            return f'Not yet initialized {type(self)}: {self.container_desc}'
-        return f'{super()._get_short_str()},{self.container_desc}'
+        sec = self._get_section_short_str()
+        return f'{self.__class__.__name__}({self._get_container_desc()}){{{sec}}}'
 
 
 class rawconfig(object):

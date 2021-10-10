@@ -75,9 +75,10 @@ class _SharedExtendedInterpolation(ExtendedInterpolation):
         super().__init__()
         defs = {}
         for child in children:
-            for sec in child.sections:
-                for k, v in child.get_options(sec).items():
-                    defs[f'{sec}:{k}'] = v
+            with rawconfig(child):
+                for sec in child.sections:
+                    for k, v in child.get_options(sec).items():
+                        defs[f'{sec}:{k}'] = v
         self.children = tuple(map(lambda c: _ParserAdapter(c, defs), children))
         self.robust = robust
 
@@ -107,31 +108,36 @@ class _SharedExtendedInterpolation(ExtendedInterpolation):
         return res
 
 
-class _StringIniConfig(IniConfig):
+class _BootstrapConfig(IniConfig):
     """Configuration class extends using advanced interpolation with
-    :class:`~configparser.ExtendedInterpolation`.
+    :class:`~configparser.ExtendedInterpolation`.  One of these is created
+    every time an instance of :class:`.ImportIniConfig` is created, which
+    includes nested configruation imports when we *descend* recursively.
 
     """
     def __init__(self, config: TextIOBase, parent: IniConfig,
                  children: Tuple[Configurable]):
-        super().__init__(None, parent.default_section)
-        self.config = config
+        """Init.
+
+        :param config: the string configuration having only the import,
+                       reference and import sections
+
+        :param parent:
+
+        """
+        super().__init__(config, parent.default_section)
         self.children = [parent] + list(children)
-        # self.children = list(children)
-        # self.children.append(parent)
 
     def append_child(self, child: Configurable):
         self.children.append(child)
         for c in self.children:
-            c.copy_sections(self)
-        # for c in self.children:
-        #     with rawconfig(c):
-        #         c.copy_sections(self)
+            with rawconfig(c):
+                c.copy_sections(self)
 
     def _create_config_parser(self) -> ConfigParser:
         parser = ConfigParser(
             interpolation=_SharedExtendedInterpolation(self.children))
-        parser.read_file(self.config)
+        parser.read_file(self.config_file)
         return parser
 
     def _create_and_load_parser(self, parser: ConfigParser):
@@ -207,9 +213,15 @@ class ImportIniConfig(IniConfig):
                 'You must set exclude_config_sections to False when the ' +
                 'import and config section are the same')
 
-    def _get_bootstrap_config(self) -> _StringIniConfig:
+    def _get_bootstrap_config(self) -> _BootstrapConfig:
         """Create the config that is used to read only the sections needed to
-        import/load other configuration.
+        import/load other configuration.  This adds the import section, any
+        sections it *refers* to, and the sections it indicates to load.
+
+        References are those needed to continue parsing the rest of the boot
+        strap configuration for this instance.  This usually includes a
+        ``default`` section that might have a ``resources`` property used to
+        populate a load section paths.
 
         """
         logger.debug('creating bootstrap parser')
@@ -218,24 +230,31 @@ class ImportIniConfig(IniConfig):
         cparser = bs_config.parser
         has_refs = bs_config.has_option(self.REFS_NAME, conf_sec)
         has_secs = bs_config.has_option(self.SECTIONS_SECTION, conf_sec)
+        # add sections and references to the temporary config
         if has_secs or has_refs:
             secs = set()
+            # add load sections
             if has_secs:
                 sec_lst: List[str] = self.serializer.parse_object(
                     bs_config.get_option(self.SECTIONS_SECTION, conf_sec))
                 secs.update(set(sec_lst))
+            # add references
             if has_refs:
                 refs: List[str] = self.serializer.parse_object(
                     bs_config.get_option(self.REFS_NAME, conf_sec))
                 secs.update(set(refs))
+            # add the import section itself, used later to load children config
             secs.add(conf_sec)
+            # remove all sections but import, load and reference from the
+            # parser
             to_remove = set(bs_config.sections) - secs
             for r in to_remove:
                 cparser.remove_section(r)
+        # create a temporary configuration with import load and references only
         sconf = StringIO()
         cparser.write(sconf)
         sconf.seek(0)
-        return _StringIniConfig(sconf, bs_config, self.children)
+        return _BootstrapConfig(sconf, bs_config, self.children)
 
     def _validate_bootstrap_config(self, config: Configurable):
         """Validate that the import section doesn't have bad configuration."""
@@ -263,8 +282,6 @@ class ImportIniConfig(IniConfig):
     def _create_config(self, section: str,
                        params: Dict[str, Any]) -> Configurable:
         """Create a config from a section."""
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'section: {section}, params: {params}')
         params = dict(params)
         cf = ConfigurableFactory(params)
         class_name = params.get('class_name')
@@ -279,17 +296,16 @@ class ImportIniConfig(IniConfig):
             config = cf.from_type(tpe)
         elif config_file is not None:
             del params[self.SINGLE_CONFIG_FILE]
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(
-                    f'getting instance using config factory: {config_file}')
             config = cf.from_path(Path(config_file))
         else:
             raise ConfigurableError(
                 f"No loader information for '{section}': {params}")
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'created config: {config}')
         return config
 
     def _create_configs(self, section: str, params: Dict[str, Any],
-                        bs_config: _StringIniConfig) -> List[Configurable]:
+                        bs_config: _BootstrapConfig) -> List[Configurable]:
         """Create one or more :class:`~zensols.config.Configuration` instance depending
         on if one or more configuration files are given.  Configurations are
         created with using a :class:`~zensols.config.ConfigurationFactory` in
@@ -306,35 +322,35 @@ class ImportIniConfig(IniConfig):
 
         """
         configs: List[Configurable] = []
-        children: List[Configurable] = bs_config.children
         conf_files: List[str] = params.get(self.CONFIG_FILES)
         if logger.isEnabledFor(logging.INFO):
-            logger.info(f'create loader from section: [{section}]')
+            logger.info(f'creating configs from section: [{section}]')
         if conf_files is None:
+            # create a configuration from the section as a section load
             configs.append(self._create_config(section, params))
         else:
+            # otherwise, synthesize a section load for each given config file
             sparams = dict(params)
             del sparams[self.CONFIG_FILES]
             for cf in conf_files:
                 parsed_cf = self.serializer.parse_object(cf)
-                if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'file: {cf} -> {parsed_cf}')
                 sparams[self.SINGLE_CONFIG_FILE] = parsed_cf
                 conf = self._create_config(section, sparams)
                 configs.append(conf)
-        for cfg in configs:
-            if logger.isEnabledFor(logging.INFO):
-                logger.info(f'create instance: {type(cfg).__name__}')
+        # add configurations as children to the bootstrap config
+        for config in configs:
             # recursively create new import ini configs and add the children
             # we've created thus far for forward interpolation capability
-            if isinstance(cfg, ImportIniConfig):
-                new_children = list(children)
+            if isinstance(config, ImportIniConfig):
+                if logger.isEnabledFor(logging.INFO):
+                    logger.info(f'descending: {config}')
+                if logger.isEnabledFor(logging.INFO):
+                    logger.info(f'adding bootstrap {bs_config.children} + self {self.children} to {config}')
+                new_children = list(bs_config.children)
                 new_children.extend(self.children)
-                if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'add {new_children} to {cfg}')
-                cfg.children = tuple(new_children)
+                config.children = tuple(new_children)
             # add the configurable to the bootstrap config
-            bs_config.append_child(cfg)
+            bs_config.append_child(config)
         return configs
 
     def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
@@ -352,7 +368,7 @@ class ImportIniConfig(IniConfig):
            not self.config_file.is_file():
             raise ConfigurableFileNotFoundError(self.config_file)
         # create the bootstrap config used to start the import process
-        bs_config: _StringIniConfig = self._get_bootstrap_config()
+        bs_config: _BootstrapConfig = self._get_bootstrap_config()
         conf_sec: str = self.config_section
         conf_secs: Set[str] = {conf_sec}
         if logger.isEnabledFor(logging.INFO):
@@ -386,34 +402,41 @@ class ImportIniConfig(IniConfig):
             conf_secs.update(cleanups)
         return conf_secs, bs_config.children
 
-    def _load_imports(self, bs_config: ConfigParser):
+    def _load_imports(self, parser: ConfigParser):
         if logger.isEnabledFor(logging.INFO):
-            logger.info(f'importing {self.container_desc}, children={self.children}')
-        # pre_exist_children = set(map(id, self.children))
+            logger.info(f'importing {self._get_container_desc()}, ' +
+                        f'children={self.children}')
         csecs, children = self._get_children()
+        overwrites = set()
         c: Configurable
-        # if logger.isEnabledFor(logging.INFO):
-        #     logger.info(f'created children: {children}')
-        # puts = set()
         for c in children:
             if logger.isEnabledFor(logging.INFO):
-                logger.info(f'loading configuration from: {c}')
-            # pre_exist = id(c) in pre_exist_children
-            par_secs = bs_config.sections()
+                logger.info(f'loading configuration {c} -> {self}')
+            par_secs = parser.sections()
             for sec in c.sections:
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'importing section {c}:[{sec}]')
                 if sec not in par_secs:
-                    bs_config.add_section(sec)
-                for k, v in c.get_options(sec).items():
+                    parser.add_section(sec)
+                try:
+                    opts = c.get_options(sec)
+                except InterpolationMissingOptionError as e:
+                    msg = 'Could not populate {c}:[{sec}]: {e}'
+                    raise ConfigurableError(msg) from e
+                for k, v in opts.items():
+                    key = f'{sec}:{k}'
+                    has = parser.has_option(sec, k)
                     fv = self._format_option(k, v, sec)
-                    # has = bs_config.has_option(sec, k)
-                    # clobber = not pre_exist or not has
-                    # if has and sec == 'vectorizer_manager_set':
-                    #     print(f'overwriting {c.__class__.__name__}:{self.config_file}:{sec}:{k} {v} -> [{self.container_desc}]:{fv} pe={pre_exist}, has={has}, clobber={clobber}')
-                    if logger.isEnabledFor(logging.DEBUG):
-                        logger.debug(f'{sec}:{k}: {v} -> {fv}')
-                    bs_config.set(sec, k, fv)
+                    # overwrite the option/property when not yet set or its
+                    # already by overwriten by a previous child; however, don't
+                    # set it when its new per this instance's import iteration
+                    if not has or key in overwrites:
+                        if logger.isEnabledFor(logging.DEBUG):
+                            logger.debug(f'overwriting {sec}:{k}: {v} -> {fv}')
+                        parser.set(sec, k, fv)
+                        overwrites.add(key)
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'imported {len(children)} children to {self}')
         if self.exclude_config_sections:
             self._config_sections = csecs
 
