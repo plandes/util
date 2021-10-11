@@ -5,7 +5,7 @@ application context.
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Any
+from typing import Dict, Any, Set, List
 from dataclasses import dataclass, field
 import os
 import logging
@@ -218,7 +218,7 @@ class ConfigurationImporter(ApplicationObserver):
                         repl_sec[k] = vr
         return DictionaryConfig(secs)
 
-    def _load(self):
+    def _load(self) -> Configurable:
         """Once we have the path and the class used to load the configuration, create
         the instance and load it.
 
@@ -230,10 +230,14 @@ class ConfigurationImporter(ApplicationObserver):
             logger.info('configurator loading section: ' +
                         f'{self.config.config_file}:[{self.name}]')
 
-        secs_to_del = set()
-        self._validate()
+        # the modified configuration that will returned
+        modified_config: Configurable = self.config
+        # sections created during this call to later be removed
+        secs_to_del: Set[str] = set()
         # create the command line specified config
-        do_back_copy = True
+        do_back_copy: bool = True
+        # config section sanity check
+        self._validate()
         # create a configuration factory using the configuration file extension
         if self.type is None:
             args = {} if self.arguments is None else self.arguments
@@ -255,6 +259,7 @@ class ConfigurationImporter(ApplicationObserver):
                     **args)
             with rawconfig(cl_config):
                 cl_config.copy_sections(self.config)
+            modified_config = cl_config
             # remove sections that were removed
             removed_secs: Set[str] = self.config.sections - cl_config.sections
             if logger.isEnabledFor(logging.DEBUG):
@@ -298,6 +303,7 @@ class ConfigurationImporter(ApplicationObserver):
             self.config.remove_section(sec)
         if self.debug:
             print(self.config.get_raw_str())
+        return modified_config
 
     def _reset(self):
         """Reset the Python logger configuration."""
@@ -305,13 +311,16 @@ class ConfigurationImporter(ApplicationObserver):
         tuple(map(root.removeHandler, root.handlers[:]))
         tuple(map(root.removeFilter, root.filters[:]))
 
-    def merge(self):
+    def merge(self) -> Configurable:
         """Merge configuration at path to the current configuration.
 
         :param config_path: the path to the configuration file
 
         """
-        load_config = True
+        # the modified configuration that will returned
+        modified_config: Configurable = self.config
+        # whether or not to load the configuration
+        load_config: bool = True
         if self.config_path is None:
             name: str = self.get_environ_var_from_app()
             if logger.isEnabledFor(logging.DEBUG):
@@ -331,15 +340,16 @@ class ConfigurationImporter(ApplicationObserver):
                 else:
                     load_config = False
         if load_config:
-            self._load()
+            modified_config = self._load()
             if self.config_path_option_name is not None:
                 self.config.set_option(
                     self.config_path_option_name,
                     f'path: {str(self.config_path)}',
                     section=self.name)
+        return modified_config
 
-    def __call__(self):
-        self.merge()
+    def __call__(self) -> Configurable:
+        return self.merge()
 
 
 @dataclass
@@ -375,7 +385,7 @@ class ConfigurationOverrider(object):
     """A config file/dir or a comma delimited section.key=value string that
     overrides configuration."""
 
-    def merge(self):
+    def merge(self) -> Configurable:
         """Merge the string configuration with the application context."""
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'overriding with: {self.override}')
@@ -387,6 +397,7 @@ class ConfigurationOverrider(object):
             else:
                 overrides = StringConfig(self.override)
             self.config.merge(overrides)
+        return self.config
 
-    def __call__(self):
-        self.merge()
+    def __call__(self) -> Configurable:
+        return self.merge()

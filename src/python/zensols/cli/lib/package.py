@@ -57,7 +57,7 @@ class PackageInfoImporter(ApplicationObserver):
         self._app = app
         self._action = action
 
-    def add(self):
+    def add(self) -> Configurable:
         """Add package information to the configuration (see class docs).
 
         """
@@ -68,6 +68,7 @@ class PackageInfoImporter(ApplicationObserver):
             logger.debug(f'adding package section: {self.section}={params}')
         d_conf = DictionaryConfig({self.section: params})
         d_conf.copy_sections(self.config)
+        return d_conf
 
-    def __call__(self):
-        self.add()
+    def __call__(self) -> Configurable:
+        return self.add()

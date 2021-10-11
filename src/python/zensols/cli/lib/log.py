@@ -7,6 +7,7 @@ from typing import Dict, Union, Any
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
+from logging import Logger
 from pathlib import Path
 from .. import ActionCliError, ApplicationError
 
@@ -119,6 +120,7 @@ class LogConfigurator(object):
         """Configure the log system.
 
         """
+        modified_logger: Logger = None
         if self.config_file is not None:
             self._config_file()
         else:
@@ -129,13 +131,16 @@ class LogConfigurator(object):
             level: int = self._to_level('app', app_level)
             self._debug(f'setting logger {self.log_name} to {level} ' +
                         f'({app_level})')
-            logging.getLogger(self.log_name).setLevel(level)
+            modified_logger = logging.getLogger(self.log_name)
+            modified_logger.setLevel(level)
         if self.loggers is not None:
             for name, level in self.loggers.items():
                 level = self._to_level(name, level)
                 assert isinstance(level, int)
                 self._debug(f'setting logger: {name} -> {level}')
-                logging.getLogger(name).setLevel(level)
+                modified_logger = logging.getLogger(name)
+                modified_logger.setLevel(level)
+        return modified_logger
 
     def __call__(self):
-        self.config()
+        return self.config()

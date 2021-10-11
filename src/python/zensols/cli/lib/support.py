@@ -12,7 +12,7 @@ import inspect
 from json import JSONEncoder
 from io import TextIOBase
 from pathlib import Path
-from zensols.config import Configurable, Dictable
+from zensols.config import Configurable, Dictable, ConfigFactory
 from zensols.introspect import ClassImporter
 from .. import (
     Action, ActionCli, ActionCliMethod, ActionMetaData,
@@ -90,16 +90,17 @@ class ExportEnvironment(object):
         for k, v in exports.asdict().items():
             writer.write(fmt.format(**{'k': k.upper(), 'v': v}))
 
-    def export(self):
+    def export(self) -> Path:
         """Create exports for shell sourcing."""
         if self.output_path is None:
             self._write(sys.stdout)
         else:
             with open(self.output_path, 'w') as f:
                 self._write(f)
+        return self.output_path
 
-    def __call__(self):
-        self.export()
+    def __call__(self) -> Path:
+        return self.export()
 
 
 @dataclass
@@ -171,14 +172,14 @@ class ListActions(ApplicationObserver, Dictable):
             finally:
                 self._command_line = False
 
-        {
+        return {
             ListFormat.name: lambda: print('\n'.join(self.asdict().keys())),
             ListFormat.text: lambda: self.write(),
             ListFormat.json: list_json,
         }[self.list_output_format]()
 
     def __call__(self):
-        self.list()
+        return self.list()
 
 
 @dataclass
@@ -202,13 +203,16 @@ class ShowConfiguration(object):
     config: Configurable = field()
     """The output format of the configuration."""
 
+    config_factory: ConfigFactory = field()
+    """The configuration factory which is returned from the app."""
+
     config_output_path: Path = field(default=None)
     """The output file name for the configuration."""
 
     config_output_format: ConfigFormat = field(default=ConfigFormat.text)
     """The output format."""
 
-    def show_config(self):
+    def show_config(self) -> Configurable:
         """Print the configuration and exit."""
         fmt = self.config_output_format
         if self.config_output_path is None:
@@ -225,6 +229,7 @@ class ShowConfiguration(object):
         finally:
             if self.config_output_path is not None:
                 writer.close()
+        return self.config_factory
 
     def __call__(self):
-        self.show_config()
+        return self.show_config()
