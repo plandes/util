@@ -435,7 +435,7 @@ class ImportIniConfig(IniConfig):
                 try:
                     opts = c.get_options(sec)
                 except InterpolationMissingOptionError as e:
-                    msg = 'Could not populate {c}:[{sec}]: {e}'
+                    msg = f'Could not populate {c}:[{sec}]: {e}'
                     raise ConfigurableError(msg) from e
                 for k, v in opts.items():
                     key = f'{sec}:{k}'
