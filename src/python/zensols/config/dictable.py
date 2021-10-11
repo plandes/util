@@ -14,7 +14,6 @@ from itertools import chain
 import inspect
 import json
 from io import TextIOBase
-from zensols.introspect import ClassImporter
 from . import ConfigurationError, Writable, ClassResolver
 
 logger = logging.getLogger(__name__)

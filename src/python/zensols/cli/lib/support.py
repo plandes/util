@@ -40,6 +40,15 @@ class ListFormat(Enum):
     name = auto()
 
 
+class ConfigFormat(Enum):
+    """Options for outputing the action list in :class:`.ShowConfiguration`.
+
+    """
+    text = auto()
+    ini = auto()
+    json = auto()
+
+
 @dataclass
 class ExportEnvironment(object):
     """The class dumps a list of bash shell export statements for sourcing in build
@@ -58,6 +67,10 @@ class ExportEnvironment(object):
                                'short_name': None}}}
 
     config: Configurable = field()
+    """The configuration used to get section information used to generate the
+    export commands.
+
+    """
 
     section: str = field()
     """The section to dump as a series of export statements."""
@@ -78,7 +91,7 @@ class ExportEnvironment(object):
             writer.write(fmt.format(**{'k': k.upper(), 'v': v}))
 
     def export(self):
-        """Create bash shell exports for shell sourcing."""
+        """Create exports for shell sourcing."""
         if self.output_path is None:
             self._write(sys.stdout)
         else:
@@ -168,3 +181,50 @@ class ListActions(ApplicationObserver, Dictable):
         self.list()
 
 
+@dataclass
+class ShowConfiguration(object):
+    """The class dumps a list of bash shell export statements for sourcing in build
+    shell scripts.
+
+    """
+    # we can't use "output_format" because ListActions would use the same
+    # causing a name collision
+    OUTPUT_FORMAT = 'config_output_format'
+    OUTPUT_PATH = 'config_output_path'
+    CLI_META = {'mnemonic_overrides': {'show_config': 'config'},
+                'option_includes': {OUTPUT_FORMAT, OUTPUT_PATH},
+                'option_overrides':
+                {OUTPUT_FORMAT: {'long_name': 'cnffmt',
+                                 'short_name': None},
+                 OUTPUT_PATH: {'long_name': 'cnfoutput',
+                               'short_name': None}}}
+
+    config: Configurable = field()
+    """The output format of the configuration."""
+
+    config_output_path: Path = field(default=None)
+    """The output file name for the configuration."""
+
+    config_output_format: ConfigFormat = field(default=ConfigFormat.text)
+    """The output format."""
+
+    def show_config(self):
+        """Print the configuration and exit."""
+        fmt = self.config_output_format
+        if self.config_output_path is None:
+            writer = sys.stdout
+        else:
+            writer = open(self.config_output_path, 'w')
+        try:
+            if fmt == ConfigFormat.text:
+                self.config.write(writer=writer)
+            elif fmt == ConfigFormat.ini:
+                print(self.config.get_raw_str().rstrip(), file=writer)
+            elif fmt == ConfigFormat.json:
+                print(self.config.asjson(indent=4), file=writer)
+        finally:
+            if self.config_output_path is not None:
+                writer.close()
+
+    def __call__(self):
+        self.show_config()

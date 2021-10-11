@@ -6,11 +6,13 @@ __author__ = 'Paul Landes'
 
 from typing import Dict, Set, Iterable, List, Any, Union
 from abc import ABCMeta, abstractmethod
-import logging
-from pathlib import Path
 import sys
-from io import TextIOBase
+import logging
+from collections import OrderedDict
 import inspect
+from pathlib import Path
+from io import TextIOBase
+import json
 from . import ConfigurationError, Serializer, Writable, Settings
 
 logger = logging.getLogger(__name__)
@@ -301,6 +303,28 @@ class Configurable(Writable, metaclass=ABCMeta):
             return next(iter(self.sections))
         except StopIteration:
             return ''
+
+    def asdict(self, sort: bool = True) -> Dict[str, Dict[str]]:
+        """Return a two-tier :class:`dict` with sections at the first level, and the
+        keyv/values at the second level.
+
+        """
+        cls = OrderedDict if sort else dict
+        secs = cls()
+        for sec in sorted(self.sections):
+            svs = cls()
+            secs[sec] = svs
+            opts = self.get_options(sec)
+            for k in sorted(opts.keys()):
+                svs[k] = opts[k]
+        return secs
+
+    def asjson(self, *args, sort: bool = True, **kwargs) -> str:
+        """Return a JSON string that represents this configuration.  For structure, see
+        :meth:`asdict`.
+
+        """
+        return json.dumps(self.asdict(sort), *args, **kwargs)
 
     def _get_short_str(self) -> str:
         sec = self._get_section_short_str()
