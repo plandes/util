@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 import sys
 import logging
 from logging import Logger
+import textwrap as tw
 from collections import OrderedDict
 import itertools as it
 from io import TextIOBase, StringIO
@@ -51,13 +52,16 @@ class Writable(ABC):
             s = s[:ml] + '...'
         return s
 
+    def _get_str_space(self, n_spaces: int) -> int:
+        return _get_str_space(n_spaces)
+
     def _sp(self, depth: int):
         """Utility method to create a space string.
 
         """
         indent = getattr(self, '_indent', None)
         indent = self.WRITABLE_INDENT_SPACE if indent is None else indent
-        return _get_str_space(depth * indent)
+        return self._get_str_space(depth * indent)
 
     def _set_indent(self, indent: int = None):
         """Set the indentation for the instance.  By default, this value is 4.
@@ -105,13 +109,19 @@ class Writable(ABC):
         writer.write(line)
         self._write_empty(writer)
 
-    def _write_block(self, lines: str, depth: int, writer: TextIOBase,
-                     limit: int = None):
+    def _write_wrap(self, line: str, depth: int, writer: TextIOBase,
+                    **kwargs):
+        lines = tw.wrap(line, width=self.WRITABLE_MAX_COL, **kwargs)
+        self._write_block(lines, depth, writer)
+
+    def _write_block(self, lines: Union[str, Iterable[str]], depth: int,
+                     writer: TextIOBase, limit: int = None):
         """Write a block of text with indentation.
 
         """
         sp = self._sp(depth)
-        lines = lines.split('\n')
+        if isinstance(lines, str):
+            lines = lines.split('\n')
         if limit is not None:
             lines = it.islice(lines, limit)
         for line in lines:

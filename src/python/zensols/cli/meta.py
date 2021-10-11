@@ -79,7 +79,7 @@ class OptionMetaData(PersistableContainer, Dictable, _MetavarFormatter):
     dtype: type = field(default=str)
     """The data type of the option (i.e. :class:`str`).
 
-    Other types include: :class:`int`, :class`float`, :clas:`bool`,
+    Other types include: :class:`int`, :class`float`, :class:`bool`,
     :class:`list` (for choice), or :class:`patlib.Path` for files and
     directories.
 

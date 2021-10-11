@@ -197,9 +197,10 @@ class CommandLineParser(Deallocatable, Dictable):
 
     def _create_parser(self, actions: Tuple[ActionMetaData]) -> OptionParser:
         return UsageActionOptionParser(
-            actions,
-            self.application_doc,
-            self.default_action,
+            actions=actions,
+            options=self.config.first_pass_options,
+            doc=self.application_doc,
+            default_action=self.default_action,
             version=('%prog ' + str(self.version)))
 
     def _configure_parser(self, parser: OptionParser,
