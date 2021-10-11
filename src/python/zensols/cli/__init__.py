@@ -12,5 +12,8 @@ from .usage import *
 from .cmd import *
 from .action import *
 from .app import *
-from .lib import *
+from .lib.log import LogConfigurator, LogLevel
+from .lib.config import ConfigurationImporter, ConfigurationOverrider
+from .lib.support import *
+from .lib.package import *
 from .harness import *
