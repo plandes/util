@@ -251,7 +251,14 @@ class ConfigurationImporter(ApplicationObserver):
     """
 
     default: Path = field(default=None)
-    """Use this file as the default when given on the command line."""
+    """Use this file as the default when given on the command line, which is not
+    used unless :obj:``expect`` is set to ``False``.
+
+    If this is set to ``skip``, then do not load any file.  This is useful when
+    the entire configuration is loaded by this class and there are
+    configuration mentions in the ``app.conf`` application context.
+
+    """
 
     config_path_environ_name: str = field(default=None)
     """An environment variable containing the default path to the configuration.
@@ -466,7 +473,10 @@ class ConfigurationImporter(ApplicationObserver):
             if val is not None:
                 self.config_path = Path(val)
             elif self.default is not None:
-                self.config_path = val
+                if self.default == 'skip':
+                    self.config_path = None
+                else:
+                    self.config_path = self.default
             else:
                 if self.expect:
                     lopt = self._get_config_option()
