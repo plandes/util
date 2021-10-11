@@ -331,7 +331,10 @@ class _UsageWriter(Writable):
 
     def __post_init__(self):
         if self.width is None:
-            self.width = os.get_terminal_size()[0]
+            try:
+                self.width = os.get_terminal_size()[0]
+            except OSError:
+                self.width = 0
         if self.width == 0:
             self.width = 80
         self.WRITABLE_MAX_COL = self.width
