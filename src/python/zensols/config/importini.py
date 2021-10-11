@@ -415,6 +415,7 @@ class ImportIniConfig(IniConfig):
             logger.info(f'importing {self._get_container_desc()}, ' +
                         f'children={self.children}')
         csecs, children = self._get_children()
+        overwrites: Set = set()
         # copy each configuration added to the bootstrap loader in the order we
         # added them.
         c: Configurable
@@ -437,10 +438,17 @@ class ImportIniConfig(IniConfig):
                     msg = 'Could not populate {c}:[{sec}]: {e}'
                     raise ConfigurableError(msg) from e
                 for k, v in opts.items():
+                    key = f'{sec}:{k}'
+                    has = parser.has_option(sec, k)
                     fv = self._format_option(k, v, sec)
-                    if logger.isEnabledFor(logging.DEBUG):
-                        logger.debug(f'overwriting {sec}:{k}: {v} -> {fv}')
-                    parser.set(sec, k, fv)
+                    # overwrite the option/property when not yet set or its
+                    # already by overwriten by a previous child; however, don't
+                    # set it when its new per this instance's import iteration
+                    if not has or key in overwrites:
+                        if logger.isEnabledFor(logging.DEBUG):
+                            logger.debug(f'overwriting {sec}:{k}: {v} -> {fv}')
+                        parser.set(sec, k, fv)
+                        overwrites.add(key)
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'imported {len(children)} children to {self}')
         if self.exclude_config_sections:
