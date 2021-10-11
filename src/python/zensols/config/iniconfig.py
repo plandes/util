@@ -129,8 +129,10 @@ class IniConfig(Configurable, Primeable):
         self._conf = None
 
     def _raise(self, msg: str):
-        if isinstance(self.config_file, Path):
+        if isinstance(self.config_file, (str, Path)):
             msg = f'{msg} in file {self.config_file}'
+        else:
+            msg = f'{msg} in {self._get_container_desc()}'
         raise ConfigurableError(msg)
 
     def has_option(self, name: str, section: str = None) -> bool:
