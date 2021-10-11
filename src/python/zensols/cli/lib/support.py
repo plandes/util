@@ -63,7 +63,7 @@ class ExportEnvironment(object):
                 'option_overrides':
                 {OUTPUT_FORMAT: {'long_name': 'expfmt',
                                  'short_name': None},
-                 OUTPUT_PATH: {'long_name': 'expoutput',
+                 OUTPUT_PATH: {'long_name': 'expout',
                                'short_name': None}}}
 
     config: Configurable = field()
@@ -196,7 +196,7 @@ class ShowConfiguration(object):
                 'option_overrides':
                 {OUTPUT_FORMAT: {'long_name': 'cnffmt',
                                  'short_name': None},
-                 OUTPUT_PATH: {'long_name': 'cnfoutput',
+                 OUTPUT_PATH: {'long_name': 'cnfout',
                                'short_name': None}}}
 
     config: Configurable = field()
