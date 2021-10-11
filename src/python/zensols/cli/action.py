@@ -463,7 +463,7 @@ class ActionCliManager(PersistableContainer, Dictable):
             action = self.config_factory.instance(conf_sec, **params)
             if not isinstance(action, ActionCli):
                 raise ActionCliManagerError(
-                    f'section instance {conf_sec} is not a class of ' +
+                    f'Section instance {conf_sec} is not a class of ' +
                     f'type ActionCli, but {type(action)}')
         else:
             # use a default with parameters collected
