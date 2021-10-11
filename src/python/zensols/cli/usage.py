@@ -110,7 +110,10 @@ class _PositionalFormatter(_Formatter):
     def __post_init__(self):
         spl = self.usage_formatter.writer.left_indent
         sp = self._get_str_space(spl)
-        self.name = f'{sp}{self.pos.name}'
+        mv = ''
+        if self.pos.metavar is not None:
+            mv = f' {self.pos.metavar}'
+        self.name = f'{sp}{self.pos.name}{mv}'
 
     def add_first_col_width(self, widths: List[int]):
         widths.append(len(self.name))
