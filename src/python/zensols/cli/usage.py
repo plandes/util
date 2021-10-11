@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 import logging
 import sys
 from io import TextIOBase
-from optparse import OptionParser, Option
+from optparse import OptionParser, Option, HelpFormatter, IndentedHelpFormatter
 from zensols.config import Writable
 from . import OptionMetaData, ActionMetaData
 
@@ -29,8 +29,11 @@ class UsageActionOptionParser(OptionParser):
     """
     def __init__(self, actions: Tuple[ActionMetaData], doc: str = None,
                  default_action: str = None, *args, **kwargs):
+        hf = IndentedHelpFormatter()
+        kwargs['formatter'] = hf
+        kwargs['description'] = doc
         super().__init__(*args, add_help_option=False, **kwargs)
-        self.usage_writer = UsageWriter(self, actions, doc, default_action)
+        self.usage_writer = UsageWriter(self, actions, hf, default_action)
         self.add_option(self._create_help())
 
     def _create_help(self):
@@ -40,6 +43,7 @@ class UsageActionOptionParser(OptionParser):
 
     def print_help(self, file: TextIOBase = sys.stdout,
                    include_actions: bool = True):
+        self.usage_writer.update_formatter()
         super().print_help(file)
         if include_actions:
             self.usage_writer.write(writer=file)
@@ -68,7 +72,7 @@ class _OptFormatter(_Formatter):
 
     def __post_init__(self):
         opt = self.opt
-        opt_left_space = ' ' * self.action.parent.opt_left_space
+        opt_left_space = ' ' * self.action.usage_formatter.opt_left_space
         sep = '' if opt.short_name is None else ', '
         long_opt = opt.long_option
         short_opt = '' if opt.short_option is None else opt.short_option
@@ -76,8 +80,8 @@ class _OptFormatter(_Formatter):
         self.opt_str = f'{opt_left_space}{short_opt}{sep}{long_opt}{metavar}'
 
     @property
-    def parent(self) -> UsageWriter:
-        return self.action.parent
+    def usage_formatter(self) -> UsageWriter:
+        return self.action.usage_formatter
 
     @property
     def doc(self) -> str:
@@ -91,15 +95,15 @@ class _OptFormatter(_Formatter):
             return ''
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
-        w1 = self.parent.two_col_width
-        w2 = self.parent.three_col_width
+        w1 = self.usage_formatter.two_col_width
+        w2 = self.usage_formatter.three_col_width
         self._write_three_col(self.opt_str, self.default, self.doc,
                               w1, w2, depth, writer)
 
 
 @dataclass
 class _ActionFormatter(_Formatter):
-    parent: UsageWriter
+    usage_formatter: _UsageFormatter
     action: ActionMetaData
     action_name: str = field(default=None)
     opts: Tuple[_OptFormatter] = field(default=None)
@@ -112,7 +116,7 @@ class _ActionFormatter(_Formatter):
             pargs = ', '.join(map(lambda p: p.name, action.positional))
             args = f' <{pargs}>'
         self.action_name = action.name + args
-        if self.parent.default_action == self.action_name:
+        if self.usage_formatter.default_action == self.action_name:
             self.action_name = f'{self.action_name} (default)'
         self.opts = tuple(map(lambda of: _OptFormatter(self, of),
                               action.options))
@@ -126,12 +130,69 @@ class _ActionFormatter(_Formatter):
         return max(len(o.default) for o in self.opts)
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
-        w1 = self.parent.two_col_width
-        w2 = self.parent.three_col_width
+        w1 = self.usage_formatter.two_col_width
+        w2 = self.usage_formatter.three_col_width
         self._write_three_col(self.action_name, '', self.action.doc, w1, w2,
                               depth, writer)
         for opt in self.opts:
             self._write_object(opt, depth, writer)
+
+
+@dataclass
+class _UsageFormatter(_Formatter):
+    writer: UsageWriter
+    actions: Tuple[ActionMetaData]
+    opt_left_space: int = field(default=2)
+    inter_col_space: int = field(default=5)
+
+    def __post_init__(self):
+        # format text for each action and respective options
+        self.action_formatters = tuple(
+            map(lambda a: _ActionFormatter(self, a), self.actions))
+
+    @property
+    def default_action(self):
+        return self.writer.default_action
+
+    @property
+    def two_col_width(self) -> int:
+        return max(a.opt_str_len for a in self.action_formatters) + \
+            self.inter_col_space
+
+    @property
+    def three_col_width(self) -> int:
+        return max(a.def_str_len for a in self.action_formatters) + \
+            self.inter_col_space
+
+    @property
+    def option_usage_names(self) -> str:
+        action_names = tuple(map(lambda a: a.name, self.actions))
+        if len(action_names) > 1:
+            names = '|'.join(action_names)
+            if self.default_action is None:
+                opts = f"<{names}> "
+            else:
+                opts = f"[{names}] "
+        elif len(action_names) > 0:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'action: {self.actions[0]}')
+            opts = ', '.join(map(lambda p: p.name, self.actions[0].positional))
+            if len(opts) > 0:
+                opts = f'<{opts}> '
+        else:
+            opts = ''
+        return opts
+
+    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
+        # format text for each action and respective options
+        action: ActionMetaData
+        fmt_len = len(self.action_formatters)
+        if fmt_len > 1:
+            writer.write('\nActions:\n')
+        for i, fmt in enumerate(self.action_formatters):
+            self._write_object(fmt, depth, writer)
+            if i < fmt_len - 1:
+                self._write_empty(writer)
 
 
 @dataclass
@@ -145,7 +206,7 @@ class UsageWriter(Writable):
     actions: Tuple[ActionMetaData] = field()
     """The set of actions to document as a usage."""
 
-    doc: str = None
+    help_formatter: HelpFormatter = None
     """The application document string."""
 
     default_action: str = field(default=None)
@@ -154,36 +215,9 @@ class UsageWriter(Writable):
     sort_actions: bool = field(default=False)
     """If ``True`` sort mnemonic output."""
 
-    opt_left_space: int = field(default=2)
-    inter_col_space: int = field(default=5)
-
-    @property
-    def two_col_width(self) -> int:
-        return max(a.opt_str_len for a in self.action_formatters) + \
-            self.inter_col_space
-
-    @property
-    def three_col_width(self) -> int:
-        return max(a.def_str_len for a in self.action_formatters) + \
-            self.inter_col_space
-#            self.two_col_width
-
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         self.writeX(depth, writer)
-        if self.sort_actions:
-            actions = sorted(self.actions, key=lambda a: a.name)
-        else:
-            actions = self.actions
-        # format text for each action and respective options
-        action: ActionMetaData
-        formatters = tuple(map(lambda a: _ActionFormatter(self, a), actions))
-        fmt_len = len(formatters)
-        if fmt_len > 1:
-            writer.write('\nActions:\n')
-        for i, fmt in enumerate(formatters):
-            self._write_object(fmt, depth, writer)
-            if i < fmt_len - 1:
-                self._write_empty(writer)
+        self._usage_formatter.write(depth, writer)
 
     def writeX(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         if self.sort_actions:
@@ -236,7 +270,6 @@ class UsageWriter(Writable):
         action_fmt_str = '{:<' + str(action_name_len + 3) + '}  {}'
         opt_str_fmt = ('{:<' + str(opt_str_len) + '}  {:<' +
                        str(def_str_len) + '}  {}\n')
-        print('O', opt_str_fmt)
 
         if len(self.actions) > 1:
             writer.write('\nActions:\n')
@@ -269,18 +302,19 @@ class UsageWriter(Writable):
                 opts = f'<{opts}> '
         else:
             opts = ''
-        if self.doc is None:
-            doc = ''
-        else:
-            doc = f'\n\n{self.doc}'
-        self.parser.usage = f"%prog {opts}[options]:{doc}"
-
+        # if self.doc is None:
+        #     doc = ''
+        # else:
+        #     doc = f'\n\n{self.doc}'
         # ------------------------------
         if self.sort_actions:
             actions = sorted(self.actions, key=lambda a: a.name)
         else:
             actions = self.actions
-        # format text for each action and respective options
-        action: ActionMetaData
-        self.action_formatters = tuple(
-            map(lambda a: _ActionFormatter(self, a), actions))
+        self._usage_formatter = _UsageFormatter(self, actions)
+
+    def update_formatter(self):
+        #'indent_increment=2, width=100, max_help_position=50
+        self.help_formatter.max_help_position = 200
+        opts = self._usage_formatter.option_usage_names
+        self.parser.usage = f"%prog {opts}[options]:"
