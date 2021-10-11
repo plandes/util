@@ -56,6 +56,9 @@ class _Formatter(Writable):
     """
     def _write_three_col(self, a: str, b: str, c: str, depth: int = 0,
                          writer: TextIOBase = sys.stdout):
+        a = '' if a is None else a
+        b = '' if b is None else b
+        c = '' if c is None else c
         w1 = self.usage_formatter.two_col_width
         w2 = self.usage_formatter.three_col_width
         a = self._trunc(a, self.usage_formatter.max_first_col)
@@ -176,13 +179,26 @@ class _UsageFormatter(_Formatter):
     writer: _UsageWriter
     actions: Tuple[ActionMetaData]
     global_options: Tuple[OptionMetaData]
+    glob_option_formatters: List[_OptionFormatter] = field(default=None)
+    action_formatters: List[_ActionFormatter] = field(default=None)
+    pos_formatters: List[_PositionalFormatter] = field(default=None)
 
     def __post_init__(self):
         self.WRITABLE_MAX_COL = self.writer.WRITABLE_MAX_COL
-        self.glob_opt_formatters = list(
+        self.glob_option_formatters = list(
             map(lambda o: _OptionFormatter(self, o), self.global_options))
-        self.action_formatters = tuple(
+        self.action_formatters = list(
             map(lambda a: _ActionFormatter(self, a), self.actions))
+        self.pos_formatters = []
+        if self.is_singleton_action:
+            for af in self.action_formatters:
+                self.glob_option_formatters.extend(af.opts)
+                self.pos_formatters.extend(af.pos)
+            self.action_formatters.clear()
+
+    @property
+    def is_singleton_action(self) -> bool:
+        return len(self.actions) == 1
 
     @property
     def default_action(self):
@@ -196,7 +212,7 @@ class _UsageFormatter(_Formatter):
         return chain.from_iterable(
             [chain.from_iterable(
                 map(lambda f: f.opts, self.action_formatters)),
-             self.glob_opt_formatters])
+             self.glob_option_formatters])
 
     @property
     @persisted('_two_col_width_pw')
@@ -204,8 +220,10 @@ class _UsageFormatter(_Formatter):
         widths = []
         for af in self.action_formatters:
             af.add_first_col_width(widths)
-        for go in self.glob_opt_formatters:
+        for go in self.glob_option_formatters:
             go.add_first_col_width(widths)
+        for po in self.pos_formatters:
+            po.add_first_col_width(widths)
         return max(widths) + self.writer.inter_col_space
 
     @property
@@ -234,11 +252,11 @@ class _UsageFormatter(_Formatter):
         return opts
 
     def _write_options(self, depth: int, writer: TextIOBase) -> bool:
-        n_fmt = len(self.glob_opt_formatters)
+        n_fmt = len(self.glob_option_formatters)
         has_opts = n_fmt > 0
         if has_opts:
             self._write_line('Options:', depth, writer)
-            for i, of in enumerate(self.glob_opt_formatters):
+            for i, of in enumerate(self.glob_option_formatters):
                 of.write(depth, writer)
         return has_opts
 
@@ -252,10 +270,19 @@ class _UsageFormatter(_Formatter):
                 self._write_empty(writer)
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
+              include_singleton_positional: bool = True,
               include_options: bool = True,
               include_actions: bool = True):
+        if self.is_singleton_action and include_singleton_positional and \
+           len(self.pos_formatters) > 0:
+            self._write_line('Positional:', depth, writer)
+            for po in self.pos_formatters:
+                self._write_object(po, depth, writer)
+            if include_options or include_actions:
+                self._write_empty(writer)
         if include_options:
-            if self._write_options(depth, writer) and include_actions:
+            if self._write_options(depth, writer) and include_actions and \
+               len(self.action_formatters) > 0:
                 self._write_empty(writer)
         if include_actions:
             self._write_actions(depth, writer)
@@ -328,12 +355,17 @@ class _UsageWriter(Writable):
         return f'{prog} {opts}[options]:'
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
+              include_singleton_positional: bool = True,
               include_options: bool = True,
               include_actions: bool = True):
         prog = self.get_prog_usage()
         self._write_line(f'Usage: {prog}', depth, writer)
         self._write_empty(writer)
-        self._write_wrap(self.doc, depth, writer)
-        self._write_empty(writer)
+        if self.doc is not None:
+            self._write_wrap(self.doc, depth, writer)
+            self._write_empty(writer)
         self.usage_formatter.write(
-            depth, writer, include_options, include_actions)
+            depth, writer,
+            include_singleton_positional=include_singleton_positional,
+            include_options=include_options,
+            include_actions=include_actions)

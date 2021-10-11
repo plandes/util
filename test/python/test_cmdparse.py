@@ -65,11 +65,10 @@ Usage: python -m unittest [options]:
 A test action.
 
 Options:
-  --version             show program's version number and exit
-  -h, --help            show this help message and exit
-  -d, --dry_run         don't do anything; just act like it
-  -c FILE, --config=FILE
-                        the path to the config file
+  -h, --help             show this help message and exit
+  --version              show the program version and exit
+  -c, --config FILE      the path to the config file
+  -d, --dry_run          don't do anything; just act like it
 """
         clc = CommandLineConfig(actions=(self.test_action, self.config_action))
         parser = CommandLineParser(clc, application_doc='A test action.')
@@ -90,21 +89,27 @@ Options:
 Usage: python -m unittest <test|prconfig> [options]:
 
 Options:
-  --version             show program's version number and exit
-  -h, --help            show this help message and exit
-  -c FILE, --config=FILE
-                        the path to the config file
+  -h, --help             show this help message and exit
+  --version              show the program version and exit
+  -c, --config FILE      the path to the config file
 
 Actions:
-test                a test action
-  -d, --dry_run    don't do anything; just act like it
+test                     a test action
+  -d, --dry_run          don't do anything; just act like it
 
-prconfig <file>     a second test action
+prconfig <file>          a second test action
+  file FILE
 """
         parser = CommandLineParser(CommandLineConfig(
             tuple([self.config_action, self.test_action, self.test_action2])))
         sio = StringIO()
         parser.write_help(writer=sio)
+        if 0:
+            print()
+            print(should)
+            print('-' * 80)
+            print(sio.getvalue())
+            print('-' * 80)
         self.assertEqual(should, sio.getvalue())
 
     def test_parse_basic(self):
