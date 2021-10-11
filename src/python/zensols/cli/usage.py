@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, Iterable
+from typing import Tuple, Iterable, List, Union
 from dataclasses import dataclass, field
 import logging
 import os
@@ -15,7 +15,7 @@ from io import TextIOBase
 from optparse import OptionParser
 from zensols.config import Writable
 from zensols.persist import persisted
-from . import OptionMetaData, ActionMetaData
+from . import OptionMetaData, ActionMetaData, PositionalMetaData
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +52,8 @@ class UsageActionOptionParser(OptionParser):
 
 @dataclass
 class _Formatter(Writable):
+    """A formattingn base class that has utility methods.
+    """
     def _write_three_col(self, a: str, b: str, c: str, depth: int = 0,
                          writer: TextIOBase = sys.stdout):
         w1 = self.usage_formatter.two_col_width
@@ -65,18 +67,21 @@ class _Formatter(Writable):
 
 @dataclass
 class _OptionFormatter(_Formatter):
+    """Write the option, which includes the option name and documenation.
+
+    """
     usage_formatter: _UsageWriter
     opt: OptionMetaData
 
     def __post_init__(self):
         self.WRITABLE_MAX_COL = self.usage_formatter.WRITABLE_MAX_COL
         opt = self.opt
-        opt_left_space = ' ' * self.usage_formatter.writer.opt_left_space
+        left_indent = ' ' * self.usage_formatter.writer.left_indent
         sep = '' if opt.short_name is None else ', '
         long_opt = opt.long_option
         short_opt = '' if opt.short_option is None else opt.short_option
         metavar = '' if opt.metavar is None else f' {opt.metavar}'
-        self.opt_str = f'{opt_left_space}{short_opt}{sep}{long_opt}{metavar}'
+        self.opt_str = f'{left_indent}{short_opt}{sep}{long_opt}{metavar}'
 
     @property
     def doc(self) -> str:
@@ -89,17 +94,42 @@ class _OptionFormatter(_Formatter):
         else:
             return ''
 
+    def add_first_col_width(self, widths: List[int]):
+        widths.append(len(self.opt_str))
+
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         self._write_three_col(
             self.opt_str, self.default, self.doc, depth, writer)
 
 
 @dataclass
+class _PositionalFormatter(_Formatter):
+    usage_formatter: _UsageFormatter
+    pos: PositionalMetaData
+
+    def __post_init__(self):
+        spl = self.usage_formatter.writer.left_indent
+        sp = self._get_str_space(spl)
+        self.name = f'{sp}{self.pos.name}'
+
+    def add_first_col_width(self, widths: List[int]):
+        widths.append(len(self.name))
+
+    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
+        self._write_three_col(self.name, '', self.pos.doc, depth, writer)
+
+
+@dataclass
 class _ActionFormatter(_Formatter):
+    """Write the action, which includes the name, positional arguments, and
+    documentation in one line, then the options afterward.
+
+    """
     usage_formatter: _UsageFormatter
     action: ActionMetaData
     action_name: str = field(default=None)
     opts: Tuple[_OptionFormatter] = field(default=None)
+    pos: Tuple[_PositionalFormatter] = field(default=None)
 
     def __post_init__(self):
         self.WRITABLE_MAX_COL = self.usage_formatter.WRITABLE_MAX_COL
@@ -115,16 +145,31 @@ class _ActionFormatter(_Formatter):
         self.opts = tuple(map(
             lambda of: _OptionFormatter(self.usage_formatter, of),
             action.options))
+        self.pos = tuple(map(
+            lambda pos: _PositionalFormatter(self.usage_formatter, pos),
+            action.positional))
+
+    def add_first_col_width(self, widths: List[int]):
+        widths.append(len(self.action_name))
+        for of in self.opts:
+            of.add_first_col_width(widths)
+        for pos in self.pos:
+            pos.add_first_col_width(widths)
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         self._write_three_col(
             self.action_name, '', self.action.doc, depth, writer)
+        for pos in self.pos:
+            self._write_object(pos, depth, writer)
         for opt in self.opts:
             self._write_object(opt, depth, writer)
 
 
 @dataclass
 class _UsageFormatter(_Formatter):
+    """Write the global options and all actions.
+
+    """
     writer: _UsageWriter
     actions: Tuple[ActionMetaData]
     global_options: Tuple[OptionMetaData]
@@ -153,8 +198,12 @@ class _UsageFormatter(_Formatter):
     @property
     @persisted('_two_col_width_pw')
     def two_col_width(self) -> int:
-        return max(len(a.opt_str) for a in self._get_opt_formatters()) + \
-            self.writer.inter_col_space
+        widths = []
+        for af in self.action_formatters:
+            af.add_first_col_width(widths)
+        for go in self.glob_opt_formatters:
+            go.add_first_col_width(widths)
+        return max(widths) + self.writer.inter_col_space
 
     @property
     @persisted('_three_col_width_pw')
@@ -235,12 +284,20 @@ class _UsageWriter(Writable):
     width: int = field(default=None)
     """The max width to print help."""
 
-    max_first_col: int = field(default=28)
+    max_first_col: Union[float, int] = field(default=0.4)
+    """Maximum width of the first column.  If this is a float, then it is computed
+    as a percentage of the terminal width.
 
-    opt_left_space: int = field(default=2)
+    """
+
+    left_indent: int = field(default=2)
+    """The number of left spaces for the option and positional arguments."""
+
     inter_col_space: int = field(default=3)
+    """The number of spaces between all three columns."""
 
     usage_formatter: _UsageFormatter = field(default=None)
+    """The usage formatter used to generate the documentation."""
 
     def __post_init__(self):
         if self.width is None:
@@ -248,6 +305,10 @@ class _UsageWriter(Writable):
         if self.width == 0:
             self.width = 80
         self.WRITABLE_MAX_COL = self.width
+        if self.max_first_col is None:
+            self.max_first_col = 0.4
+        if isinstance(self.max_first_col, float):
+            self.max_first_col = int(self.width * self.max_first_col)
         if self.sort_actions:
             actions = sorted(self.actions, key=lambda a: a.name)
         else:
