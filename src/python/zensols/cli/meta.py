@@ -28,8 +28,40 @@ class ApplicationError(ActionCliError):
     pass
 
 
+@dataclass
+class _MetavarFormatter(object):
+    def __post_init__(self):
+        if issubclass(self.dtype, Enum) and self.choices is None:
+            self.choices = tuple(sorted(self.dtype.__members__.keys()))
+        self._set_metvar()
+
+    @property
+    def is_choice(self) -> bool:
+        """Whether or not this option represents string combinations that map to a
+        :class:`enum.Enum` Python class.
+
+        """
+        return (self.choices is not None) or issubclass(self.dtype, Enum)
+
+    def _set_metvar(self) -> str:
+        if self.is_choice:
+            metavar = f"<{'|'.join(self.choices)}>"
+        elif self.dtype == Path:
+            metavar = 'FILE'
+        elif self.dtype == bool:
+            metavar = None
+        elif self.dtype == str:
+            metavar = 'STRING'
+        else:
+            metavar = self.dtype.__name__.upper()
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'metavar recompute using {self.dtype}: ' +
+                         f'{metavar}, {self.choices}')
+        self.metavar = metavar
+
+
 @dataclass(eq=True, order=True, unsafe_hash=True)
-class OptionMetaData(PersistableContainer, Dictable):
+class OptionMetaData(PersistableContainer, Dictable, _MetavarFormatter):
     """A command line option."""
 
     DATA_TYPES = frozenset(TypeMapper.DEFAULT_DATA_TYPES.values())
@@ -71,33 +103,7 @@ class OptionMetaData(PersistableContainer, Dictable):
     def __post_init__(self):
         if self.dest is None:
             self.dest = self.long_name
-        if issubclass(self.dtype, Enum) and self.choices is None:
-            self.choices = tuple(sorted(self.dtype.__members__.keys()))
-        if self.metavar is None:
-            self._set_metavar()
-
-    @property
-    def is_choice(self) -> bool:
-        """Whether or not this option represents string combinations that map to a
-        :class:`enum.Enum` Python class.
-
-        """
-        return (self.choices is not None) or issubclass(self.dtype, Enum)
-
-    def _set_metavar(self, clobber: bool = True):
-        if self.is_choice:
-            self.metavar = f"<{'|'.join(self.choices)}>"
-        elif self.dtype == Path:
-            self.metavar = 'FILE'
-        elif self.dtype == bool:
-            self.metavar = None
-        elif self.dtype == str:
-            self.metavar = 'STRING'
-        else:
-            self.metavar = self.dtype.__name__.upper()
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'metavar recompute using {self.dtype}: ' +
-                         f'{self.metavar}, {self.choices}')
+        _MetavarFormatter.__post_init__(self)
 
     def _str_vals(self) -> Tuple[str, str, str]:
         default = self.default
@@ -189,7 +195,7 @@ class OptionMetaData(PersistableContainer, Dictable):
 
 
 @dataclass
-class PositionalMetaData(Dictable):
+class PositionalMetaData(Dictable, _MetavarFormatter):
     """A command line required argument that has no option switches.
 
     """
@@ -210,6 +216,18 @@ class PositionalMetaData(Dictable):
     """The documentation of the positional metadata or ``None`` if missing.
 
     """
+
+    choices: Tuple[str] = field(default=None)
+    """The constant list of choices when :obj:`dtype` is :class:`list`.  Note that
+    this class is a tuple so instances are hashable in :class:`.ActionCli`.
+
+    """
+
+    metavar: str = field(default=None, repr=False)
+    """Used in the command line help for the type of the option."""
+
+    def __post_init__(self):
+        _MetavarFormatter.__post_init__(self)
 
 
 class OptionFactory(object):
