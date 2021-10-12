@@ -184,18 +184,25 @@ class CliHarness(object):
                 logger.info(f'adding source path: {src_path} to python path')
             if src_path_str not in sys.path:
                 sys.path.append(src_path_str)
-        app_conf_res = self.app_config_resource
+        app_conf_res: str = self.app_config_resource
         if isinstance(app_conf_res, str):
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'app conf res: {app_conf_res}, ' +
-                             f'entry path: {entry_path}')
+                logger.debug(
+                    f'app conf res: {app_conf_res}, entry path: {entry_path}' +
+                    f', root_dir: {root_dir}, cur_path: {cur_path}')
             if root_dir != cur_path:
-                app_conf_res = root_dir / app_conf_res
+                app_conf_res: Path = root_dir / app_conf_res
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'relative app conf res: {app_conf_res}')
                 # absolute paths do not work with package_resource as it
                 # removes the leading slash when resolving resource paths
-                app_conf_res = str(app_conf_res.relative_to(Path.cwd()))
+                app_conf_res = Path(os.path.relpath(
+                    app_conf_res.resolve(), Path.cwd()))
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'update app config resource: {app_conf_res}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'args={args}, src_path={src_path}, ' +
+                         f'root_dir={root_dir}, app_conf_res={app_conf_res}')
         return _HarnessEnviron(args, src_path, root_dir, app_conf_res)
 
     def _create_harness_environ(self, args: List[str]) -> _HarnessEnviron:
