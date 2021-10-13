@@ -412,10 +412,33 @@ class NotebookHarness(CliHarness):
     add :obj:`src_dir_name` to the Python path.
 
     """
+    factory_kwargs: Dict[str, Any] = field(default_factory=dict)
+    """Arguments given to the factory when creating new application instances with
+    :meth:`__call__`.
+
+    """
+
     def __post_init__(self):
+        """
+        :param factory_kwargs: the keyword arguments used to create the
+                               application factory; such as reloading
+        """
         super().__post_init__()
+        self._app_factory = None
+        self.reset()
+
+    def reset(self):
+        """Reset the notebook and recreate all resources.
+
+        :param factory_kwargs: the keyword arguments used to create the
+                               application factory; such as reloading
+
+        """
         self.set_browser_width()
-        self.application_factory = self.create_application_factory()
+        if self._app_factory is not None:
+            self._app_factory.deallocate()
+        self._app_factory = self.create_application_factory(
+            **self.factory_kwargs)
 
     @staticmethod
     def set_browser_width(width: int = 95):
@@ -431,4 +454,4 @@ class NotebookHarness(CliHarness):
 
     def __call__(self, args: str) -> Any:
         """Return the invokable instance."""
-        return self.application_factory.get_instance(args)
+        return self._app_factory.get_instance(args)
