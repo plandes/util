@@ -33,7 +33,8 @@ class _MetavarFormatter(object):
     def __post_init__(self):
         if issubclass(self.dtype, Enum) and self.choices is None:
             self.choices = tuple(sorted(self.dtype.__members__.keys()))
-        self._set_metvar()
+        if self.metavar is None:
+            self._set_metvar()
 
     @property
     def is_choice(self) -> bool:
