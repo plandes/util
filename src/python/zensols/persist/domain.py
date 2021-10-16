@@ -50,10 +50,8 @@ class chunks(object):
 
 
 class Stash(ABC):
-    """This is a pure virtual class that represents CRUDing data that uses ``dict``
-    semantics.  The data is usually CRUDed to the file system but need not be.
-    Instance can be used as iterables or dicsts.  If the former, each item is
-    returned as a key/value tuple.
+    """A dictionary-like pure virtual class for CRUDing data, most of which read
+    and write to/from the file system.
 
     Note that there are subtle differences a [Stash] and a ``dict`` when
     generating or accessing data.  For example, when indexing obtaining the
