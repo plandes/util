@@ -221,14 +221,21 @@ class DirectoryStash(Stash):
         self.assert_path_dir()
         return Path(self.path, fname)
 
+    def _load_file(self, path: Path) -> Any:
+        with open(path, 'rb') as f:
+            return pickle.load(f)
+
+    def _dump_file(self, inst: Any, path: Path):
+        with open(path, 'wb') as f:
+            pickle.dump(inst, f)
+
     def load(self, name: str) -> Any:
         path = self.key_to_path(name)
         inst = None
         if path.exists():
             if logger.isEnabledFor(logging.DEBUG):
                 self._debug(f'loading instance from {path}')
-            with open(path, 'rb') as f:
-                inst = pickle.load(f)
+            inst = self._load_file(path)
         if logger.isEnabledFor(logging.DEBUG):
             self._debug(f'loaded instance: {name} -> {type(inst)}')
         return inst
@@ -259,8 +266,7 @@ class DirectoryStash(Stash):
         if logger.isEnabledFor(logging.DEBUG):
             self._debug(f'saving instance: {name} -> {type(inst)}')
         path = self.key_to_path(name)
-        with open(path, 'wb') as f:
-            pickle.dump(inst, f)
+        self._dump_file(inst, path)
 
     def delete(self, name: str):
         if logger.isEnabledFor(logging.DEBUG):
