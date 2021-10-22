@@ -98,6 +98,11 @@ class CliHarness(object):
     log_format: str = field(default='%(asctime)-15s [%(name)s] %(message)s')
     """The log formatting used in :meth:`configure_logging`."""
 
+    no_exit: bool = field(default=False)
+    """If ``True`` do not exist the program when :class:`SystemExit` is raised.
+
+    """
+
     def __post_init__(self):
         pass
 
@@ -122,6 +127,20 @@ class CliHarness(object):
             logger.debug(f'module name: {mod_name}, file: {finf.filename}, ' +
                          f'method: {meth}')
         return meth
+
+    def _handle_exist(self, se: SystemExit):
+        """Handle attempts to exit the Python interpreter.  This default implementation
+    simplly prints the error if :obj:`no_exit` is ``True``.
+
+        :param se: the error caught
+
+        :raises: SystemExit if :obj:`no_exit` is ``False``
+
+        """
+        if self.no_exit:
+            print(f'exit: {se}')
+        else:
+            raise se
 
     def configure_logging(self, *args, **kwargs):
         """Convenience method to configure the logging package system for early stage
@@ -267,7 +286,10 @@ class CliHarness(object):
         """
         cli: ApplicationFactory = self.create_application_factory(
             args, **factory_kwargs)
-        return cli.invoke(args[1:])
+        try:
+            return cli.invoke(args[1:])
+        except SystemExit as e:
+            self._handle_exist(e)
 
     def get_instance(self, args: Union[List[str], str] = None,
                      **factory_kwargs: Dict[str, Any]) -> Any:
@@ -284,15 +306,20 @@ class CliHarness(object):
         :see: :meth:`.ApplicationFactory.get_instance`
 
         """
+        self.no_exit = True
         if isinstance(args, str):
             args = f'_ {args}'
         else:
             args = ['_'] + args
         cli: ApplicationFactory = self.create_application_factory(
             args, **factory_kwargs)
-        return cli.get_instance(args[1:])
+        try:
+            return cli.get_instance(args[1:])
+        except SystemExit as e:
+            self._handle_exist(e)
 
-    def _proto(self, args: List[str], **factory_kwargs: Dict[str, Any]):
+    def _proto(self, args: Union[List[str], str],
+               **factory_kwargs: Dict[str, Any]):
         """Invoke the prototype.
 
         :param args: the command line arguments without the first argument (the
@@ -301,22 +328,41 @@ class CliHarness(object):
         :param factory_kwargs: arguments given to the command line factory
 
         """
+        args = args.split() if isinstance(args, str) else args
         args = ['_'] + args
+        self.no_exit = True
         return self.invoke(args, **factory_kwargs)
 
-    def proto(self):
+    def proto(self, args: Union[List[str], str] = None):
         """Invoke the prototype using :obj:`proto_args` and
         :obj:`proto_factory_kwargs`.
+
+        :param args: the command line arguments without the first argument (the
+                     program name)
 
         """
         if self.proto_header is not None:
             print(self.proto_header)
-        args = self.proto_args
-        args = args.split() if isinstance(args, str) else args
+        args = self.proto_args if args is None else args
         try:
             return self._proto(args, **self.proto_factory_kwargs)
         except SystemExit as e:
-            print(f'exit: {e}')
+            self._handle_exist(e)
+
+    def __call__(self, args: Union[List[str], str] = None):
+        """Invoke the command line with arguments.  This is useful for calling from the
+        Python REPL.
+
+        :param args: the command line arguments without the first argument (the
+                     program name)
+
+        """
+        self.proto_header = None
+        self.no_exit = True
+        try:
+            return self.proto(args)
+        except SystemExit as e:
+            self._handle_exist(e)
 
     def run(self) -> Optional[ActionResult]:
         """The command line script entry point."""
