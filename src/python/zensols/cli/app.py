@@ -748,14 +748,11 @@ class ApplicationFactory(PersistableContainer):
             self._handle_error(e)
 
     @classmethod
-    def create_harness(cls: Type, is_cli: bool = True, **kwargs):
+    def create_harness(cls: Type, **kwargs):
         """Create and return a :class:`.CliHarness`.
-
-        :param is_cli: if ``True`` create a harness suitable for a command line
-                       entry point
 
         :param kwargs: the keyword arguments given to the harness initializer
 
         """
         from . import CliHarness
-        return CliHarness(relocate=not is_cli, app_factory_class=cls, **kwargs)
+        return CliHarness(app_factory_class=cls, **kwargs)
