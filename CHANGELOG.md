@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - App config configuration have a new type (`import`), which allows a
   `^{config_path}` to be substituted with the `--config` file name giving more
   control over the start up load process.
+- More harness/app factory convenience methods and functionality, such as
+  creating a harness from the app factory.
+- Jupyter harness is now reloadable.
+- First pass applications return useful data, such as the `config` first pass
+  app.
 
 ### Changed
 - All options in the `import` section of `ImportIniConfig` must now be proper
@@ -32,7 +37,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   and small Python templates.
 
 ### Added
-- Added jupyter notebook harness.
+- Added Jupyter notebook harness.
 - New CLI `ApplicationError` to differentiate between types of errors and
   when to print the stack trace by having the application factory handle the
   exception.
