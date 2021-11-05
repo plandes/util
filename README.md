@@ -51,6 +51,62 @@ pip3 install zensols.util
 ```
 
 
+## Command Line Usage
+
+This library contains a full persistence layer and other utilities.  However, a
+quick and dirty example that uses the configuration and command line
+functionality is given below.  See the other [examples] to learn how else to
+use it.
+
+```python
+from dataclasses import dataclass
+import os
+from io import StringIO
+from zensols.cli import ApplicationFactory, CliHarness
+
+
+CONFIG = """
+[cli]
+class_name = zensols.cli.ActionCliManager
+apps = list: app
+
+[app]
+class_name = fsinfo.Application
+"""
+
+
+@dataclass
+class Application(object):
+    """Toy application example that provides file system information.
+
+    """
+    def ls(self, format: str = 'short'):
+        """List the contents of the directory.
+
+        :param format: the output format <short|long>
+
+        """
+        cmd = ['ls']
+        if format == 'long':
+            cmd.append('-l')
+        os.system(' '.join(cmd))
+
+
+class FsInfoApplicationFactory(ApplicationFactory):
+    def __init__(self, *args, **kwargs):
+        kwargs.update(dict(package_resource='fsinfo',
+                           app_config_resource=StringIO(CONFIG)))
+        super().__init__(*args, **kwargs)
+
+
+if __name__ == '__main__':
+    harness = CliHarness(app_factory_class=FsInfoApplicationFactory)
+    harness.run().result
+```
+
+See the [full example] for the full example.
+
+
 ## Template
 
 The easiest to get started is to [template] out this project is to create your
@@ -130,3 +186,6 @@ Copyright (c) 2020 - 2021 Paul Landes
 
 [command action library]: doc/command-line.md
 [configuration]: doc/config.md
+
+[full example]: https://github.com/plandes/util/blob/master/example/app/fsinfo.py
+[examples]: https://github.com/plandes/util/blob/master/example
