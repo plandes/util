@@ -64,7 +64,6 @@ import os
 from io import StringIO
 from zensols.cli import ApplicationFactory, CliHarness
 
-
 CONFIG = """
 [cli]
 class_name = zensols.cli.ActionCliManager
@@ -73,7 +72,6 @@ apps = list: app
 [app]
 class_name = fsinfo.Application
 """
-
 
 @dataclass
 class Application(object):
