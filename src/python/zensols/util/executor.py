@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Union, Iterable
+from typing import Union, Iterable, Optional
 from dataclasses import dataclass, field
 import logging
 from logging import Logger
@@ -50,9 +50,17 @@ class Executor(object):
     """Used as the `cwd` when creating :class:`.Popen`.
 
     """
+    def __call__(self, cmd: Union[str, Iterable[str], Path]) -> \
+            Optional[Union[Popen, int]]:
+        """Run a command.
+
+        :see: :meth:`.run`
+
+        """
+        return self.run(cmd)
 
     def run(self, cmd: Union[str, Iterable[str], Path]) -> \
-            Union[Popen, int, type(None)]:
+            Optional[Union[Popen, int]]:
         """Run a commmand.
 
         :param cmd: either one string, a sequence of arguments or a path (see
@@ -82,6 +90,9 @@ class Executor(object):
                 return self.wait(proc)
 
     def wait(self, proc: Popen) -> int:
+        """Wait for process ``proc`` to end and return the processes exit value.
+
+        """
         ex_val = self.check_exit_value
         proc.wait(self.timeout)
         ret = proc.returncode
