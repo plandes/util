@@ -102,7 +102,8 @@ if __name__ == '__main__':
     harness.run().result
 ```
 
-See the [full example] that demonstrates more complex command line handling.
+See the [full example] that demonstrates more complex command line handling,
+documentation and explanation.
 
 
 ## Template
