@@ -102,6 +102,24 @@ if __name__ == '__main__':
     harness.run().result
 ```
 
+The framework automatically links each command line action mnemonic (i.e. `ls`)
+to the data class `Application` method `ls` and command line help.  For
+example:
+```shell
+$ python ./fsinfo.py -h
+Usage: fsinfo.py [options]:
+
+List the contents of the directory.
+
+Options:
+  -h, --help                    show this help message and exit
+  --version                     show the program version and exit
+  -f, --format STRING   short   the output format <short|long>
+
+$ python ./fsinfo.py -f short
+__pycache__  fsinfo.py
+```
+
 See the [full example] that demonstrates more complex command line handling,
 documentation and explanation.
 
