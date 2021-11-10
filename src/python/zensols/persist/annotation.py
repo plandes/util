@@ -313,11 +313,25 @@ class PersistableContainer(Deallocatable):
     If the class level attribute ``_PERSITABLE_TRANSIENT_ATTRIBUTES`` is set,
     all attributes name given in this set will be set to ``None`` when pickled.
 
+    If the class level attribute ``_PERSITABLE_PROPERTIES`` is set, all
+    properties given will be accessed for force creation before pickling.
+
+    If the class level attribute ``_PERSITABLE_METHODS`` is set, all method
+    given will be accessed for force creation before pickling.
+
     """
     def __getstate__(self):
-        state = copy(self.__dict__)
         removes = set()
         tran_attribute_name = '_PERSITABLE_TRANSIENT_ATTRIBUTES'
+        prop_attribute_name = '_PERSITABLE_PROPERTIES'
+        meth_attribute_name = '_PERSITABLE_METHODS'
+        if hasattr(self, prop_attribute_name):
+            for attr in getattr(self, prop_attribute_name):
+                getattr(self, attr)
+        if hasattr(self, meth_attribute_name):
+            for attr in getattr(self, meth_attribute_name):
+                getattr(self, attr)()
+        state = copy(self.__dict__)
         if hasattr(self, tran_attribute_name):
             tran_attribs = getattr(self, tran_attribute_name)
             if logger.isEnabledFor(logging.DEBUG):
