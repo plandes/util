@@ -33,7 +33,7 @@ class Dictable(Writable):
 
     See :meth:`write` for how a dictable writes itself as a sublcass of
     :class:`.Writable` and usage of class attributes
-    `_DICTABLE_WRITABLE_DESCENDANTS`` and ``_DICTABLE_WRITE_EXCLUDES``.
+    ``_DICTABLE_WRITABLE_DESCENDANTS`` and ``_DICTABLE_WRITE_EXCLUDES``.
 
     .. document private functions
     .. automethod:: _get_dictable_attributes
