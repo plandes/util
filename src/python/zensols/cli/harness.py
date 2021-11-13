@@ -192,6 +192,8 @@ class CliHarness(object):
             logger.debug(f'entry path: {entry_path}')
         if self.root_dir is None:
             root_dir = entry_path
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'no root dir, using entry path: {entry_path}')
         else:
             root_dir = entry_path / self.root_dir
         if logger.isEnabledFor(logging.DEBUG):
