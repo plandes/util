@@ -396,14 +396,10 @@ class TestPersistWork(unittest.TestCase):
         self.assertEqual('yetmoredata', stash.load())
 
     def paths(self, name):
-        path = self.targdir
-        file_path = path / f'{name}.db'
-        # linux and versions of Python on macOS don't add the `.db` extension
-        is_py_higher_38 = sys.version_info[0] >= 3 and sys.version_info[1] > 8
-        if (platform == "linux" or platform == "linux2") or is_py_higher_38:
-            path = file_path
-        else:
-            path = path / name
+        ext = ShelveStash.get_extension()
+        ext = '' if ext is None else f'.{ext}'
+        path = self.targdir / f'{name}'
+        file_path = self.targdir / f'{name}{ext}'
         return file_path, path
 
     def test_shelve_stash(self):
@@ -412,7 +408,7 @@ class TestPersistWork(unittest.TestCase):
         self.assertFalse(file_path.exists())
         obj = 'obj create of tmp6'
         self.assertEqual(None, s.load('tmp6'))
-        self.assertTrue(file_path.exists())
+        self.assertTrue(file_path.exists(), f'does not exist: {file_path}')
         s.dump('tmp6', obj)
         self.assertTrue(file_path.exists())
         o2 = s.load('tmp6')
@@ -425,7 +421,7 @@ class TestPersistWork(unittest.TestCase):
         self.assertFalse(file_path.exists())
         with shelve(path) as s:
             self.assertFalse(s.exists('cool'))
-        self.assertTrue(file_path.exists())
+        self.assertTrue(file_path.exists(), f'does not exist: {file_path}')
         with shelve(path) as s:
             s.dump('cool', [1, 2, 123])
             self.assertTrue([1, 2, 123], s.load('cool'))

@@ -3,13 +3,14 @@
 """
 __author__ = 'Paul Landes'
 
-import logging
-from typing import Any, Iterable
+from typing import Any, Iterable, Optional, List
 from dataclasses import dataclass, field
+import logging
+import itertools as it
 from pathlib import Path
 import shelve as sh
-from zensols.persist import persisted
-from zensols.persist import CloseableStash
+from zensols.util.tempfile import tempfile
+from zensols.persist import persisted, CloseableStash
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,33 @@ class ShelveStash(CloseableStash):
 
     def __post_init__(self):
         self.is_open = False
+
+    @classmethod
+    def get_extension(cls) -> str:
+        if not hasattr(cls, '_EXTENSION'):
+            ext: Optional[str] = None
+            with tempfile(create=False, remove=False) as path:
+                inst = sh.open(str(path.resolve()), writeback=False)
+                del_path: Path = None
+                try:
+                    inst.close()
+                    spaths: List[Path] = path.parent.glob(path.name + '*')
+                    spath: Path
+                    for spath in it.islice(spaths, 1):
+                        ext = spath.suffix
+                        if len(ext) > 1 and ext.startswith('.'):
+                            ext = ext[1:]
+                        del_path = spath
+                    ext = None if len(ext) == 0 else ext
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug(f'found extension: <{ext}>')
+                finally:
+                    if del_path is not None:
+                        if logger.isEnabledFor(logging.DEBUG):
+                            logger.debug(f'deleting: {del_path}')
+                        del_path.unlink()
+            cls._EXTENSION = ext
+        return cls._EXTENSION
 
     @property
     @persisted('_shelve')
