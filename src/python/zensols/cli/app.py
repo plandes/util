@@ -455,6 +455,9 @@ class ApplicationFactory(PersistableContainer):
 
     :see: :meth:`_create_config_factory`
 
+    .. document private functions
+    .. automethod:: _handle_error
+
     """
 
     def __post_init__(self):
