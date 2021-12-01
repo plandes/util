@@ -319,27 +319,25 @@ class ConfigurationImporter(ApplicationObserver):
         """
         # the modified configuration that will returned
         modified_config: Configurable = self.config
-        # whether or not to load the configuration
-        load_config: bool = True
         if self.config_path is None:
             name: str = self.get_environ_var_from_app()
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f"attempting load config from env var '{name}'")
             val: str = os.environ.get(name)
             if val is not None:
-                self.config_path = Path(val)
+                rc_path = Path(val)
+                if rc_path.exists():
+                    self.config_path = rc_path
             elif self.default is not None:
                 if self.default == 'skip':
                     self.config_path = None
                 else:
                     self.config_path = self.default
-            else:
-                if self.expect:
-                    lopt = self._get_config_option()
-                    raise ApplicationError(f'Missing option {lopt}')
-                else:
-                    load_config = False
-        if load_config:
+        if self.config_path is None:
+            if self.expect:
+                lopt = self._get_config_option()
+                raise ApplicationError(f'Missing option {lopt}')
+        else:
             modified_config = self._load()
             if self.config_path_option_name is not None:
                 self.config.set_option(
