@@ -443,7 +443,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                     v.deallocate()
             self._shared.clear()
 
-    def instance(self, name: str = None, *args, **kwargs):
+    def instance(self, name: Optional[str] = None, *args, **kwargs):
         if self._shared is None:
             inst = super().instance(name, *args, **kwargs)
         else:
@@ -468,8 +468,12 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         :see: :meth:`instance`
 
         """
-        inst = self.instance(name, *args, **kwargs)
-        self.clear_instance(name)
+        prev_shared = self._shared
+        self._shared = None
+        try:
+            inst = self.instance(name, *args, **kwargs)
+        finally:
+            self._shared = prev_shared
         return inst
 
     def _set_reload(self, reload: bool):
