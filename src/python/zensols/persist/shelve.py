@@ -137,9 +137,11 @@ class shelve(object):
     For example, the following opens a file ``path``, sets a temporary variable
     ``stash``, prints all the data from the shelve, and then closes it.
 
-    with shelve(path) as stash:
-        for id, val in stash, 30:
-            print(f'{id}: {val}')
+    Example::
+
+        with shelve(path) as stash:
+            for id, val in stash, 30:
+                print(f'{id}: {val}')
 
     """
     def __init__(self, *args, **kwargs):
