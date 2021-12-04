@@ -153,7 +153,10 @@ class PersistedWork(Deallocatable):
         if self.path.is_file():
             self._info('loading work from {}'.format(self.path))
             with open(self.path, 'rb') as f:
-                obj = pickle.load(f)
+                try:
+                    obj = pickle.load(f)
+                except EOFError as e:
+                    raise PersistableError(f'Can not read: {self.path}') from e
         else:
             self._info('saving work to {}'.format(self.path))
             if self.mkdir:
