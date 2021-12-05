@@ -5,6 +5,7 @@ __author__ = 'Paul Landes'
 
 from dataclasses import dataclass, field
 import logging
+import re
 from zensols.config import Configurable, DictionaryConfig
 from zensols.util import PackageResource
 from .. import Action, Application, ApplicationObserver
@@ -19,6 +20,8 @@ class PackageInfoImporter(ApplicationObserver):
     key/values are:
 
       * **name**: the package name (:obj:`.PackageResources.name`)
+      * **short_name**: a shorter package name useful for setting in logging
+        messages taken from :obj:`.PackageResources.name`
       * **version**: the package version (:obj:`.PackageResources.version`)
 
     This class is useful to configure the default application module given by
@@ -41,13 +44,13 @@ class PackageInfoImporter(ApplicationObserver):
     exposes the parts of this class necessary for the CLI.
 
     """
+    _BUT_FIRST_REGEX = re.compile(r'^[^.]+\.(.+)$')
 
     config: Configurable = field()
     """The parent configuration, which is populated with the package
     information.
 
     """
-
     section: str = field(default='package')
     """The name of the section to create with the package information."""
 
@@ -57,12 +60,17 @@ class PackageInfoImporter(ApplicationObserver):
         self._app = app
         self._action = action
 
+    def _short_name(self, pkg_res: PackageResource) -> str:
+        m: re.Match = self._BUT_FIRST_REGEX.match(pkg_res.name)
+        return pkg_res.name if m is None else m.group(1)
+
     def add(self) -> Configurable:
         """Add package information to the configuration (see class docs).
 
         """
         pkg_res: PackageResource = self._app.factory.package_resource
         params = {'name': pkg_res.name,
+                  'short_name': self._short_name(pkg_res),
                   'version': pkg_res.version}
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'adding package section: {self.section}={params}')

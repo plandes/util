@@ -319,13 +319,15 @@ class ConfigurationImporter(ApplicationObserver):
         """
         # the modified configuration that will returned
         modified_config: Configurable = self.config
+        env_var: str = None
+        rc_path: Path = None
         if self.config_path is None:
-            name: str = self.get_environ_var_from_app()
+            env_var: str = self.get_environ_var_from_app()
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"attempting load config from env var '{name}'")
-            val: str = os.environ.get(name)
-            if val is not None:
-                rc_path = Path(val)
+                logger.debug(f"loading config from env var '{env_var}'")
+            env_var_path: str = os.environ.get(env_var)
+            if env_var_path is not None:
+                rc_path = Path(env_var_path)
                 if rc_path.exists():
                     self.config_path = rc_path
             elif self.default is not None:
@@ -336,6 +338,9 @@ class ConfigurationImporter(ApplicationObserver):
         if self.config_path is None:
             if self.expect:
                 lopt = self._get_config_option()
+                if env_var is not None and env_var_path is not None:
+                    logger.warning(f'Environment variable {env_var} set to ' +
+                                   f'non-existant path: {rc_path}')
                 raise ApplicationError(f'Missing option {lopt}')
         else:
             modified_config = self._load()
