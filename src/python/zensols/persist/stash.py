@@ -223,7 +223,10 @@ class DirectoryStash(Stash):
 
     def _load_file(self, path: Path) -> Any:
         with open(path, 'rb') as f:
-            return pickle.load(f)
+            try:
+                return pickle.load(f)
+            except EOFError as e:
+                raise PersistableError(f'Can not read: {self.path}') from e
 
     def _dump_file(self, inst: Any, path: Path):
         with open(path, 'wb') as f:
