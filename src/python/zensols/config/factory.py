@@ -454,9 +454,9 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         return inst
 
     def new_instance(self, name: str = None, *args, **kwargs):
-        """Create a new instance without it being shared.  This only does something
-        different from :meth:`instance` if this is a shared instance factory
-        ith ``shared=True`` given to the initializer.
+        """Create a new instance without it being shared.  This is done by purging the
+        existing instance from the shared cache when it is created next time the
+        contained instances are shared.
 
         :param name: the name of the class (by default) or the key name of the
                      class used to find the class
@@ -466,6 +466,17 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         :param kwargs: given to the ``__init__`` method
 
         :see: :meth:`instance`
+
+        :see: :meth:`new_deep_instance`
+
+        """
+        inst = self.instance(name, *args, **kwargs)
+        self.clear_instance(name)
+        return inst
+
+    def new_deep_instance(self, name: str = None, *args, **kwargs):
+        """Like :meth:`new_instance` but copy all recursive instances as new objects as
+        well.
 
         """
         prev_shared = self._shared
