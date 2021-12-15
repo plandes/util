@@ -330,9 +330,13 @@ class PersistableContainer(Deallocatable):
         meth_attribute_name = '_PERSITABLE_METHODS'
         if hasattr(self, prop_attribute_name):
             for attr in getattr(self, prop_attribute_name):
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'for property get: {attr}')
                 getattr(self, attr)
         if hasattr(self, meth_attribute_name):
             for attr in getattr(self, meth_attribute_name):
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'for method get: {attr}')
                 getattr(self, attr)()
         state = copy(self.__dict__)
         if hasattr(self, tran_attribute_name):
