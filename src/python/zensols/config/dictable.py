@@ -4,7 +4,7 @@ primitives handy for creating JSON.
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Any, Iterable, Union, Tuple
+from typing import Dict, Any, Iterable, Tuple, Optional
 from dataclasses import dataclass, fields, asdict
 import dataclasses
 import sys
@@ -120,7 +120,7 @@ class Dictable(Writable):
             raise ConfigurationError(f'not a dataclass: {obj.__class__}')
         return self._from_dict(asdict(obj), recurse, readable)
 
-    def _format_dictable(self, obj: Any) -> Union[str, None]:
+    def _format_dictable(self, obj: Any) -> Optional[str]:
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'format dictable: {type(obj)}')
         v = None
