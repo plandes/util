@@ -455,8 +455,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
 
     def new_instance(self, name: str = None, *args, **kwargs):
         """Create a new instance without it being shared.  This is done by purging the
-        existing instance from the shared cache when it is created next time the
-        contained instances are shared.
+        existing instance from the shared cache when it is created next time
+        the contained instances are shared.
 
         :param name: the name of the class (by default) or the key name of the
                      class used to find the class

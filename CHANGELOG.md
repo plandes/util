@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.7.1] - 2022-01-12
+### Changed
+- Shelve extension calculation is not heuristically calculated by creating a
+  file to fix tests across various (g)dbm libraries across platforms.
+- Add file name in `persisted` to pickle error messages.
+- Better `DirectoryStash` pickle error messages.
+- Robustly ignore missing config files when the configuration importer is
+  configured not to expect them.
+
+### Added
+- Simple CLI example.
+- Class level properties set on `PersistableContainer` instances to
+  automatically persist attributes.
+- MacOS keychain `Configurable` for user/password access.
+- `ImportConfigFactory` provides a way to create new instances with methods
+  `new_instance` and `new_deep_instance`.
+
+
 ## [1.7.0] - 2021-10-22
 ### Added
 - Added `frozendict` as a dependency.
@@ -289,7 +307,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.7.1...HEAD
+[1.7.1]: https://github.com/plandes/util/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/plandes/util/compare/v1.6.3...v1.7.0
 [1.6.3]: https://github.com/plandes/util/compare/v1.6.2...v1.6.3
 [1.6.2]: https://github.com/plandes/util/compare/v1.6.1...v1.6.2
