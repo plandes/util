@@ -112,7 +112,6 @@ class ActionCli(PersistableContainer, Dictable):
     called.
 
     """
-
     def _is_option_enabled(self, name: str) -> bool:
         """Return ``True`` if the option is enabled and eligible to be added to the
         command line.
