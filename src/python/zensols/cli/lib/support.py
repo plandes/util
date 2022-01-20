@@ -1,4 +1,5 @@
-"""First pass application to export the environment
+"""General purpose first pass applications to support the build and
+configuration functionality.
 
 """
 __author__ = 'Paul Landes'
@@ -7,6 +8,7 @@ from typing import Dict, Type, Any
 from dataclasses import dataclass, field
 from enum import Enum, auto, EnumMeta
 import sys
+import os
 import logging
 import inspect
 from json import JSONEncoder
@@ -18,6 +20,7 @@ from .. import (
     Action, ActionCli, ActionCliMethod, ActionMetaData,
     Application, ApplicationObserver,
 )
+from .. import ConfigurationImporter
 
 logger = logging.getLogger(__name__)
 
@@ -233,3 +236,36 @@ class ShowConfiguration(object):
 
     def __call__(self):
         return self.show_config()
+
+
+@dataclass
+class EditConfiguration(object):
+    """Edits the configuration file given on the command line.  This must be added
+    *after* the :class:`~zensols.cli.ConfigurationImporter` class.
+
+    """
+    CLI_META = {'option_includes': set(),
+                'mnemonic_overrides': {'edit_configuration': 'editconf'}}
+
+    config_factory: ConfigFactory = field()
+    """The configuration factory which is returned from the app."""
+
+    section_name: str = field(default='config_cli')
+    """The section of the CLI configuration that contains the entry."""
+
+    command: str = field(default='emacsclient -n {path}')
+    """The command used on the :function:`os.system` command to edit the file.
+
+    """
+    def edit_configuration(self):
+        """Edit the configuration file."""
+        sec = self.config_factory(self.section_name)
+        attr: str = ConfigurationImporter.CONFIG_PATH_FIELD
+        path: Path = getattr(sec, attr)
+        path = str(path.absolute())
+        cmd = self.command.format(**dict(path=path))
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'editing file: {path}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'system: {cmd}')
+        os.system(cmd)

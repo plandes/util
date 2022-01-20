@@ -14,9 +14,7 @@ from zensols.introspect import (
     Class, ClassField, ClassParam, ClassMethod, ClassMethodArg,
     ClassInspector, ClassImporter,
 )
-from zensols.config import (
-    Configurable, Dictable, ConfigFactory
-)
+from zensols.config import Configurable, Dictable, ConfigFactory
 from . import (
     DocUtil, ActionCliError, PositionalMetaData, OptionMetaData, ActionMetaData
 )
@@ -416,6 +414,34 @@ class ActionCliManager(PersistableContainer, Dictable):
             cls = cls_imp.get_class()
         return cls
 
+    def _create_action_from_section(self, conf_sec: str,
+                                    params: Dict[str, Any]) -> ActionCli:
+        """Create an action from a section in the configuration.  If both the class
+        ``CLI_META`` exists, then this will replace all options (properties)
+        defined.
+
+        :param conf_sec: the section name in the configuration that has the
+                         action to create/overwrite the data
+
+        :param params: the parameters used to create the :class:`.ActionCli`
+
+        :return: an instance of :class:`.ActionCli` that represents the what is
+                 given in the configuration section
+
+        """
+        sec: Dict[str, Any] = self.config_factory.config.populate(
+            {}, section=conf_sec)
+        del sec['class_name']
+        params.update(sec)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'creating action from section {conf_sec} -> {sec}')
+        action = self.config_factory.instance(conf_sec, **params)
+        if not isinstance(action, ActionCli):
+            raise ActionCliManagerError(
+                f'Section instance {conf_sec} is not a class of ' +
+                f'type ActionCli, but {type(action)}')
+        return action
+
     def _add_app(self, section: str):
         """Add an :class:`.ActionCli` instanced from the configuration given by a
         section.  The application is added to :obj:`._actions`.  The section is
@@ -460,15 +486,12 @@ class ActionCliManager(PersistableContainer, Dictable):
         if conf_sec in self.config.sections:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'found configuration section: {conf_sec}')
-            action = self.config_factory.instance(conf_sec, **params)
-            if not isinstance(action, ActionCli):
-                raise ActionCliManagerError(
-                    f'Section instance {conf_sec} is not a class of ' +
-                    f'type ActionCli, but {type(action)}')
+            action = self._create_action_from_section(conf_sec, params)
         else:
             # use a default with parameters collected
             action = ActionCli(**params)
-        logger.debug(f'created action: {action}')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'created action: {action}')
         self._add_action(action)
 
     @property
