@@ -218,7 +218,7 @@ class ConfigurationImporter(ApplicationObserver):
                         repl_sec[k] = vr
         return DictionaryConfig(secs)
 
-    def _load(self) -> Configurable:
+    def _load_configuration(self) -> Configurable:
         """Once we have the path and the class used to load the configuration, create
         the instance and load it.
 
@@ -305,6 +305,18 @@ class ConfigurationImporter(ApplicationObserver):
             print(self.config.get_raw_str())
         return modified_config
 
+    def _load(self) -> Configurable:
+        """Load the configuration and update the application context.
+
+        """
+        modified_config = self._load_configuration()
+        if self.config_path_option_name is not None:
+            self.config.set_option(
+                self.config_path_option_name,
+                f'path: {str(self.config_path)}',
+                section=self.name)
+        return modified_config
+
     def _reset(self):
         """Reset the Python logger configuration."""
         root = logging.getLogger()
@@ -342,13 +354,10 @@ class ConfigurationImporter(ApplicationObserver):
                     logger.warning(f'Environment variable {env_var} set to ' +
                                    f'non-existant path: {rc_path}')
                 raise ApplicationError(f'Missing option {lopt}')
+            else:
+                modified_config = self._load()
         else:
             modified_config = self._load()
-            if self.config_path_option_name is not None:
-                self.config.set_option(
-                    self.config_path_option_name,
-                    f'path: {str(self.config_path)}',
-                    section=self.name)
         return modified_config
 
     def __call__(self) -> Configurable:
