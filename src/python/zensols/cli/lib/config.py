@@ -242,9 +242,13 @@ class ConfigurationImporter(ApplicationObserver):
         if self.type is None:
             args = {} if self.arguments is None else self.arguments
             cf = ConfigurableFactory(kwargs=args)
-            cl_config = cf.from_path(self.config_path)
-            logger.info(f'config loaded {self.config_path} as ' +
-                        f'type {cl_config.__class__.__name__}')
+            if self.config_path is None:
+                # this happens when expect=False and no configuration is given
+                cl_config = DictionaryConfig()
+            else:
+                cl_config = cf.from_path(self.config_path)
+                logger.info(f'config loaded {self.config_path} as ' +
+                            f'type {cl_config.__class__.__name__}')
         # import using ImportIniConfig as a section
         elif self.type == self.IMPORT_TYPE:
             args: dict = {} if self.arguments is None else self.arguments
