@@ -4,7 +4,7 @@ configuration functionality.
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Type, Any
+from typing import Dict, Type, Any, Optional
 from dataclasses import dataclass, field
 from enum import Enum, auto, EnumMeta
 import sys
@@ -299,6 +299,7 @@ class ProgramNameConfigurator(object):
                 'always_invoke': True,
                 # only the path to the configuration should be exposed as a
                 # an option on the comamnd line
+                'mnemonic_includes': {'add_program_name'},
                 'option_includes': {}}
 
     config: Configurable = field()
@@ -306,21 +307,44 @@ class ProgramNameConfigurator(object):
     information.
 
     """
-    section: str = field(default='prog')
+    section: str = field(default='program')
     """The name of the section to create with the package information."""
 
     default: str = field(default='prog')
     """The default progran name to use when can not be inferred."""
 
-    def add_program_name(self):
-        lead_arg = sys.argv[0]
+    @classmethod
+    def infer_program_name(self, entry_path: str = None) -> Optional[str]:
+        """Infer the program name using the system arguments.
+
+        :param entry_path: used to infer the program name from the entry point
+                           script, which defaults ``sys.argv[0]``
+
+        """
+        entry_path = sys.argv[0] if entry_path is None else entry_path
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'command line leading arg: <{lead_arg}>')
-        if lead_arg is not None and len(lead_arg) > 0:
-            prog_name = Path(lead_arg).stem
-        else:
-            prog_name = self.default
+            logger.debug(f'command line leading arg: <{entry_path}>')
+        if entry_path is not None and len(entry_path) > 0:
+            return Path(entry_path).stem
+
+    def create_section(self, entry_path: str = None) -> Dict[str, str]:
+        """Return a dict with the contents of the program and name section.
+
+        :param entry_path: used to infer the program name from the entry point
+                           script, which defaults ``sys.argv[0]``
+
+        """
+        prog_name = self.infer_program_name(entry_path) or self.default
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'using program name: {prog_name}')
-        d_conf = DictionaryConfig({self.section: {'name': prog_name}})
+        return {self.section: {'name': prog_name}}
+
+    def add_program_name(self):
+        """Add the program name as a single configuration section and parameter.
+
+        :see: :obj:`section`
+
+        :see: :obj:`default`
+        """
+        d_conf = DictionaryConfig(self.create_section())
         d_conf.copy_sections(self.config)
