@@ -14,7 +14,9 @@ import inspect
 from json import JSONEncoder
 from io import TextIOBase
 from pathlib import Path
-from zensols.config import Configurable, Dictable, ConfigFactory
+from zensols.config import (
+    Configurable, Dictable, ConfigFactory, DictionaryConfig
+)
 from zensols.introspect import ClassImporter
 from .. import (
     Action, ActionCli, ActionCliMethod, ActionMetaData,
@@ -269,3 +271,56 @@ class EditConfiguration(object):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'system: {cmd}')
         os.system(cmd)
+
+
+@dataclass
+class ProgramNameConfigurator(object):
+    """Adds a section with the name of the program to use.  This is useful for
+    adding the program name to the beginning of logging lines to confirm to
+    UNIX line output standards.
+
+    To add it to the logging output add it to the
+    :class:`~zensols.cli.LogConfigurator` section's ``format`` property.
+
+    Example::
+        [add_prog_cli]
+        class_name = zensols.cli.ProgramNameConfigurator
+        default = someprog
+
+        [log_cli]
+        class_name = zensols.cli.LogConfigurator
+        format = ${prog:name}: %%(message)s
+
+    """
+    CLI_META = {'first_pass': True,  # not a separate action
+                # since there are no options and this is a first pass, force
+                # the CLI API to invoke it as otherwise there's no indication
+                # to the CLI that it needs to be called
+                'always_invoke': True,
+                # only the path to the configuration should be exposed as a
+                # an option on the comamnd line
+                'option_includes': {}}
+
+    config: Configurable = field()
+    """The parent configuration, which is populated with the package
+    information.
+
+    """
+    section: str = field(default='prog')
+    """The name of the section to create with the package information."""
+
+    default: str = field(default='prog')
+    """The default progran name to use when can not be inferred."""
+
+    def add_program_name(self):
+        lead_arg = sys.argv[0]
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'command line leading arg: <{lead_arg}>')
+        if lead_arg is not None and len(lead_arg) > 0:
+            prog_name = Path(lead_arg).stem
+        else:
+            prog_name = self.default
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'using program name: {prog_name}')
+        d_conf = DictionaryConfig({self.section: {'name': prog_name}})
+        d_conf.copy_sections(self.config)

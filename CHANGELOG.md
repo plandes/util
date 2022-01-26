@@ -10,10 +10,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - The CLI class `EditConfiguration`, which edits the configuration file.
+- The CLI class `ProgramNameConfigurator`, which adds the inferred program name
+  as a section.
 
 ### Changed
 - Section for `ActionCli` decorators over-write that which is defined at the
   class level for an application in `CLI_META`.
+- Bug fixes for missing configuration when configured to not expect it.
 
 
 ## [1.7.1] - 2022-01-12
