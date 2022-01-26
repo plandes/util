@@ -158,7 +158,11 @@ class CliHarness(object):
     def _create_context(self, env: _HarnessEnviron) -> \
             Dict[str, Dict[str, str]]:
         ctx = dict(self.app_config_context)
-        ctx['appenv'] = {'root_dir': str(env.root_dir)}
+        appenv = ctx.get('appenv')
+        if appenv is None:
+            appenv = {}
+            ctx['appenv'] = appenv
+        appenv['root_dir'] = str(env.root_dir)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating initial context with {ctx}')
         return ctx
