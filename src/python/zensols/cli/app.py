@@ -25,7 +25,7 @@ from zensols.persist import (
 )
 from zensols.util import PackageResource
 from zensols.config import (
-    ConfigurableFileNotFoundError, Serializer, Settings, Dictable,
+    ConfigurableFileNotFoundError, Serializer, Dictable,
     Configurable, ConfigFactory, ImportIniConfig, ImportConfigFactory,
 )
 from . import (
@@ -564,6 +564,8 @@ class ApplicationFactory(PersistableContainer):
         parser resources.  The data is cached and use in property getters.
 
         """
+        cl_name: str = ClassImporter.full_classname(ActionCliManager)
+        cli_sec: str = ActionCliManager.SECTION
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'create resources for: {type(self)}')
         if isinstance(self.app_config_resource, str):
@@ -572,10 +574,15 @@ class ApplicationFactory(PersistableContainer):
         else:
             file_obj = self.app_config_resource
             config: Configurable = self._create_application_context(file_obj)
+        # create a default CLI ActionCliManager section when it doesn't exist
+        if cli_sec not in config.sections:
+            ser: Serializer = config.serializer
+            apps: str = ser.format_option(['app'])
+            config.set_option('apps', apps, section=cli_sec)
+            config.set_option('class_name', cl_name, section=cli_sec)
         fac: ConfigFactory = self._create_config_factory(config)
-        cl_name: str = ClassImporter.full_classname(ActionCliManager)
-        cli_mng: ActionCliManager = fac(
-            ActionCliManager.SECTION, class_name=cl_name)
+        # add class name to relax missing class_name
+        cli_mng: ActionCliManager = fac(cli_sec, class_name=cl_name)
         actions: Tuple[ActionMetaData] = tuple(chain.from_iterable(
             map(lambda a: a.meta_datas, cli_mng.actions.values())))
         config = CommandLineConfig(actions)
