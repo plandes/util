@@ -162,6 +162,11 @@ class ConfigFactory(object):
 
     """
 
+    CLASS_NAME = 'class_name'
+    """The class name attribute in the section that identifies the fully qualified
+    instance to create.
+
+    """
     def __init__(self, config: Configurable, pattern: str = '{name}',
                  default_name: str = 'default',
                  class_resolver: ClassResolver = None):
@@ -222,14 +227,14 @@ class ConfigFactory(object):
         except Exception as e:
             logger.error(f'can not populate from section {sec}: {e}')
             raise e
-        class_name = params.get('class_name')
+        class_name = params.get(self.CLASS_NAME)
         if class_name is None:
             if len(params) == 0:
                 raise FactoryError(f'no such entry: \'{name}\'')
             else:
                 class_name = 'zensols.config.Settings'
         else:
-            del params['class_name']
+            del params[self.CLASS_NAME]
         return class_name, params
 
     def _has_init_parameter(self, cls: Type, param_name: str):
@@ -282,6 +287,8 @@ class ConfigFactory(object):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating instance of {name}')
         class_name, params = self._class_name_params(name)
+        if self.CLASS_NAME in kwargs:
+            class_name = kwargs.pop(self.CLASS_NAME)
         cls = self._find_class(class_name)
         params.update(kwargs)
         if self._has_init_parameter(cls, self.CONFIG_ATTRIBUTE) \

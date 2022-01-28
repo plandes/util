@@ -17,13 +17,15 @@ from io import TextIOBase
 from itertools import chain
 from pathlib import Path
 from frozendict import frozendict
-from zensols.introspect import Class, ClassMethod, ClassField, ClassMethodArg
+from zensols.introspect import (
+    Class, ClassMethod, ClassField, ClassMethodArg, ClassImporter
+)
 from zensols.persist import (
     persisted, PersistedWork, PersistableContainer, Deallocatable
 )
 from zensols.util import PackageResource
 from zensols.config import (
-    ConfigurableFileNotFoundError, Serializer, Dictable,
+    ConfigurableFileNotFoundError, Serializer, Settings, Dictable,
     Configurable, ConfigFactory, ImportIniConfig, ImportConfigFactory,
 )
 from . import (
@@ -571,7 +573,9 @@ class ApplicationFactory(PersistableContainer):
             file_obj = self.app_config_resource
             config: Configurable = self._create_application_context(file_obj)
         fac: ConfigFactory = self._create_config_factory(config)
-        cli_mng: ActionCliManager = fac(ActionCliManager.SECTION)
+        cl_name: str = ClassImporter.full_classname(ActionCliManager)
+        cli_mng: ActionCliManager = fac(
+            ActionCliManager.SECTION, class_name=cl_name)
         actions: Tuple[ActionMetaData] = tuple(chain.from_iterable(
             map(lambda a: a.meta_datas, cli_mng.actions.values())))
         config = CommandLineConfig(actions)
