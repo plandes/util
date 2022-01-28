@@ -17,7 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Section for `ActionCli` decorators over-write that which is defined at the
   class level for an application in `CLI_META`.
 - Bug fixes for missing configuration when configured to not expect it.
-
+- Remove need for the `class_name` in the `cli` section for application
+  contexts.
+- Remove need for the `cli` section, which defaults to loading the single
+  application section `app`.
 
 ## [1.7.1] - 2022-01-12
 ### Changed

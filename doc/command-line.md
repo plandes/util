@@ -47,6 +47,9 @@ to instantiate, which has the method to call from the command line `__main__`.
 The `apps` line in the `cli` section lists all the application to create, each
 of which maps as an *action* using a mnemonic for each of it's methods.
 
+**Note**: in this example, the `cli` section can be omitted since it uses the
+default entry of the `apps` property set to the singleton `app` section.
+
 Since this example creates a simple payroll application, we'll create a *hello
 world* like class in `payroll.py` that will evolve in to a more complex
 application:
