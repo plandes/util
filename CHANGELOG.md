@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.7.2] - 2022-01-30
 ### Added
 - The CLI class `EditConfiguration`, which edits the configuration file.
 - The CLI class `ProgramNameConfigurator`, which adds the inferred program name
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   contexts.
 - Remove need for the `cli` section, which defaults to loading the single
   application section `app`.
+
 
 ## [1.7.1] - 2022-01-12
 ### Changed
@@ -321,7 +323,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.7.1...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.7.2...HEAD
+[1.7.2]: https://github.com/plandes/util/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/plandes/util/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/plandes/util/compare/v1.6.3...v1.7.0
 [1.6.3]: https://github.com/plandes/util/compare/v1.6.2...v1.6.3
