@@ -414,6 +414,8 @@ class TestPersistWork(unittest.TestCase):
         o2 = s.load('tmp6')
         self.assertEqual(obj, o2)
         s.delete('tmp6')
+        self.assertFalse(s.exists('tmp6'))
+        s.clear()
         self.assertFalse(file_path.exists())
 
     def test_shelve_stash_with(self):

@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Fixed delete and clear functionality in `ShelveStash`.
+
+
 ## [1.7.2] - 2022-01-30
 ### Added
 - The CLI class `EditConfiguration`, which edits the configuration file.

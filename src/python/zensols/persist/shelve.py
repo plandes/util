@@ -61,14 +61,29 @@ class ShelveStash(CloseableStash):
         return cls._EXTENSION
 
     @property
+    @persisted('_real_path')
+    def real_path(self) -> Path:
+        """The path the shelve API created on this file system.  This is provided since
+        :obj:`path` does *not* take in to account that some (G)DBM
+        implementations add an extension and others do not This differes across
+        libraries compiled against the Python interpreter and platorm.
+
+        """
+        ext = ShelveStash.get_extension()
+        ext = '' if ext is None else f'.{ext}'
+        return self.path.parent / f'{self.path.name}{ext}'
+
+    @property
     @persisted('_shelve')
     def shelve(self):
         """Return an opened shelve object.
 
         """
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('creating shelve data')
-        self.path.parent.mkdir(parents=True, exist_ok=True)
+            exists: bool = self.real_path.exists()
+            logger.debug(f'creating shelve data, exists: {exists}')
+        if not self.is_open:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
         fname = str(self.path.absolute())
         inst = sh.open(fname, writeback=self.writeback)
         self.is_open = True
@@ -105,14 +120,10 @@ class ShelveStash(CloseableStash):
         "Delete the shelve data file."
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'deleting: {name}')
-        self.close()
-        for path in (Path(self.path.parent, self.path.name),
-                     Path(self.path.parent, self.path.name + '.db')):
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'clearing {path} if exists: {path.exists()}')
-            if path.exists():
-                path.unlink()
-                break
+        if name is None:
+            self.clear()
+        else:
+            del self.shelve[name]
 
     def close(self):
         "Close the shelve object, which is needed for data consistency."
@@ -125,10 +136,11 @@ class ShelveStash(CloseableStash):
                 self.is_open = False
 
     def clear(self):
+        self.close()
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('clearing shelve data')
-        if self.path.exists():
-            self.path.unlink()
+            logger.debug(f'clearing shelve data if exists: {self.real_path}')
+        if self.real_path.exists():
+            self.real_path.unlink()
 
 
 class shelve(object):
