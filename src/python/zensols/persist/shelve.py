@@ -76,7 +76,7 @@ class ShelveStash(CloseableStash):
     @property
     @persisted('_shelve')
     def shelve(self):
-        """Return an opened shelve object.
+        """Return an opened shelve mod:`shelve` object.
 
         """
         if logger.isEnabledFor(logging.DEBUG):
@@ -100,7 +100,7 @@ class ShelveStash(CloseableStash):
         self._assert_auto_close()
         return ret
 
-    def dump(self, name, inst):
+    def dump(self, name: str, inst: Any):
         self.shelve[name] = inst
         self._assert_auto_close()
 
