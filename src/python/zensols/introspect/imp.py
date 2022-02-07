@@ -4,6 +4,7 @@
 __author__ = 'Paul Landes'
 
 from typing import Any, Tuple, Type, Sequence
+from types import ModuleType
 import logging
 import importlib
 from functools import reduce
@@ -49,6 +50,24 @@ class ClassImporter(object):
         else:
             return module + '.' + cls.__name__
 
+    @staticmethod
+    def get_module(name: str, reload: bool = False) -> ModuleType:
+        """Return the module that has ``name``.
+
+        :param name: the string name, which can have dots (``.``) to for sub
+                     modules
+
+        """
+        pkg_s = name.split('.')
+        mod = reduce(lambda m, n: getattr(m, n), pkg_s[1:], __import__(name))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'mod: {mod}, reloading: {reload}')
+        if reload:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'reload: cls: {mod}')
+            mod = importlib.reload(mod)
+        return mod
+
     def parse_module_class(self) -> Sequence[str]:
         """Parse the module and class name part of the fully qualifed class name.
         """
@@ -60,22 +79,15 @@ class ClassImporter(object):
                 f'not a fully qualified class name: {cname}')
         return match.groups()
 
-    def get_module_class(self) -> Tuple[Any, Type]:
+    def get_module_class(self) -> Tuple[ModuleType, Type]:
         """Return the module and class as a tuple of the given class in the
         initializer.
 
         """
-        pkg, cname = self.parse_module_class()
+        mod_name, cname = self.parse_module_class()
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'pkg: {pkg}, class: {cname}')
-        pkg_s = pkg.split('.')
-        mod = reduce(lambda m, n: getattr(m, n), pkg_s[1:], __import__(pkg))
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'mod: {mod}, reloading: {self.reload}')
-        if self.reload:
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'reload: cls: {mod}, {cname}')
-            mod = importlib.reload(mod)
+            logger.debug(f'mod_name: {mod_name}, class: {cname}')
+        mod = self.get_module(mod_name, self.reload)
         if not hasattr(mod, cname):
             raise ClassImporterError(
                 f"no class '{cname}' found in module '{mod}'")
