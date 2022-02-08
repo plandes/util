@@ -14,11 +14,7 @@ from collections import OrderedDict
 import itertools as it
 from io import TextIOBase, StringIO
 from functools import lru_cache
-from zensols.util import APIError
-
-
-class ConfigurationError(APIError):
-    pass
+from . import ConfigurationError
 
 
 @lru_cache(maxsize=50)

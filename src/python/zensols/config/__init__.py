@@ -3,12 +3,23 @@
 """
 __author__ = 'Paul Landes'
 
-from .serial import *
+
+from zensols.util import APIError
+
+
+class ConfigurationError(APIError):
+    """Thrown for any configuration error in this module.
+
+    """
+    pass
+
+
 from .writable import *
+from .dictable import *
+from .serial import *
 from .configbase import *
 from .strconfig import *
 from .factory import *
-from .dictable import *
 from .writeback import *
 from .yaml import *
 from .iniconfig import *

@@ -14,7 +14,9 @@ import re
 import copy as cp
 from time import time
 from zensols.util import APIError
-from zensols.introspect import ClassImporter
+from zensols.introspect import (
+    ClassImporter, ClassResolver, DictionaryClassResolver
+)
 from zensols.config import Configurable
 from zensols.persist import persisted, PersistedWork, Deallocatable
 
@@ -55,53 +57,6 @@ class FactoryStateObserver(ABC):
     @abstractmethod
     def _notify_state(self, state: FactoryState):
         pass
-
-
-class ClassResolver(ABC):
-    """Used to resolve a class from a string.
-
-    """
-    @staticmethod
-    def full_classname(cls: type) -> str:
-        """Return a fully qualified class name string for class ``cls``.
-
-        """
-        return ClassImporter.full_classname(cls)
-
-    def find_class(self, class_name: str) -> Type:
-        """Return a class given the name of the class.
-
-        :param class_name: represents the class name, which might or might not
-                           have the module as part of that name
-
-        """
-        pass
-
-
-class DictionaryClassResolver(ClassResolver):
-    """Resolve a class name from a list of registered class names without the
-    module part.  This is used with the ``register`` method on
-    ``ConfigFactory``.
-
-    :see: ConfigFactory.register
-
-    """
-    def __init__(self, instance_classes: Dict[str, type]):
-        self.instance_classes = instance_classes
-
-    def find_class(self, class_name: str) -> Type:
-        classes = {}
-        classes.update(globals())
-        classes.update(self.instance_classes)
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'looking up class: {class_name}')
-        if class_name not in classes:
-            raise FactoryError(
-                f'class {class_name} is not registered in factory {self}')
-        cls = classes[class_name]
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'found class: {cls}')
-        return cls
 
 
 class FactoryClassImporter(ClassImporter):

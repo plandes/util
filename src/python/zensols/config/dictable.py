@@ -14,7 +14,8 @@ from itertools import chain
 import inspect
 import json
 from io import TextIOBase
-from . import ConfigurationError, Writable, ClassResolver
+from zensols.introspect import ClassResolver
+from . import ConfigurationError, Writable
 
 logger = logging.getLogger(__name__)
 
@@ -117,7 +118,7 @@ class Dictable(Writable):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'from dataclass: {type(obj)}')
         if not dataclasses.is_dataclass(obj):
-            raise ConfigurationError(f'not a dataclass: {obj.__class__}')
+            raise ConfigurationError(f'Not a dataclass: {obj.__class__}')
         return self._from_dict(asdict(obj), recurse, readable)
 
     def _format_dictable(self, obj: Any) -> Optional[str]:

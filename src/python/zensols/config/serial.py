@@ -3,19 +3,17 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Union, Any, Set, Tuple, List
+from typing import Dict, Union, Any, Set, Tuple, List, Iterable
 from dataclasses import dataclass, field
 import logging
-from pprint import pprint
-import sys
 import json
 from json import JSONEncoder
 from itertools import chain
-from io import TextIOBase
 import re
 import pkg_resources
 from pathlib import Path
 from zensols.introspect import ClassImporter
+from . import Dictable
 
 logger = logging.getLogger(__name__)
 OBJECT_KEYS = {'_type', '_data'}
@@ -35,7 +33,7 @@ def as_python_object(dct: Dict[str, str]):
     return dct
 
 
-class Settings(object):
+class Settings(Dictable):
     """A default object used to populate in :meth:`.Configurable.populate` and
     :meth:`.ConfigFactory.instance`.
 
@@ -43,15 +41,18 @@ class Settings(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
-    def asdict(self) -> Dict[str, Any]:
+    def keys(self) -> Iterable[Any]:
+        return self.__dict__.keys()
+
+    def get(self, name: str, default: Any = None) -> Any:
+        return self.__dict__.get(name, default)
+
+    def _from_dictable(self, recurse: bool, readable: bool,
+                       class_name_param: str = None) -> Dict[str, Any]:
         return self.__dict__
 
-    def asjson(self, *args, **kwargs) -> str:
-        return json.dumps(self.__dict__, *args, **kwargs)
-
-    def get(self, name: str) -> str:
-        if hasattr(self, name):
-            return getattr(self, name)
+    def __getitem__(self, name: str) -> str:
+        return self.__dict__[name]
 
     def __eq__(self, other) -> bool:
         return self.__dict__ == other.__dict__
@@ -61,9 +62,6 @@ class Settings(object):
 
     def __repr__(self) -> str:
         return self.__str__()
-
-    def write(self, writer: TextIOBase = sys.stdout):
-        pprint(self.__dict__, writer)
 
 
 @dataclass
@@ -133,7 +131,7 @@ class Serializer(object):
         """Parse as a string in to a Python object.  The following is done to parse the
         string in order:
 
-          1. Primitive (i.e. ``1.23`` is a float, ``True`` is a boolean)
+          1. Primitive (i.e. ``1.23`` is a float, ``True`` is a boolean).
           2. A :class:`pathlib.Path` object when prefixed with ``path:``.
           3. Evaluate using the Python parser when prefixed ``eval:``.
           4. Evaluate as JSON when prefixed with ``json:``.
