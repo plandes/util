@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
-## [1.7.3] - 2022-02-11
+## [1.7.3] - 2022-02-12
 ### Changed
 - Fixed delete and clear functionality in `ShelveStash`.
 - Make `Settings` more dictionary like and inherit from `Dictable`.
