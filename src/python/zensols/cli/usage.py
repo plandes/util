@@ -53,6 +53,7 @@ class UsageActionOptionParser(OptionParser):
 @dataclass
 class _Formatter(Writable):
     """A formattingn base class that has utility methods.
+
     """
     def _write_three_col(self, a: str, b: str, c: str, depth: int = 0,
                          writer: TextIOBase = sys.stdout):
