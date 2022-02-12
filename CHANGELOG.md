@@ -8,8 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.7.3] - 2022-02-11
 ### Changed
 - Fixed delete and clear functionality in `ShelveStash`.
+- Make `Settings` more dictionary like and inherit from `Dictable`.
+- Move `DictResolver` and `ClassResolver` to introspection module.
 
 
 ## [1.7.2] - 2022-01-30
@@ -327,7 +330,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.7.2...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.7.3...HEAD
+[1.7.3]: https://github.com/plandes/util/compare/v1.7.2...v1.7.3
 [1.7.2]: https://github.com/plandes/util/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/plandes/util/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/plandes/util/compare/v1.6.3...v1.7.0
