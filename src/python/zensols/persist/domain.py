@@ -51,7 +51,9 @@ class chunks(object):
 
 class Stash(ABC):
     """A dictionary-like pure virtual class for CRUDing data, most of which read
-    and write to/from the file system.
+    and write to/from the file system.  One major difference is dictionaries
+    iterate over keys while stashes iterate over items, which calls
+    :meth:`items`.
 
     Note that there are subtle differences a [Stash] and a ``dict`` when
     generating or accessing data.  For example, when indexing obtaining the
