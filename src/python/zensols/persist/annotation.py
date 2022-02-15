@@ -324,6 +324,8 @@ class PersistableContainer(Deallocatable):
 
     """
     def __getstate__(self):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'get state for {self.__class__}')
         removes = set()
         tran_attribute_name = '_PERSITABLE_TRANSIENT_ATTRIBUTES'
         prop_attribute_name = '_PERSITABLE_PROPERTIES'
@@ -351,7 +353,12 @@ class PersistableContainer(Deallocatable):
                 if v.transient:
                     removes.add(v.varname)
         for k in removes:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'removed persistable attribute: {k}')
             state[k] = None
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'state keys for {self.__class__}: ' +
+                         f'{", ".join(state.keys())}')
         return state
 
     def __setstate__(self, state):
