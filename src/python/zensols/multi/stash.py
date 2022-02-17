@@ -31,13 +31,11 @@ class ChunkProcessor(object):
     """The application context configuration used to create the parent stash.
 
     """
-
     name: str = field()
     """The name of the parent stash used to create the chunk, and subsequently
     process this chunk.
 
     """
-
     chunk_id: int = field()
     """The nth chunk."""
 
@@ -137,10 +135,10 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     """
 
     workers: Union[int, float] = field()
-    """The number of processes spawned to accomplish the work; if this is a
-    negative number, add the number of CPU processors with this number, so -1
-    would result in one fewer works utilized than the number of CPUs, which is
-    a good policy for a busy server.
+    """The number of processes spawned to accomplish the work or 0 to use all CPU
+    cores.  If this is a negative number, add the number of CPU processors with
+    this number, so -1 would result in one fewer works utilized than the number
+    of CPUs, which is a good policy for a busy server.
 
     If the number is a float, then it is taken to be the percentage of the
     number of processes.  If it is a float, the value must be in range (0, 1].
@@ -301,10 +299,12 @@ class MultiProcessFactoryStash(MultiProcessStash):
     :obj:`delegate`, which persists the data.
 
     """
-
     enable_preemptive: bool = field(default=True)
-    """If ``False``, do not invoke the :obj:`factory` instance's data
-    calculation.
+    """If ``False``, do not invoke the :obj:`factory` instance's data calculation.
+    If the value is ``always``, then always assume the data is not calcuated,
+    which forces the factory prime.  Otherwise, if ``None``, then call the
+    super class data calculation falling back on the :obj:`factory` if the
+    super returns ``False``.
 
     """
     def __init__(self, config: Configurable, name: str,
@@ -329,11 +329,13 @@ class MultiProcessFactoryStash(MultiProcessStash):
         self.enable_preemptive = enable_preemptive
 
     def _calculate_has_data(self) -> bool:
-        has_data = super()._calculate_has_data()
-        if not has_data and \
-           self.enable_preemptive and \
-           isinstance(self.factory, PreemptiveStash):
-            has_data = self.factory._calculate_has_data()
+        has_data = False
+        if self.enable_preemptive != 'always':
+            has_data = super()._calculate_has_data()
+            if not has_data and \
+               self.enable_preemptive and \
+               isinstance(self.factory, PreemptiveStash):
+                has_data = self.factory._calculate_has_data()
         return has_data
 
     def prime(self):

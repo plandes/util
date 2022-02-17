@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Feature to use configuration syntax resolution in evaluated configuration
   entries.
+- Add option to `MultiProcessFactoryStash` to preemptively calculate data
+  existence on a field parameter.
 
 
 ## [1.7.3] - 2022-02-12
