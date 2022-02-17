@@ -13,7 +13,7 @@ import re
 import pkg_resources
 from pathlib import Path
 from zensols.introspect import ClassImporter
-from . import Dictable
+from . import ConfigurationError, Dictable
 
 logger = logging.getLogger(__name__)
 OBJECT_KEYS = {'_type', '_data'}
@@ -82,6 +82,7 @@ class Serializer(object):
     CLASS_REGEXP = re.compile(r'^class:\s*(.+)$')
     PRIMITIVES = set([bool, float, int, None.__class__])
     DEFAULT_RESOURCE_MODULE = None
+    _EVAL_KEYS = frozenset('resolve import'.split())
 
     allow_types: Set[type] = field(
         default_factory=lambda:
@@ -105,6 +106,10 @@ class Serializer(object):
     def _parse_eval(self, pconfig: str, evalstr: str = None) -> str:
         if pconfig is not None:
             pconfig = eval(pconfig)
+            bad_keys = set(pconfig.keys()) - self._EVAL_KEYS
+            if len(bad_keys) > 0:
+                raise ConfigurationError(
+                    f'Unknown evaluation keys: {", ".join(bad_keys)}')
             if 'import' in pconfig:
                 imports = pconfig['import']
                 if logger.isEnabledFor(logging.DEBUG):
@@ -113,6 +118,10 @@ class Serializer(object):
                     if logger.isEnabledFor(logging.DEBUG):
                         logger.debug(f'importing: {i}')
                     exec(f'import {i}')
+            if 'resolve' in pconfig:
+                for k, v in pconfig['resolve'].items():
+                    v = self.parse_object(v)
+                    locals()[k] = v
         if evalstr is not None:
             return eval(evalstr)
 

@@ -238,6 +238,18 @@ school_clique: domain.Organization = factory('school_clique')
 Organization(boss=Person(age=16, aliases=['cool dude (0)', 'bad dude (1)']))
 ```
 
+Along with the `import` keyword, you can also use `resolve` in use the same
+configuration parsing functionality create and resolve instances, then use it
+in the evaluation.  For example:
+```ini
+dictionary_of_paths = eval(
+  {'resolve': {'ent_file': 'resource(example.package): resources/config.json'}}): {
+   'path': ent_file}
+```
+creates a dictionary with a `pathlib.Path` instance for key `path` set to the
+resources directory with a JSON file of installed package `example.package`.
+
+
 ### Resources
 
 Resources are paths that exist either in a local project, or point to a

@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- Feature to use configuration syntax resolution in evaluated configuration
+  entries.
+
+
 ## [1.7.3] - 2022-02-12
 ### Changed
 - Fixed delete and clear functionality in `ShelveStash`.
