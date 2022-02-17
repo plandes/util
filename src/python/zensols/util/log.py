@@ -123,12 +123,15 @@ class loglevel(object):
             logger.debug('test')
 
     """
-    def __init__(self, name: Union[List[str], str], level: int = logging.DEBUG,
-                 init: int = None):
-        """Initialize.
+    def __init__(self, name: Union[List[str], str, None] = '',
+                 level: int = logging.DEBUG, init: int = None):
+        """Configure the temporary logging setup.
 
         :param name: the name of the logger to set, or if a list is passed,
-                     configure all loggers in the list
+                     configure all loggers in the list; if a string, configure
+                     all logger names split on spaces; if ``None`` or
+                     ``False``, do not configure anything (handy for REPL
+                     prototyping); default to the root logger to log everything
 
         :param level: the logging level, which defaults to :obj:`logging.DEBUG`
 
@@ -137,8 +140,10 @@ class loglevel(object):
                      ``True`` to use :obj:`logging.WARNING`
 
         """
-        if isinstance(name, str):
-            name = [name]
+        if name is None or not name:
+            name = ()
+        elif isinstance(name, str):
+            name = name.split()
         self.loggers = tuple(map(logging.getLogger, name))
         self.initial_levels = tuple(map(lambda lg: lg.level, self.loggers))
         self.level = level
