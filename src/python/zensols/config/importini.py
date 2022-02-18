@@ -4,12 +4,10 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Iterable, Tuple, List, Dict, Any, Set, Sequence
-from dataclasses import dataclass, field
+from typing import Iterable, Tuple, List, Dict, Any, Set, Sequence, Union
 import logging
 from itertools import chain
 from collections import ChainMap
-from io import StringIO, TextIOBase
 from pathlib import Path
 from configparser import (
     ConfigParser, ExtendedInterpolation, InterpolationMissingOptionError
@@ -231,23 +229,24 @@ class ImportIniConfig(IniConfig):
         populate a load section paths.
 
         """
-        logger.debug('creating bootstrap parser')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('creating bootstrap parser')
         conf_sec = self.config_section
         bs_config = IniConfig(self.config_file)
         cparser = bs_config.parser
-        has_refs = bs_config.has_option(self.REFS_NAME, conf_sec)
         has_secs = bs_config.has_option(self.SECTIONS_SECTION, conf_sec)
+        has_refs = bs_config.has_option(self.REFS_NAME, conf_sec)
         # add sections and references to the temporary config
         if has_secs or has_refs:
             secs = set()
             # add load sections
             if has_secs:
-                sec_lst: List[str] = self.serializer.parse_object(
+                sec_lst: List[Union[str, Path]] = self.serializer.parse_object(
                     bs_config.get_option(self.SECTIONS_SECTION, conf_sec))
                 secs.update(set(sec_lst))
             # add references
             if has_refs:
-                refs: List[str] = self.serializer.parse_object(
+                refs: List[Union[str, Path]] = self.serializer.parse_object(
                     bs_config.get_option(self.REFS_NAME, conf_sec))
                 secs.update(set(refs))
             # add the import section itself, used later to load children config
@@ -386,15 +385,20 @@ class ImportIniConfig(IniConfig):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating children for: {conf_sec}')
         # first load files given in the import section
-        if bs_config.has_option(self.CONFIG_FILES, conf_sec):
-            fnames: List[str] = self.serializer.parse_object(
+        if bs_config.has_option(self.SINGLE_CONFIG_FILE, conf_sec):
+            fname: Union[Path, str] = self.serializer.parse_object(
+                bs_config.get_option(self.SINGLE_CONFIG_FILE, conf_sec))
+            params = {self.SINGLE_CONFIG_FILE: fname}
+            self._create_configs('<no section>', params, bs_config)
+        elif bs_config.has_option(self.CONFIG_FILES, conf_sec):
+            fnames: List[Union[Path, str]] = self.serializer.parse_object(
                 bs_config.get_option(self.CONFIG_FILES, conf_sec))
             for fname in fnames:
                 params = {self.SINGLE_CONFIG_FILE: fname}
                 self._create_configs('<no section>', params, bs_config)
         # load each import section, again in order
         if bs_config.has_option(self.SECTIONS_SECTION, conf_sec):
-            secs: List[str] = self.serializer.parse_object(
+            secs: List[Union[Path, str]] = self.serializer.parse_object(
                 bs_config.get_option(self.SECTIONS_SECTION, conf_sec))
             for sec in secs:
                 if logger.isEnabledFor(logging.DEBUG):
@@ -455,7 +459,8 @@ class ImportIniConfig(IniConfig):
             self._config_sections = csecs
 
     def _create_and_load_parser(self, parser: ConfigParser):
-        logger.debug('creating and loading parser')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('creating and loading parser')
         super()._create_and_load_parser(parser)
         self._load_imports(parser)
         if hasattr(self, '_config_sections'):

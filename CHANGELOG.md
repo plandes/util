@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Add option to `MultiProcessFactoryStash` to preemptively calculate data
   existence on a field parameter.
 
+### Changed
+- Ignore of single configuration file from `ImportIniConfig` bug fix.
+
 
 ## [1.7.3] - 2022-02-12
 ### Changed
