@@ -1,3 +1,4 @@
+from __future__ import annotations
 """Classes that create new instances of classes from application configuration
 objects and files.
 
@@ -12,6 +13,7 @@ import logging
 import inspect
 import re
 import copy as cp
+from pathlib import Path
 from time import time
 from zensols.util import APIError
 from zensols.introspect import (
@@ -23,15 +25,21 @@ from zensols.persist import persisted, PersistedWork, Deallocatable
 logger = logging.getLogger(__name__)
 
 
-class RedefinedInjectionError(APIError):
-    """Raised when any attempt to redefine or reuse injections for a class
-    """
-    pass
-
-
 class FactoryError(APIError):
     """Raised when an object can not be instantianted by a :class:`.ConfigFactory`.
 
+    """
+    def __init__(self, msg: str, factory: ConfigFactory = None):
+        if factory is not None:
+            config = factory.config
+            if config is not None and hasattr(config, 'config_file') and \
+               isinstance(config.config_file, (str, Path)):
+                msg += f', in file: {config.config_file}'
+        super().__init__(msg)
+
+
+class RedefinedInjectionError(FactoryError):
+    """Raised when any attempt to redefine or reuse injections for a class
     """
     pass
 
@@ -180,12 +188,12 @@ class ConfigFactory(object):
         try:
             params.update(self.config.populate({}, section=sec))
         except Exception as e:
-            logger.error(f'can not populate from section {sec}: {e}')
-            raise e
+            raise FactoryError(
+                f'Can not populate from section {sec}', self) from e
         class_name = params.get(self.CLASS_NAME)
         if class_name is None:
             if len(params) == 0:
-                raise FactoryError(f'no such entry: \'{name}\'')
+                raise FactoryError(f"No such entry: '{name}'", self)
             else:
                 class_name = 'zensols.config.Settings'
         else:
@@ -218,7 +226,7 @@ class ConfigFactory(object):
                 inst._notify_state(FactoryState.CREATED)
         except Exception as e:
             raise FactoryError(f'Can not create \'{cls_desc}\' for class ' +
-                               f'{cls}({args})({kwargs}): {e}') from e
+                               f'{cls}({args})({kwargs}): {e}', self) from e
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'inst: {inst.__class__}')
         return inst
@@ -480,10 +488,11 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 inst = self.instance(secs, **params)
             except Exception as e:
                 raise FactoryError(
-                    f"Could not create instance from section '{section}'") \
-                    from e
+                    f"Could not create instance from section '{section}'",
+                    self) from e
         else:
-            raise FactoryError(f'Unknown instance type {type(secs)}: {secs}')
+            raise FactoryError(
+                f'Unknown instance type {type(secs)}: {secs}', self)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating instance in section {section} ' +
                          f'with {params}, config: {config_params}')
@@ -500,7 +509,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             inst_conf = eval(pconfig)
             unknown = set(inst_conf.keys()) - defined_directives
             if len(unknown) > 0:
-                raise FactoryError(f'unknown directive(s): {unknown}')
+                raise FactoryError(f'Unknown directive(s): {unknown}', self)
             if 'param' in inst_conf:
                 cparams = inst_conf['param']
                 cparams = self.config.serializer.populate_state(cparams, {})
@@ -573,8 +582,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 pw_name = f'_{prop_name}_pw'
                 params['path'] = pw_name
                 if prop_name not in kwargs:
-                    raise FactoryError(f"no property '{prop_name}' found '" +
-                                       f"in section '{sec_name}'")
+                    raise FactoryError(f"No property '{prop_name}' found '" +
+                                       f"in section '{sec_name}'", self)
                 params['initial_value'] = kwargs[prop_name]
                 # don't delete the key here so that the type can be defined for
                 # dataclasses, effectively as documentation
@@ -599,7 +608,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             msg = ('attempt redefine or reuse injection for class ' +
                    f'{class_name} in section {sec_name} previously ' +
                    f'defined in section {prev_defined_sec}')
-            raise RedefinedInjectionError(msg)
+            raise RedefinedInjectionError(msg, self)
 
         if len(pw_injects) > 0 and class_name not in self._INJECTS:
             if logger.isEnabledFor(logging.DEBUG):
