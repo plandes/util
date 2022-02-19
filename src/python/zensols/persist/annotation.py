@@ -314,7 +314,10 @@ class PersistableContainer(Deallocatable):
     there isn't a persistence use case.
 
     If the class level attribute ``_PERSITABLE_TRANSIENT_ATTRIBUTES`` is set,
-    all attributes name given in this set will be set to ``None`` when pickled.
+    all attributes given in this set will be set to ``None`` when pickled.
+
+    If the class level attribute ``_PERSITABLE_REMOVE_ATTRIBUTES`` is set, all
+    attributes given in this set will be set object deleted when pickled.
 
     If the class level attribute ``_PERSITABLE_PROPERTIES`` is set, all
     properties given will be accessed for force creation before pickling.
@@ -328,6 +331,7 @@ class PersistableContainer(Deallocatable):
             logger.debug(f'get state for {self.__class__}')
         removes = set()
         tran_attribute_name = '_PERSITABLE_TRANSIENT_ATTRIBUTES'
+        remove_attribute_name = '_PERSITABLE_REMOVE_ATTRIBUTES'
         prop_attribute_name = '_PERSITABLE_PROPERTIES'
         meth_attribute_name = '_PERSITABLE_METHODS'
         if hasattr(self, prop_attribute_name):
@@ -356,6 +360,12 @@ class PersistableContainer(Deallocatable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'removed persistable attribute: {k}')
             state[k] = None
+        if hasattr(self, remove_attribute_name):
+            remove_attribs = getattr(self, remove_attribute_name)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'remove attributes: {tran_attribs}')
+            for k in remove_attribs:
+                del state[k]
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'state keys for {self.__class__}: ' +
                          f'{", ".join(state.keys())}')
