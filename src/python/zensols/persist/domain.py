@@ -564,3 +564,22 @@ class FactoryStash(PreemptiveStash):
                 self._debug('factory keys')
             ks = self.factory.keys()
         return ks
+
+
+@dataclass
+class CacheFactoryStash(FactoryStash):
+    """Like :class:`.FactoryStash` but suitable for :class:`.ReadOnlyStash` factory
+    instances that have a defined key set and only need a backing stash for
+    caching.
+
+    """
+    dump_factory_nones: bool = field(default=False)
+    """Whether to pass on ``None`` values to the delegate when the factory creates
+    them.
+
+    """
+    def keys(self) -> Iterable[str]:
+        return self.factory.keys()
+
+    def exists(self, name: str) -> bool:
+        return self.factory.exists(name)
