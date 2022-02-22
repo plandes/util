@@ -526,6 +526,11 @@ class FactoryStash(PreemptiveStash):
     enable_preemptive: bool = field(default=True)
     """If ``False``, do not invoke the super class's data calculation."""
 
+    dump_factory_nones: bool = field(default=True)
+    """Whether to pass on ``None`` values to the delegate when the factory creates
+    them.
+
+    """
     def _calculate_has_data(self) -> bool:
         if self.enable_preemptive:
             return super()._calculate_has_data()
@@ -540,12 +545,13 @@ class FactoryStash(PreemptiveStash):
             if logger.isEnabledFor(logging.DEBUG):
                 self._debug(f'resetting data and loading from factory: {name}')
             item = self.factory.load(name)
-            if logger.isEnabledFor(logging.DEBUG):
-                self._debug(f'dumping {name} -> {type(item)}')
-            super().dump(name, item)
-            self._reset_has_data()
-            if logger.isEnabledFor(logging.DEBUG):
-                self._debug(f'reset data: has_data={self.has_data}')
+            if self.dump_factory_nones:
+                if logger.isEnabledFor(logging.DEBUG):
+                    self._debug(f'dumping {name} -> {type(item)}')
+                super().dump(name, item)
+                self._reset_has_data()
+                if logger.isEnabledFor(logging.DEBUG):
+                    self._debug(f'reset data: has_data={self.has_data}')
         return item
 
     def keys(self) -> Iterable[str]:
