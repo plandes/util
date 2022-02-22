@@ -545,7 +545,7 @@ class FactoryStash(PreemptiveStash):
             if logger.isEnabledFor(logging.DEBUG):
                 self._debug(f'resetting data and loading from factory: {name}')
             item = self.factory.load(name)
-            if self.dump_factory_nones:
+            if item is not None or self.dump_factory_nones:
                 if logger.isEnabledFor(logging.DEBUG):
                     self._debug(f'dumping {name} -> {type(item)}')
                 super().dump(name, item)
