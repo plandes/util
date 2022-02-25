@@ -248,7 +248,10 @@ class IniConfig(Configurable, Primeable):
             # getting sections invokes parsing, which causes issues if used in
             # a debugging statement when we're not yet ready to parse
             return ''
-        return next(iter(self.parser.sections()))
+        secs = tuple(self.parser.sections())
+        if len(secs) > 0:
+            return secs[0]
+        return ''
 
     def _get_short_str(self) -> str:
         sec = self._get_section_short_str()
