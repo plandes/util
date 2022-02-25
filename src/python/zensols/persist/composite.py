@@ -90,7 +90,7 @@ class DirectoryCompositeStash(DirectoryStash):
         for group in groups:
             if not isinstance(group, set):
                 raise PersistableError(
-                    f'Composition not set: {group} ({type(group)})')
+                    f'Composition {group} is not type set: ({type(group)})')
             name = '-'.join(sorted(group))
             path = comp_path / name
             comp_stash = DirectoryStash(path)
