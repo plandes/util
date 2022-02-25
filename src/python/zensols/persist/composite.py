@@ -57,14 +57,13 @@ class DirectoryCompositeStash(DirectoryStash):
                      :obj:`COMPOSITE_DIRECTORY_NAME`
 
         :param groups: the groups of the ``dict`` composite attribute, which
-                        are sets of keys, each of which are persisted to their
-                        respective directory
+                       are sets of keys, each of which are persisted to their
+                       respective directory
 
         :param attribute_name: the name of the attribute in each item to split
                                across groups/directories; the instance data to
                                persist has the composite attribute of type
                                ``dict``
-
 
         :param load_keys: the keys used to load the data from the composite
                           stashs in to the attribute ``dict`` instance; only
