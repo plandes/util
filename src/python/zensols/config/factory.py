@@ -34,7 +34,10 @@ class FactoryError(APIError):
             config = factory.config
             if config is not None and hasattr(config, 'config_file') and \
                isinstance(config.config_file, (str, Path)):
-                msg += f', in file: {config.config_file}'
+                cf = config.config_file
+                if isinstance(cf, Path):
+                    cf = cf.absolute()
+                msg += f', in file: {cf}'
         super().__init__(msg)
 
 

@@ -214,9 +214,8 @@ class ImportIniConfig(IniConfig):
         self.children = children
         if exclude_config_sections and \
            (self.default_section == self.config_section):
-            raise ConfigurableError(
-                'You must set exclude_config_sections to False when the ' +
-                'import and config section are the same')
+            self._raise('You must set exclude_config_sections to False ' +
+                        'when the import and config section are the same')
 
     def _get_bootstrap_config(self) -> _BootstrapConfig:
         """Create the config that is used to read only the sections needed to
@@ -300,8 +299,7 @@ class ImportIniConfig(IniConfig):
             del params[self.SINGLE_CONFIG_FILE]
             config = cf.from_path(Path(config_file))
         else:
-            raise ConfigurableError(
-                f"No loader information for '{section}': {params}")
+            self._raise(f"No loader information for '{section}': {params}")
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'created config: {config}')
         return config
@@ -440,7 +438,7 @@ class ImportIniConfig(IniConfig):
                     opts = c.get_options(sec)
                 except InterpolationMissingOptionError as e:
                     msg = f'Could not populate {c}:[{sec}]: {e}'
-                    raise ConfigurableError(msg) from e
+                    self._raise(msg, e)
                 for k, v in opts.items():
                     key = f'{sec}:{k}'
                     has = parser.has_option(sec, k)

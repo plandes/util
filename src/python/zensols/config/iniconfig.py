@@ -128,12 +128,17 @@ class IniConfig(Configurable, Primeable):
     def reload(self):
         self._conf = None
 
-    def _raise(self, msg: str):
-        if isinstance(self.config_file, (str, Path)):
+    def _raise(self, msg: str, err: Exception = None):
+        if isinstance(self.config_file, str):
             msg = f'{msg} in file {self.config_file}'
+        elif isinstance(self.config_file, Path):
+            msg = f'{msg} in file {self.config_file.absolute()}'
         else:
             msg = f'{msg} in {self._get_container_desc()}'
-        raise ConfigurableError(msg)
+        if err is None:
+            raise ConfigurableError(msg)
+        else:
+            raise ConfigurableError(msg) from err
 
     def has_option(self, name: str, section: str = None) -> bool:
         section = self.default_section if section is None else section
