@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class MissingDataKeys(PersistableError):
     def __init__(self, keys: Set[str]):
-        super().__init__(f'missing data keys: {keys}')
+        super().__init__(f'Missing data keys: {keys}')
         self.keys = keys
 
 
