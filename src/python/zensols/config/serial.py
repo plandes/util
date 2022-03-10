@@ -117,7 +117,10 @@ class Serializer(object):
                 for i in imports:
                     if logger.isEnabledFor(logging.DEBUG):
                         logger.debug(f'importing: {i}')
-                    exec(f'import {i}')
+                    if i.startswith('from'):
+                        exec(i)
+                    else:
+                        exec(f'import {i}')
             if 'resolve' in pconfig:
                 for k, v in pconfig['resolve'].items():
                     v = self.parse_object(v)
