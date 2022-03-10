@@ -42,14 +42,12 @@ class CliHarness(object):
     containing the source files.
 
     """
-
     package_resource: Union[str, PackageResource] = field(default='app')
     """The application package resource.
 
     :see: :obj:`.ApplicationFactory.package_resource`
 
     """
-
     app_config_resource: Union[str, TextIOBase] = field(
         default='resources/app.conf')
     """The relative resource path to the application's context.  If set as an
@@ -69,7 +67,6 @@ class CliHarness(object):
     (i.e. :obj:`sys.argv`) arguments.
 
     """
-
     app_factory_class: Union[str, Type[ApplicationFactory]] = field(
         default=ApplicationFactory)
     """The application factory used to create thye application."""
@@ -81,7 +78,6 @@ class CliHarness(object):
     pip).
 
     """
-
     proto_args: Union[str, List[str]] = field(default_factory=list)
     """The command line arguments."""
 
@@ -94,7 +90,6 @@ class CliHarness(object):
     method.
 
     """
-
     log_format: str = field(default='%(asctime)-15s [%(name)s] %(message)s')
     """The log formatting used in :meth:`configure_logging`."""
 
@@ -102,7 +97,6 @@ class CliHarness(object):
     """If ``True`` do not exist the program when :class:`SystemExit` is raised.
 
     """
-
     def __post_init__(self):
         pass
 
@@ -469,7 +463,6 @@ class NotebookHarness(CliHarness):
     :meth:`__call__`.
 
     """
-
     def __post_init__(self):
         """
         :param factory_kwargs: the keyword arguments used to create the
