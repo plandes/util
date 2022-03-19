@@ -219,7 +219,7 @@ class dealloc_recursive(object):
 
 class dealloc(object):
     """Object used with a ``with`` scope for deallocating any subclass of
-    :class:`Deallocatable``.  The first argument can also be a function, which
+    :class:`.Deallocatable`.  The first argument can also be a function, which
     is useful when tracking deallocations when ``track`` is ``True``.
 
     Example::
