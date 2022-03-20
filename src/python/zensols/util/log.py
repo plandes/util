@@ -122,9 +122,13 @@ class loglevel(object):
         with loglevel(__name__):
             logger.debug('test')
 
+        with loglevel(['zensols.persist', 'zensols.config'], init=True):
+            logger.debug('test')
+
     """
     def __init__(self, name: Union[List[str], str, None] = '',
-                 level: int = logging.DEBUG, init: int = None):
+                 level: int = logging.DEBUG, init: Union[bool, int] = None,
+                 enable: bool = True):
         """Configure the temporary logging setup.
 
         :param name: the name of the logger to set, or if a list is passed,
@@ -139,15 +143,21 @@ class loglevel(object):
                      :func:`logging.basicConfig` using the given level or
                      ``True`` to use :obj:`logging.WARNING`
 
+        :param enable: if ``False``, disable any logging configuration changes
+                       for the block
+
         """
         if name is None or not name:
             name = ()
         elif isinstance(name, str):
             name = name.split()
-        self.loggers = tuple(map(logging.getLogger, name))
+        if enable:
+            self.loggers = tuple(map(logging.getLogger, name))
+        else:
+            self.loggers = ()
         self.initial_levels = tuple(map(lambda lg: lg.level, self.loggers))
         self.level = level
-        if init is not None:
+        if init is not None and enable:
             if init is True:
                 init = logging.WARNING
             logging.basicConfig(level=init)
