@@ -222,7 +222,7 @@ class ReadOnlyStash(Stash):
     def __post_init__(self):
         self.strict = False
 
-    def dump(self, name: str, inst):
+    def dump(self, name: str, inst: Any):
         if self.strict:
             raise PersistableError(
                 'Dump not implemented for read only stashes')

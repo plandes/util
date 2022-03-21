@@ -175,7 +175,7 @@ class CacheStash(DelegateStash):
             item = default
         return item
 
-    def delete(self, name=None):
+    def delete(self, name: str = None):
         if self.cache_stash.exists(name):
             self.cache_stash.delete(name)
         if not isinstance(self.delegate, ReadOnlyStash):
