@@ -85,13 +85,11 @@ class OptionMetaData(PersistableContainer, Dictable, _MetavarFormatter):
     directories.
 
     """
-
     choices: Tuple[str] = field(default=None)
     """The constant list of choices when :obj:`dtype` is :class:`list`.  Note that
     this class is a tuple so instances are hashable in :class:`.ActionCli`.
 
     """
-
     default: str = field(default=None)
     """The default value of the option."""
 
