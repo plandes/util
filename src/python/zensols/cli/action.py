@@ -63,13 +63,11 @@ class ActionCli(PersistableContainer, Dictable):
     """The target class meta data parsed by :class:`.ClassInspector`
 
     """
-
     options: Dict[str, OptionMetaData] = field(default=None)
     """Options added by :class:`.ActionCliManager`, which are those options parsed
     by the entire class metadata.
 
     """
-
     mnemonic_includes: Set[str] = field(default=None)
     """A list of mnemonicss to include, or all if ``None``."""
 
@@ -81,7 +79,6 @@ class ActionCli(PersistableContainer, Dictable):
     of the action.
 
     """
-
     option_includes: Set[str] = field(default=None)
     """A list of options to include, or all if ``None``."""
 
@@ -96,13 +93,11 @@ class ActionCli(PersistableContainer, Dictable):
     :see: :meth:`.ActionCliManager._create_op_meta_data`
 
     """
-
     first_pass: bool = field(default=False)
     """Whether or not this is a first pass action (i.e. such as setting the level
     in :class:`~zensols.cli.LogConfigurator`).
 
     """
-
     always_invoke: bool = field(default=False)
     """If ``True``, always invoke all methods for the action regardless if an
     action mnemonic and options pertaining to the action are not given by the
@@ -211,11 +206,11 @@ class ActionCli(PersistableContainer, Dictable):
                         name = o_name
                     if option_includes is not None:
                         meth_params: Set[OptionMetaData] = set(
-                            filter(lambda o: o.long_name in option_includes,
+                            filter(lambda o: o.dest in option_includes,
                                    meth_params))
                     if option_excludes is not None:
                         meth_params: Set[OptionMetaData] = set(
-                            filter(lambda o: o.long_name not in option_excludes,
+                            filter(lambda o: o.dest not in option_excludes,
                                    meth_params))
                 else:
                     raise ActionCliManagerError(
