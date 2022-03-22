@@ -191,6 +191,11 @@ class ReadOnlyStash(Stash):
     :meth:`keys`.  However, it is recommended to implement :meth:`exists` to
     speed things up.
 
+    Setting attribute ``strict`` to ``True`` will raise a
+    :class:`.PersistableError` for any modification attempts.  Otherwise,
+    setting it to ``False`` (the default) silently ignores and does nothing on
+    :meth:`.dump`, :meth:`delete` and :meth:`clear`.
+
     Example::
 
         class RangeStash(ReadOnlyStash):
@@ -368,6 +373,25 @@ class DelegateStash(CloseableStash, metaclass=ABCMeta):
         self._debug_meth('close')
         if self.delegate is not None:
             return self.delegate.close()
+
+
+@dataclass
+class ReadOnlyDelegateStash(DelegateStash, ReadOnlyStash):
+    """Makes any stash read only.
+
+    """
+    def __post_init__(self):
+        super().__post_init__()
+        ReadOnlyStash.__post_init__(self)
+
+    def dump(self, name: str, inst: Any):
+        ReadOnlyStash.dump(self, name, inst)
+
+    def delete(self, name: str = None):
+        ReadOnlyStash.delete(self, name)
+
+    def clear(self):
+        ReadOnlyStash.clear(self)
 
 
 @dataclass
