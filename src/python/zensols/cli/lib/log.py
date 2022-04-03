@@ -45,7 +45,6 @@ class LogConfigurator(object):
     exposes the parts of this class necessary for the CLI.
 
     """
-
     log_name: str = field(default=None)
     """The log name space."""
 
@@ -60,7 +59,6 @@ class LogConfigurator(object):
     command line.
 
     """
-
     config_file: Path = field(default=None)
     """If provided, configure the log system with this configuration file."""
 
@@ -141,6 +139,17 @@ class LogConfigurator(object):
                 modified_logger = logging.getLogger(name)
                 modified_logger.setLevel(level)
         return modified_logger
+
+    @classmethod
+    def set_format(cls, format: str):
+        """Set the format of the logger after previously set using this class.
+
+        """
+        root = logging.getLogger()
+        hdlr: logging.StreamHandler = root.handlers[0]
+        assert type(hdlr) == logging.StreamHandler
+        fmt = logging.Formatter(format)
+        hdlr.setFormatter(fmt)
 
     def __call__(self):
         return self.config()
