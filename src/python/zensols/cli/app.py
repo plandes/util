@@ -68,12 +68,10 @@ class Action(Deallocatable, Dictable):
     method on a class to invoke.
 
     """
-
     method_meta: ClassMethod = field()
     """The metadata of the method to use for the invocation of the action.
 
     """
-
     @property
     @persisted('_name')
     def name(self) -> str:
@@ -163,7 +161,6 @@ class ApplicationResult(Dictable):
     that same order provided to the :class:`.ActionCliManager`.
 
     """
-
     @property
     @persisted('_by_name')
     def by_name(self) -> Dict[str, ActionResult]:
@@ -216,7 +213,6 @@ class Invokable(object):
     :class:`.Application` to invoke the entire CLI application.
 
     """
-
     action: Action = field()
     """The action used to create this instance."""
 
@@ -431,7 +427,6 @@ class ApplicationFactory(PersistableContainer):
     is converted to a package if given as a string during post initialization.
 
     """
-
     app_config_resource: Union[str, TextIOBase] = field(
         default='resources/app.conf')
     """The relative resource path to the application's context if :class:`str`.  If
@@ -439,7 +434,6 @@ class ApplicationFactory(PersistableContainer):
     object.
 
     """
-
     children_configs: Tuple[Configurable] = field(default=None)
     """Any children configurations added to the root level configuration."""
 
@@ -449,7 +443,6 @@ class ApplicationFactory(PersistableContainer):
     :see: :meth:`_create_config_factory`
 
     """
-
     reload_pattern: Union[re.Pattern, str] = field(default=None)
     """If set, reload classes that have a fully qualified name that match the
     regular expression regarless of the setting ``reload`` in
@@ -461,7 +454,6 @@ class ApplicationFactory(PersistableContainer):
     .. automethod:: _handle_error
 
     """
-
     def __post_init__(self):
         if self.package_resource is None:
             raise ActionCliError('Missing package resource')
