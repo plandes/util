@@ -3,7 +3,7 @@ from __future__ import annotations
 
 """
 
-from typing import Dict, Tuple, Iterable, Set, List, Any
+from typing import Dict, Tuple, Iterable, Set, List, Any, Type
 from dataclasses import dataclass, field
 import dataclasses
 import logging
@@ -249,11 +249,12 @@ class ActionCli(PersistableContainer, Dictable):
 
 @dataclass
 class ActionCliManager(PersistableContainer, Dictable):
-    """An :class:`.ActionCli` is created from the configuration given by the
-    section.  Optionally, another section using :obj:`decorator_section_format`
-    will be read to add additional metadata and configuration to instantiated
-    object.  The decorated information is used to help bridge between the class
-    given to be instantiated and the CLI.
+    """Manages instances of :class:`.ActionCli`.  An :class:`.ActionCli` is created
+    from the configuration given by the section.  Optionally, another section
+    using :obj:`decorator_section_format` will be read to add additional
+    metadata and configuration to instantiated object.  The decorated
+    information is used to help bridge between the class given to be
+    instantiated and the CLI.
 
     :see: :obj:`actions`
 
@@ -268,17 +269,24 @@ class ActionCliManager(PersistableContainer, Dictable):
     (otherwise missing section configuration :class:`.ActionCli`.
 
     """
+    _CLI_META_ATTRIBUTE_NAMES = frozenset(
+        ('mnemonic_includes mnemonic_excludes mnemonic_overrides ' +
+         'option_includes option_excludes option_overrides').split())
+    """A list of keys used in the static class metadata variable named
+    :obj:`CLASS_META_ATTRIBUTE`, which is used to merge static class CLI
+    metadata.
 
+    :see: :meth:`combine_meta`
+
+    """
     _CLASS_IMPORTERS = {}
     """Resolved class cache (see :meth:`_resolve_class`).
 
     """
-
     config_factory: ConfigFactory = field()
     """The configuration factory used to create :class:`.ActionCli` instances.
 
     """
-
     apps: Tuple[str] = field()
     """The application section names."""
 
@@ -293,6 +301,32 @@ class ActionCliManager(PersistableContainer, Dictable):
 
     default_action: str = field(default=None)
     """The default mnemonic use when the user does not supply one."""
+
+    @classmethod
+    def combine_meta(self: Type, parent: Type, cli_meta: Dict[str, Any]):
+        """Merge static class CLI metadata of the variable named
+        :obj:`CLASS_META_ATTRIBUTE`.
+
+        :param self: this class
+
+        :param parent: the parent class of the caller, which is used to get the
+                       parent classes CLI metadata to merge
+
+        :param cli_meta: the metadata identified by the
+                         :obj:`CLASS_META_ATTRIBUTE`
+
+        """
+        classes: List[Type] = [parent]
+        classes.extend(parent.__bases__)
+        for ans in classes:
+            if hasattr(ans, self.CLASS_META_ATTRIBUTE):
+                meta = getattr(ans, self.CLASS_META_ATTRIBUTE)
+                for attr in self._CLI_META_ATTRIBUTE_NAMES & meta.keys():
+                    ans_val = meta.get(attr)
+                    this_val = cli_meta.get(attr)
+                    if ans_val is not None and this_val is not None:
+                        cli_meta[attr] = ans_val | this_val
+        return cli_meta
 
     @property
     def config(self) -> Configurable:
