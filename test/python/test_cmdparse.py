@@ -65,10 +65,10 @@ Usage: python -m unittest [options]:
 A test action.
 
 Options:
-  -h, --help             show this help message and exit
-  --version              show the program version and exit
-  -c, --config FILE      the path to the config file
-  -d, --dry_run          don't do anything; just act like it
+  -h, --help           show this help message and exit
+  --version            show the program version and exit
+  -c, --config FILE    the path to the config file
+  -d, --dry_run        don't do anything; just act like it
 """
         clc = CommandLineConfig(actions=(self.test_action, self.config_action))
         parser = CommandLineParser(clc, application_doc='A test action.')
@@ -89,15 +89,15 @@ Options:
 Usage: python -m unittest <test|prconfig> [options]:
 
 Options:
-  -h, --help             show this help message and exit
-  --version              show the program version and exit
-  -c, --config FILE      the path to the config file
+  -h, --help           show this help message and exit
+  --version            show the program version and exit
+  -c, --config FILE    the path to the config file
 
 Actions:
-test                     a test action
-  -d, --dry_run          don't do anything; just act like it
+test                   a test action
+  -d, --dry_run        don't do anything; just act like it
 
-prconfig <file>          a second test action
+prconfig <file>        a second test action
   file FILE
 """
         parser = CommandLineParser(CommandLineConfig(
