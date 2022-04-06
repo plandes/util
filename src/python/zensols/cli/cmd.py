@@ -17,7 +17,7 @@ from zensols.persist import persisted, PersistableContainer, Deallocatable
 from zensols.config import Dictable
 from . import (
     ApplicationError, OptionMetaData, PositionalMetaData, ActionMetaData,
-    UsageActionOptionParser,
+    UsageConfig, UsageActionOptionParser,
 )
 
 logger = logging.getLogger(__name__)
@@ -181,7 +181,6 @@ class CommandLineParser(Deallocatable, Dictable):
     ``--version`` switch.
 
     """
-
     default_action: str = field(default=None)
     """The default mnemonic use when the user does not supply one."""
 
@@ -189,6 +188,8 @@ class CommandLineParser(Deallocatable, Dictable):
     """The program documentation to use when it can not be deduced from the action.
 
     """
+    usage_config: UsageConfig = field(default_factory=UsageConfig)
+    """Configuraiton information for the command line help."""
 
     def __post_init__(self):
         if len(self.config.actions) == 0:
@@ -201,6 +202,7 @@ class CommandLineParser(Deallocatable, Dictable):
             options=self.config.first_pass_options,
             doc=self.application_doc,
             default_action=self.default_action,
+            usage_config=self.usage_config,
             version=('%prog ' + str(self.version)))
 
     def _configure_parser(self, parser: OptionParser,

@@ -580,7 +580,8 @@ class ApplicationFactory(PersistableContainer):
         config = CommandLineConfig(actions)
         parser = CommandLineParser(config, self.package_resource.version,
                                    default_action=cli_mng.default_action,
-                                   application_doc=self._get_app_doc(cli_mng))
+                                   application_doc=self._get_app_doc(cli_mng),
+                                   usage_config=cli_mng.usage_config)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'created factory: {fac}')
         return fac, cli_mng, parser

@@ -16,7 +16,8 @@ from zensols.introspect import (
 )
 from zensols.config import Configurable, Dictable, ConfigFactory
 from . import (
-    DocUtil, ActionCliError, PositionalMetaData, OptionMetaData, ActionMetaData
+    DocUtil, ActionCliError, PositionalMetaData,
+    OptionMetaData, ActionMetaData, UsageConfig,
 )
 
 logger = logging.getLogger(__name__)
@@ -301,6 +302,9 @@ class ActionCliManager(PersistableContainer, Dictable):
 
     default_action: str = field(default=None)
     """The default mnemonic use when the user does not supply one."""
+
+    usage_config: UsageConfig = field(default_factory=UsageConfig)
+    """Configuraiton information for the command line help."""
 
     @classmethod
     def combine_meta(self: Type, parent: Type, cli_meta: Dict[str, Any]):

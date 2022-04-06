@@ -13,11 +13,52 @@ from itertools import chain
 from pathlib import Path
 from io import TextIOBase
 from optparse import OptionParser
-from zensols.config import Writable
+from zensols.config import Writable, Dictable
 from zensols.persist import persisted
 from . import OptionMetaData, ActionMetaData, PositionalMetaData
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class UsageConfig(Dictable):
+    """Configuraiton information for the command line help.
+
+    """
+    width: int = field(default=None)
+    """The max width to print help."""
+
+    max_first_col: Union[float, int] = field(default=0.4)
+    """Maximum width of the first column.  If this is a float, then it is computed
+    as a percentage of the terminal width.
+
+    """
+    max_metavar_len: Union[float, int] = field(default=0.2)
+    """Max length of the option type."""
+
+    left_indent: int = field(default=2)
+    """The number of left spaces for the option and positional arguments."""
+
+    inter_col_space: int = field(default=2)
+    """The number of spaces between all three columns."""
+
+    sort_actions: bool = field(default=False)
+    """If ``True`` sort mnemonic output."""
+
+    def __post_init__(self):
+        if self.width is None:
+            try:
+                self.width = os.get_terminal_size()[0]
+            except OSError:
+                self.width = 0
+        if self.width == 0:
+            self.width = 80
+        if self.max_first_col is None:
+            self.max_first_col = 0.4
+        if isinstance(self.max_first_col, float):
+            self.max_first_col = int(self.width * self.max_first_col)
+        if isinstance(self.max_metavar_len, float):
+            self.max_metavar_len = int(self.width * self.max_metavar_len)
 
 
 class UsageActionOptionParser(OptionParser):
@@ -32,8 +73,8 @@ class UsageActionOptionParser(OptionParser):
 
     """
     def __init__(self, actions: Tuple[ActionMetaData],
-                 options: Tuple[OptionMetaData], doc: str = None,
-                 default_action: str = None, *args, **kwargs):
+                 options: Tuple[OptionMetaData], usage_config: UsageConfig,
+                 doc: str = None, default_action: str = None, *args, **kwargs):
         super().__init__(*args, add_help_option=False, **kwargs)
         help_op = OptionMetaData(
             'help', 'h', dtype=bool, doc='show this help message and exit')
@@ -42,7 +83,7 @@ class UsageActionOptionParser(OptionParser):
             doc='show the program version and exit')
         options = [help_op, version_op] + list(options)
         self._usage_writer = _UsageWriter(
-            self, actions, options, doc, default_action)
+            self, actions, options, doc, usage_config, default_action)
         self.add_option(help_op.create_option())
 
     def print_help(self, file: TextIOBase = sys.stdout,
@@ -76,20 +117,32 @@ class _OptionFormatter(_Formatter):
     """
     usage_formatter: _UsageWriter
     opt: OptionMetaData
+    usage_config: UsageConfig
 
     def __post_init__(self):
-        self.WRITABLE_MAX_COL = self.usage_formatter.WRITABLE_MAX_COL
+        self.WRITABLE_MAX_COL = self.usage_config.width
         opt = self.opt
-        left_indent = ' ' * self.usage_formatter.writer.left_indent
-        sep = '' if opt.short_name is None else ', '
-        long_opt = opt.long_option
-        short_opt = '' if opt.short_option is None else opt.short_option
-        metavar = '' if opt.metavar is None else f' {opt.metavar}'
-        self.opt_str = f'{left_indent}{short_opt}{sep}{long_opt}{metavar}'
-
-    @property
-    def doc(self) -> str:
-        return '' if self.opt.doc is None else self.opt.doc
+        self.doc = '' if self.opt.doc is None else self.opt.doc
+        left_indent: str = ' ' * self.usage_config.left_indent
+        max_olen: int = self.usage_config.max_metavar_len
+        sep: str = '' if opt.short_name is None else ', '
+        long_opt: str = opt.long_option
+        short_opt: str = '' if opt.short_option is None else opt.short_option
+        metavar: str = '' if opt.metavar is None else opt.metavar
+        self._opt_str = f'{left_indent}{short_opt}{sep}{long_opt}'
+        if len(metavar) > max_olen:
+            if metavar.find('|') > -1:
+                metavar = metavar[1:-1]
+                if len(self.doc) > 0:
+                    self.doc += ', '
+                self.doc += f"X is one of: {', '.join(metavar.split('|'))}"
+                self._opt_str += ' X'
+            else:
+                if len(self.doc) > 0:
+                    self.doc += ', of '
+                self.doc += f'type {metavar}'
+        else:
+            self._opt_str += f' {metavar}'
 
     @property
     def default(self) -> str:
@@ -99,11 +152,11 @@ class _OptionFormatter(_Formatter):
             return ''
 
     def add_first_col_width(self, widths: List[int]):
-        widths.append(len(self.opt_str))
+        widths.append(len(self._opt_str))
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         self._write_three_col(
-            self.opt_str, self.default, self.doc, depth, writer)
+            self._opt_str, self.default, self.doc, depth, writer)
 
 
 @dataclass
@@ -112,7 +165,7 @@ class _PositionalFormatter(_Formatter):
     pos: PositionalMetaData
 
     def __post_init__(self):
-        spl = self.usage_formatter.writer.left_indent
+        spl = self.usage_formatter.writer.usage_config.left_indent
         sp = self._get_str_space(spl)
         mv = ''
         if self.pos.metavar is not None:
@@ -134,12 +187,13 @@ class _ActionFormatter(_Formatter):
     """
     usage_formatter: _UsageFormatter
     action: ActionMetaData
+    usage_config: UsageConfig = field()
     action_name: str = field(default=None)
     opts: Tuple[_OptionFormatter] = field(default=None)
     pos: Tuple[_PositionalFormatter] = field(default=None)
 
     def __post_init__(self):
-        self.WRITABLE_MAX_COL = self.usage_formatter.WRITABLE_MAX_COL
+        self.WRITABLE_MAX_COL = self.usage_config.width
         action = self.action
         if len(action.positional) == 0:
             args = ''
@@ -150,7 +204,8 @@ class _ActionFormatter(_Formatter):
         if self.usage_formatter.default_action == self.action_name:
             self.action_name = f'{self.action_name} (default)'
         self.opts = tuple(map(
-            lambda of: _OptionFormatter(self.usage_formatter, of),
+            lambda of: _OptionFormatter(
+                self.usage_formatter, of, self.usage_config),
             action.options))
         self.pos = tuple(map(
             lambda pos: _PositionalFormatter(self.usage_formatter, pos),
@@ -179,17 +234,20 @@ class _UsageFormatter(_Formatter):
     """
     writer: _UsageWriter
     actions: Tuple[ActionMetaData]
+    usage_config: UsageConfig
     global_options: Tuple[OptionMetaData]
     glob_option_formatters: List[_OptionFormatter] = field(default=None)
     action_formatters: List[_ActionFormatter] = field(default=None)
     pos_formatters: List[_PositionalFormatter] = field(default=None)
 
     def __post_init__(self):
-        self.WRITABLE_MAX_COL = self.writer.WRITABLE_MAX_COL
+        self.WRITABLE_MAX_COL = self.usage_config.width
         self.glob_option_formatters = list(
-            map(lambda o: _OptionFormatter(self, o), self.global_options))
+            map(lambda o: _OptionFormatter(self, o, self.usage_config),
+                self.global_options))
         self.action_formatters = list(
-            map(lambda a: _ActionFormatter(self, a), self.actions))
+            map(lambda a: _ActionFormatter(self, a, self.usage_config),
+                self.actions))
         self.pos_formatters = []
         if self.is_singleton_action:
             for af in self.action_formatters:
@@ -207,7 +265,7 @@ class _UsageFormatter(_Formatter):
 
     @property
     def max_first_col(self) -> int:
-        return self.writer.max_first_col
+        return self.writer.usage_config.max_first_col
 
     def _get_opt_formatters(self) -> Iterable[_OptionFormatter]:
         return chain.from_iterable(
@@ -225,19 +283,21 @@ class _UsageFormatter(_Formatter):
             go.add_first_col_width(widths)
         for po in self.pos_formatters:
             po.add_first_col_width(widths)
-        return max(widths) + self.writer.inter_col_space
+        return max(widths) + self.usage_config.inter_col_space
 
     @property
     @persisted('_three_col_width_pw')
     def three_col_width(self) -> int:
         return max(len(a.default) for a in self._get_opt_formatters()) + \
-            self.writer.inter_col_space
+            self.usage_config.inter_col_space
 
-    @property
-    def option_usage_names(self) -> str:
+    def get_option_usage_names(self, expand: bool = True) -> str:
         action_names = tuple(map(lambda a: a.name, self.actions))
         if len(action_names) > 1:
-            names = '|'.join(action_names)
+            if expand:
+                names = '|'.join(action_names)
+            else:
+                names = 'actions'
             if self.default_action is None:
                 opts = f"<{names}> "
             else:
@@ -306,57 +366,35 @@ class _UsageWriter(Writable):
     doc: str = field()
     """The application document string."""
 
+    usage_config: UsageConfig = field(default_factory=UsageConfig)
+    """Configuraiton information for the command line help."""
+
     default_action: str = field(default=None)
     """The default mnemonic use when the user does not supply one."""
-
-    sort_actions: bool = field(default=False)
-    """If ``True`` sort mnemonic output."""
-
-    width: int = field(default=None)
-    """The max width to print help."""
-
-    max_first_col: Union[float, int] = field(default=0.4)
-    """Maximum width of the first column.  If this is a float, then it is computed
-    as a percentage of the terminal width.
-
-    """
-
-    left_indent: int = field(default=2)
-    """The number of left spaces for the option and positional arguments."""
-
-    inter_col_space: int = field(default=3)
-    """The number of spaces between all three columns."""
 
     usage_formatter: _UsageFormatter = field(default=None)
     """The usage formatter used to generate the documentation."""
 
     def __post_init__(self):
-        if self.width is None:
-            try:
-                self.width = os.get_terminal_size()[0]
-            except OSError:
-                self.width = 0
-        if self.width == 0:
-            self.width = 80
-        self.WRITABLE_MAX_COL = self.width
-        if self.max_first_col is None:
-            self.max_first_col = 0.4
-        if isinstance(self.max_first_col, float):
-            self.max_first_col = int(self.width * self.max_first_col)
-        if self.sort_actions:
+        self.WRITABLE_MAX_COL = self.usage_config.width
+        if self.usage_config.sort_actions:
             actions = sorted(self.actions, key=lambda a: a.name)
         else:
             actions = self.actions
         self.usage_formatter = _UsageFormatter(
-            self, actions, self.global_options)
+            self, actions, self.usage_config, self.global_options)
 
     def get_prog_usage(self) -> str:
         prog = '<python>'
         if len(sys.argv) > 0:
             prog_path: Path = Path(sys.argv[0])
             prog = prog_path.name
-        opts = self.usage_formatter.option_usage_names
-        return f'{prog} {opts}[options]:'
+        opts = self.usage_formatter.get_option_usage_names()
+        usage = f'{prog} {opts}[options]:'
+        if len(usage) > (self.usage_config.width - 7):
+            opts = self.usage_formatter.get_option_usage_names(expand=False)
+            usage = f'{prog} {opts}[options]:'
+        return usage
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
               include_singleton_positional: bool = True,
