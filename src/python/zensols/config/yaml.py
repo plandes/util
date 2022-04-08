@@ -50,24 +50,25 @@ class YamlConfig(Configurable, Dictable):
 
     @classmethod
     def _is_primitive(cls, obj) -> bool:
-        return isinstance(obj, (float, int, bool, str, list, tuple))
+        return isinstance(obj, (float, int, bool, str, set, list, tuple, Path))
+
+    def _flatten(self, context: Dict[str, Any], path: str,
+                 n: Dict[str, Any], sep: str = '.'):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('path: {}, n: <{}>'.format(path, n))
+            logger.debug('context: <{}>'.format(context))
+        if n is None:
+            context[path] = None
+        elif self._is_primitive(n):
+            context[path] = n
+        elif isinstance(n, dict):
+            for k, v in n.items():
+                k = path + sep + k if len(path) else k
+                self._flatten(context, k, v, sep)
+        else:
+            raise ConfigurableError(f'Unknown yaml type {type(n)}: {n}')
 
     def _parse(self) -> Tuple[str, Dict[str, str], Dict[str, str]]:
-        def flatten(path, n):
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug('path: {}, n: <{}>'.format(path, n))
-                logger.debug('context: <{}>'.format(context))
-            if n is None:
-                context[path] = None
-            elif self._is_primitive(n):
-                context[path] = n
-            elif isinstance(n, dict):
-                for k, v in n.items():
-                    k = path + '.' + k if len(path) else k
-                    flatten(k, v)
-            else:
-                raise ConfigurableError(f'Unknown yaml type {type(n)}: {n}')
-
         cfile = self.config_file
         if not cfile.is_file():
             raise ConfigurableFileNotFoundError(cfile)
@@ -79,8 +80,8 @@ class YamlConfig(Configurable, Dictable):
         struct = yaml.load(content, yaml.FullLoader)
         context = {}
         context.update(self.default_vars)
-        flatten('', struct)
-        self._all_keys = copy.copy(list(context.keys()))
+        self._flatten(context, '', struct)
+        self._all_keys = set(context.keys())
         return content, struct, context
 
     def _make_class(self) -> type:
@@ -202,7 +203,7 @@ class """ + class_name + """(Template):
 
     def get_options(self, name: str = None) -> Dict[str, Any]:
         name = self.default_section if name is None else name
-        if self.default_vars and name in self.default_vars:
+        if self.default_vars is not None and name in self.default_vars:
             return self.default_vars[name]
         else:
             node = self.get_tree(name)
