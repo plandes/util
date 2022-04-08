@@ -27,6 +27,7 @@ from .dictconfig import *
 from .json import *
 from .configfac import *
 from .importini import *
+from .importyaml import *
 from .envconfig import *
 from .keychain import *
 from .meta import *
