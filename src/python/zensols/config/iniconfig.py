@@ -40,7 +40,6 @@ class IniConfig(Configurable, Primeable):
                        configuration file is missing
 
         """
-
         super().__init__(default_section)
         if isinstance(config_file, str):
             self.config_file = Path(config_file).expanduser()
