@@ -18,13 +18,12 @@ class Keychain(object):
     """A wrapper to macOS's Keychain service using binary ``/usr/bin/security``.
     This provides a cleartext password for the given service and account.
 
-    :param account: the account, which is usually an email address
-
-    :param service: the service (grouping in Keychain.app)
-
     """
-    account: str
+    account: str = field()
+    """The account, which is usually an email address."""
+
     service: str = field(default='python-passwords')
+    """the service (grouping in Keychain.app)"""
 
     @staticmethod
     def getpassword(account: str, service: str) -> str:
