@@ -49,7 +49,8 @@ class Configurable(Writable, metaclass=ABCMeta):
         """Initialize.
 
         :param default_section: used as the default section when non given on
-                                the get methds such as :meth:`get_option`
+                                the get methds such as :meth:`get_option`;
+                                which defaults to ``defualt``
 
         """
         if default_section is None:

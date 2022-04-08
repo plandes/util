@@ -151,7 +151,7 @@ class _BootstrapConfig(IniConfig):
 
 class ImportIniConfig(IniConfig):
     """A configuration that uses other :class:`.Configurable` classes to load other
-    sections.  A special ``config`` section is given that indicates what other
+    sections.  A special ``import`` section is given that indicates what other
     sections to load as children configuration.  Each of those indicated to
     import are processed in order by:
 
@@ -163,6 +163,25 @@ class ImportIniConfig(IniConfig):
       3. Variable interpolation as a function of
          :class:`~configparser.ConfigParser` using
          :class:`~configparser.ExtendedInterpolation`.
+
+    The ``import`` section has a ``sections`` entry as list of sections to
+    load, a ``references`` entry indicating which sections to provide as
+    children sections in child loaders, a ``config_file`` and ``config_files`
+    entries to load as children directly.
+
+    For example::
+
+        [import]
+        references = list: default, package, env
+        sections = list: imp_obj
+
+        [imp_obj]
+        type = importini
+        config_file = resource: resources/obj.conf
+
+    This configuration loads a resource import INI, which is an implementation
+    of this class, and provides sections ``default``, ``package`` and ``env``
+    for any property string interpolation while loading ``obj.conf``.
 
     See the `API documentation
     <https://plandes.github.io/util/doc/config.html#import-ini-configuration>`_

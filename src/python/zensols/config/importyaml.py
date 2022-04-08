@@ -1,5 +1,4 @@
-"""Like :class:`.YamlConfig` but supports configuration importation like
-:class:`.ImportIniConfig`.
+"""YAML configuration importation like :class:`.ImportIniConfig`.
 
 """
 __author__ = 'Paul Landes'
@@ -19,9 +18,35 @@ class _Template(Template):
 
 
 class ImportYamlConfig(YamlConfig):
+    """Like :class:`.YamlConfig` but supports configuration importation like
+    :class:`.ImportIniConfig`.  The list imports is given at :obj:`import_name`
+    (see initializer), and contains the same information as import sections
+    documented in :class:`.ImportIniConfig`.
+
+    """
     def __init__(self, config_file: Union[Path, TextIOBase] = None,
                  default_section: str = None, sections_name: str = 'sections',
-                 import_name: str = 'import', sections: Set[str] = None):
+                 sections: Set[str] = None, import_name: str = 'import'):
+        """Initialize with importation configuration.
+
+        :param config_file: the configuration file path to read from; if the
+                            type is an instance of :class:`io.TextIOBase`, then
+                            read it as a file object
+
+        :param default_section: used as the default section when non given on
+                                the get methds such as :meth:`get_option`;
+                                which defaults to ``defualt``
+
+        :param sections_name: the dot notated path to the variable that has a
+                              list of sections
+
+        :param sections: used as the set of sections for this instance
+
+        :param import_name: the dot notated path to the variable that has the
+                            import entries (see class docs); defaults to
+                            ``import``
+
+        """
         super().__init__(config_file, default_section, default_vars=None,
                          delimiter=None, sections_name=sections_name,
                          sections=sections)

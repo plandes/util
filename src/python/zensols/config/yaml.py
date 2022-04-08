@@ -37,7 +37,20 @@ class YamlConfig(Configurable, Dictable):
                             type is an instance of :class:`io.TextIOBase`, then
                             read it as a file object
 
-        :param default_section: default section (defaults to `default`)
+        :param default_section: used as the default section when non given on
+                                the get methds such as :meth:`get_option`;
+                                which defaults to ``defualt``
+
+        :param default_vars: **depreciated**; artifact from the old
+                             configuration defaults based INI config
+
+        :param delimiter: the delimiter used for template replacement with dot
+                          syntax
+
+        :param sections_name: the dot notated path to the variable that has a
+                              list of sections
+
+        :param sections: used as the set of sections for this instance
 
         """
         super().__init__(default_section)
