@@ -23,12 +23,17 @@ class PythonObjectEncoder(JSONEncoder):
     def default(self, obj: Any):
         if isinstance(obj, set):
             return {'_type': obj.__class__.__name__, '_data': tuple(obj)}
+        elif isinstance(obj, Path):
+            return {'_type': 'pathlib.Path', '_data': str(obj)}
         return JSONEncoder.default(self, obj)
 
 
 def as_python_object(dct: Dict[str, str]):
     if set(dct.keys()) == OBJECT_KEYS:
-        cls = eval(dct['_type'])
+        if dct['_type'] == 'pathlib.Path':
+            cls = Path
+        else:
+            cls = eval(dct['_type'])
         return cls(dct['_data'])
     return dct
 
