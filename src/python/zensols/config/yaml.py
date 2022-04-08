@@ -29,7 +29,8 @@ class YamlConfig(Configurable, Dictable):
 
     def __init__(self, config_file: Union[str, Path, TextIOBase] = None,
                  default_section: str = None, default_vars: str = None,
-                 delimiter: str = '$', sections_name: str = 'sections'):
+                 delimiter: str = '$', sections_name: str = 'sections',
+                 sections: Set[str] = None):
         """Initialize this instance.
 
         :param config_file: the configuration file path to read from; if the
@@ -47,6 +48,8 @@ class YamlConfig(Configurable, Dictable):
         self.default_vars = default_vars if default_vars else {}
         self.delimiter = delimiter
         self.sections_name = sections_name
+        if sections is not None:
+            self.sections = sections
 
     @classmethod
     def _is_primitive(cls, obj) -> bool:
@@ -230,8 +233,14 @@ class """ + class_name + """(Template):
         :obj:`root`.
 
         """
-        sec_key = f'{self.root}.{self.sections_name}'
-        if self.has_option(sec_key):
-            return frozenset(self.get_option_list(sec_key))
-        else:
-            return frozenset()
+        if not hasattr(self, '_sections'):
+            sec_key = f'{self.root}.{self.sections_name}'
+            if self.has_option(sec_key):
+                self._sections = frozenset(self.get_option_list(sec_key))
+            else:
+                self._sections = frozenset()
+        return self._sections
+
+    @sections.setter
+    def sections(self, sections: Set[str]):
+        self._sections = sections
