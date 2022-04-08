@@ -261,7 +261,13 @@ class Configurable(Writable, metaclass=ABCMeta):
         """
         for sec in sorted(self.sections):
             self._write_line(sec, depth, writer)
-            for k, v in self.get_options(sec).items():
+            opts: Dict[str, str] = self.get_options(sec)
+            if opts is None:
+                raise ConfigurationError(f'No such section: {sec}')
+            if not isinstance(opts, dict):
+                raise ConfigurationError(
+                    f'Expecting dict but got {type(opts)} in section {sec}')
+            for k, v in opts.items():
                 self._write_line(f'{k}: {v}', depth + 1, writer)
 
     def _get_calling_module(self, depth: int = 0):
