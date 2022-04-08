@@ -64,7 +64,7 @@ class KeychainConfig(DictionaryConfig):
     """
     def __init__(self, account: str, user: str = None,
                  service: str = 'python-passwords',
-                 default_section: str = None):
+                 default_section: str = 'keychain'):
         """Initialize.
 
         :param account: the account (usually an email address) used to fetch in

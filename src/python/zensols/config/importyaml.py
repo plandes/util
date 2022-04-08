@@ -77,11 +77,15 @@ class ImportYamlConfig(YamlConfig):
 
         if import_def is not None:
             for sec_name, params in import_def.items():
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'import sec: {sec_name}')
                 config = ConfigurableFactory.from_section(params, sec_name)
                 for sec in config.sections:
                     cnf[sec] = config.get_options(section=sec)
 
         self._config.update(cnf)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'updated config: {self._config}')
         self._flatten(context, '', self._config, ':')
         new_keys = set(map(lambda k: k.replace(':', '.'), context.keys()))
         self._all_keys.update(new_keys)
