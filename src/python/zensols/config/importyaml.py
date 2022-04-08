@@ -39,11 +39,11 @@ class ImportYamlConfig(YamlConfig):
                     repl[k] = rc
             par.update(repl)
 
-        sec_key = f'{self.root}.{self.import_name}'
-        import_def = self.get_options(sec_key)
-        cnf = {}
-        ctx = {}
-        context = {}
+        import_def: Dict[str, Any] = self.get_options(
+            f'{self.root}.{self.import_name}')
+        cnf: Dict[str, Any] = {}
+        context: Dict[str, str] = {}
+
         if import_def is not None:
             for sec_name, params in import_def.items():
                 config = ConfigurableFactory.from_section(params, sec_name)
@@ -52,7 +52,8 @@ class ImportYamlConfig(YamlConfig):
 
         self._config.update(cnf)
         self._flatten(context, '', self._config, ':')
-        self._all_keys.update(ctx.keys())
+        new_keys = set(map(lambda k: k.replace(':', '.'), context.keys()))
+        self._all_keys.update(new_keys)
         repl_node(self._config)
 
     def _compile(self) -> Dict[str, Any]:
