@@ -50,14 +50,13 @@ class YamlConfig(Configurable, Dictable):
 
     @classmethod
     def _is_primitive(cls, obj) -> bool:
-        return isinstance(obj, str) or \
-           isinstance(obj, list) or \
-           isinstance(obj, bool)
+        return isinstance(obj, (float, int, bool, str, list, tuple))
 
     def _parse(self) -> Tuple[str, Dict[str, str], Dict[str, str]]:
         def flatten(path, n):
-            logger.debug('path: {}, n: <{}>'.format(path, n))
-            logger.debug('context: <{}>'.format(context))
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug('path: {}, n: <{}>'.format(path, n))
+                logger.debug('context: <{}>'.format(context))
             if n is None:
                 context[path] = None
             elif self._is_primitive(n):
@@ -106,15 +105,16 @@ class """ + class_name + """(Template):
         cls = eval(class_name)
         return cls
 
-    def _compile(self) -> Dict[str, str]:
+    def _compile(self) -> Dict[str, Any]:
         content, struct, context = self._parse()
         prev = None
-        cls = self._make_class()
-        while prev != content:
-            prev = content
-            # TODO: raise here for missing keys embedded in the file rather
-            # than KeyError
-            content = cls(content).substitute(context)
+        if self.delimiter is not None:
+            cls = self._make_class()
+            while prev != content:
+                prev = content
+                # TODO: raise here for missing keys embedded in the file rather
+                # than KeyError
+                content = cls(content).substitute(context)
         return yaml.load(content, yaml.FullLoader)
 
     @property
@@ -127,12 +127,19 @@ class """ + class_name + """(Template):
                        class_name_param: str = None) -> Dict[str, Any]:
         return self.config
 
-    def get_tree(self, name) -> Dict[str, Any]:
+    def get_tree(self, name: str) -> Dict[str, Any]:
+        """Get the YAML tree for a node in the configuration.
+
+        :param name: the doted notation indicating which node in the tree to
+                     retrieve
+
+        """
         def find(n, path, name):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'search: n={n}, path={path}, name={name}')
             if path == name:
-                logger.debug(f'found: <{n}>')
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'found: <{n}>')
                 return n
             elif isinstance(n, dict):
                 for k, v in n.items():
@@ -142,7 +149,8 @@ class """ + class_name + """(Template):
                         if logger.isEnabledFor(logging.DEBUG):
                             logger.debug(f'found {name} -> {v}')
                         return v
-                logger.debug('not found: {}'.format(name))
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug('not found: {}'.format(name))
         return find(self.config, '', name)
 
     def _get_option(self, name: str) -> str:
@@ -152,7 +160,7 @@ class """ + class_name + """(Template):
         elif self.default_vars is not None and name in self.default_vars:
             return self.default_vars[name]
         else:
-            raise ConfigurableError('No such option: {}'.format(name))
+            raise ConfigurableError(f'No such option: {name} ({type(node)})')
 
     def set_option(self, name: str, value: str, section: str = None):
         """This is a no-op for now as client's don't expect an exception."""
@@ -180,8 +188,10 @@ class """ + class_name + """(Template):
     def get_option(self, name: str, section: str = None) -> str:
         """Return an option using a dot encoded path.
 
+        :param section: ignored
+
         """
-        if self.default_vars and name in self.default_vars:
+        if self.default_vars is not None and name in self.default_vars:
             return self.default_vars[name]
         else:
             ops = self.options
@@ -190,7 +200,7 @@ class """ + class_name + """(Template):
             else:
                 raise ConfigurableError(f'No such option: {name}')
 
-    def get_options(self, name: str = None) -> Dict[str, str]:
+    def get_options(self, name: str = None) -> Dict[str, Any]:
         name = self.default_section if name is None else name
         if self.default_vars and name in self.default_vars:
             return self.default_vars[name]
@@ -221,6 +231,6 @@ class """ + class_name + """(Template):
         """
         sec_key = f'{self.root}.{self.sections_name}'
         if self.has_option(sec_key):
-            return tuple(self.get_option_list(sec_key))
+            return frozenset(self.get_option_list(sec_key))
         else:
-            return ()
+            return frozenset()
