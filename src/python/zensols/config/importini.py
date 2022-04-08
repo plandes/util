@@ -171,11 +171,11 @@ class ImportIniConfig(IniConfig):
     """
     IMPORT_SECTION = 'import'
     SECTIONS_SECTION = 'sections'
-    SINGLE_CONFIG_FILE = 'config_file'
+    SINGLE_CONFIG_FILE = ConfigurableFactory.SINGLE_CONFIG_FILE
     CONFIG_FILES = 'config_files'
     REFS_NAME = 'references'
     CLEANUPS_NAME = 'cleanups'
-    TYPE_NAME = 'type'
+    TYPE_NAME = ConfigurableFactory.TYPE_NAME
     _IMPORT_SECTION_FIELDS = {SECTIONS_SECTION, SINGLE_CONFIG_FILE,
                               CONFIG_FILES, REFS_NAME, CLEANUPS_NAME}
 
@@ -283,26 +283,7 @@ class ImportIniConfig(IniConfig):
     def _create_config(self, section: str,
                        params: Dict[str, Any]) -> Configurable:
         """Create a config from a section."""
-        params = dict(params)
-        cf = ConfigurableFactory(params)
-        class_name = params.get('class_name')
-        tpe = params.get(self.TYPE_NAME)
-        config_file = params.get(self.SINGLE_CONFIG_FILE)
-        config: Configurable
-        if class_name is not None:
-            del params['class_name']
-            config = cf.from_class_name(class_name)
-        elif tpe is not None:
-            del params[self.TYPE_NAME]
-            config = cf.from_type(tpe)
-        elif config_file is not None:
-            del params[self.SINGLE_CONFIG_FILE]
-            config = cf.from_path(Path(config_file))
-        else:
-            self._raise(f"No loader information for '{section}': {params}")
-        if logger.isEnabledFor(logging.INFO):
-            logger.info(f'created config: {config}')
-        return config
+        return ConfigurableFactory.from_section(params, section)
 
     def _create_configs(self, section: str, params: Dict[str, Any],
                         bs_config: _BootstrapConfig) -> List[Configurable]:

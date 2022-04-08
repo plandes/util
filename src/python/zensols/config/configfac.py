@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Any
+from typing import Dict, Any, Type
 from dataclasses import dataclass, field
 import sys
 import logging
@@ -37,6 +37,11 @@ class ConfigurableFactory(object):
     """The configuration factory extension to clas name.
 
     """
+    TYPE_NAME = 'type'
+    """The section entry for the configurable type (eg ``ini`` vs ``yaml``)."""
+
+    SINGLE_CONFIG_FILE = 'config_file'
+    """The section entry for the configuration file."""
 
     FILE_EXT_REGEX = re.compile(r'.+\.([a-zA-Z]+?)$')
     """A regular expression to parse out the extension from a file name."""
@@ -77,6 +82,8 @@ class ConfigurableFactory(object):
         mod_name: str = self._mod_name()
         if config_type == 'importini':
             config_type = 'ImportIni'
+        elif config_type == 'importyaml':
+            config_type = 'ImportYaml'
         else:
             config_type = config_type.capitalize()
         class_name = f'{mod_name}.{config_type}Config'
@@ -115,3 +122,27 @@ class ConfigurableFactory(object):
             finally:
                 self.kwargs = old_kwargs
         return inst
+
+    @classmethod
+    def from_section(cls: Type, kwargs: Dict[str, Any], section: str) -> \
+            Configurable:
+        params = dict(kwargs)
+        class_name = params.get('class_name')
+        self = cls(params)
+        tpe = params.get(self.TYPE_NAME)
+        config_file = params.get(self.SINGLE_CONFIG_FILE)
+        config: Configurable
+        if class_name is not None:
+            del params['class_name']
+            config = self.from_class_name(class_name)
+        elif tpe is not None:
+            del params[self.TYPE_NAME]
+            config = self.from_type(tpe)
+        elif config_file is not None:
+            del params[self.SINGLE_CONFIG_FILE]
+            config = self.from_path(Path(config_file))
+        else:
+            self._raise(f"No loader information for '{section}': {params}")
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'created config: {config}')
+        return config
