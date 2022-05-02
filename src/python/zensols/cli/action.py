@@ -322,6 +322,7 @@ class ActionCliManager(PersistableContainer, Dictable):
         """
         classes: List[Type] = [parent]
         classes.extend(parent.__bases__)
+        cli_meta = cp.deepcopy(cli_meta)
         for ans in classes:
             if hasattr(ans, self.CLASS_META_ATTRIBUTE):
                 meta = getattr(ans, self.CLASS_META_ATTRIBUTE)
@@ -330,6 +331,8 @@ class ActionCliManager(PersistableContainer, Dictable):
                     this_val = cli_meta.get(attr)
                     if ans_val is not None and this_val is not None:
                         cli_meta[attr] = ans_val | this_val
+                    elif ans_val is not None:
+                        cli_meta[attr] = cp.deepcopy(ans_val)
         return cli_meta
 
     @property
