@@ -1,18 +1,17 @@
+from __future__ import annotations
 """Implementation of a dictionary backing configuration.
 
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Set
-from dataclasses import dataclass
+from typing import Dict, Set, Type, Any
 import logging
-from . import ConfigurableError, Configurable
+from . import ConfigurableError, Configurable, Dictable
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class DictionaryConfig(Configurable):
+class DictionaryConfig(Configurable, Dictable):
     """This is a simple implementation of a dictionary backing configuration.  The
     provided configuration is just a two level dictionary.  The top level keys
     are the section and the values are a single depth dictionary with string
@@ -41,6 +40,21 @@ class DictionaryConfig(Configurable):
             self._dict_config = {}
         else:
             self._dict_config = config
+
+    @classmethod
+    def from_config(cls: Type, other: Configurable) -> DictionaryConfig:
+        """Create an instance from another configurable."""
+        def_sec = None
+        if hasattr(other, 'default_section'):
+            def_sec = other.default_section
+        secs = {}
+        for sec in other.sections:
+            secs[sec] = other.get_options(sec)
+        return cls(secs, default_section=def_sec)
+
+    @property
+    def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
+        return self._get_config()
 
     def _get_config(self) -> Dict[str, Dict[str, str]]:
         """Return the two level dict structure used for this configuration.

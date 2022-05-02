@@ -24,6 +24,7 @@ from .writeback import *
 from .yaml import *
 from .iniconfig import *
 from .dictconfig import *
+from .diff import *
 from .json import *
 from .configfac import *
 from .importini import *
