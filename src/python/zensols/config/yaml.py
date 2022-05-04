@@ -7,7 +7,6 @@ from typing import Dict, Tuple, Set, Any, Union
 import logging
 from pathlib import Path
 from io import TextIOBase
-import copy
 import yaml
 from zensols.config import (
     ConfigurableError, ConfigurableFileNotFoundError, Configurable, Dictable
