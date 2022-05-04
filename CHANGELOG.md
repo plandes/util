@@ -8,14 +8,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.8.0] - 2022-05-04
 ### Added
 - Feature to use configuration syntax resolution in evaluated configuration
   entries.
 - Add option to `MultiProcessFactoryStash` to preemptively calculate data
   existence on a field parameter.
+- Add `CacheFactoryStash` for read only stashes with a fixed key set that need
+  a backing store.
+- Command line application `CLI_META` combination useful for inheritance.
+- Add log format setter to `LogConfigurator`.
+- A YAML configuration importation class (`ImportYamlConfig`) like
+  `ImportIniConfig`.
 
 ### Changed
 - Ignore of single configuration file from `ImportIniConfig` bug fix.
+- More robust error messages for `ImportIniConfig` reads.
+- Better configuration `eval:` import support.
 
 
 ## [1.7.3] - 2022-02-12
@@ -340,7 +349,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.7.3...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/plandes/util/compare/v1.7.3...v1.8.0
 [1.7.3]: https://github.com/plandes/util/compare/v1.7.2...v1.7.3
 [1.7.2]: https://github.com/plandes/util/compare/v1.7.1...v1.7.2
 [1.7.1]: https://github.com/plandes/util/compare/v1.7.0...v1.7.1
