@@ -5,16 +5,20 @@ from enum import Enum, auto
 import logging
 from io import StringIO
 from zensols.util import Executor
-from zensols.cli import ApplicationFactory, CliHarness
+from zensols.cli import CliHarness, ProgramNameConfigurator
 
 logger = logging.getLogger(__name__)
-
 
 CONFIG = """
 # configure the command line
 [cli]
-class_name = zensols.cli.ActionCliManager
-apps = list: app
+apps = list: log_cli, app
+
+[log_cli]
+class_name = zensols.cli.LogConfigurator
+format = ${program:name}: %%(message)s
+log_name = ${program:name}
+level = debug
 
 # create an instance of an executor that uses this module's logger (above)
 [executor]
@@ -71,29 +75,20 @@ class Application(object):
         print(text)
 
 
-class FsInfoApplicationFactory(ApplicationFactory):
-    """The application factory creates instances of :class:`.Application` (defined
-    above).  It also provides the package for which it belongs and the
-    configuration (given above).
-
-    """
-    def __init__(self, *args, **kwargs):
-        kwargs.update(dict(package_resource='fsinfo',
-                           app_config_resource=StringIO(CONFIG)))
-        super().__init__(*args, **kwargs)
-
-
-# the name check for main isn't needed when the application class is defined in
-# a separate file/module than the entry point
-if __name__ == '__main__':
+if (__name__ == '__main__'):
     # create the CLI harness, which simplifies the process of executing the
     # application
-    harness = CliHarness(app_factory_class=FsInfoApplicationFactory)
-    # configure logging for this module to be at level info for the executor
-    harness.configure_logging(loggers={'fsinfo': 'info'},
-                              format='%%(message)s')
-    # run the application based on the command line argument
-    res = harness.run().result
-    # the result is what's returned from the method invoked mapped by the
-    # action given on the command line
-    logger.debug(f'exit: {res}')
+    CliHarness(
+        # either a pathlib.Path to where the config is, or for this example,
+        # the configuration itself.
+        app_config_resource=StringIO(CONFIG),
+        # create a Configurable configuration instance and pass as a two level
+        # dictionary with the program name
+        app_config_context=ProgramNameConfigurator(
+            None, default='fsinfo').create_section(),
+        # arguments passed when run from the Python REPL
+        proto_args='ls -f long',
+        # factory keyword arguments when running in the Python REPL, so we
+        # don't have to restart after each change
+        proto_factory_kwargs={'reload_pattern': '^fsinfo'},
+    ).run()
