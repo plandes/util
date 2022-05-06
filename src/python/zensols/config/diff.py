@@ -47,7 +47,6 @@ class ConfigurableDiffer(DictionaryConfig):
             if m is None:
                 raise ValueError(f'Unknown diff format: {sec_prop}')
             sec, prop = m.groups()
-            #cstr = f"{vals['old_value']} -> {vals['new_value']}"
             cstr = self._change_format.format(
                 vals['old_value'], vals['new_value'])
             changes[sec][prop] = cstr
