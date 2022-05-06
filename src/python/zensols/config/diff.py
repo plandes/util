@@ -32,7 +32,7 @@ class ConfigurableDiffer(DictionaryConfig):
         try:
             from deepdiff import DeepDiff
         except ModuleNotFoundError as e:
-            m = 'DeepDiff module is not installed, use: pip install deepdiff'
+            m = "DeepDiff module is not installed, use: 'pip install deepdiff'"
             raise APIError(m) from e
         da = DictionaryConfig.from_config(self._config_a)
         db = DictionaryConfig.from_config(self._config_b)
