@@ -37,6 +37,9 @@ class ConfigurableDiffer(DictionaryConfig):
         da = DictionaryConfig.from_config(self._config_a)
         db = DictionaryConfig.from_config(self._config_b)
         dd = DeepDiff(da.asdict(), db.asdict())
+        if 'values_changed' not in dd:
+            keys = ', '.join(dd.keys())
+            raise APIError(f'No values changed, found keys: {keys}')
         vc = dd['values_changed']
         changes = collections.defaultdict(dict)
         for sec_prop, vals in vc.items():
