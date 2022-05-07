@@ -100,6 +100,9 @@ class ImportYamlConfig(YamlConfig):
                 elif isinstance(c, str):
                     repl[k] = self.serializer.parse_object(c)
             par.update(repl)
+            for k, v in par.items():
+                if isinstance(v, list):
+                    par[k] = tuple(v)
 
         root: Dict[str, Any] = super()._compile()
         self._config = root
