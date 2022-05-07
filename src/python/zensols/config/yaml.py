@@ -150,7 +150,7 @@ class """ + class_name + """(Template):
                      retrieve
 
         """
-        def find(n, path, name):
+        def find(n: Union[Dict, Any], path: str, name: str):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'search: n={n}, path={path}, name={name}')
             if path == name:
