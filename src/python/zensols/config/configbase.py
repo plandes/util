@@ -229,7 +229,10 @@ class Configurable(Writable, metaclass=ABCMeta):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'copying section {sec}')
             try:
-                for k, v in self.get_options(sec).items():
+                opts: Dict[str, Any] = self.get_options(sec)
+                if opts is None:
+                    raise ConfigurableError(f"No such section: '{sec}'")
+                for k, v in opts.items():
                     to_populate.set_option(k, v, sec)
             # robust is needed by lib.ConfigurationImporter._load(); but deal
             # only with interpolation errors
