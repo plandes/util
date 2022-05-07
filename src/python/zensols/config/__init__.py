@@ -19,7 +19,7 @@ from .dictable import *
 from .serial import *
 from .configbase import *
 from .strconfig import *
-from .factory import *
+from .facbase import *
 from .importfac import *
 from .writeback import *
 from .yaml import *
