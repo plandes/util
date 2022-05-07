@@ -3,10 +3,11 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, Dict, Optional, Union, Any
+from typing import Tuple, Dict, Optional, Union, Any, Type
 import logging
 import types
 import re
+import dacite
 from zensols.introspect import ClassResolver
 from zensols.persist import persisted, PersistedWork, Deallocatable
 from . import FactoryError, ImportClassResolver, ConfigFactory
@@ -34,14 +35,16 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
     children recursively.
 
     """
-
     _OBJECT_REGEXP = re.compile(r'^object(?:\((.+)\))?:\s*(.+)$',
                                 re.DOTALL)
     """The ``object`` regular expression used to instantiate non-shared singleton
     instances tied to the outside instance..
 
     """
-
+    _DATACLASS_REGEXP = re.compile(r'^dataclass(?:\((.+)\))?:\s*(.+)$',
+                                   re.DOTALL)
+    """
+    """
     _INJECTS = {}
     """Track injections to fail on any attempts to redefine."""
 
@@ -235,9 +238,15 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
 
     def _object_instance(self, pconfig: str, class_name: str):
         params, inst_conf = self._parse_child_params(pconfig)
-        cls = self._find_class(class_name)
+        cls: Type = self._find_class(class_name)
         desc = f'object instance {class_name}'
         return super()._instance(desc, cls, **params)
+
+    def _dataclass_instance(self, pconfig: str, class_name: str):
+        params, inst_conf = self._parse_child_params(pconfig)
+        print('PARRAM', pconfig, params, inst_conf, class_name)
+        cls: Type = self._find_class(class_name)
+        return dacite.from_dict(data_clas=cls, data=params)
 
     def from_config_string(self, v: str) -> Any:
         """Create an instance from a string that looks like :obj:`_INSTANCE_REGEXP` or
@@ -251,7 +260,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         else:
             m = self._OBJECT_REGEXP.match(v)
             if m is not None:
-                v = self._object_instance(pconfig, section)
+                pconfig, class_name = m.groups()
+                v = self._object_instance(pconfig, class_name)
         return v
 
     def _class_name_params(self, name):
@@ -261,15 +271,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         try:
             for k, v in params.items():
                 if isinstance(v, str):
-                    m = self._INSTANCE_REGEXP.match(v)
-                    if m is not None:
-                        pconfig, section = m.groups()
-                        insts[k] = self._populate_instances(pconfig, section)
-                    else:
-                        m = self._OBJECT_REGEXP.match(v)
-                        if m:
-                            pconfig, section = m.groups()
-                            insts[k] = self._object_instance(pconfig, section)
+                    insts[k] = self.from_config_string(v)
         finally:
             self._set_reload(initial_reload)
         params.update(insts)
