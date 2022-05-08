@@ -7,7 +7,6 @@ from typing import Dict, Any, Type
 from dataclasses import dataclass, field
 import sys
 import logging
-import re
 from pathlib import Path
 from zensols.introspect import ClassImporter
 from . import Configurable, IniConfig
@@ -27,6 +26,11 @@ class ConfigurableFactory(object):
     An example of this is the :class:`.ConfigurationImporter` loading user
     specific configuration.
 
+    If the class uses type type ``import``, the type is prepended with
+    ``import`` and then mapped using :obj:`EXTENSION_TO_TYPE`.  This allows
+    mixing of different files in one ``config_files`` entry and avoids multiple
+    import sections.
+
     :see: `.ImportIniConfig`
 
     """
@@ -43,8 +47,8 @@ class ConfigurableFactory(object):
     SINGLE_CONFIG_FILE = 'config_file'
     """The section entry for the configuration file."""
 
-    FILE_EXT_REGEX = re.compile(r'.+\.([a-zA-Z]+?)$')
-    """A regular expression to parse out the extension from a file name."""
+    CLASS_NAME = 'class_name'
+    """The section entry for the class to use."""
 
     kwargs: Dict[str, Any] = field(default_factory=dict)
     """The keyword arguments given to the factory on creation."""
@@ -93,11 +97,8 @@ class ConfigurableFactory(object):
         """Map a path to a ``config type``.  See :meth:`from_type`.
 
         """
-        m = self.FILE_EXT_REGEX.match(path.name)
-        if m is not None:
-            ext = m.group(1)
-        else:
-            ext = None
+        ext = path.suffix
+        ext = None if len(ext) == 0 else ext[1:]
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"using extension to map: '{ext}'")
         class_type = self.EXTENSION_TO_TYPE.get(ext)
@@ -116,7 +117,7 @@ class ConfigurableFactory(object):
             class_type = self._path_to_type(path)
             old_kwargs = self.kwargs
             self.kwargs = dict(self.kwargs)
-            self.kwargs['config_file'] = path
+            self.kwargs[self.SINGLE_CONFIG_FILE] = path
             try:
                 inst = self.from_type(class_type)
             finally:
@@ -127,16 +128,21 @@ class ConfigurableFactory(object):
     def from_section(cls: Type, kwargs: Dict[str, Any], section: str) -> \
             Configurable:
         params = dict(kwargs)
-        class_name = params.get('class_name')
+        class_name = params.get(cls.CLASS_NAME)
         self = cls(params)
         tpe = params.get(self.TYPE_NAME)
         config_file = params.get(self.SINGLE_CONFIG_FILE)
         config: Configurable
         if class_name is not None:
-            del params['class_name']
+            del params[self.CLASS_NAME]
             config = self.from_class_name(class_name)
         elif tpe is not None:
             del params[self.TYPE_NAME]
+            if tpe == 'import' and config_file is not None:
+                ext = Path(config_file).suffix[1:]
+                etype = self.EXTENSION_TO_TYPE.get(ext)
+                if etype is not None:
+                    tpe = f'import{etype}'
             config = self.from_type(tpe)
         elif config_file is not None:
             del params[self.SINGLE_CONFIG_FILE]
