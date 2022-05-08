@@ -250,7 +250,10 @@ class """ + class_name + """(Template):
         if not hasattr(self, '_sections'):
             sec_key = f'{self.root}.{self.sections_name}'
             if self.has_option(sec_key):
-                self._sections = frozenset(self.get_option_list(sec_key))
+                secs = self.get_tree(sec_key)
+                if isinstance(secs, str):
+                    secs = self.get_option_list(sec_key)
+                self._sections = frozenset(secs)
             else:
                 self._sections = frozenset([self.root])
         return self._sections
