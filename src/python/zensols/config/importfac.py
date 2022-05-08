@@ -245,12 +245,35 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         desc = f'object instance {class_name}'
         return super()._instance(desc, cls, **params)
 
+    def _dataclass_from_dict(self, cls: Type, data: Any):
+        if isinstance(data, str):
+            data = self.from_config_string(data)
+        if dataclasses.is_dataclass(cls) and isinstance(data, dict):
+            fieldtypes = {f.name: f.type for f in dataclasses.fields(cls)}
+            param = {f: self._dataclass_from_dict(fieldtypes[f], data[f])
+                     for f in data}
+            data = cls(**param)
+        elif isinstance(data, (tuple, list)):
+            origin: Type = typing.get_origin(cls)
+            cls = typing.get_args(cls)
+            if isinstance(cls, (tuple, list, set)) and len(cls) == 1:
+                cls = next(iter(cls))
+            data: Iterable[Any] = map(
+                lambda x: self._dataclass_from_dict(cls, x), data)
+            data = origin(data)
+        return data
+
     def _dataclass_instance(self, class_name: str, section: str):
-        #params, inst_conf = self._parse_child_params(pconfig)
+        from_dict = self._dataclass_from_dict
         cls: Type = self._find_class(class_name)
         params = self._EMPTY_CHILD_PARAMS
         inst: Settings = self._create_instance(section, params, params)
-        return self.config.serializer.dataclass_from_dict(cls, inst.asdict())
+        if isinstance(inst, (tuple, list)):
+            elems = map(lambda x: from_dict(cls, x.asdict()), inst)
+            inst = inst.__class__(elems)
+        else:
+            inst = from_dict(cls, inst.asdict())
+        return inst
 
     def from_config_string(self, v: str) -> Any:
         """Create an instance from a string that looks like :obj:`_INSTANCE_REGEXP` or
