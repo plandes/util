@@ -250,7 +250,7 @@ class """ + class_name + """(Template):
             if self.has_option(sec_key):
                 self._sections = frozenset(self.get_option_list(sec_key))
             else:
-                self._sections = frozenset()
+                self._sections = frozenset([self.root])
         return self._sections
 
     @sections.setter
