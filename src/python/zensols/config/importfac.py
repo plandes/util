@@ -250,8 +250,11 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             data = self.from_config_string(data)
         if dataclasses.is_dataclass(cls) and isinstance(data, dict):
             fieldtypes = {f.name: f.type for f in dataclasses.fields(cls)}
-            param = {f: self._dataclass_from_dict(fieldtypes[f], data[f])
-                     for f in data}
+            try:
+                param = {f: self._dataclass_from_dict(fieldtypes[f], data[f])
+                         for f in data}
+            except KeyError as e:
+                raise FactoryError(f"No datacalass field {e} in '{cls}, data: {data}'")
             data = cls(**param)
         elif isinstance(data, (tuple, list)):
             origin: Type = typing.get_origin(cls)
