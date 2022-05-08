@@ -30,7 +30,9 @@ class YamlConfig(Configurable, Dictable):
                  default_section: str = None, default_vars: str = None,
                  delimiter: str = '$', sections_name: str = 'sections',
                  sections: Set[str] = None):
-        """Initialize this instance.
+        """Initialize this instance.  When sections are not set, and the sections are
+        not given in configuration file at location :obj:`sections_name` the
+        root is made a singleton section.
 
         :param config_file: the configuration file path to read from; if the
                             type is an instance of :class:`io.TextIOBase`, then
