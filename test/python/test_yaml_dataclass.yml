@@ -1,0 +1,8 @@
+import unittest
+from zensols.config import YamlConfig
+
+
+class TestYaml(unittest.TestCase):
+    def test_yaml(self):
+        defaults = {'HOME': 'homedir'}
+        conf = YamlConfig('test-resources/config-test.yml',

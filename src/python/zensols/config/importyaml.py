@@ -59,6 +59,8 @@ class ImportYamlConfig(YamlConfig):
             for k, c in par.items():
                 if isinstance(c, dict):
                     repl_node(c)
+                elif isinstance(c, list):
+                    repl[k] = tuple(c)
                 elif isinstance(c, str):
                     template = _Template(c)
                     rc = template.safe_substitute(context)
@@ -100,9 +102,6 @@ class ImportYamlConfig(YamlConfig):
                 elif isinstance(c, str):
                     repl[k] = self.serializer.parse_object(c)
             par.update(repl)
-            for k, v in par.items():
-                if isinstance(v, list):
-                    par[k] = tuple(v)
 
         root: Dict[str, Any] = super()._compile()
         self._config = root

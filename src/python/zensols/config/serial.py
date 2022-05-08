@@ -3,7 +3,9 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Union, Any, Set, Tuple, List, Iterable
+import typing
+from typing import Dict, Union, Any, Set, Tuple, List, Iterable, Type
+import dataclasses
 from dataclasses import dataclass, field
 import logging
 import json
@@ -249,6 +251,22 @@ class Serializer(object):
 
     def _json_load(self, json_str: str) -> Any:
         return json.loads(json_str, object_hook=as_python_object)
+
+    @classmethod
+    def dataclass_from_dict(self, cls: Type, data: Any):
+        if dataclasses.is_dataclass(cls):
+            fieldtypes = {f.name: f.type for f in dataclasses.fields(cls)}
+            data = cls(**{f: self.dataclass_from_dict(fieldtypes[f], data[f])
+                          for f in data})
+        elif isinstance(data, (tuple, list)):
+            origin: Type = typing.get_origin(cls)
+            cls = typing.get_args(cls)
+            if isinstance(cls, (tuple, list, set)) and len(cls) == 1:
+                cls = next(iter(cls))
+            data: Iterable[Any] = map(
+                lambda x: self.dataclass_from_dict(cls, x), data)
+            data = origin(data)
+        return data
 
     def format_option(self, obj: Any) -> str:
         """Format a Python object in to the string represetation per object syntax

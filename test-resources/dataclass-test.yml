@@ -1,0 +1,16 @@
+croot:
+  sections: croot.instances
+  instances:
+    dept: "dataclass(test_yaml_dataclass.Department): croot.dept"
+  dept:
+    name: hr
+    employees:
+      - name: bob
+        age: 21
+        salary: 15.5
+      - name: jill
+        age: 25
+        salary: 12.5
+        drivers_license:
+          state: IL
+          number: 598430IL
