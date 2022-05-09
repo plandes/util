@@ -3,12 +3,12 @@
 """
 __author__ = 'Paul Landes'
 
-import logging
 from typing import Any, Set, Tuple
-from functools import reduce
+import logging
 import collections
-import shutil
+from functools import reduce
 from pathlib import Path
+import shutil
 from . import PersistableError, DirectoryStash
 
 logger = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ class DirectoryCompositeStash(DirectoryStash):
     the data is needed, the entire composite item is loaded.
 
     *Note:* If order of the data is important, use an instance of
-     :class:`collections.OrderedDict` as the attribute data.
+    :class:`collections.OrderedDict` as the attribute data.
 
     """
     INSTANCE_DIRECTORY_NAME = 'inst'
@@ -73,20 +73,28 @@ class DirectoryCompositeStash(DirectoryStash):
 
         """
         super().__init__(path)
-        stashes = {}
-        comp_path = self.path / self.COMPOSITE_DIRECTORY_NAME
-        self.top_level_dir = self.path
-        self.stash_by_group = {}
-        self.stash_by_attribute = stashes
-        self.path = self.path / self.INSTANCE_DIRECTORY_NAME
-        self.groups = groups
-        self.all_keys = reduce(lambda a, b: a | b, groups)
-        self.load_keys = load_keys
         self.attribute_name = attribute_name
-        comps: Set[str]
+        self.load_keys = load_keys
         if load_keys is not None and not isinstance(load_keys, set):
             raise PersistableError(
                 f'Expecting set but got {load_keys} {type(load_keys)}')
+        self._top_level_dir = self.path
+        self.path = self.path / self.INSTANCE_DIRECTORY_NAME
+        self.groups = groups
+
+    @property
+    def groups(self) -> Tuple[Set[str]]:
+        return self._groups
+
+    @groups.setter
+    def groups(self, groups: Tuple[Set[str]]):
+        self._groups = groups
+        stashes = {}
+        comp_path: Path = self._top_level_dir / self.COMPOSITE_DIRECTORY_NAME
+        self._stash_by_group = {}
+        self._stash_by_attribute = stashes
+        self.all_keys = reduce(lambda a, b: a | b, groups)
+        comps: Set[str]
         for group in groups:
             if not isinstance(group, set):
                 raise PersistableError(
@@ -101,16 +109,9 @@ class DirectoryCompositeStash(DirectoryStash):
                     raise PersistableError(
                         f'Duplicate name \'{k}\' in {groups}')
                 stashes[k] = comp_stash
-                self.stash_by_group[name] = comp_stash
+                self._stash_by_group[name] = comp_stash
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'creating composit hash with groups: {self.groups}')
-
-    def clear(self):
-        logger.info('DirectoryCompositeStash: clearing')
-        if self.top_level_dir.is_dir():
-            if logger.isEnabledFor(logging.INFO):
-                logger.info(f'deleting subtree: {self.top_level_dir}')
-            shutil.rmtree(self.top_level_dir)
 
     def _to_composite(self, data: dict) -> Tuple[str, Any, Tuple[str, Any]]:
         """Create the composite data used to by the composite stashes to persist.
@@ -134,10 +135,10 @@ class DirectoryCompositeStash(DirectoryStash):
         if len(missing_keys) > 0:
             raise MissingDataKeys(missing_keys)
         for k, v in data.items():
-            if k not in self.stash_by_attribute:
+            if k not in self._stash_by_attribute:
                 raise PersistableError(
                     f'Unmapping/grouped attribute: {k} in {self.groups}')
-            stash = self.stash_by_attribute[k]
+            stash = self._stash_by_attribute[k]
             data_group[stash.group_name][k] = v
         data_group = tuple(data_group.items())
         if logger.isEnabledFor(logging.DEBUG):
@@ -153,7 +154,7 @@ class DirectoryCompositeStash(DirectoryStash):
         try:
             setattr(inst, self.attribute_name, None)
             for group_name, composite_inst in composite:
-                stash = self.stash_by_group[group_name]
+                stash = self._stash_by_group[group_name]
                 stash.dump(name, composite_inst)
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'dump composite {group_name}/{name}: ' +
@@ -172,12 +173,12 @@ class DirectoryCompositeStash(DirectoryStash):
         """
         attr_name = self.attribute_name
         comp_data = {}
-        attribs = set(self.stash_by_attribute.keys())
+        attribs = set(self._stash_by_attribute.keys())
         if self.load_keys is not None:
             attribs = attribs & self.load_keys
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'load attribs: {attribs}')
-        for stash in self.stash_by_group.values():
+        for stash in self._stash_by_group.values():
             if len(stash.group & attribs) > 0:
                 data = stash.load(name)
                 logger.debug(f'loaded: {data}')
@@ -208,3 +209,10 @@ class DirectoryCompositeStash(DirectoryStash):
             logger.debug(f'loaded {name}({self.attribute_name})')
         setattr(inst, self.attribute_name, attr_val)
         return inst
+
+    def clear(self):
+        logger.info('DirectoryCompositeStash: clearing')
+        if self._top_level_dir.is_dir():
+            if logger.isEnabledFor(logging.INFO):
+                logger.info(f'deleting subtree: {self._top_level_dir}')
+            shutil.rmtree(self._top_level_dir)

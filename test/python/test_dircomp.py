@@ -52,11 +52,11 @@ class TestDirectoryCompStash(unittest.TestCase):
         stash = DcsTestStash(path, groups=self.groups)
         stash_path = self.targdir / 'create' / DcsTestStash.INSTANCE_DIRECTORY_NAME
         self.assertEqual(stash_path, stash.path)
-        cstashes = stash.stash_by_attribute
+        cstashes = stash._stash_by_attribute
         self.assertEqual(set(cstashes.keys()), set('apple orange dog cat'.split()))
         gnames = set(map(lambda s: s.group_name, cstashes.values()))
         self.assertEqual(gnames, set('cat-dog apple-orange '.split()))
-        self.assertEqual(set(stash.stash_by_group.keys()), set('cat-dog apple-orange '.split()))
+        self.assertEqual(set(stash._stash_by_group.keys()), set('cat-dog apple-orange '.split()))
 
     def test_dict_to_composite(self):
         path = self.targdir / 'to_dict'
