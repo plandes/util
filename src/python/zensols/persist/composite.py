@@ -88,12 +88,14 @@ class DirectoryCompositeStash(DirectoryStash):
 
     @groups.setter
     def groups(self, groups: Tuple[Set[str]]):
-        self._groups = groups
+        if len(groups) == 0:
+            raise PersistableError('Must have at least one group set')
+        self._groups = tuple(map(frozenset, groups))
         stashes = {}
         comp_path: Path = self._top_level_dir / self.COMPOSITE_DIRECTORY_NAME
         self._stash_by_group = {}
         self._stash_by_attribute = stashes
-        self.all_keys = reduce(lambda a, b: a | b, groups)
+        self._all_keys = frozenset(reduce(lambda a, b: a | b, groups))
         comps: Set[str]
         for group in groups:
             if not isinstance(group, set):
@@ -130,8 +132,8 @@ class DirectoryCompositeStash(DirectoryStash):
         is_ordered = isinstance(data, collections.OrderedDict)
         context = tuple(data.keys()) if is_ordered else None
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'keys: {data.keys()}, groups: {self.all_keys}')
-        missing_keys: Set[str] = self.all_keys - set(data.keys())
+            logger.debug(f'keys: {data.keys()}, groups: {self._all_keys}')
+        missing_keys: Set[str] = self._all_keys - set(data.keys())
         if len(missing_keys) > 0:
             raise MissingDataKeys(missing_keys)
         for k, v in data.items():
