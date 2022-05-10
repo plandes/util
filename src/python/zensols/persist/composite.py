@@ -84,10 +84,18 @@ class DirectoryCompositeStash(DirectoryStash):
 
     @property
     def groups(self) -> Tuple[Set[str]]:
+        """The groups of the ``dict`` composite attribute, which are sets of keys, each
+        of which are persisted to their respective directory.
+
+        """
         return self._groups
 
     @groups.setter
     def groups(self, groups: Tuple[Set[str]]):
+        """The groups of the ``dict`` composite attribute, which are sets of keys, each
+        of which are persisted to their respective directory.
+
+        """
         if len(groups) == 0:
             raise PersistableError('Must have at least one group set')
         self._groups = tuple(map(frozenset, groups))
