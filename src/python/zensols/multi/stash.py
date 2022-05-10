@@ -86,11 +86,11 @@ class ChunkProcessor(object):
 @dataclass
 class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     """A stash that forks processes to process data in a distributed fashion.  The
-    stash is typically created by a
-    :class:`zensols.config.factory.ImportConfigFactory` in the child process.
-    Work is chunked (grouped) and then sent to child processes.  In each, a new
-    instance of this same stash is created using :class:`.ImportConfigFactory`
-    and then an abstract method is called to dump the data.
+    stash is typically created by a :class:`.ImportConfigFactory` in the child
+    process.  Work is chunked (grouped) and then sent to child processes.  In
+    each, a new instance of this same stash is created using
+    :class:`.ImportConfigFactory` and then an abstract method is called to dump
+    the data.
 
     The :obj:`delegate` stash is used to manage the actual persistence of the
     data.
