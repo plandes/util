@@ -306,10 +306,10 @@ class PersistableContainerMetadata(object):
 
 
 class PersistableContainer(Deallocatable):
-    """Classes can extend this that want to persist :class:`.PersistableWork`
+    """Classes can extend this that want to persist :class:`.PersistedWork`
     instances, which otherwise are not persistable.
 
-    This class also manages the deallocation of all :class:`.PersistableWork`
+    This class also manages the deallocation of all :class:`.PersistedWork`
     attributes of the class, which might be another reason to use it even if
     there isn't a persistence use case.
 
