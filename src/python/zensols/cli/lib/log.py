@@ -151,5 +151,12 @@ class LogConfigurator(object):
         fmt = logging.Formatter(format)
         hdlr.setFormatter(fmt)
 
+    @staticmethod
+    def reset():
+        """Reset the logging system.  All configuration is removed."""
+        from importlib import reload
+        logging.shutdown()
+        reload(logging)
+
     def __call__(self):
         return self.config()
