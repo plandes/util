@@ -111,9 +111,9 @@ Usage: fsinfo.py [options]:
 List the contents of the directory.
 
 Options:
-  -h, --help                    show this help message and exit
-  --version                     show the program version and exit
-  -f, --format STRING   short   the output format <short|long>
+  -h, --help                        show this help message and exit
+  --version                         show the program version and exit
+  -f, --format <long|short>  short  the output format
 
 $ python ./fsinfo.py -f short
 __pycache__  fsinfo.py
