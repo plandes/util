@@ -117,7 +117,6 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     should be an instance definition of a :class:`.LogConfigurator`.
 
     """
-
     config: Configurable = field()
     """The application configuration meant to be populated by
     :class:`zensols.config.factory.ImportClassFactory`."""
@@ -133,7 +132,6 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     of chunks (in this case the data is tupleized).
 
     """
-
     workers: Union[int, float] = field()
     """The number of processes spawned to accomplish the work or 0 to use all CPU
     cores.  If this is a negative number, add the number of CPU processors with
@@ -144,7 +142,6 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     number of processes.  If it is a float, the value must be in range (0, 1].
 
     """
-
     def __post_init__(self):
         super().__post_init__()
         self.is_child = False
