@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.8.1] - 2022-05-14
+
+### Added
+- Instances of `@dataclass` configurable in YAML configurables/files.
+
+### Changed
+- Make `DirectoryCompositeStash.groups` a property that re-configures the
+  instance.
+- By default YAML configurables use the root as the singleton section.
+
+
 ## [1.8.0] - 2022-05-04
 ### Added
 - Feature to use configuration syntax resolution in evaluated configuration
@@ -349,7 +360,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.8.1...HEAD
+[1.8.1]: https://github.com/plandes/util/compare/v1.8.0...v1.8.1
 [1.8.0]: https://github.com/plandes/util/compare/v1.7.3...v1.8.0
 [1.7.3]: https://github.com/plandes/util/compare/v1.7.2...v1.7.3
 [1.7.2]: https://github.com/plandes/util/compare/v1.7.1...v1.7.2
