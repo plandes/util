@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Union, Any
+from typing import Union, Any, Dict
 import logging
 import sys
 import re
@@ -326,7 +326,7 @@ class PersistableContainer(Deallocatable):
     given will be accessed for force creation before pickling.
 
     """
-    def __getstate__(self):
+    def __getstate__(self) -> Dict[str, Any]:
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'get state for {self.__class__}')
         removes = set()
@@ -371,7 +371,7 @@ class PersistableContainer(Deallocatable):
                          f'{", ".join(state.keys())}')
         return state
 
-    def __setstate__(self, state):
+    def __setstate__(self, state: Dict[str, Any]):
         """Set the owner to containing instance and the worker function to the owner's
         function by name.
 
