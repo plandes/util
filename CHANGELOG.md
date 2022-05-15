@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [1.8.1] - 2022-05-14
 ### Removed
-- Support for Python 3.7 as `typing.get_origin` is needed by this version.
+- Support for Python 3.7 is removed as `typing.get_origin` is needed by this
+  version.
 
 ### Added
 - Instances of `@dataclass` configurable in YAML configurables/files.
