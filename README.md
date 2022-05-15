@@ -60,46 +60,45 @@ use it.
 
 ```python
 from dataclasses import dataclass
+from enum import Enum, auto
 import os
 from io import StringIO
-from zensols.cli import ApplicationFactory, CliHarness
+from zensols.cli import CliHarness
 
 CONFIG = """
+# configure the command line
 [cli]
-class_name = zensols.cli.ActionCliManager
 apps = list: app
 
+# define the application, whose code is given below
 [app]
 class_name = fsinfo.Application
 """
+
+class Format(Enum):
+    short = auto()
+    long = auto()
 
 @dataclass
 class Application(object):
     """Toy application example that provides file system information.
 
     """
-    def ls(self, format: str = 'short'):
+    def ls(self, format: Format = Format.short):
         """List the contents of the directory.
 
-        :param format: the output format <short|long>
+        :param format: the output format
 
         """
         cmd = ['ls']
-        if format == 'long':
+        if format == Format.long:
             cmd.append('-l')
         os.system(' '.join(cmd))
 
 
-class FsInfoApplicationFactory(ApplicationFactory):
-    def __init__(self, *args, **kwargs):
-        kwargs.update(dict(package_resource='fsinfo',
-                           app_config_resource=StringIO(CONFIG)))
-        super().__init__(*args, **kwargs)
-
-
-if __name__ == '__main__':
-    harness = CliHarness(app_factory_class=FsInfoApplicationFactory)
-    harness.run().result
+if (__name__ == '__main__'):
+    harnes = CliHarness(app_config_resource=StringIO(CONFIG))
+    harnes.run()
 ```
 
 The framework automatically links each command line action mnemonic (i.e. `ls`)
