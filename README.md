@@ -1,7 +1,6 @@
 # Zensols Utilities
 
 [![PyPI][pypi-badge]][pypi-link]
-[![Python 3.7][python37-badge]][python37-link]
 [![Python 3.8][python38-badge]][python38-link]
 [![Python 3.9][python39-badge]][python39-link]
 [![Build Status][build-badge]][build-link]
@@ -181,7 +180,6 @@ Copyright (c) 2020 - 2021 Paul Landes
 [pypi]: https://pypi.org/project/zensols.util/
 [pypi-link]: https://pypi.python.org/pypi/zensols.util
 [pypi-badge]: https://img.shields.io/pypi/v/zensols.util.svg
-[python37-badge]: https://img.shields.io/badge/python-3.7-blue.svg
 [python37-link]: https://www.python.org/downloads/release/python-370
 [python38-badge]: https://img.shields.io/badge/python-3.8-blue.svg
 [python38-link]: https://www.python.org/downloads/release/python-380
