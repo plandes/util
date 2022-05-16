@@ -163,7 +163,7 @@ class CliHarness(object):
 
     def _get_app_factory_class(self) -> Type[ApplicationFactory]:
         if isinstance(self.app_factory_class, str):
-            ci = ClassImporter(self.app_factory_class)
+            ci = ClassImporter(self.app_factory_class, False)
             cls = ci.get_class()
         else:
             cls = self.app_factory_class
