@@ -73,16 +73,24 @@ class ClassImporter(object):
         """Parse the module and class name part of the fully qualifed class name.
         """
 
-        cname = self.class_name
-        match = re.match(self.CLASS_REGEX, cname)
+        cname: str = self.class_name
+        match: re.Match = re.match(self.CLASS_REGEX, cname)
         if not match:
             raise ClassImporterError(
-                f'not a fully qualified class name: {cname}')
+                f'Not a fully qualified class name: {cname}')
         return match.groups()
 
-    def get_module_class(self) -> Tuple[ModuleType, Type]:
+    def get_module_class(self, resolve_module: bool = False) -> \
+            Tuple[ModuleType, Type]:
         """Return the module and class as a tuple of the given class in the
         initializer.
+
+        :param resolve_module: if ``True`` then resolve the module from the
+                               class rather than the module portion of the
+                               :obj:`class_name` string
+
+        :return: a tuple of the module and class represented by
+                 :obj:`class_name`
 
         """
         mod_name, cname = self.parse_module_class()
@@ -91,10 +99,12 @@ class ClassImporter(object):
         mod = self.get_module(mod_name, self.reload)
         if not hasattr(mod, cname):
             raise ClassImporterError(
-                f"no class '{cname}' found in module '{mod}'")
+                f"No class '{cname}' found in module '{mod}'")
         cls = getattr(mod, cname)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'class: {cls}')
+        if resolve_module:
+            mod = self.get_module(cls.__module__, self.reload)
         return mod, cls
 
     def get_class(self) -> Type:
