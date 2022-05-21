@@ -389,9 +389,12 @@ class ImportIniConfig(IniConfig):
             params = {self.SINGLE_CONFIG_FILE: fname}
             self._create_configs('<no section>', params, bs_config)
         elif bs_config.has_option(self.CONFIG_FILES, conf_sec):
-            fnames: List[Union[Path, str]] = self.serializer.parse_object(
+            sec = bs_config.populate(section=conf_sec)
+            fnames: List[str] = self.serializer.parse_object(
                 bs_config.get_option(self.CONFIG_FILES, conf_sec))
             for fname in fnames:
+                # enable resource descriptors
+                fname: Any = self.serializer.parse_object(fname)
                 params = {self.SINGLE_CONFIG_FILE: fname}
                 self._create_configs('<no section>', params, bs_config)
         # load each import section, again in order
