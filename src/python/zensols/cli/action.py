@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 
 from typing import Dict, Tuple, Iterable, Set, List, Any, Type
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
 import dataclasses
 import logging
 import copy as cp
@@ -294,6 +294,11 @@ class ActionCliManager(PersistableContainer, Dictable):
     cleanups: Tuple[str] = field(default=None)
     """The sections to remove after the application is built."""
 
+    cleanup_removes: InitVar[Set[str]] = field(default=None)
+    """Clean ups to remove, which is helpful when a single section to remove is
+    needed when importing from other files.
+
+    """
     decorator_section_format: str = field(default='{section}_decorator')
     """Format of :class:`.ActionCli` configuration classes."""
 
@@ -305,6 +310,12 @@ class ActionCliManager(PersistableContainer, Dictable):
 
     usage_config: UsageConfig = field(default_factory=UsageConfig)
     """Configuraiton information for the command line help."""
+
+    def __post_init__(self, cleanup_removes: Set[str]):
+        super().__init__()
+        if cleanup_removes is not None and self.cleanups is not None:
+            self.cleanups = tuple(
+                filter(lambda s: s not in cleanup_removes, self.cleanups))
 
     @classmethod
     def combine_meta(self: Type, parent: Type, cli_meta: Dict[str, Any]):
