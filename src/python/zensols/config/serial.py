@@ -183,11 +183,17 @@ class Serializer(object):
                         tpe = pconfig.get('type')
                         if tpe is not None:
                             tpe = eval(tpe)
+                            tpe = self.parse_object if tpe == object else tpe
                             parsed = list(map(tpe, parsed))
                     if ctype == 'tuple':
                         parsed = tuple(parsed)
+                    elif ctype == 'list':
+                        parsed = list(parsed)
                     elif ctype == 'set':
                         parsed = set(parsed)
+                    else:
+                        raise ConfigurationError(
+                            f'Unknown sequence type: {ctype}')
             if parsed is None:
                 m = self.RESOURCE_REGEXP.match(v)
                 if m:
@@ -239,7 +245,8 @@ class Serializer(object):
         for k, v in state.items():
             if parse_types and isinstance(v, str):
                 v = self.parse_object(v)
-            logger.debug('setting {} => {} on {}'.format(k, v, obj))
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug('setting {} => {} on {}'.format(k, v, obj))
             if is_dict:
                 obj[k] = v
             else:

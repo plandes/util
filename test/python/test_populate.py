@@ -25,10 +25,12 @@ class TestConfigPopulate(unittest.TestCase):
         self.assertEqual(s.lst_int, [1, 2])
         self.assertEqual(s.lst_float, [1., 2.])
         self.assertEqual(s.lst_str2, ['1', '2'])
-        self.assertEqual(s.tup_str, ['1', '2'])
-        self.assertEqual(s.tup_int, [1, 2])
-        self.assertEqual(s.tup_float, [1., 2.])
-        self.assertEqual(s.tup_str2, ['1', '2'])
+        self.assertEqual(s.tup_str, ('1', '2'))
+        self.assertEqual(s.tup_int, (1, 2))
+        self.assertEqual(s.tup_float, (1., 2.))
+        self.assertEqual(s.tup_str2, ('1', '2'))
+        self.assertEqual(s.set_str2, {'2', '1'})
+        self.assertEqual(s.lst_obj, [1, 2, Path('a.txt'), Path('res.txt')])
 
     def test_eval(self):
         s = self.conf.get_option_object('param9')
