@@ -294,9 +294,14 @@ class ActionCliManager(PersistableContainer, Dictable):
     cleanups: Tuple[str] = field(default=None)
     """The sections to remove after the application is built."""
 
+    app_removes: InitVar[Set[str]] = field(default=None)
+    """Removes apps from :obj:`apps, which is helpful when a single section to
+    remove is needed when importing from other files.
+
+    """
     cleanup_removes: InitVar[Set[str]] = field(default=None)
-    """Clean ups to remove, which is helpful when a single section to remove is
-    needed when importing from other files.
+    """Clean ups to remove from :obj:`cleanups`, which is helpful when a single
+    section to remove is needed when importing from other files.
 
     """
     decorator_section_format: str = field(default='{section}_decorator')
@@ -311,8 +316,11 @@ class ActionCliManager(PersistableContainer, Dictable):
     usage_config: UsageConfig = field(default_factory=UsageConfig)
     """Configuraiton information for the command line help."""
 
-    def __post_init__(self, cleanup_removes: Set[str]):
+    def __post_init__(self, app_removes: Set[str], cleanup_removes: Set[str]):
         super().__init__()
+        if app_removes is not None and self.apps is not None:
+            self.apps = tuple(
+                filter(lambda s: s not in app_removes, self.apps))
         if cleanup_removes is not None and self.cleanups is not None:
             self.cleanups = tuple(
                 filter(lambda s: s not in cleanup_removes, self.cleanups))
