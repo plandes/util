@@ -70,13 +70,11 @@ class ConfigurationImporter(ApplicationObserver):
     exposes the parts of this class necessary for the CLI.
 
     """
-
     IMPORT_TYPE = 'import'
     """The string value of the ``type`` parameter in the section config identifying
     an :class:`.ImportIniConfig` import section.
 
     """
-
     ENVIRON_VAR_REGEX = re.compile(r'^.+\.([a-z]+?)$')
     """A regular expression to parse the name from the package name for the
     environment variable that might hold the configuration
@@ -91,12 +89,10 @@ class ConfigurationImporter(ApplicationObserver):
     (see class docs).
 
     """
-
     expect: bool = field(default=True)
     """If ``True``, raise an :class:`.ApplicationError` if the option is not given.
 
     """
-
     default: Path = field(default=None)
     """Use this file as the default when given on the command line, which is not
     used unless :obj:``expect`` is set to ``False``.
@@ -106,12 +102,10 @@ class ConfigurationImporter(ApplicationObserver):
     configuration mentions in the ``app.conf`` application context.
 
     """
-
     config_path_environ_name: str = field(default=None)
     """An environment variable containing the default path to the configuration.
 
     """
-
     type: str = field(default=None)
     """The type of :class:`.Configurable` use to create in
     :class:`.ConfigurableFactory`.  If this is not provided, the factory
@@ -120,12 +114,10 @@ class ConfigurationImporter(ApplicationObserver):
     :see: :class:`.ConfigurableFactory`
 
     """
-
     arguments: Dict[str, Any] = field(default=None)
     """Additional arguments to pass to the :class:`.ConfigFactory` when created.
 
     """
-
     section: str = field(default=None)
     """Additional which section to load as an import.  This is only valid and used
     when :obj:`type` is set to `import`.  When it is, the section will replace
@@ -138,13 +130,11 @@ class ConfigurationImporter(ApplicationObserver):
     for more information.
 
     """
-
     config_path_option_name: str = field(default='config_path')
     """If not ``None``, the name of the option to set in the section defined for
     this instance (section = :obj:`name`).
 
     """
-
     debug: bool = field(default=False)
     """Printn the configuration after the merge operation."""
 
@@ -396,7 +386,6 @@ class ConfigurationOverrider(object):
     (see class docs).
 
     """
-
     override: str = field(default=None)
     """A config file/dir or a comma delimited section.key=value string that
     overrides configuration."""
