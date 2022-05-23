@@ -1,15 +1,16 @@
+from __future__ import annotations
 """Creates instances of :class:`.Configurable`.
 
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Any, Type
+from typing import Dict, Any, Type, Union
 from dataclasses import dataclass, field
 import sys
 import logging
 from pathlib import Path
 from zensols.introspect import ClassImporter
-from . import Configurable, IniConfig
+from . import Configurable, IniConfig, DictionaryConfig
 
 logger = logging.getLogger(__name__)
 
@@ -125,13 +126,17 @@ class ConfigurableFactory(object):
         return inst
 
     @classmethod
-    def from_section(cls: Type, kwargs: Dict[str, Any], section: str) -> \
-            Configurable:
+    def from_section(cls: Type[ConfigurableFactory], kwargs: Dict[str, Any],
+                     section: str) -> Configurable:
         params = dict(kwargs)
-        class_name = params.get(cls.CLASS_NAME)
-        self = cls(params)
-        tpe = params.get(self.TYPE_NAME)
-        config_file = params.get(self.SINGLE_CONFIG_FILE)
+        class_name: str = params.get(cls.CLASS_NAME)
+        self: ConfigurableFactory = cls(params)
+        tpe: str = params.get(self.TYPE_NAME)
+        config_file: Union[str, Dict[str, str]] = params.get(
+            self.SINGLE_CONFIG_FILE)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'class: {class_name}, type: {tpe}, ' +
+                         f'config: {config_file}, params: {params}')
         config: Configurable
         if class_name is not None:
             del params[self.CLASS_NAME]
