@@ -30,6 +30,56 @@ class ConfiguratorImporterTemplate(Template):
 
 
 @dataclass
+class ConfigurationOverrider(object):
+    """Overrides configuration in the app config.  This is useful for replacing on
+    a per command line invocation basis.  Examples could include changing the
+    number of epochs trained for a model.
+
+    The :obj:`override` field either contains a path to a file that contains
+    the configuration file to use to clobber the given sections/values, or a
+    string to be interpreted by :class:`.StringConfig`.  This determination is
+    made by whether or not the string points to an existing file or directory.
+
+    """
+    OVERRIDE_PATH_FIELD = 'override'
+    CLI_META = {'first_pass': True,  # not a separate action
+                'mnemonic_includes': {'merge'},
+                # better/shorter  long name, and reserve the short name
+                'option_overrides': {OVERRIDE_PATH_FIELD:
+                                     {'metavar': '<FILE|DIR|STRING>',
+                                      'short_name': None}},
+                # only the path to the configuration should be exposed as a
+                # an option on the comamnd line
+                'option_includes': {OVERRIDE_PATH_FIELD}}
+
+    config: Configurable = field()
+    """The parent configuration, which is populated from the child configuration
+    (see class docs).
+
+    """
+    override: str = field(default=None)
+    """A config file/dir or a comma delimited section.key=value string that
+    overrides configuration."""
+
+    def merge(self) -> Configurable:
+        """Merge the string configuration with the application context."""
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'overriding with: {self.override}')
+        if self.override is not None:
+            path = Path(self.override)
+            if path.exists():
+                cf = ConfigurableFactory()
+                overrides = cf.from_path(path)
+            else:
+                overrides = StringConfig(self.override)
+            self.config.merge(overrides)
+        return self.config
+
+    def __call__(self) -> Configurable:
+        return self.merge()
+
+
+@dataclass
 class ConfigurationImporter(ApplicationObserver):
     """This class imports a child configuration in to the application context.  It
     does this by:
@@ -186,7 +236,7 @@ class ConfigurationImporter(ApplicationObserver):
 
     def _populate_import_sections(self, config: Configurable) -> Configurable:
         sec: Dict[str, str] = self.config.get_options(self.section)
-        secs = {}
+        secs: Dict[str, Dict[str, str]] = {}
         populated_sec = {}
         vals = self.__dict__
         for k, v in sec.items():
@@ -197,7 +247,7 @@ class ConfigurationImporter(ApplicationObserver):
                 self.config.get_option(
                     ImportIniConfig.SECTIONS_SECTION, self.section))
             for sec in sub_secs:
-                repl_sec = {}
+                repl_sec: Dict[str, str] = {}
                 secs[sec] = repl_sec
                 with rawconfig(config):
                     for k, v in config.get_options(sec).items():
@@ -249,7 +299,7 @@ class ConfigurationImporter(ApplicationObserver):
             with rawconfig(ini):
                 cl_config = ImportIniConfig(
                     config_file=ini,
-                    children=self._app.factory.children_configs,
+                    children=self._app.factory.children_configs or (),
                     **args)
             with rawconfig(cl_config):
                 cl_config.copy_sections(self.config)
@@ -353,56 +403,6 @@ class ConfigurationImporter(ApplicationObserver):
         else:
             modified_config = self._load()
         return modified_config
-
-    def __call__(self) -> Configurable:
-        return self.merge()
-
-
-@dataclass
-class ConfigurationOverrider(object):
-    """Overrides configuration in the app config.  This is useful for replacing on
-    a per command line invocation basis.  Examples could include changing the
-    number of epochs trained for a model.
-
-    The :obj:`override` field either contains a path to a file that contains
-    the configuration file to use to clobber the given sections/values, or a
-    string to be interpreted by :class:`.StringConfig`.  This determination is
-    made by whether or not the string points to an existing file or directory.
-
-    """
-    OVERRIDE_PATH_FIELD = 'override'
-    CLI_META = {'first_pass': True,  # not a separate action
-                'mnemonic_includes': {'merge'},
-                # better/shorter  long name, and reserve the short name
-                'option_overrides': {OVERRIDE_PATH_FIELD:
-                                     {'metavar': '<FILE|DIR|STRING>',
-                                      'short_name': None}},
-                # only the path to the configuration should be exposed as a
-                # an option on the comamnd line
-                'option_includes': {OVERRIDE_PATH_FIELD}}
-
-    config: Configurable = field()
-    """The parent configuration, which is populated from the child configuration
-    (see class docs).
-
-    """
-    override: str = field(default=None)
-    """A config file/dir or a comma delimited section.key=value string that
-    overrides configuration."""
-
-    def merge(self) -> Configurable:
-        """Merge the string configuration with the application context."""
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'overriding with: {self.override}')
-        if self.override is not None:
-            path = Path(self.override)
-            if path.exists():
-                cf = ConfigurableFactory()
-                overrides = cf.from_path(path)
-            else:
-                overrides = StringConfig(self.override)
-            self.config.merge(overrides)
-        return self.config
 
     def __call__(self) -> Configurable:
         return self.merge()
