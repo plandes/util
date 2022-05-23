@@ -132,8 +132,7 @@ class ConfigurableFactory(object):
         class_name: str = params.get(cls.CLASS_NAME)
         self: ConfigurableFactory = cls(params)
         tpe: str = params.get(self.TYPE_NAME)
-        config_file: Union[str, Dict[str, str]] = params.get(
-            self.SINGLE_CONFIG_FILE)
+        config_file: str = params.get(self.SINGLE_CONFIG_FILE)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'class: {class_name}, type: {tpe}, ' +
                          f'config: {config_file}, params: {params}')
