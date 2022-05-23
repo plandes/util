@@ -230,6 +230,8 @@ class ImportIniConfig(IniConfig):
         super().__init__(*args, use_interpolation=use_interpolation, **kwargs)
         self.config_section = config_section
         self.exclude_config_sections = exclude_config_sections
+        if children is None:
+            self._raise('Missing importini children')
         self.children = children
         if exclude_config_sections and \
            (self.default_section == self.config_section):
