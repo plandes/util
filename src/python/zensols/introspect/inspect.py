@@ -428,7 +428,7 @@ class ClassInspector(object):
                                  f'{node.value}')
         return Class(
             cls,
-            ClassDoc(self.cls.__doc__),
+            None if self.cls.__doc__ is None else ClassDoc(self.cls.__doc__),
             fields={d.name: d for d in fields},
             methods={m.name: m for m in methods})
 
