@@ -51,7 +51,7 @@ class _PreLoadImportIniConfig(ImportIniConfig):
                        params: Dict[str, Any]) -> Configurable:
         conf: Configurable = None
         key: str = None
-        config_file: Union[Path, str] = params[self.SINGLE_CONFIG_FILE]
+        config_file: Union[Path, str] = params.get(self.SINGLE_CONFIG_FILE)
         if isinstance(config_file, str):
             key = self.parse_preload(config_file)
         if key is not None:
