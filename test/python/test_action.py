@@ -3,7 +3,7 @@ import sys
 import logging
 from io import StringIO
 from zensols.util.log import loglevel
-from zensols.config import ConfigurableError, Settings, FactoryError
+from zensols.config import Settings, FactoryError
 from zensols.cli import (
     ActionCli, ActionCliError, ActionCliManager,
     OptionMetaData, ActionMetaData,
@@ -366,3 +366,17 @@ class TestOverrideConfig(LogTestCase):
         self.assertEqual('overridefruit', res.action.meta_data.name)
         self.assertEqual(Settings(first='apple', second='pear'),
                          res.result)
+
+
+class TestOverrideConfigAction(LogTestCase):
+    def test_with_config(self):
+        self.cli = ApplicationFactory(
+            'zensols.testapp', 'test-resources/test-app-config-override.conf')
+        aset: CommandActionSet = self.cli.create(
+            '--config test-resources/stash-factory.conf --override=basket.second=strawberry,basket.sixth=blueberry,app_default.val=pair'.split())
+        app_res: ApplicationResult = aset.invoke()
+        res: ActionResult = app_res.second_pass_result
+        sets: Settings = res.result
+        self.assertTrue(isinstance(sets, Settings))
+        should = {'first': 'banana', 'second': 'grape', 'sixth': 'blueberry', 'fourth': 'pair', 'fifth': 'kiwi'}
+        self.assertEqual(should, sets.asdict())

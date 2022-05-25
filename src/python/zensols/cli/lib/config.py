@@ -5,11 +5,12 @@ application context.
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Any, Set, List
+from typing import Dict, Any, Set, List, Tuple, Optional, Type
 from dataclasses import dataclass, field
 import os
 import logging
 from string import Template
+import parse as par
 import re
 from pathlib import Path
 from zensols.util import PackageResource
@@ -18,15 +19,49 @@ from zensols.config import (
     IniConfig, ImportIniConfig, StringConfig, DictionaryConfig,
 )
 from .. import (
-    ActionCliError, ApplicationError, OptionMetaData, ActionMetaData,
-    ApplicationObserver, Action, Application,
+    Dictable, ActionCliError, ApplicationError, OptionMetaData, ActionMetaData,
+    Invokable, ApplicationObserver, Action, Application,
 )
 
 logger = logging.getLogger(__name__)
 
 
-class ConfiguratorImporterTemplate(Template):
+class _ConfiguratorImporterTemplate(Template):
     delimiter = '^'
+
+
+class _PreLoadImportIniConfig(ImportIniConfig):
+    _PRELOAD_FORMAT = 'preload:{}'
+
+    def __init__(self, *args, preloads: Dict[str, Configurable], **kwargs):
+        super().__init__(*args, **kwargs)
+        self.preloads = preloads
+
+    @classmethod
+    def format_preload(self, name: str) -> str:
+        return self._PRELOAD_FORMAT.format(name)
+
+    @classmethod
+    def parse_preload(self, s: str) -> Optional[str]:
+        pres: par.Result = par.parse(self._PRELOAD_FORMAT, s)
+        if pres is not None:
+            return pres[0]
+
+    def _create_config(self, section: str,
+                       params: Dict[str, Any]) -> Configurable:
+        conf: Configurable = None
+        config_file: str = params[self.SINGLE_CONFIG_FILE]
+        key = self.parse_preload(config_file)
+        if key is not None:
+            conf = self.preloads.get(key)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"create config '{key} -> {conf} ({type(conf)})")
+            if conf is None:
+                logger.warning(f"matched a preload format '{config_file}' " +
+                               f"with non-existing preload: '{key}'")
+        if conf is None:
+            conf = super()._create_config(section, params)
+        return conf
 
 
 @dataclass
@@ -41,16 +76,16 @@ class ConfigurationOverrider(object):
     made by whether or not the string points to an existing file or directory.
 
     """
-    OVERRIDE_PATH_FIELD = 'override'
+    OVERRIDE_FIELD = 'override'
     CLI_META = {'first_pass': True,  # not a separate action
                 'mnemonic_includes': {'merge'},
                 # better/shorter  long name, and reserve the short name
-                'option_overrides': {OVERRIDE_PATH_FIELD:
+                'option_overrides': {OVERRIDE_FIELD:
                                      {'metavar': '<FILE|DIR|STRING>',
                                       'short_name': None}},
                 # only the path to the configuration should be exposed as a
                 # an option on the comamnd line
-                'option_includes': {OVERRIDE_PATH_FIELD}}
+                'option_includes': {OVERRIDE_FIELD}}
 
     config: Configurable = field()
     """The parent configuration, which is populated from the child configuration
@@ -61,10 +96,10 @@ class ConfigurationOverrider(object):
     """A config file/dir or a comma delimited section.key=value string that
     overrides configuration."""
 
-    def merge(self) -> Configurable:
-        """Merge the string configuration with the application context."""
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'overriding with: {self.override}')
+    disable: bool = field(default=False)
+    """"""
+
+    def get_configurable(self) -> Optional[Configurable]:
         if self.override is not None:
             path = Path(self.override)
             if path.exists():
@@ -72,7 +107,16 @@ class ConfigurationOverrider(object):
                 overrides = cf.from_path(path)
             else:
                 overrides = StringConfig(self.override)
-            self.config.merge(overrides)
+            return overrides
+
+    def merge(self) -> Configurable:
+        """Merge the string configuration with the application context."""
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'overriding with: {self.override}')
+        if not self.disable:
+            conf: Optional[Configurable] = self.get_configurable()
+            if conf is not None:
+                self.config.merge(conf)
         return self.config
 
     def __call__(self) -> Configurable:
@@ -80,7 +124,7 @@ class ConfigurationOverrider(object):
 
 
 @dataclass
-class ConfigurationImporter(ApplicationObserver):
+class ConfigurationImporter(ApplicationObserver, Dictable):
     """This class imports a child configuration in to the application context.  It
     does this by:
 
@@ -102,6 +146,9 @@ class ConfigurationImporter(ApplicationObserver):
     In the case the child configuration is loaded
 
     """
+    _OVERRIDES_KEY = ConfigurationOverrider.OVERRIDE_FIELD
+    _OVERRIDES_PRELOAD = _PreLoadImportIniConfig.format_preload(_OVERRIDES_KEY)
+
     CONFIG_PATH_FIELD = 'config_path'
     """The field name in this class of the child configuration path."""
 
@@ -228,20 +275,39 @@ class ConfigurationImporter(ApplicationObserver):
         self._app = app
         self._action = action
 
+    def _get_override_config(self) -> Configurable:
+        conf: Configurable = None
+        ac: Action
+        for ac in self._app.actions:
+            ctype: Type = ac.class_meta.class_type
+            if issubclass(ctype, ConfigurationOverrider):
+                opts: Dict[str, Any] = ac.command_action.options
+                sconf: str = opts.get(ConfigurationOverrider.OVERRIDE_FIELD)
+                params = {ConfigurationOverrider.OVERRIDE_FIELD: sconf}
+                co = ConfigurationOverrider(self.config, **params)
+                conf = co.get_configurable()
+                break
+        if conf is None:
+            conf = DictionaryConfig()
+        return conf
+
     def _validate(self):
         # the section attribute is only useful for ImportIniConfig imports
         if self.type != self.IMPORT_TYPE and self.section is not None:
             raise ActionCliError("Cannot have a 'section' entry " +
                                  f"without type of '{self.IMPORT_TYPE}'")
 
-    def _populate_import_sections(self, config: Configurable) -> Configurable:
+    def _populate_import_sections(self, config: Configurable) -> \
+            Tuple[Configurable, Set[str]]:
         sec: Dict[str, str] = self.config.get_options(self.section)
         secs: Dict[str, Dict[str, str]] = {}
         populated_sec = {}
-        vals = self.__dict__
+        vals = self.asdict()
+        vals[self._OVERRIDES_KEY] = self._OVERRIDES_PRELOAD
         for k, v in sec.items():
             populated_sec[k] = v.format(**vals)
         secs[ImportIniConfig.IMPORT_SECTION] = populated_sec
+        preload_keys: Set[str] = set()
         if ImportIniConfig.SECTIONS_SECTION in populated_sec:
             sub_secs: List[str] = self.config.serializer.parse_object(
                 self.config.get_option(
@@ -251,12 +317,20 @@ class ConfigurationImporter(ApplicationObserver):
                 secs[sec] = repl_sec
                 with rawconfig(config):
                     for k, v in config.get_options(sec).items():
-                        tpl = ConfiguratorImporterTemplate(v)
-                        vr = tpl.substitute(vals)
+                        tpl = _ConfiguratorImporterTemplate(v)
+                        try:
+                            vr = tpl.substitute(vals)
+                        except KeyError as e:
+                            raise ActionCliError(
+                                f"Bad config load special key {e} in: '{v}'")
                         if logger.isEnabledFor(logging.DEBUG):
                             logger.debug(f'{sec}:{k}: {v} -> {vr}')
+                        pls = map(_PreLoadImportIniConfig.parse_preload,
+                                  self.config.serializer.parse_object(vr))
+                        pls = filter(lambda x: x is not None, pls)
+                        preload_keys.update(pls)
                         repl_sec[k] = vr
-        return DictionaryConfig(secs)
+        return DictionaryConfig(secs), preload_keys
 
     def _load_configuration(self) -> Configurable:
         """Once we have the path and the class used to load the configuration, create
@@ -292,14 +366,24 @@ class ConfigurationImporter(ApplicationObserver):
         # import using ImportIniConfig as a section
         elif self.type == self.IMPORT_TYPE:
             args: dict = {} if self.arguments is None else self.arguments
+            children: Tuple[Configurable] = self._app.factory.children_configs
             ini: IniConfig = IniConfig(self.config)
-            dconf: Configurable = self._populate_import_sections(ini)
+            dconf: Configurable
+            preload_keys: Set[str]
+            dconf, preload_keys = self._populate_import_sections(ini)
+            preloads: Dict[str, Configurable] = {}
+            if self._OVERRIDES_KEY in preload_keys:
+                preloads[self._OVERRIDES_KEY] = self._get_override_config()
             secs_to_del.update(dconf.sections)
             dconf.copy_sections(ini)
+            if children is None:
+                # unit test cases will not have children configurables
+                children = ()
             with rawconfig(ini):
-                cl_config = ImportIniConfig(
+                cl_config = _PreLoadImportIniConfig(
+                    preloads=preloads,
                     config_file=ini,
-                    children=self._app.factory.children_configs or (),
+                    children=children,
                     **args)
             with rawconfig(cl_config):
                 cl_config.copy_sections(self.config)

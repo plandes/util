@@ -59,7 +59,6 @@ class Action(Deallocatable, Dictable):
     parsed on a per action level.
 
     """
-
     cli: ActionCli = field()
     """Command line interface of the action meta data."""
 
