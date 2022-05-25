@@ -5,7 +5,7 @@ application context.
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Any, Set, List, Tuple, Optional, Type
+from typing import Dict, Any, Set, List, Tuple, Optional, Type, Union
 from dataclasses import dataclass, field
 import os
 import logging
@@ -50,8 +50,10 @@ class _PreLoadImportIniConfig(ImportIniConfig):
     def _create_config(self, section: str,
                        params: Dict[str, Any]) -> Configurable:
         conf: Configurable = None
-        config_file: str = params[self.SINGLE_CONFIG_FILE]
-        key = self.parse_preload(config_file)
+        key: str = None
+        config_file: Union[Path, str] = params[self.SINGLE_CONFIG_FILE]
+        if isinstance(config_file, str):
+            key = self.parse_preload(config_file)
         if key is not None:
             conf = self.preloads.get(key)
             if logger.isEnabledFor(logging.DEBUG):
@@ -143,10 +145,10 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
     its child set as :obj:`config` so the two can reference each other at
     property/factory resolve time.
 
-    Special mnemonic ``^{config}`` can be used in an :class`.ImportIniConfig`
-    import section in the `config_files` property to load the referred
-    configuration file in any order with the other loaded files.  The special
-    mnemonic ``^{override}`` does the same thing with the
+    Special mnemonic ``^{config_path}`` can be used in an
+    :class`.ImportIniConfig` import section in the `config_files` property to
+    load the referred configuration file in any order with the other loaded
+    files.  The special mnemonic ``^{override}`` does the same thing with the
     :class:`.ConfigurationOverrider` one pass application as well.
 
     """
@@ -329,10 +331,11 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
                                 f"Bad config load special key {e} in: '{v}'")
                         if logger.isEnabledFor(logging.DEBUG):
                             logger.debug(f'{sec}:{k}: {v} -> {vr}')
-                        pls = map(_PreLoadImportIniConfig.parse_preload,
-                                  self.config.serializer.parse_object(vr))
-                        pls = filter(lambda x: x is not None, pls)
-                        preload_keys.update(pls)
+                        pls = self.config.serializer.parse_object(vr)
+                        if isinstance(pls, (list, tuple)):
+                            pls = map(_PreLoadImportIniConfig.parse_preload, pls)
+                            pls = filter(lambda x: x is not None, pls)
+                            preload_keys.update(pls)
                         repl_sec[k] = vr
         return DictionaryConfig(secs), preload_keys
 
