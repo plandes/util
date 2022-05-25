@@ -207,12 +207,14 @@ class CommandLineParser(Deallocatable, Dictable):
 
     def _configure_parser(self, parser: OptionParser,
                           options: Iterable[OptionMetaData]):
-        opt_names = set()
+        opt_names = {}
         for opt in options:
-            if opt.long_name in opt_names:
+            prev: OptionMetaData = opt_names.get(opt.long_name)
+            if prev is not None:
                 raise CommandLineConfigError(
-                    f'Duplicate option: {opt.long_name}')
-            opt_names.add(opt.long_name)
+                    f"Duplicate option: '{prev.long_name}': " +
+                    f"<{prev}> -> <{opt}>")
+            opt_names[opt.long_name] = opt
             op_opt = opt.create_option()
             parser.add_option(op_opt)
 
