@@ -20,7 +20,7 @@ from zensols.config import (
 )
 from .. import (
     Dictable, ActionCliError, ApplicationError, OptionMetaData, ActionMetaData,
-    Invokable, ApplicationObserver, Action, Application,
+    ApplicationObserver, Action, Application,
 )
 
 logger = logging.getLogger(__name__)
@@ -143,7 +143,11 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
     its child set as :obj:`config` so the two can reference each other at
     property/factory resolve time.
 
-    In the case the child configuration is loaded
+    Special mnemonic ``^{config}`` can be used in an :class`.ImportIniConfig`
+    import section in the `config_files` property to load the referred
+    configuration file in any order with the other loaded files.  The special
+    mnemonic ``^{override}`` does the same thing with the
+    :class:`.ConfigurationOverrider` one pass application as well.
 
     """
     _OVERRIDES_KEY = ConfigurationOverrider.OVERRIDE_FIELD
