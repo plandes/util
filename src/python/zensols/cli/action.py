@@ -340,7 +340,8 @@ class ActionCliManager(PersistableContainer, Dictable):
                 for k in both_keys:
                     sv = src_val.get(k)
                     tv = targ_val.get(k)
-                    if sv is not None and tv is not None:
+                    if sv is not None and tv is not None and\
+                       isinstance(sv, dict) and isinstance(tv, dict):
                         targ_val[k] = tv | sv
                 target[attr] = src_val | targ_val
             elif src_val is not None:
