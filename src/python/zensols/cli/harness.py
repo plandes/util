@@ -57,7 +57,6 @@ class CliHarness(object):
     :see: :obj:`.ApplicationFactory.app_config_resource`
 
     """
-
     app_config_context: Dict[str, Dict[str, str]] = field(default_factory=dict)
     """More context given to the application context on app creation."""
 
@@ -427,6 +426,8 @@ class ConfigurationImporterCliHarness(CliHarness):
         env: _HarnessEnviron = self._create_harness_environ(args)
         app_fac: ApplicationFactory = self._create_app_fac(env, factory_kwargs)
         try:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'creating application {app_fac} with {env.args}')
             app: Application = app_fac.create(env.args)
             args = list(env.args)
             args.extend(self._get_config_path_args(env, app))
@@ -443,6 +444,9 @@ class ConfigurationImporterCliHarness(CliHarness):
     def get_instance(self, args: Union[List[str], str] = None,
                      **factory_kwargs: Dict[str, Any]) -> Any:
         args = args.split() if isinstance(args, str) else args
+        args.insert(0, '_')
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'get inst: {args}, factory: {factory_kwargs}')
         app_fac, args = self._update_args(args, **factory_kwargs)
         if app_fac is not None:
             return app_fac.get_instance(args)
