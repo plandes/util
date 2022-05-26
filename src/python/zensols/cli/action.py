@@ -326,6 +326,29 @@ class ActionCliManager(PersistableContainer, Dictable):
                 filter(lambda s: s not in cleanup_removes, self.cleanups))
 
     @classmethod
+    def _combine_meta(self: Type, source: Dict[str, Any],
+                      target: Dict[str, Any], keys: Set[str] = None):
+        if keys is None:
+            keys = self._CLI_META_ATTRIBUTE_NAMES & source.keys()
+        for attr in keys:
+            src_val = source.get(attr)
+            targ_val = target.get(attr)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'attr: {attr} {src_val} -> {targ_val}')
+            if src_val is not None and targ_val is not None:
+                both_keys = src_val.keys() | targ_val.keys()
+                for k in both_keys:
+                    sv = src_val.get(k)
+                    tv = targ_val.get(k)
+                    if sv is not None and tv is not None:
+                        targ_val[k] = tv | sv
+                target[attr] = src_val | targ_val
+            elif src_val is not None:
+                target[attr] = cp.deepcopy(src_val)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'result: {target[attr]}')
+
+    @classmethod
     def combine_meta(self: Type, parent: Type, cli_meta: Dict[str, Any]):
         """Merge static class CLI metadata of the variable named
         :obj:`CLASS_META_ATTRIBUTE`.
@@ -344,14 +367,8 @@ class ActionCliManager(PersistableContainer, Dictable):
         cli_meta = cp.deepcopy(cli_meta)
         for ans in classes:
             if hasattr(ans, self.CLASS_META_ATTRIBUTE):
-                meta = getattr(ans, self.CLASS_META_ATTRIBUTE)
-                for attr in self._CLI_META_ATTRIBUTE_NAMES & meta.keys():
-                    ans_val = meta.get(attr)
-                    this_val = cli_meta.get(attr)
-                    if ans_val is not None and this_val is not None:
-                        cli_meta[attr] = ans_val | this_val
-                    elif ans_val is not None:
-                        cli_meta[attr] = cp.deepcopy(ans_val)
+                meta: Dict[str, Any] = getattr(ans, self.CLASS_META_ATTRIBUTE)
+                self._combine_meta(meta, cli_meta)
         return cli_meta
 
     @property
@@ -489,7 +506,7 @@ class ActionCliManager(PersistableContainer, Dictable):
         sec.pop(cn_attr, None)
         if cn_attr not in params:
             params[cn_attr] = ClassImporter.full_classname(ActionCli)
-        params.update(sec)
+        self._combine_meta(sec, params)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating action from section {conf_sec} -> {sec}')
         action = self.config_factory.instance(conf_sec, **params)
