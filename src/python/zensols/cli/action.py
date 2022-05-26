@@ -485,7 +485,10 @@ class ActionCliManager(PersistableContainer, Dictable):
         """
         sec: Dict[str, Any] = self.config_factory.config.populate(
             {}, section=conf_sec)
-        del sec['class_name']
+        cn_attr: str = ConfigFactory.CLASS_NAME
+        sec.pop(cn_attr, None)
+        if cn_attr not in params:
+            params[cn_attr] = ClassImporter.full_classname(ActionCli)
         params.update(sec)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating action from section {conf_sec} -> {sec}')
