@@ -99,8 +99,10 @@ class ConfigurationOverrider(object):
     overrides configuration."""
 
     disable: bool = field(default=False)
-    """"""
+    """Whether to disable the application, which is useful to set to ``False`` when
+    used with :class:`.ConfigurationImporter`.
 
+    """
     def get_configurable(self) -> Optional[Configurable]:
         if self.override is not None:
             path = Path(self.override)
