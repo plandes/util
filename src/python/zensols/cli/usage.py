@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, Iterable, List, Union
+from typing import Tuple, Iterable, List, Union, Optional
 from dataclasses import dataclass, field
 import logging
 import os
@@ -36,6 +36,9 @@ class UsageConfig(Dictable):
     max_metavar_len: Union[float, int] = field(default=0.2)
     """Max length of the option type."""
 
+    max_default_len: Union[float, int] = field(default=0.2)
+    """Max length in characters of the default value."""
+
     left_indent: int = field(default=2)
     """The number of left spaces for the option and positional arguments."""
 
@@ -59,6 +62,8 @@ class UsageConfig(Dictable):
             self.max_first_col = int(self.width * self.max_first_col)
         if isinstance(self.max_metavar_len, float):
             self.max_metavar_len = int(self.width * self.max_metavar_len)
+        if isinstance(self.max_default_len, float):
+            self.max_default_len = int(self.width * self.max_default_len)
 
 
 class UsageActionOptionParser(OptionParser):
@@ -129,6 +134,7 @@ class _OptionFormatter(_Formatter):
         long_opt: str = opt.long_option
         short_opt: str = '' if opt.short_option is None else opt.short_option
         metavar: str = '' if opt.metavar is None else opt.metavar
+        mlen, over = self._get_min_default_len()
         self._opt_str = f'{left_indent}{short_opt}{sep}{long_opt}'
         if len(metavar) > max_olen:
             if metavar.find('|') > -1:
@@ -143,11 +149,25 @@ class _OptionFormatter(_Formatter):
                 self.doc += f'type {metavar}'
         else:
             self._opt_str += f' {metavar}'
+        if over:
+            self.doc += f' with default {self.opt.default_str}'
+
+    def _get_min_default_len(self) -> Tuple[Optional[int], bool]:
+        mdlen: int = None
+        over: bool = False
+        if self.opt.default is not None and self.opt.dtype != bool:
+            mdlen: int = self.usage_config.max_default_len
+            over = (len(self.opt.default_str) + 3) > mdlen
+        return mdlen, over
 
     @property
     def default(self) -> str:
-        if self.opt.default is not None and self.opt.dtype != bool:
-            return self.opt.default_str
+        mlen, over = self._get_min_default_len()
+        if mlen is not None:
+            s: str = self.opt.default_str
+            if over:
+                s = s[:mlen] + '...'
+            return s
         else:
             return ''
 
