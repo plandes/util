@@ -185,6 +185,7 @@ class _PositionalFormatter(_Formatter):
     pos: PositionalMetaData
 
     def __post_init__(self):
+        self.WRITABLE_MAX_COL = self.usage_formatter.usage_config.width
         spl = self.usage_formatter.writer.usage_config.left_indent
         sp = self._get_str_space(spl)
         mv = ''
