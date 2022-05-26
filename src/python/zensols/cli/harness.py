@@ -444,6 +444,8 @@ class ConfigurationImporterCliHarness(CliHarness):
     def get_instance(self, args: Union[List[str], str] = None,
                      **factory_kwargs: Dict[str, Any]) -> Any:
         args = args.split() if isinstance(args, str) else args
+        if args is None:
+            args = []
         args.insert(0, '_')
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'get inst: {args}, factory: {factory_kwargs}')
