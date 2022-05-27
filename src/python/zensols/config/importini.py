@@ -12,6 +12,7 @@ from pathlib import Path
 from configparser import (
     ConfigParser, ExtendedInterpolation, InterpolationMissingOptionError
 )
+from zensols.introspect import ClassImporterError
 from . import (
     ConfigurableError, ConfigurableFileNotFoundError,
     Configurable, ConfigurableFactory, IniConfig, rawconfig,
@@ -328,17 +329,29 @@ class ImportIniConfig(IniConfig):
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'creating configs from section: [{section}]')
         if conf_files is None:
-            # create a configuration from the section as a section load
-            configs.append(self._create_config(section, params))
+            try:
+                # create a configuration from the section as a section load
+                configs.append(self._create_config(section, params))
+            except ClassImporterError as e:
+                raise ConfigurableError(
+                    f"Could not import section '{section}': {e}") from e
         else:
             # otherwise, synthesize a section load for each given config file
             sparams = dict(params)
             del sparams[self.CONFIG_FILES]
-            for cf in conf_files:
-                parsed_cf = self.serializer.parse_object(cf)
-                sparams[self.SINGLE_CONFIG_FILE] = parsed_cf
-                conf = self._create_config(section, sparams)
-                configs.append(conf)
+            try:
+                for cf in conf_files:
+                    parsed_cf = self.serializer.parse_object(cf)
+                    # skip Nones substituted by introplation (like when
+                    # ConfigurationImporter subtitutues a missing config file)
+                    if parsed_cf is not None:
+                        sparams[self.SINGLE_CONFIG_FILE] = parsed_cf
+                        conf = self._create_config(section, sparams)
+                        configs.append(conf)
+            except ClassImporterError as e:
+                raise ConfigurableError(
+                    f"Could not import '{cf}' in section '{section}': {e}") \
+                    from e
         # add configurations as children to the bootstrap config
         for config in configs:
             # recursively create new import ini configs and add the children
