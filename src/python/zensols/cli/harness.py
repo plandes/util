@@ -97,7 +97,19 @@ class CliHarness(object):
 
     """
     def __post_init__(self):
-        pass
+        if self.root_dir is not None:
+            if not self.root_dir.is_dir():
+                raise ApplicationError(
+                    f'No such root directory: {self.root_dir}')
+            self.add_sys_path(self.root_dir)
+
+    @staticmethod
+    def add_sys_path(to_add: Path):
+        spath: str
+        to_add = to_add.expanduser().resolve()
+        if not any(map(lambda p: Path(p).expanduser().resolve() == to_add,
+                       sys.path)):
+            sys.path.append(str(to_add))
 
     @property
     def invoke_method(self) -> str:
@@ -197,11 +209,9 @@ class CliHarness(object):
             logger.debug(f'root dir: {root_dir}')
         if self.src_dir_name is not None:
             src_path = root_dir / self.src_dir_name
-            src_path_str = str(src_path)
             if logger.isEnabledFor(logging.INFO):
                 logger.info(f'adding source path: {src_path} to python path')
-            if src_path_str not in sys.path:
-                sys.path.append(src_path_str)
+            self.add_sys_path(src_path)
         app_conf_res: str = self.app_config_resource
         if isinstance(app_conf_res, str):
             if logger.isEnabledFor(logging.DEBUG):
