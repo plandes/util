@@ -4,7 +4,7 @@ configuration functionality.
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Type, Any, Optional
+from typing import Dict, Type, Any, Optional, Tuple, Union
 from dataclasses import dataclass, field
 from enum import Enum, auto, EnumMeta
 import sys
@@ -14,12 +14,13 @@ import inspect
 from json import JSONEncoder
 from io import TextIOBase
 from pathlib import Path
+import shutil
 from zensols.config import (
     Configurable, Dictable, ConfigFactory, DictionaryConfig
 )
 from zensols.introspect import ClassImporter
 from .. import (
-    Action, ActionCli, ActionCliMethod, ActionMetaData,
+    Action, ActionCli, ActionCliMethod, ActionMetaData, ActionCliManager,
     Application, ApplicationObserver,
 )
 from .. import ConfigurationImporter
@@ -52,6 +53,14 @@ class ConfigFormat(Enum):
     text = auto()
     ini = auto()
     json = auto()
+
+
+@dataclass
+class DryRunApplication(object):
+    CLI_META = {'option_overrides': {'dry_run': {'short_name': 'd'}}}
+
+    dry_run: bool = field(default=False)
+    """Don't do anything; just act like it."""
 
 
 @dataclass
@@ -348,3 +357,57 @@ class ProgramNameConfigurator(object):
         """
         d_conf = DictionaryConfig(self.create_section())
         d_conf.copy_sections(self.config)
+
+
+@dataclass
+class Cleaner(DryRunApplication):
+    """Clean (removes) files and directories not needed by the project.  The first
+    tuple of paths will get deleted at any level, the next needs a level of 1
+    and so on.
+
+    """
+    CLASS_INSPECTOR = {}
+    CLI_META = ActionCliManager.combine_meta(
+        DryRunApplication,
+        {'mnemonic_includes': {'clean'},
+         'option_excludes': {'paths'},
+         'option_overrides': {'clean_level': {'long_name': 'clevel',
+                                              'short_name': None}}})
+
+    paths: Tuple[Tuple[Union[str, Path]]] = field(default=None)
+    """Paths to delete (files or directories) with each group corresponding to a
+    level (see class docs).
+
+    """
+    clean_level: int = field(default=0)
+    """The level at which to delete."""
+
+    def _remove_path(self, level: int, glob: Path) -> bool:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'maybe removing glob: {glob}')
+        if glob.parent.name == '**':
+            parent = glob.parent.parent
+            pat = f'{glob.parent}/{glob.name}'
+        else:
+            parent = glob.parent
+            pat = glob.name
+        for path in parent.glob(pat):
+            if path.exists():
+                if logger.isEnabledFor(logging.WARNING):
+                    logger.warn(f'removing (level {level}): {path}')
+                if not self.dry_run:
+                    if path.is_dir():
+                        shutil.rmtree(path)
+                    else:
+                        path.unlink()
+
+    def clean(self):
+        """Clean up unecessary files."""
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('cleaning unecessary files...')
+        for level, paths in enumerate(self.paths):
+            if level <= self.clean_level:
+                for path in paths:
+                    if isinstance(path, str):
+                        path = Path(path)
+                    self._remove_path(level, path)
