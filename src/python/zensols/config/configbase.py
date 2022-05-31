@@ -270,7 +270,7 @@ class Configurable(Writable, metaclass=ABCMeta):
                 raise ConfigurationError(f'No such section: {sec}')
             if not isinstance(opts, dict):
                 raise ConfigurationError(
-                    f'Expecting dict but got {type(opts)} in section {sec}')
+                    f"Expecting dict but got {type(opts)} in section '{sec}'")
             for k, v in opts.items():
                 self._write_line(f'{k}: {v}', depth + 1, writer)
 
