@@ -1,0 +1,11 @@
+project:
+  sections: [project.context]
+  org_name: Zensol Python
+  description: Simple Clojure project
+  template-directory:
+    description: root of source code tree
+    example: view/template/proj
+    default: make-proj
+  context:
+    example: nlparse
+    default: someproj

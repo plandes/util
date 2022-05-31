@@ -26,7 +26,8 @@ class ImportYamlConfig(YamlConfig):
     """
     def __init__(self, config_file: Union[Path, TextIOBase] = None,
                  default_section: str = None, sections_name: str = 'sections',
-                 sections: Set[str] = None, import_name: str = 'import'):
+                 sections: Set[str] = None, import_name: str = 'import',
+                 parse_values: bool = False):
         """Initialize with importation configuration.
 
         :param config_file: the configuration file path to read from; if the
@@ -46,12 +47,18 @@ class ImportYamlConfig(YamlConfig):
                             import entries (see class docs); defaults to
                             ``import``
 
+        :param parse_values: whether to invoke the :class:`.Serializer` to
+                             create in memory Python data, which defaults to
+                             false to keep data as string for configuraiton
+                             merging
+
         """
         super().__init__(config_file, default_section, default_vars=None,
                          delimiter=None, sections_name=sections_name,
                          sections=sections)
         self.import_name = import_name
         self.serializer = Serializer()
+        self._parse_values = parse_values
 
     def _post_config(self):
         def repl_node(par: Dict[str, Any]):
@@ -106,5 +113,6 @@ class ImportYamlConfig(YamlConfig):
         root: Dict[str, Any] = super()._compile()
         self._config = root
         self._post_config()
-        serialize(root)
+        if self._parse_values:
+            serialize(root)
         return root

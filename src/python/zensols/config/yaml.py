@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Tuple, Set, Any, Union
+from typing import Dict, Tuple, Set, Any, Union, Optional, List, Type
 import logging
 from pathlib import Path
 from io import TextIOBase
@@ -46,7 +46,7 @@ class YamlConfig(Configurable, Dictable):
                              configuration defaults based INI config
 
         :param delimiter: the delimiter used for template replacement with dot
-                          syntax
+                          syntax, or ``None`` for no template replacement
 
         :param sections_name: the dot notated path to the variable that has a
                               list of sections
@@ -67,7 +67,7 @@ class YamlConfig(Configurable, Dictable):
 
     @classmethod
     def _is_primitive(cls, obj) -> bool:
-        return isinstance(obj, (float, int, bool, str, set, list, tuple, Path))
+        return isinstance(obj, (float, int, bool, str, set, list, tuple, Type, Path))
 
     def _flatten(self, context: Dict[str, Any], path: str,
                  n: Dict[str, Any], sep: str = '.'):
@@ -145,7 +145,7 @@ class """ + class_name + """(Template):
                        class_name_param: str = None) -> Dict[str, Any]:
         return self.config
 
-    def get_tree(self, name: str) -> Dict[str, Any]:
+    def get_tree(self, name: Optional[str] = None) -> Dict[str, Any]:
         """Get the YAML tree for a node in the configuration.
 
         :param name: the doted notation indicating which node in the tree to
@@ -169,6 +169,8 @@ class """ + class_name + """(Template):
                         return v
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug('not found: {}'.format(name))
+        if name is None:
+            return self.config
         return find(self.config, '', name)
 
     def _get_option(self, name: str) -> str:
@@ -241,6 +243,44 @@ class """ + class_name + """(Template):
             self._root = next(iter(root_keys))
         return self._root
 
+    def _get_at_depth(self, node: Any, s_level: int, level: int,
+                      path: List[str]) -> Set[str]:
+        def map_node(x: Tuple[str, Any]) -> str:
+            k, v = x
+            if isinstance(v, dict):
+                if len(path) > 0:
+                    k = '.'.join(path) + '.' + k
+            else:
+                k = None
+            return k
+
+        nodes: Set[str] = set()
+        if isinstance(node, dict):
+            if level < s_level:
+                for k, child in node.items():
+                    path.append(k)
+                    ns = self._get_at_depth(child, s_level, level+1, path)
+                    path.pop()
+                    nodes.update(ns)
+            elif level == s_level:
+                return set(filter(lambda x: x is not None,
+                                  map(map_node, node.items())))
+        return nodes
+
+    def _find_sections(self) -> Set[str]:
+        secs: Set[str]
+        sec_key = f'{self.root}.{self.sections_name}'
+        if self.has_option(sec_key):
+            secs: Dict[str, Any] = self.get_tree(sec_key)
+            if isinstance(secs, str):
+                secs = self.get_option_list(sec_key)
+            elif isinstance(secs, int):
+                secs = self._get_at_depth(self.get_tree(None), secs, 0, [])
+            secs = frozenset(secs)
+        else:
+            secs = self._get_at_depth(self.get_tree(None), 0, 0, [])
+        return secs
+
     @property
     def sections(self) -> Set[str]:
         """Return the sections by finding the :obj:`section_name` based from the
@@ -248,14 +288,7 @@ class """ + class_name + """(Template):
 
         """
         if not hasattr(self, '_sections'):
-            sec_key = f'{self.root}.{self.sections_name}'
-            if self.has_option(sec_key):
-                secs = self.get_tree(sec_key)
-                if isinstance(secs, str):
-                    secs = self.get_option_list(sec_key)
-                self._sections = frozenset(secs)
-            else:
-                self._sections = frozenset([self.root])
+            self._sections = self._find_sections()
         return self._sections
 
     @sections.setter

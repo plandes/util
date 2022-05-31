@@ -3,9 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-import typing
 from typing import Dict, Union, Any, Set, Tuple, List, Iterable, Type
-import dataclasses
 from dataclasses import dataclass, field
 import logging
 import json
@@ -272,6 +270,9 @@ class Serializer(object):
             v = obj
         elif cls in self.PRIMITIVES:
             v = str(obj)
+        elif isinstance(obj, Type):
+            cname = ClassImporter.full_classname(obj)
+            v = f'class: {cname}'
         elif isinstance(obj, Path):
             return f'path: {obj}'
         else:

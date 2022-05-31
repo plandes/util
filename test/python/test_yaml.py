@@ -16,6 +16,7 @@ class TestYaml(unittest.TestCase):
         self.assertEqual(eqstr, conf.get_option('project.context.litval'))
         eqlist = ['apple', 'banana', 'nlparse orange']
         self.assertEqual(eqlist, conf.get_option('project.fruit'))
+        self.assertEqual({'project'}, conf.sections)
 
     def test_yaml_ops(self):
         ops = {'HOME': 'homedir',
@@ -37,3 +38,22 @@ class TestYaml(unittest.TestCase):
                           delimiter='^',
                           default_vars=defaults)
         self.assertEqual(ops, conf.options)
+
+    def test_yaml_set_sections(self):
+        conf = YamlConfig('test-resources/config-sections.yml',
+                          sections={'project.template-directory'})
+        self.assertEqual('Zensol Python', conf.get_option('project.org_name'))
+        self.assertEqual({'project.template-directory'}, conf.sections)
+
+    def test_yaml_set_sections_decl(self):
+        conf = YamlConfig('test-resources/config-sections-decl.yml')
+        self.assertEqual('Zensol Python', conf.get_option('project.org_name'))
+        self.assertEqual({'project.context'}, conf.sections)
+        self.assertEqual({'default': 'someproj', 'example': 'nlparse'},
+                         conf.populate({}, 'project.context'))
+
+    def test_yaml_level_sections(self):
+        conf = YamlConfig('test-resources/config-sections-level.yml')
+        should = {'second_tree.st-dir', 'project.context',
+                  'project.template-directory'}
+        self.assertEqual(should, conf.sections)
