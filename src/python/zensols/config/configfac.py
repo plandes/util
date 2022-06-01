@@ -44,7 +44,7 @@ class ConfigurableFactory(object):
 
     TYPE_TO_CLASS_PREFIX = {'importini': 'ImportIni',
                             'importyaml': 'ImportYaml',
-                            'condyml': 'ConditionalYaml'}
+                            'condyaml': 'ConditionalYaml'}
     """Mapping from :obj:`TYPE_NAME` option to class prefix."""
 
     TYPE_NAME = 'type'

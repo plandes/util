@@ -7,7 +7,7 @@ COND_CONF = """\
 sections = list: imp_yaml
 
 [imp_yaml]
-type_map = dict: {'yml': 'condyml'}
+type_map = dict: {'yml': 'condyaml'}
 config_file = test-resources/config-conditional.yml
 """
 
