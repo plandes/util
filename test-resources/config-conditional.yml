@@ -1,17 +1,23 @@
-# overrides for classification LSTM network
-condition:
+1.condition:
+  if: 'eval: not ${default:testvar}'
+  then:
+    top_lev:
+      bval: falseval
+  else:
+    top_lev:
+      bval: trueval
+
+3.condition:
   if: ${default:testvar}
   then:
     classify_net_settings:
       embedding_layer: 'glove_50_embedding_layer'
       recurrent_settings: 'recurrent_settings'
-      # set the dropout for the classification network propogates to sub networks
       dropout: 0.1
   else:
     classify_net_settings:
       embedding_layer: 'transformer_embedding_layer'
 
-# tell the model automation API which model to use
 executor:
   net_settings: 'instance: classify_net_settings'
   condition:

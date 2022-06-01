@@ -6,6 +6,7 @@ __author__ = 'Paul Landes'
 from typing import Dict, Any, Optional, List, Union
 from dataclasses import dataclass, field
 import logging
+import re
 from zensols.persist import persisted
 from . import ImportYamlConfig, ConfigurationError, Serializer
 
@@ -61,14 +62,13 @@ class ConditionalYamlConfig(ImportYamlConfig):
               recurrent_settings: 'recurrent_settings'
 
     """
-    _CONDITION_NODE = 'condition'
+    _CONDITION_REGEX = re.compile(r'^(?:[a-zA-Z0-9-_.]+)?condition$')
     _IF_NODE = 'if'
     _THEN_NODE = 'then'
     _ELSE_NODE = 'else'
 
-    def __init__(self, *args, condition_node: str = _CONDITION_NODE, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._condition_node = condition_node
         self._evals: Dict[str, Dict[str, Any]] = {}
 
     def _find_node(self, n: Union[Dict, Any], path: str, name: str):
@@ -80,14 +80,18 @@ class ConditionalYamlConfig(ImportYamlConfig):
 
     def _eval_tree(self, node: Dict[str, Any]):
         repls = {}
+        dels = set()
         for cn, cv in node.items():
+            if self._CONDITION_REGEX.match(cn) is not None:
+                dels.add(cn)
             if isinstance(cv, _Condition):
                 cond = cv
                 repls[cond.name] = cond.child
             elif isinstance(cv, dict):
                 self._eval_tree(cv)
         node.update(repls)
-        node.pop(self._CONDITION_NODE, None)
+        for n in dels:
+            del node[n]
 
     def get_tree(self, name: Optional[str] = None) -> Dict[str, Any]:
         node = self._evals.get(name)
@@ -127,8 +131,10 @@ class ConditionalYamlConfig(ImportYamlConfig):
         add_conds = {}
         for cn, cv in par.items():
             if isinstance(cv, dict):
-                if cn == self._condition_node:
+                if self._CONDITION_REGEX.match(cn) is not None:
                     cond = self._create_condition(cv)
+                    if cond.name in add_conds:
+                        raise ConfigurationError(f'Duplicate cond: {cond}')
                     add_conds[cond.name] = cond
                 else:
                     path.append(cn)

@@ -74,17 +74,20 @@ class TestYaml(unittest.TestCase):
 
     def test_condition(self):
         conf = self._create_cond_config({'default': {'testvar': 'True'}})
-        self.assertTrue('True', conf.get_option('testvar', 'default'))
-        self.assertTrue('glove_50_embedding_layer',
-                        conf.get_option('embedding_layer', 'classify_net_settings'))
+
+        self.assertEqual('trueval', conf.get_option('bval', 'top_lev'))
+        self.assertEqual('True', conf.get_option('testvar', 'default'))
+        self.assertEqual('glove_50_embedding_layer',
+                         conf.get_option('embedding_layer', 'classify_net_settings'))
         should = {'net_settings': 'instance: classify_net_settings',
                   'second_level': {'aval': 1}, 'slcon': 2}
-        self.assertTrue(should, conf.populate({}, 'executor'))
+        self.assertEqual(should, conf.populate({}, 'executor'))
 
-        conf = self._create_cond_config({'default': {'testvar': 'eval: 1 == 0'}})
-        self.assertTrue('eval: 1 == 0', conf.get_option('testvar', 'default'))
-        self.assertTrue('transformer_embedding_layer',
-                        conf.get_option('embedding_layer', 'classify_net_settings'))
+        conf = self._create_cond_config({'default': {'testvar': 'False'}})
+        self.assertEqual('False', conf.get_option('testvar', 'default'))
+        self.assertEqual('falseval', conf.get_option('bval', 'top_lev'))
+        self.assertEqual('transformer_embedding_layer',
+                         conf.get_option('embedding_layer', 'classify_net_settings'))
         should = {'net_settings': 'instance: classify_net_settings',
                   'second_level': {'aval': 2}, 'slcon': 3}
-        self.assertTrue(should, conf.populate({}, 'executor'))
+        self.assertEqual(should, conf.populate({}, 'executor'))
