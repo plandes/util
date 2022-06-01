@@ -106,7 +106,7 @@ class ImportYamlConfig(YamlConfig):
             logger.debug(f'updated config: {self._config}')
         self._flatten(context, '', self._config, ':')
 
-        if len(self.children) > 0 and False:
+        if len(self.children) > 0:
             dconf = DictionaryConfig()
             for child in self.children:
                 child.copy_sections(dconf)

@@ -356,8 +356,7 @@ class ImportIniConfig(IniConfig):
         for config in configs:
             # recursively create new import ini configs and add the children
             # we've created thus far for forward interpolation capability
-            #if isinstance(config, (ImportIniConfig, ImportYamlConfig)):
-            if isinstance(config, ImportIniConfig):
+            if isinstance(config, (ImportIniConfig, ImportYamlConfig)):
                 if logger.isEnabledFor(logging.INFO):
                     logger.info(f'descending: {config}')
                 if logger.isEnabledFor(logging.INFO):
