@@ -1,9 +1,19 @@
 import unittest
-from zensols.config import YamlConfig
+from io import StringIO
+from zensols.config import YamlConfig, ImportIniConfig, DictionaryConfig
+
+COND_CONF = """\
+[import]
+sections = list: imp_yaml
+
+[imp_yaml]
+type_map = dict: {'yml': 'condyml'}
+config_file = test-resources/config-conditional.yml
+"""
 
 
 class TestYaml(unittest.TestCase):
-    def test_yaml(self):
+    def test_env_var(self):
         defaults = {'HOME': 'homedir'}
         conf = YamlConfig('test-resources/config-test.yml',
                           delimiter='^',
@@ -18,7 +28,7 @@ class TestYaml(unittest.TestCase):
         self.assertEqual(eqlist, conf.get_option('project.fruit'))
         self.assertEqual({'project'}, conf.sections)
 
-    def test_yaml_ops(self):
+    def test_ops(self):
         ops = {'HOME': 'homedir',
                'project.context.envval': 'here',
                'project.context.litval': 'a non-subst ${HOME} but homedir works val',
@@ -39,21 +49,42 @@ class TestYaml(unittest.TestCase):
                           default_vars=defaults)
         self.assertEqual(ops, conf.options)
 
-    def test_yaml_set_sections(self):
+    def test_set_sections(self):
         conf = YamlConfig('test-resources/config-sections.yml',
                           sections={'project.template-directory'})
         self.assertEqual('Zensol Python', conf.get_option('project.org_name'))
         self.assertEqual({'project.template-directory'}, conf.sections)
 
-    def test_yaml_set_sections_decl(self):
+    def test_set_sections_decl(self):
         conf = YamlConfig('test-resources/config-sections-decl.yml')
         self.assertEqual('Zensol Python', conf.get_option('project.org_name'))
         self.assertEqual({'project.context'}, conf.sections)
         self.assertEqual({'default': 'someproj', 'example': 'nlparse'},
                          conf.populate({}, 'project.context'))
 
-    def test_yaml_level_sections(self):
+    def test_level_sections(self):
         conf = YamlConfig('test-resources/config-sections-level.yml')
         should = {'second_tree.st-dir', 'project.context',
                   'project.template-directory'}
         self.assertEqual(should, conf.sections)
+
+    def _create_cond_config(self, params: dict):
+        dconf = DictionaryConfig(params)
+        return ImportIniConfig(StringIO(COND_CONF), children=(dconf,))
+
+    def test_condition(self):
+        conf = self._create_cond_config({'default': {'testvar': 'True'}})
+        self.assertTrue('True', conf.get_option('testvar', 'default'))
+        self.assertTrue('glove_50_embedding_layer',
+                        conf.get_option('embedding_layer', 'classify_net_settings'))
+        should = {'net_settings': 'instance: classify_net_settings',
+                  'second_level': {'aval': 1}, 'slcon': 2}
+        self.assertTrue(should, conf.populate({}, 'executor'))
+
+        conf = self._create_cond_config({'default': {'testvar': 'eval: 1 == 0'}})
+        self.assertTrue('eval: 1 == 0', conf.get_option('testvar', 'default'))
+        self.assertTrue('transformer_embedding_layer',
+                        conf.get_option('embedding_layer', 'classify_net_settings'))
+        should = {'net_settings': 'instance: classify_net_settings',
+                  'second_level': {'aval': 2}, 'slcon': 3}
+        self.assertTrue(should, conf.populate({}, 'executor'))

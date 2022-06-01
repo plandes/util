@@ -145,6 +145,24 @@ class """ + class_name + """(Template):
                        class_name_param: str = None) -> Dict[str, Any]:
         return self.config
 
+    def _find_node(self, n: Union[Dict, Any], path: str, name: str):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'search: n={n}, path={path}, name={name}')
+        if path == name:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'found: <{n}>')
+            return n
+        elif isinstance(n, dict):
+            for k, v in n.items():
+                k = path + '.' + k if len(path) else k
+                v = self._find_node(v, k, name)
+                if v is not None:
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug(f'found {name} -> {v}')
+                    return v
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug('not found: {}'.format(name))
+
     def get_tree(self, name: Optional[str] = None) -> Dict[str, Any]:
         """Get the YAML tree for a node in the configuration.
 
@@ -152,26 +170,9 @@ class """ + class_name + """(Template):
                      retrieve
 
         """
-        def find(n: Union[Dict, Any], path: str, name: str):
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'search: n={n}, path={path}, name={name}')
-            if path == name:
-                if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'found: <{n}>')
-                return n
-            elif isinstance(n, dict):
-                for k, v in n.items():
-                    k = path + '.' + k if len(path) else k
-                    v = find(v, k, name)
-                    if v is not None:
-                        if logger.isEnabledFor(logging.DEBUG):
-                            logger.debug(f'found {name} -> {v}')
-                        return v
-                if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug('not found: {}'.format(name))
         if name is None:
             return self.config
-        return find(self.config, '', name)
+        return self._find_node(self.config, '', name)
 
     def _get_option(self, name: str) -> str:
         node = self.get_tree(name)

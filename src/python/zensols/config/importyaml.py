@@ -3,12 +3,15 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Union, Any, Set
+from typing import Dict, Union, Any, Set, Tuple
 from pathlib import Path
 import logging
 from string import Template
 from io import TextIOBase
-from . import Serializer, ConfigurableFactory, YamlConfig
+from . import (
+    Serializer, Configurable, ConfigurableFactory,
+    DictionaryConfig, YamlConfig,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -27,8 +30,12 @@ class ImportYamlConfig(YamlConfig):
     def __init__(self, config_file: Union[Path, TextIOBase] = None,
                  default_section: str = None, sections_name: str = 'sections',
                  sections: Set[str] = None, import_name: str = 'import',
-                 parse_values: bool = False):
-        """Initialize with importation configuration.
+                 parse_values: bool = False,
+                 children: Tuple[Configurable] = ()):
+        """Initialize with importation configuration.  The usage of ``default_vars`` in
+        the super class is disabled since this implementation uses a mix of dot
+        and colon (configparser) variable substitution (the later used when
+        imported from an :class:`.ImportIniConfig`.
 
         :param config_file: the configuration file path to read from; if the
                             type is an instance of :class:`io.TextIOBase`, then
@@ -59,8 +66,9 @@ class ImportYamlConfig(YamlConfig):
         self.import_name = import_name
         self.serializer = Serializer()
         self._parse_values = parse_values
+        self.children = children
 
-    def _post_config(self):
+    def _import_parse(self):
         def repl_node(par: Dict[str, Any]):
             repl = {}
             for k, c in par.items():
@@ -70,7 +78,7 @@ class ImportYamlConfig(YamlConfig):
                     repl[k] = tuple(c)
                 elif isinstance(c, str):
                     template = _Template(c)
-                    rc = template.safe_substitute(context)
+                    rc = template.safe_substitute(tpl_context)
                     if logger.isEnabledFor(logging.DEBUG):
                         logger.debug(f'subs: {c} -> {rc}')
                     repl[k] = rc
@@ -80,6 +88,7 @@ class ImportYamlConfig(YamlConfig):
             f'{self.root}.{self.import_name}')
         cnf: Dict[str, Any] = {}
         context: Dict[str, str] = {}
+        tpl_context = {}
 
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'import defs: {import_def}')
@@ -96,6 +105,14 @@ class ImportYamlConfig(YamlConfig):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'updated config: {self._config}')
         self._flatten(context, '', self._config, ':')
+
+        if len(self.children) > 0 and False:
+            dconf = DictionaryConfig()
+            for child in self.children:
+                child.copy_sections(dconf)
+            tpl_context.update(dconf.as_flat_dict())
+        tpl_context.update(context)
+
         new_keys = set(map(lambda k: k.replace(':', '.'), context.keys()))
         self._all_keys.update(new_keys)
         repl_node(self._config)
@@ -112,7 +129,7 @@ class ImportYamlConfig(YamlConfig):
 
         root: Dict[str, Any] = super()._compile()
         self._config = root
-        self._post_config()
+        self._import_parse()
         if self._parse_values:
             serialize(root)
         return root

@@ -15,7 +15,7 @@ from configparser import (
 from zensols.introspect import ClassImporterError
 from . import (
     ConfigurableError, ConfigurableFileNotFoundError,
-    Configurable, ConfigurableFactory, IniConfig, rawconfig,
+    Configurable, ConfigurableFactory, IniConfig, ImportYamlConfig, rawconfig,
 )
 
 logger = logging.getLogger(__name__)
@@ -356,6 +356,7 @@ class ImportIniConfig(IniConfig):
         for config in configs:
             # recursively create new import ini configs and add the children
             # we've created thus far for forward interpolation capability
+            #if isinstance(config, (ImportIniConfig, ImportYamlConfig)):
             if isinstance(config, ImportIniConfig):
                 if logger.isEnabledFor(logging.INFO):
                     logger.info(f'descending: {config}')

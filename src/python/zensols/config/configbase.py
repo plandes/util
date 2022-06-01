@@ -314,7 +314,7 @@ class Configurable(Writable, metaclass=ABCMeta):
         except StopIteration:
             return ''
 
-    def asdict(self, sort: bool = True) -> Dict[str, Dict[str]]:
+    def asdict(self, sort: bool = True) -> Dict[str, Dict[str, Any]]:
         """Return a two-tier :class:`dict` with sections at the first level, and the
         keyv/values at the second level.
 
@@ -328,6 +328,17 @@ class Configurable(Writable, metaclass=ABCMeta):
             for k in sorted(opts.keys()):
                 svs[k] = opts[k]
         return secs
+
+    def as_flat_dict(self) -> Dict[str, Any]:
+        """Return a flat one-tier :class:`dict` with keys in ``<section>:<option>``
+        format.
+
+        """
+        flat: Dict[str, Any] = {}
+        for sec, opts in self.asdict(False).items():
+            for k, v in opts.items():
+                flat[f'{sec}:{k}'] = v
+        return flat
 
     def asjson(self, *args, sort: bool = True, **kwargs) -> str:
         """Return a JSON string that represents this configuration.  For structure, see
