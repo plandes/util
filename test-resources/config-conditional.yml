@@ -9,7 +9,7 @@ condition:
       dropout: 0.1
   else:
     classify_net_settings:
-      embedding_layer: 'instance: transformer_embedding_layer'
+      embedding_layer: 'transformer_embedding_layer'
 
 # tell the model automation API which model to use
 executor:

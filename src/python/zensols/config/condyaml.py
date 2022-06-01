@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class _Condition(object):
+    """Contains data needed to branch at the level of node replacement.
+    """
     serializer: Serializer = field(repr=False)
     name: str
     ifn: Any
@@ -38,6 +40,27 @@ class _Condition(object):
 
 
 class ConditionalYamlConfig(ImportYamlConfig):
+    """Conditionally includes configuration based on very basic if/then logic.
+    YAML nodes (defaulting to name ``condition``) are replaced with a single
+    node either under a ``then`` node or an ``else`` node.
+
+    For the ``then`` node to be used, the ``if`` value must evaluate to
+    something that evaluates to true in Python.  For this reason, it is
+    recommended to use boolean constants or ``eval:`` syntax.
+
+    For example::
+        condition:
+          if: ${default:testvar}
+          then:
+            classify_net_settings:
+              embedding_layer: 'glove_50_embedding_layer'
+              recurrent_settings: 'recurrent_settings'
+          else:
+            classify_net_settings:
+              embedding_layer: 'transformer_embedding_layer'
+              recurrent_settings: 'recurrent_settings'
+
+    """
     _CONDITION_NODE = 'condition'
     _IF_NODE = 'if'
     _THEN_NODE = 'then'
