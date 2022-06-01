@@ -117,19 +117,18 @@ class ImportYamlConfig(YamlConfig):
         self._all_keys.update(new_keys)
         repl_node(self._config)
 
-    def _compile(self) -> Dict[str, Any]:
-        def serialize(par: Dict[str, Any]):
-            repl = {}
-            for k, c in par.items():
-                if isinstance(c, dict):
-                    serialize(c)
-                elif isinstance(c, str):
-                    repl[k] = self.serializer.parse_object(c)
-            par.update(repl)
+    def _serialize(self, par: Dict[str, Any]):
+        repl = {}
+        for k, c in par.items():
+            if isinstance(c, dict):
+                self._serialize(c)
+            elif isinstance(c, str):
+                repl[k] = self.serializer.parse_object(c)
+        par.update(repl)
 
-        root: Dict[str, Any] = super()._compile()
-        self._config = root
+    def _compile(self) -> Dict[str, Any]:
+        self._config = super()._compile()
         self._import_parse()
         if self._parse_values:
-            serialize(root)
-        return root
+            self._serialize(self._config)
+        return self._config
