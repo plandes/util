@@ -109,22 +109,22 @@ class ConditionalYamlConfig(ImportYamlConfig):
         thn = node.get(self._THEN_NODE)
         eln = node.get(self._ELSE_NODE)
         if ifn is None:
-            raise ConfigurationError(
+            self._raise(
                 f"Missing '{self._IF_NODE}' in condition: {node}")
         if thn is None and eln is None:
-            raise ConfigurationError(
+            self._raise(
                 f"Either '{self._THEN_NODE}' or " +
                 f"'{self._ELSE_NODE}' must follow an if in: {node}")
         for cn, name in ((thn, self._IF_NODE), (eln, self._ELSE_NODE)):
             if cn is not None and len(cn) > 1:
-                raise ConfigurationError(
+                self._raise(
                     'Conditionals can have only one child, ' +
                     f"but got {len(cn)}: {cn}'")
         thn_k = None if thn is None else next(iter(thn.keys()))
         eln_k = None if eln is None else next(iter(eln.keys()))
         if thn_k is not None and eln_k is not None and thn_k != eln_k:
-            raise ConfigurationError(
-                "Conditionals must have the same child root, got: '{node}'")
+            self._raise(
+                f"Conditionals must have the same child root, got: '{node}'")
         return _Condition(self.serializer, thn_k or eln_k, ifn, thn, eln, node)
 
     def _map_conditions(self, par: Dict[str, Any], path: List[str]):
@@ -134,7 +134,7 @@ class ConditionalYamlConfig(ImportYamlConfig):
                 if self._CONDITION_REGEX.match(cn) is not None:
                     cond = self._create_condition(cv)
                     if cond.name in add_conds:
-                        raise ConfigurationError(f'Duplicate cond: {cond}')
+                        self._raise(f'Duplicate cond: {cond}')
                     add_conds[cond.name] = cond
                 else:
                     path.append(cn)

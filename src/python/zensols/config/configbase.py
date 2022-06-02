@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Set, Iterable, List, Any, Union
+from typing import Dict, Set, Iterable, List, Any, Union, Optional
 from abc import ABCMeta, abstractmethod
 import sys
 import logging
@@ -350,6 +350,21 @@ class Configurable(Writable, metaclass=ABCMeta):
     def _get_short_str(self) -> str:
         sec = self._get_section_short_str()
         return f'{self.__class__.__name__}{{{sec}}}'
+
+    def _raise(self, msg: str, err: Exception = None):
+        config_file: Optional[Union[Path, str]] = None
+        if hasattr(self, 'config_file'):
+            config_file = self.config_file
+        if isinstance(config_file, str):
+            msg = f'{msg} in file {config_file}'
+        elif isinstance(config_file, Path):
+            msg = f'{msg} in file {config_file.absolute()}'
+        else:
+            msg = f'{msg} in {self._get_container_desc()}'
+        if err is None:
+            raise ConfigurableError(msg)
+        else:
+            raise ConfigurableError(msg) from err
 
     def __str__(self):
         return f'<{self._get_short_str()}>'
