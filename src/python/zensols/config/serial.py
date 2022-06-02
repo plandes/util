@@ -76,6 +76,7 @@ class Serializer(object):
 
     """
     FLOAT_REGEXP = re.compile(r'^[-+]?\d*\.\d+$')
+    SCI_REGEXP = re.compile(r'^([+-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+))$')
     INT_REGEXP = re.compile(r'^[-+]?[0-9]+$')
     BOOL_REGEXP = re.compile(r'^True|False')
     PATH_REGEXP = re.compile(r'^path:\s*(.+)$')
@@ -158,6 +159,8 @@ class Serializer(object):
             v = None
         elif self.FLOAT_REGEXP.match(v):
             v = float(v)
+        elif self.SCI_REGEXP.match(v):
+            v = float(eval(v))
         elif self.INT_REGEXP.match(v):
             v = int(v)
         elif self.BOOL_REGEXP.match(v):

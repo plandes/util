@@ -32,6 +32,16 @@ class TestConfigPopulate(unittest.TestCase):
         self.assertEqual(s.set_str2, {'2', '1'})
         self.assertEqual(s.lst_obj, [1, 2, Path('a.txt'), Path('res.txt')])
 
+    def test_sci_notation(self):
+        s = self.conf.populate(section='sci_test')
+        self.assertTrue(isinstance(s.v1, float))
+        self.assertEqual(2e-3, s.v1)
+        self.assertEqual(-2e-3, s.v2)
+        self.assertEqual(-2e-3, s.v2)
+        self.assertEqual(1.111e-11, s.v3)
+        self.assertEqual(3e4, s.v4)
+        self.assertEqual(-3e4, s.v5)
+
     def test_eval(self):
         s = self.conf.get_option_object('param9')
         self.assertEqual(s, {'scott': 2, 'paul': 1})

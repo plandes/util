@@ -1,5 +1,5 @@
 import unittest
-from configparser import NoSectionError, DuplicateSectionError
+from configparser import DuplicateSectionError
 from zensols.config import ConfigurableError, IniConfig
 
 
