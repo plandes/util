@@ -411,3 +411,6 @@ class Cleaner(DryRunApplication):
                     if isinstance(path, str):
                         path = Path(path)
                     self._remove_path(level, path)
+
+    def __call__(self):
+        self.clean()
