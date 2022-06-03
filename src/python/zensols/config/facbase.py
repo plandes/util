@@ -103,7 +103,6 @@ class ConfigFactory(object):
     section.
 
     """
-
     CONFIG_ATTRIBUTE = 'config'
     """The *configuration* of the parameter given to ``__init__``.  If a parameter
     of this name is on the instance being created it will be set as the
@@ -111,14 +110,12 @@ class ConfigFactory(object):
     instance.
 
     """
-
     CONFIG_FACTORY_ATTRIBUTE = 'config_factory'
     """The *configuration factory* of the parameter given to ``__init__``.  If a
     parameter of this name is on the instance being created it will be set as
     the instance of this configuration factory.
 
     """
-
     CLASS_NAME = 'class_name'
     """The class name attribute in the section that identifies the fully qualified
     instance to create.
