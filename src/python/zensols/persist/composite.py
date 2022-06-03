@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Set, Tuple
+from typing import Any, Set, Tuple, Union
 import logging
 import collections
 from functools import reduce
@@ -96,9 +96,15 @@ class DirectoryCompositeStash(DirectoryStash):
         of which are persisted to their respective directory.
 
         """
+        def map_group(group: Union[set, list, tuple]):
+            if not isinstance(group, (set, list, tuple)):
+                raise PersistableError(
+                    f'Composition {group} is not type set: ({type(group)})')
+            return frozenset(group)
+
         if len(groups) == 0:
             raise PersistableError('Must have at least one group set')
-        self._groups = tuple(map(frozenset, groups))
+        groups = tuple(map(map_group, groups))
         stashes = {}
         comp_path: Path = self._top_level_dir / self.COMPOSITE_DIRECTORY_NAME
         self._stash_by_group = {}
@@ -106,9 +112,6 @@ class DirectoryCompositeStash(DirectoryStash):
         self._all_keys = frozenset(reduce(lambda a, b: a | b, groups))
         comps: Set[str]
         for group in groups:
-            if not isinstance(group, set):
-                raise PersistableError(
-                    f'Composition {group} is not type set: ({type(group)})')
             name = '-'.join(sorted(group))
             path = comp_path / name
             comp_stash = DirectoryStash(path)
@@ -121,7 +124,8 @@ class DirectoryCompositeStash(DirectoryStash):
                 stashes[k] = comp_stash
                 self._stash_by_group[name] = comp_stash
         if logger.isEnabledFor(logging.INFO):
-            logger.info(f'creating composit hash with groups: {self.groups}')
+            logger.info(f'creating composit hash with groups: {groups}')
+        self._groups = groups
 
     def _to_composite(self, data: dict) -> Tuple[str, Any, Tuple[str, Any]]:
         """Create the composite data used to by the composite stashes to persist.
