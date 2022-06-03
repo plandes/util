@@ -483,6 +483,8 @@ class ActionCliManager(PersistableContainer, Dictable):
             cls_imp = ClassImporter(class_name, reload=False)
             cls = cls_imp.get_class()
             self._CLASS_IMPORTERS[class_name] = cls_imp
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'storing cachced {class_name}')
         else:
             cls = cls_imp.get_class()
         return cls
