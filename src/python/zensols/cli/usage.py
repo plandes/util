@@ -33,10 +33,10 @@ class UsageConfig(Dictable):
     as a percentage of the terminal width.
 
     """
-    max_metavar_len: Union[float, int] = field(default=0.2)
+    max_metavar_len: Union[float, int] = field(default=0.15)
     """Max length of the option type."""
 
-    max_default_len: Union[float, int] = field(default=0.2)
+    max_default_len: Union[float, int] = field(default=0.1)
     """Max length in characters of the default value."""
 
     left_indent: int = field(default=2)
