@@ -336,13 +336,14 @@ class ActionCliManager(PersistableContainer, Dictable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'attr: {attr} {src_val} -> {targ_val}')
             if src_val is not None and targ_val is not None:
-                both_keys = src_val.keys() | targ_val.keys()
-                for k in both_keys:
-                    sv = src_val.get(k)
-                    tv = targ_val.get(k)
-                    if sv is not None and tv is not None and\
-                       isinstance(sv, dict) and isinstance(tv, dict):
-                        targ_val[k] = tv | sv
+                if isinstance(src_val, dict):
+                    both_keys = src_val.keys() | targ_val.keys()
+                    for k in both_keys:
+                        sv = src_val.get(k)
+                        tv = targ_val.get(k)
+                        if sv is not None and tv is not None and\
+                           isinstance(sv, dict) and isinstance(tv, dict):
+                            targ_val[k] = tv | sv
                 target[attr] = src_val | targ_val
             elif src_val is not None:
                 target[attr] = cp.deepcopy(src_val)
