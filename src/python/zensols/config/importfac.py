@@ -31,6 +31,12 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
     parameter.
 
     """
+    DATACLASS = 'dataclass'
+    """Similar to :obj:`~zensols.config.facbase.ConfigFactory.CLASS_NAME`, an
+    attribute in a section that allows for creating instances of dataclasses
+    inline (i.e in YAML).
+
+    """
     _INSTANCE_REGEXP = re.compile(r'^instance(?:\((.+)\))?:\s*(.+)$',
                                   re.DOTALL)
     """The ``instance`` regular expression used to identify children attributes to
@@ -369,7 +375,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             k = next(iter(inst_dict.keys()))
             v = inst_dict[k]
             if isinstance(v, dict):
-                cls: Optional[str] = v.pop('dataclass', None)
+                cls: Optional[str] = v.pop(self.DATACLASS, None)
                 if cls is not None:
                     cls: Type = self._find_class(cls)
                     dc: Any = self._dataclass_from_dict(cls, v)
