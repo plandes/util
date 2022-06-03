@@ -370,17 +370,20 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             self._set_reload(initial_reload)
 
         self._add_injects(inst, pw_injects, reset_props)
-        if isinstance(inst, Settings):
-            inst_dict = inst.asdict()
-            k = next(iter(inst_dict.keys()))
-            v = inst_dict[k]
-            if isinstance(v, dict):
-                cls: Optional[str] = v.pop(self.DATACLASS, None)
-                if cls is not None:
-                    cls: Type = self._find_class(cls)
-                    dc: Any = self._dataclass_from_dict(cls, v)
-                    inst_dict[k] = dc
+        if isinstance(inst, Settings) and len(inst) == 1:
+            self._populate_dataclass(inst)
         return inst
+
+    def _populate_dataclass(self, inst: Any):
+        inst_dict = inst.asdict()
+        k = next(iter(inst_dict.keys()))
+        v = inst_dict[k]
+        if isinstance(v, dict):
+            cls: Optional[str] = v.pop(self.DATACLASS, None)
+            if cls is not None:
+                cls: Type = self._find_class(cls)
+                dc: Any = self._dataclass_from_dict(cls, v)
+                inst_dict[k] = dc
 
     def _process_injects(self, sec_name, kwargs):
         pname = 'injects'
