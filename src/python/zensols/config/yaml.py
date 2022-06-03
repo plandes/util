@@ -9,7 +9,7 @@ from pathlib import Path
 from io import TextIOBase
 import yaml
 from zensols.config import (
-    ConfigurableError, ConfigurableFileNotFoundError, Configurable, Dictable
+    ConfigurableFileNotFoundError, Configurable, Dictable
 )
 
 logger = logging.getLogger(__name__)
@@ -67,13 +67,13 @@ class YamlConfig(Configurable, Dictable):
 
     @classmethod
     def _is_primitive(cls, obj) -> bool:
-        return isinstance(obj, (float, int, bool, str, set, list, tuple, Type, Path))
+        return isinstance(obj, (float, int, bool, str, set,
+                                list, tuple, Type, Path))
 
     def _flatten(self, context: Dict[str, Any], path: str,
                  n: Dict[str, Any], sep: str = '.'):
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('path: {}, n: <{}>'.format(path, n))
-            logger.debug('context: <{}>'.format(context))
+            logger.debug(f'path: {path}, n: <{n}>, context: <{context}>')
         if n is None:
             context[path] = None
         elif self._is_primitive(n):
@@ -86,6 +86,8 @@ class YamlConfig(Configurable, Dictable):
             self._raise(f'Unknown yaml type {type(n)}: {n}')
 
     def _parse(self) -> Tuple[str, Dict[str, str], Dict[str, str]]:
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'parsing: {self.config_file}')
         cfile = self.config_file
         if not cfile.is_file():
             raise ConfigurableFileNotFoundError(cfile)
@@ -104,7 +106,6 @@ class YamlConfig(Configurable, Dictable):
     def _make_class(self) -> type:
         class_name = 'YamlTemplate{}'.format(self.CLASS_VER)
         self.CLASS_VER += 1
-        # why couldn't they have made idpattern and delimiter instance members?
         # note we have to give the option of different delimiters since the
         # default '$$' (use case=OS env vars) is always resolved to '$' given
         # the iterative variable substitution method
@@ -185,7 +186,6 @@ class """ + class_name + """(Template):
 
     def set_option(self, name: str, value: str, section: str = None):
         """This is a no-op for now as client's don't expect an exception."""
-        # TODO: implement
         pass
 
     @property
