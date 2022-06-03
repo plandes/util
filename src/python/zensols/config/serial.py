@@ -59,6 +59,9 @@ class Settings(Dictable):
     def __getitem__(self, name: str) -> str:
         return self.__dict__[name]
 
+    def __len__(self) -> int:
+        return len(self.__dict__)
+
     def __eq__(self, other) -> bool:
         return self.__dict__ == other.__dict__
 
@@ -230,7 +233,7 @@ class Serializer(object):
     def populate_state(self, state: Dict[str, str],
                        obj: Union[dict, object] = None,
                        parse_types: bool = True) -> Union[dict, object]:
-        """Populate an object with at string dictionary.  The keys are used for the
+        """Populate an object with a string dictionary.  The keys are used for the
         output, and the values are parsed in to Python objects using
         :meth:`parse_object`.  The keys in the input are used as the same keys
         if ``obj`` is a ``dict``.  Otherwise, set data as attributes on the
@@ -247,7 +250,7 @@ class Serializer(object):
             if parse_types and isinstance(v, str):
                 v = self.parse_object(v)
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug('setting {} => {} on {}'.format(k, v, obj))
+                logger.debug(f'setting {k} => {v} on {obj}')
             if is_dict:
                 obj[k] = v
             else:
