@@ -1,16 +1,32 @@
 croot:
-  sections: croot.instances
   instances:
-    dept: "dataclass(test_yaml_dataclass.Department): croot.dept"
-  dept:
-    name: hr
-    employees:
-      - name: bob
-        age: 21
-        salary: 15.5
-      - name: jill
-        age: 25
-        salary: 12.5
-        drivers_license:
-          state: IL
-          number: 598430IL
+    dept: 'dataclass(test_yaml_dataclass.Department): croot.referenced.dept'
+  referenced:
+    dept:
+      name: hr
+      employees:
+        - name: bob
+          age: 21
+          salary: 15.5
+        - name: jill
+          age: 25
+          salary: 12.5
+          drivers_license:
+            state: IL
+            number: 598430IL
+    another_emp:
+      name: bill
+      age: 32
+      salary: 58.2
+      drivers_license:
+        state: CA
+        number: "eval: '6901'"
+  inlines:
+    dept2:
+      dataclass: test_yaml_dataclass.Department
+      name: it
+      employees:
+        - name: martha
+          age: 65
+          salary: 10.1
+        - 'dataclass(test_yaml_dataclass.Person): croot.referenced.another_emp'

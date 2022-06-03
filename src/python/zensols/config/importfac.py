@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 
 
 class RedefinedInjectionError(FactoryError):
-    """Raised when any attempt to redefine or reuse injections for a class
+    """Raised when any attempt to redefine or reuse injections for a class.
+
     """
     pass
 
@@ -37,18 +38,19 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
     children recursively.
 
     """
-    _OBJECT_REGEXP = re.compile(r'^object(?:\((.+)\))?:\s*(.+)$',
-                                re.DOTALL)
+    _OBJECT_REGEXP = re.compile(r'^object(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     """The ``object`` regular expression used to instantiate non-shared singleton
     instances tied to the outside instance..
 
     """
-    _DATACLASS_REGEXP = re.compile(r'^dataclass\((.+)\):\s*(.+)$',
-                                   re.DOTALL)
-    """
+    _DATACLASS_REGEXP = re.compile(r'^dataclass\((.+)\):\s*(.+)$', re.DOTALL)
+    """The ``dataclass`` regular expression used to create Python dataclasses with
+    nested data in formats such as YAML.
+
     """
     _INJECTS = {}
     """Track injections to fail on any attempts to redefine."""
+
     _EMPTY_CHILD_PARAMS = frozendict()
 
     def __init__(self, *args, reload: Optional[bool] = False,
@@ -248,17 +250,20 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
     def _dataclass_from_dict(self, cls: Type, data: Any):
         if isinstance(data, str):
             data = self.from_config_string(data)
+            if isinstance(data, str):
+                data = self.config.serializer.parse_object(data)
         if dataclasses.is_dataclass(cls) and isinstance(data, dict):
             fieldtypes = {f.name: f.type for f in dataclasses.fields(cls)}
             try:
                 param = {f: self._dataclass_from_dict(fieldtypes[f], data[f])
                          for f in data}
             except KeyError as e:
-                raise FactoryError(f"No datacalass field {e} in '{cls}, data: {data}'")
+                raise FactoryError(
+                    f"No datacalass field {e} in '{cls}, data: {data}'")
             data = cls(**param)
         elif isinstance(data, (tuple, list)):
             origin: Type = typing.get_origin(cls)
-            cls = typing.get_args(cls)
+            cls: Type = typing.get_args(cls)
             if isinstance(cls, (tuple, list, set)) and len(cls) == 1:
                 cls = next(iter(cls))
             data: Iterable[Any] = map(
@@ -312,31 +317,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         params.update(insts)
         return class_name, params
 
-    def _process_injects(self, sec_name, kwargs):
-        pname = 'injects'
-        pw_param_set = kwargs.get(pname)
-        props = []
-        if pw_param_set is not None:
-            del kwargs[pname]
-            for params in eval(pw_param_set):
-                params = dict(params)
-                prop_name = params['name']
-                del params['name']
-                pw_name = f'_{prop_name}_pw'
-                params['path'] = pw_name
-                if prop_name not in kwargs:
-                    raise FactoryError(f"No property '{prop_name}' found '" +
-                                       f"in section '{sec_name}'", self)
-                params['initial_value'] = kwargs[prop_name]
-                # don't delete the key here so that the type can be defined for
-                # dataclasses, effectively as documentation
-                #
-                # del kwargs[prop_name]
-                props.append((pw_name, prop_name, params))
-        return props
-
-    def _instance(self, cls_desc, cls, *args, **kwargs):
-        sec_name = cls_desc
+    def _instance(self, sec_name: str, cls: Type, *args, **kwargs):
         reset_props = False
         class_name = ClassResolver.full_classname(cls)
         if logger.isEnabledFor(logging.DEBUG):
@@ -376,12 +357,50 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 inst = class_importer.instance(*args, **kwargs)
                 reset_props = True
             else:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'base call instance: {sec_name}')
                 inst = super()._instance(sec_name, cls, *args, **kwargs)
         finally:
             self._set_reload(initial_reload)
 
-        cls = inst.__class__
+        self._add_injects(inst, pw_injects, reset_props)
+        if isinstance(inst, Settings):
+            inst_dict = inst.asdict()
+            k = next(iter(inst_dict.keys()))
+            v = inst_dict[k]
+            if isinstance(v, dict):
+                cls: Optional[str] = v.pop('dataclass', None)
+                if cls is not None:
+                    cls: Type = self._find_class(cls)
+                    dc: Any = self._dataclass_from_dict(cls, v)
+                    inst_dict[k] = dc
+        return inst
 
+    def _process_injects(self, sec_name, kwargs):
+        pname = 'injects'
+        pw_param_set = kwargs.get(pname)
+        props = []
+        if pw_param_set is not None:
+            del kwargs[pname]
+            for params in eval(pw_param_set):
+                params = dict(params)
+                prop_name = params['name']
+                del params['name']
+                pw_name = f'_{prop_name}_pw'
+                params['path'] = pw_name
+                if prop_name not in kwargs:
+                    raise FactoryError(f"No property '{prop_name}' found '" +
+                                       f"in section '{sec_name}'", self)
+                params['initial_value'] = kwargs[prop_name]
+                # don't delete the key here so that the type can be defined for
+                # dataclasses, effectively as documentation
+                #
+                # del kwargs[prop_name]
+                props.append((pw_name, prop_name, params))
+        return props
+
+    def _add_injects(self, inst: Any, pw_injects, reset_props: bool):
+        cls: Type = inst.__class__
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'adding injects: {len(pw_injects)}')
         for pw_name, prop_name, inject in pw_injects:
@@ -407,4 +426,3 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 setattr(cls, prop_name, prop)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'create instance {cls}')
-        return inst

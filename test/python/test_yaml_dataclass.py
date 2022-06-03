@@ -25,10 +25,12 @@ class Department(Dictable):
 
 
 class TestYamlDataclass(unittest.TestCase):
-    def test_dc(self):
-        conf = YamlConfig('test-resources/dataclass-test.yml')
-        fac = ImportConfigFactory(conf)
-        instances: Settings = fac('croot.instances')
+    def setUp(self):
+        self.conf = YamlConfig('test-resources/dataclass-test.yml')
+        self.fac = ImportConfigFactory(self.conf)
+
+    def test_ref(self):
+        instances: Settings = self.fac('croot.instances')
         self.assertEqual(Settings, type(instances))
         dept: Department = instances.dept
         self.assertEqual(Department, type(dept))
@@ -40,4 +42,18 @@ class TestYamlDataclass(unittest.TestCase):
                   Person(name='jill', age=25, salary=12.5,
                          drivers_license=DriversLicense(
                              state='IL', number='598430IL')))
+        self.assertEqual(should, dept.employees)
+
+    def test_inline(self):
+        instances: Settings = self.fac('croot.inlines')
+        self.assertEqual(Settings, type(instances))
+        dept: Department = instances.dept2
+        self.assertEqual(Department, type(dept))
+        self.assertEqual('it', dept.name)
+        self.assertEqual(tuple, type(dept.employees))
+        should = (Person(name='martha', age=65, salary=10.1,
+                         drivers_license=None),
+                  Person(name='bill', age=32, salary=58.2,
+                         drivers_license=DriversLicense(
+                             state='CA', number='6901')))
         self.assertEqual(should, dept.employees)
