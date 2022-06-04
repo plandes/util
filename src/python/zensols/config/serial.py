@@ -292,6 +292,10 @@ class Serializer(object):
         exist, it defaults to the relateve file given in ``module_name``. If it
         finds it, it returns a path on the file system.
 
+        Note that when a package is not installed, the ``resources`` directory
+        must be in the module system path.  This happens automatically when
+        installed, otherwise symbolic links are needed.
+
         :param: resource_name the file name of the resource to obtain (or name
                 if obtained from an installed module)
 
