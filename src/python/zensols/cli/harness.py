@@ -105,10 +105,17 @@ class CliHarness(object):
 
     @staticmethod
     def add_sys_path(to_add: Path):
+        """Add to the Python system path if not already.
+
+        :param to_add: the path to test and add
+
+        """
+        def canon(p: Path):
+            return p.expanduser().resolve().absolute()
+
         spath: str
-        to_add = to_add.expanduser().resolve()
-        if not any(map(lambda p: Path(p).expanduser().resolve() == to_add,
-                       sys.path)):
+        to_add = canon(to_add)
+        if not any(map(lambda p: canon(Path(p)) == to_add, sys.path)):
             sys.path.append(str(to_add))
 
     @property
