@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Removed
+- Support for Python 3.8 is removed.
+
 
 ## [1.9.0] - 2022-05-14
 ### Removed
