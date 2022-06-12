@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 import logging
 import re
 from zensols.persist import persisted
-from . import ImportYamlConfig, ConfigurationError, Serializer
+from . import ImportYamlConfig, Serializer
 
 logger = logging.getLogger(__name__)
 

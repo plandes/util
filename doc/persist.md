@@ -23,7 +23,7 @@ Since the all subsequent calls to the method use the cached value, the method
 should take no arguments.  The annotation should be used *right* before the
 method definition, so it should be added after any `@property` annotation.
 
-A class can optionally extend [PersistedContainer] to automate the process of
+A class can optionally extend [PersistableContainer] to automate the process of
 (de)serializing all [PersistedWork] instances safely.  This class also safely
 deallocates all persisted work data that extend [Deallocatable].
 

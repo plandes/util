@@ -11,7 +11,7 @@ best place to start with the most functionality is the
 file.
 
 This will read an [INI] format uses the `configparser.ExtendedInterpolation`
-for [variable substitution].  See the [INI Format](#ini-format) section for an
+for [variable substitution].  See the [INI format] section for an
 example.
 
 While the [INI] format is preferred, the [YAML] format is also supported.
@@ -27,8 +27,7 @@ configuration parsing library in Python.  This format uses the syntax
 (variable name) settings.  For example `${default:temporary_dir}` refers to the
 root directory's `target` directory.  The `root_dir` entry in the `default`
 section is taken from an environment `dict` given in the initializer of the
-[ExtendedInterpolationEnvConfig] class.
-
+[ExtendedInterpolationEnvConfig] class.  For example:
 ```ini
 [default]
 root_dir = ${env:app_root}
@@ -53,11 +52,116 @@ file.
 
 ## YAML Format
 
-This format is implemented by the [YamlConfig] class.  The [grsync] utility
-provides an example [grsync YAML] configuration file.  The first level of all
-properties are defined as sections.  However, all variables are accessible
-using series of dot (`.`) separated paths.  See the YAML test
+The [YAML](https://yaml.org) format is implemented by the [YamlConfig] class.
+The [grsync] utility provides an example [grsync YAML] configuration file.  The
+first level of all properties are defined as sections.  However, all variables
+are accessible using series of dot (`.`) separated paths.  See the YAML test
 case [test_yaml.py] for an example.
+
+
+### YAML sections
+
+YAML configuration files "fit" in the INI configuration two level (section,
+option) constraints by indicating nodes in the YAML tree as sections and the
+respective children nodes as that section's options.  A list of sections can be
+given as a node under the root called `sections`.  For example, the YAML
+configuration file:
+```yaml
+project:
+  sections: [project.context]
+  context:
+    example: nlparse
+```
+is equivalent to:
+```ini
+[project.context]
+example = nlparse
+```
+
+When the `sections` node is missing, then all root level nodes in the YAML are
+sections with children nodes as respective options, so the YAML: ```yaml
+project: example: nlparse
+
+context:
+  default: someproj
+```
+
+has the INI equivalent as:
+```ini
+[project]
+example = nlparse
+
+[context]
+default = someproj
+```
+
+### YAML Importation
+
+Much like [INI importation](#import-ini-configuration), the [ImportYamlConfig]
+class supports importation with an `import` node.  For example:
+```yaml
+project:
+  import:
+    some_yaml_imp:
+      config_file: an-ini-file.conf
+  example: nlparse
+```
+with `an-ini-file.conf` containing:
+```ini
+[an_imported_sec]
+child_op = 1
+```
+is equivalent to:
+```ini
+[project]
+import = dict: {'some_yaml_imp': {'config_file': 'a.conf'}}
+example = nlparse
+
+[an_imported_sec]
+child_op = 1
+```
+
+
+### YAML Conditionals
+
+Simple if/then/else logic can be used in YAML configurations using a top level
+`condition` node with children `if`, `then` and `else` nodes using the
+[ConditionalYamlConfig] class.  However, the following caveats apply:
+* Only a single node can follow under the `if`, `then` and `else` nodes.
+* The same node name must used under the `then` and `else` nodes.
+* All `if` `then` and `else` node must always exist.
+
+When the `if` node evaluates to any "truthy" value, the child under the `then`
+node replaces everything at and under the respective `condition` node,
+otherwise `else` node is used as the replacement.
+
+The `condition` node can appear anywhere and at any level in the YAML tree.
+However, to avoid the issue of name collisions as sections, a prefix can be
+added, such as:
+
+For example, the [conditional YAML test case] has:
+```yaml
+1.condition:
+  if: 'eval: not ${default:testvar}'
+  then:
+    top_lev:
+      bval: falseval
+  else:
+    top_lev:
+      bval: trueval
+
+3.condition:
+  if: ${default:testvar}
+  then:
+    classify_net_settings:
+      embedding_layer: 'glove_50_embedding_layer'
+  else:
+    classify_net_settings:
+      embedding_layer: 'transformer_embedding_layer'
+```
+In this example, the `default:testvar` is defined either elsewhere in this
+configuration or defined by a "calling" [INI
+imported](#import-ini-configuration) section.
 
 
 ## JSON Format
@@ -82,36 +186,15 @@ integrate with all other *zensols* packages.
 
 Any non-trivial application is recommended to have an *application context*
 type class that allows for specific customization and behavior with retrieving
-(or storing) configuration.  Another reason for an application specific
-configuration class is that the configuration is typically passed around the
-application, and calling it by name can help the readability of your code.
+(or storing) configuration.  This framework uses instances of [Configurable]
+for this application context, which is added to instances created by a
+[ConfigFactory] (including [ImportConfigFactory], which is the API framework
+default).  It populates classes that have the following *initial* parameters in
+the initializer in order:
 
-The Python boilerplate generates this configuration class that defines faux
-section called `env` as see in the `${env:app_root}` variable given in the
-example from the [INI formatted] example.  This example shows how this default
-environment is given (if not provided to the initializer).  The
-`default_expect` parameter tells the parser to raise an error when a particular
-parameter is not provided.
-
-
-```python
-from zensols.config import ExtendedInterpolationEnvConfig
-
-class AppConfig(ExtendedInterpolationEnvConfig):
-    def __init__(self, *args, **kwargs):
-        if len(args) == 0 and 'config_file' not in kwargs:
-            kwargs['config_file'] = 'resources/someproj.conf'
-        if 'env' not in kwargs:
-            kwargs['env'] = {}
-        env = kwargs['env']
-        defs = {'app_root': '.'}
-        for k, v in defs.items():
-            if k not in env:
-                if logger.isEnabledFor(logging.INFO):
-                    logger.info(f'using default {k} = {v}')
-                env[k] = v
-        super().__init__(*args, default_expect=True, **kwargs)
-```
+* `name`: the name of the section from which the instance was created
+* `config`: the [Configurable] *application context* where instance was defined
+* `config_factory`: the [ConfigFactory] that created the instance
 
 
 ### Parsing
@@ -140,6 +223,8 @@ in how it reads data, which uses the following rules:
   [Configuration Factory] and [Instance Parameters](#instance-parameters)
   sections).
 * A string starting with `class:` a class/type specified by a class name.
+* A string starting with `dataclass(<class name>)` a dataclass (see
+  [Dataclasses](#dataclasses)).
 * Anything else as a string.
 
 
@@ -258,9 +343,8 @@ method, which in turn, uses the [pkg_resources] API to base the path from an
 installation.
 
 This mechanism needs the package metadata information to find the correct
-module in the install path.  This is set automatically when using CLI classes
-such as [OneConfPerActionOptionsCliEnv].  However, there are additional
-[setuptools] resources needed, which include:
+module in the install path.  However, there are additional [setuptools]
+resources needed, which include:
 * `python-resources` added in `PROJ_MODULES` in the makefile using the
   `zenbuild` build environment
 * `package_data` in `src/python/setup.py` to include the globs for the
@@ -298,7 +382,9 @@ type = importini
 config_files = list: resource(zensols.nlp): resources/obj.conf
 ```
 The `type = importini` tells it to use a [ImportIniConfig] (see the [Configuration
-Implementations](#configuration-implementations) section).
+Implementations](#configuration-implementations) section).  This parameter can
+also be set to `import` to use [ImportIniConfig] for `.conf` and `.ini` files,
+and [ImportYamlConfig] for `.yml` files.
 
 For an example of how to use a resource library, see the [nlparse example].
 
@@ -349,12 +435,41 @@ employees = instance: tuple: bob, bart
 ```
 
 
+### Dataclasses
+
+Instances of [dataclasses](https://docs.python.org/3/library/dataclasses.html)
+are supported using a `dataclass(<class name>): <section>` form.  Either use a
+`dict:` prefix in INI files, or define it in YAML with the corresponding
+(recursive data class) structure.  For example, the [dataclass test case] the
+following:
+```yaml
+croot:
+  instances:
+    dept: 'dataclass(test_yaml_dataclass.Department): croot.referenced.dept'
+  referenced:
+    dept:
+      name: hr
+      employees:
+        - name: bob
+          age: 21
+          salary: 15.5
+        - name: jill
+		...
+```
+Creates a dataclass instance of `test_yaml_dataclass.Department` whose
+definition is given with configuration starting with `dept:`.  Inline
+dataclasses in are also supported by creating a `dataclass: <class name>` entry
+with the following caveats:
+* It must be in a YAML configuration file.
+* It must be defined as a section (see [YAML sections](#yaml-sections)).
+
+
 ### Import INI Configuration
 
 A more advanced feature is to import other configurations in a top level.  The
-[ImportIniConfig] class also supports the [INI format](#ini-format), but adds
-other configuration sections to its own.  To create a configuration file that
-is used by the class, do the following:
+[ImportIniConfig] class also supports the [INI format], but adds other
+configuration sections to its own.  To create a configuration file that is used
+by the class, do the following:
 1. Create an `import` section that has:
    * `sections`: a comma delimited list of sections with information of other
      configuration to load
@@ -443,6 +558,12 @@ listed below:
     dictionary.
   * [ImportIniConfig]: An [INI Configuration](#import-ini-configuration) that
     uses other [Configurable] classes to load other sections.
+  * [ImportYamlConfig]: like [ImportIniConfig] but more limited in
+    functionality using the YAML format (see [YAML
+    Importation](#yaml-importation)).
+  * [ConditionalYamlConfig]: like [ImportYamlConfig] but replaces (sub)trees in
+    the YAML configuration based on simple if/then/else logic (see [YAML
+    Conditions](#yaml-conditions)).
 * Memory based:
   * [DictionaryConfig]: This is a simple implementation of a dictionary backing
     configuration.
@@ -464,19 +585,21 @@ this documentation.
 [YAML]: https://yaml.org
 [variable substitution]: https://docs.python.org/3.3/library/configparser.html#configparser.ExtendedInterpolation
 [grsync]: https://github.com/plandes/grsync
-[grsync YAML]: https://github.com/plandes/grsync/blob/master/test-resources/small-test.yml
+[grsync YAML]: https://github.com/plandes/grsync/blob/master/test-resources/yaml-test.yml
 [pathlib.Path]: https://docs.python.org/3/library/pathlib.html
 [Java Spring]: https://spring.io
 [setuptools]: https://setuptools.readthedocs.io/en/latest/
 [pkg_resources]: https://setuptools.readthedocs.io/en/latest/pkg_resources.html
 
-[Zensols natural language processing library]: https://github.com/plandes/deepnlp
+[Zensols deep learning natural language processing library]: https://github.com/plandes/deepnlp
 [zensols.deepnlp resource library]: https://github.com/plandes/deepnlp/tree/master/resources
 [nlparse example]: https://github.com/plandes/nlparse/blob/master/example/simple.py
 
 [test_yaml.py]: https://github.com/plandes/util/blob/master/test/python/test_yaml.py
 [Configuration Factory]: #configuration-factory
 [configuration factory]: #configuration-factory
+[INI format]: #ini-format
+[INI formatted]: #ini-format
 
 [Configurable]: ../api/zensols.config.html#zensols.config.configbase.Configurable
 [IniConfig]: ../api/zensols.config.html#zensols.config.iniconfig.IniConfig
@@ -485,10 +608,14 @@ this documentation.
 [EnvironmentConfig]: ../api/zensols.config.html#zensols.config.envconfig.EnvironmentConfig
 [JsonConfig]: ../api/zensols.config.html#zensols.config.json.JsonConfig
 [YamlConfig]: ../api/zensols.config.html#zensols.config.yaml.YamlConfig
+[ImportYamlConfig]: ../api/zensols.config.html#zensols.config.importyaml.ImportYamlConfig
+[ConditionalYamlConfig]: ../api/zensols.config.html#zensols.config.condyaml.ConditionalYamlConfig
 [StringConfig]: ../api/zensols.config.html#zensols.config.strconfig.StringConfig
-[ImportConfigFactory]: ../api/zensols.config.html#zensols.config.factory.ImportConfigFactory
+[ConfigFactory]: ../api/zensols.config.html#zensols.config.facbase.ConfigFactory
+[ImportConfigFactory]: ../api/zensols.config.html#zensols.config.importfac.ImportConfigFactory
 [ExtendedInterpolationEnvConfig]: ../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig
 [populate]: ../api/zensols.config.html#zensols.config.configbase.Configurable.populate
 [resource_filename]: ../api/zensols.config.html#zensols.config.configbase.Configurable.resource_filename
 [examples]: https://github.com/plandes/util/tree/master/example
-[OneConfPerActionOptionsCliEnv]: ../api/zensols.cli.html#zensols.cli.peraction.OneConfPerActionOptionsCliEnv
+[dataclass test case]: #https://github.com/plandes/util/blob/master/test-resources/dataclass-test.yml
+[conditional YAML test case]: https://github.com/plandes/util/blob/master/test-resources/config-conditional.yml

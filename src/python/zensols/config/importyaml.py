@@ -22,9 +22,9 @@ class _Template(Template):
 
 class ImportYamlConfig(YamlConfig):
     """Like :class:`.YamlConfig` but supports configuration importation like
-    :class:`.ImportIniConfig`.  The list imports is given at :obj:`import_name`
-    (see initializer), and contains the same information as import sections
-    documented in :class:`.ImportIniConfig`.
+    :class:`.ImportIniConfig`.  The list of imports is given at
+    :obj:`import_name` (see initializer), and contains the same information as
+    import sections documented in :class:`.ImportIniConfig`.
 
     """
     def __init__(self, config_file: Union[Path, TextIOBase] = None,
