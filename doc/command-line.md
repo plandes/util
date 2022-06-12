@@ -4,8 +4,100 @@ The goal of this API is to require little to no meta data to create a command
 line.  Instead, a complete command line interface is automatically built given
 a class and follows from the structure and meta data of the class itself.
 
-This API replaces the [SimpleActionCli] and its sub classes, which will
-eventually be removed from a future major release.
+
+## Harness and Simple Example
+
+To start, and a good place to jump right in, a minimalist example is provided.
+The [fsinfo.py] example provides an example of how to use the command line
+harness, which is a class that provides a command line interface, [Jupyter
+notebooks] and the Python REPL to the an [application context].
+
+In the [fsinfo.py] example, this application context is defined inline in INI
+format:
+```python
+CONFIG = """
+[cli]
+apps = list: log_cli, app
+...
+[app]
+class_name = fsinfo.Application
+executor = instance: executor
+"""
+```
+
+The next enumeration class provides a programmatic way to identify a short
+verses long output format when listing a directory for our application.
+However, it is also used by the command line API to generate a help message and
+validate command line arguments:
+```python
+class Format(Enum):
+    short = auto()
+    long = auto()
+```
+
+The next part of the example application defines a [dataclass] which is not
+only invoked by the command line API glue code, but also used to create the
+help usage for the command line:
+```python
+@dataclass
+class Application(object):
+    """Toy application example that provides file system information.
+
+	"""
+    # tell the framework to not treat the executor field as an option
+    CLI_META = {'option_excludes': {'executor'}}
+
+    executor: Executor = field()
+    """The executor."""
+...
+    def echo(self, text: str):
+        """Repeat back what is given as text.
+        """
+        print(text)
+```
+
+The top level usage documentation comes from the class documentation, method
+documentation for actions, and the parameters themselves for the arguments.
+The `CLI_META` is a class level hint to the API glue code to not add the
+`executor` class as part of the command line, which it would by default
+otherwise.  This parameter is added based on the [application context] adds
+this to the class when one of the methods are run based on the user selected
+action that maps to the called method.
+
+Finally we create and run a harness based on the configuration we've created,
+which in turn points to our application `dataclass`:
+```python
+if (__name__ == '__main__'):
+    CliHarness(
+        app_config_resource=StringIO(CONFIG),
+        app_config_context=ProgramNameConfigurator(
+            None, default='fsinfo').create_section(),
+        proto_args='ls -f long',
+        proto_factory_kwargs={'reload_pattern': '^fsinfo'},
+    ).run()
+```
+
+We provide the `app_config_resource` as a stream based object.  If this were a
+string or `pathlib.Path`, it would get the [application context] from the file
+system.
+
+Next, the `app_config_context` parameter uses a *first pass* application (see
+the [Two Pass Command Line Parser](#two-pass-command-line-parser) section) to
+create a section given to the application context that has the program info
+used by the logging setup.
+
+The `proto_args` parameter are the command line arguments used when prototyping
+the application in the Python REPL as if the application were run from the
+command line.
+
+Finally the `proto_factory_kwargs` tell the API to reload any module (matched
+as a regular expression) starting `fsinfo`, which is the module defined by this
+script.  This is more useful for larger applications with multiple module
+name spaces.
+
+
+
+## Tutorial
 
 Like the other documentation, this covers the command line API as a tutorial
 and points out the API for further perusing in a breadth first manner.  As this
@@ -20,7 +112,7 @@ template as described in the main documentation [template
 section](../#template).
 
 
-## Boilerplate
+### Boilerplate
 
 Every introspective CLI application needs an *application context* (see the
 [configuration documentation](config.html#application-context)), which is just
@@ -115,7 +207,7 @@ hello world
 ```
 
 
-## Domain
+### Domain
 
 Let's add some container classes in `domain.py` to hold data for our payroll
 system, which are employees and their salaries and a grouping for them by
@@ -174,7 +266,7 @@ db = instance: emp_db
 ```
 
 
-### Application Class and Actions
+#### Application Class and Actions
 
 We'll flesh out our main application class with documentation and data class
 field `dry_run`.
@@ -219,7 +311,7 @@ want to include the sub class for additional actions and options, set the class
 attribute `CLASS_INSPECTOR` (see [INSPECT_META]) to `{}`.
 
 
-### Action Decorators
+#### Action Decorators
 
 Now we have the try run boolean flag generated from our data class field
 attribute and we see the method docstring used as the program documentation.
@@ -251,7 +343,7 @@ The format of decorator sections can be modified with
 `decorator_section_format` given to the [ActionCliManager].
 
 
-### Domain and Choices
+#### Domain and Choices
 
 We'll want to be able to allow different formats to print employees for our
 `print_employees` method  However, this parameter will only apply to this
@@ -317,7 +409,7 @@ employees:
 ```
 
 
-## User Configuration
+### User Configuration
 
 So far all the configuration we've seen is tied closely to the code, and not
 the kind of configuration the end user cares about or should want to see.  This
@@ -337,7 +429,7 @@ the configuration and add it to the application context.  It is configured as a
 *first pass* class, which means it is run before the application.
 
 
-### Two Pass Command Line Parser
+#### Two Pass Command Line Parser
 
 Generally speaking, there are many first pass actions that prepare for one of
 many second pass actions indicated by the user using the *action*'s mnemonic.
@@ -397,7 +489,7 @@ is `import`, which requires a `section` property.  The section is then loaded
 just like the `[import]` of an [import ini configuration].
 
 
-### Split Out the User Configuration
+#### Split Out the User Configuration
 
 Now we can move what we think the user might edit to the user context
 `payroll.conf`, and we'll add a few defaults while we're at it:
@@ -426,7 +518,7 @@ The `high_cost` user configuration option gives what the company determines is
 a high cost employee and needs to be used to separate employees.
 
 
-## Another Second Pass Action
+### Another Second Pass Action
 
 Now we need to report on high salaried employees using the `high_cost` option
 in the user configuration, so let's add that capability to the "database":
@@ -498,7 +590,7 @@ to use since we have more than one eligible action, so instead it uses the
 class's docstring.
 
 
-### Renaming the Mnemonics
+#### Renaming the Mnemonics
 
 While the help messages look natural for a command line program, the long
 mnemonic names look out of place and would be cumbersome to type.  Again, we'll
@@ -540,14 +632,14 @@ Conversely, we link from the `default` section's `high_cost` parameter to the
 "data base" `emp_db` section for the `EmployeeDatabase.high_cost` attribute.
 
 
-### Default Action
+#### Default Action
 
 A `default_action` attribute can be set on the [ActionCliManager] in the `cli`
 section when it is created to use an action by name if the user does not supply
 one.  Usage identifies which action is the default.
 
 
-## Logging
+### Logging
 
 It would be nice to be able to log some messages instead of print them for our
 application, but only our application.  If we turn on information level logging
@@ -600,7 +692,7 @@ documentation since we now have more than one class, which doesn't allow for
 taking it from the class docstring.
 
 
-## More Actions
+### More Actions
 
 Speaking of the package, perhaps we want to report some information about it.
 Already we have a way of getting it's version with the `--version` option.  But
@@ -645,7 +737,7 @@ package: payroll
 ```
 
 
-## Positional Arguments
+### Positional Arguments
 
 Let's suppose our formatting for employee printing changes and we no longer
 trust the default given on the command line.  Instead we want to force the user
@@ -675,7 +767,7 @@ human_resources: homer, bob
 ```
 
 
-## Environment
+### Environment
 
 It is important to easily supply environment information to the application,
 for which the framework has two means:
@@ -730,7 +822,7 @@ provide.  This is very handy in setting application roots that might have
 different data directories for scientific data, models, etc.
 
 
-## Directory Structure
+### Directory Structure
 
 So far, our examples have been small and had a simple flat directory
 structure.  However, in larger applications, we'll want to branch out and
@@ -770,8 +862,12 @@ the `example/cli/1-boilerplate` directory in the source repository.
 <!-- links -->
 
 [example]: https://github.com/plandes/util/tree/master/example/cli
+[fsinfo.py]: https://github.com/plandes/util/blob/master/example/app/fsinfo.py
+[application context]: config.html#application-context
 [configuration]: config.md
 [setuptools]: https://setuptools.readthedocs.io/en/latest/
+[dataclass]: https://docs.python.org/3/library/dataclasses.html
+[Jupyter notebooks]: https://jupyter.org
 
 [Enum]: https://docs.python.org/3/library/enum.html
 [OptionParser]: https://docs.python.org/3/library/optparse.html
@@ -787,7 +883,6 @@ the `example/cli/1-boilerplate` directory in the source repository.
 [ImportConfigFactory]: ../api/zensols.config.html#zensols.config.factory.ImportConfigFactory
 [LogConfigurator]: ../api/zensols.cli.html#zensols.cli.lib.LogConfigurator
 [PackageInfoImporter]: ../api/zensols.cli.html#zensols.cli.lib.PackageInfoImporter
-[SimpleActionCli]: ../api/zensols.cli.html#zensols.cli.simple.SimpleActionCli
 [CONFIG_META]: ../api/zensols.cli.html#zensols.cli.lib.LogConfigurator.CLI_META
 [LogConfigurator.CONFIG_META]: ../api/zensols.cli.html#zensols.cli.lib.LogConfigurator.CLI_META
 [INSPECT_META]: ../api/zensols.introspect.html#zensols.introspect.inspect.ClassInspector.INSPECT_META
