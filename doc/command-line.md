@@ -873,13 +873,15 @@ config_files = list:
 The `config_imp` section is indicated as an importation section in the
 [cli-config.conf] resource library.  The special syntax `^{config_path}`
 indicates to load the file given by the `--config` option and `^{override}`
-loads the configuration given in the `--override` option.  Finally the
-`obj.conf` is loaded all in this order.  The developer can change this order to
-allow overriding or re-overriding configuration based on the needs of the
-application.
+loads the configuration given in the `--override` option (see the
+[ConfigurationOverrider] first pass application).
 
-Given we have one specific configuration file, we can set it as the default so
-the user need not specify it in the `app.conf` with:
+Finally, the `obj.conf` is loaded after the user and overriding configuration
+all in this order.  The developer can change this order to allow overriding or
+re-overriding configuration based on the needs of the application.
+
+Since we have only one configuration file, we can set it as the default so the
+user need not specify it.  To do this we add the following to `app.conf` with:
 ```ini
 # set the default configuration file
 [config_cli_decorator]
@@ -934,6 +936,7 @@ the `example/cli/1-boilerplate` directory in the source repository.
 [OptionParser]: https://docs.python.org/3/library/optparse.html
 
 [import ini configuration]: config.html#import-ini-configuration
+[ConfigurationOverrider]: ../api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationOverrider
 [EnvironmentConfig]: ../api/zensols.config.html#zensols.config.envconfig.EnvironmentConfig
 [ActionCli]: ../api/zensols.cli.html#zensols.cli.action.ActionCli
 [ActionCliManager]: ../api/zensols.cli.html#zensols.cli.action.ActionCliManager
