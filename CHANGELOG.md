@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [1.10.0] - 2022-06-13
+### Added
+- Command line first pass applications and `--config` option added as resource
+  libraries.
+- If/then/else logic during configuration creation with
+  `ConditionalYamlConfig`.
+- Nest and invoke `--override` anywhere in the configuration importation
+  list.
+- Inline `@dataclasses` in YAML files at the section level.
+- Scientific notation formatted configuration option values.
+
+### Changed
+- Updated documentation to be more current, added newer API.
+- `DirectoryCompositeStash` now robustly handle group sequences.
+- Better collapsing of long option and defaults usage help columns.
+- Bug fixes and supporter for merging `CLI_META` for CLI applications.
+
 ### Removed
 - Support for Python 3.8 is removed.
 
@@ -366,7 +384,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.10.0...HEAD
+[1.10.0]: https://github.com/plandes/util/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/plandes/util/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/plandes/util/compare/v1.7.3...v1.8.0
 [1.7.3]: https://github.com/plandes/util/compare/v1.7.2...v1.7.3

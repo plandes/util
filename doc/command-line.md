@@ -7,10 +7,11 @@ a class and follows from the structure and meta data of the class itself.
 
 ## Harness and Simple Example
 
-To start, and a good place to jump right in, a minimalist example is provided.
-The [fsinfo.py] example provides an example of how to use the command line
-harness, which is a class that provides a command line interface, [Jupyter
-notebooks] and the Python REPL to the an [application context].
+To start, and a good place to jump right in, the [template](../#template)
+section's example is expanded (see [fsinfo.py] for the complete example).  It
+provides an example of how to use the command line harness, which is a class
+that provides a command line interface, [Jupyter notebooks] and the Python REPL
+to the an [application context].
 
 In the [fsinfo.py] example, this application context is defined inline in INI
 format:
@@ -96,20 +97,17 @@ script.  This is more useful for larger applications with multiple module
 name spaces.
 
 
-
 ## Tutorial
 
-Like the other documentation, this covers the command line API as a tutorial
-and points out the API for further perusing in a breadth first manner.  As this
-API is build on the [configuration], please read or skim that documentation
-first.  We'll start with a simple application and build it up, with the final
-version being the CLI [example] directory.
+This tutorial covers the command line API in a breadth first manner.  Please
+read the [configuration] documentation first as this document builds on it.  We
+will start with a simple application and build it up, with the final version
+being the CLI [example] directory.
 
 The remainder of the tutorial shows by example of how to use the framework.
 The working example code at the end of each sub section can be found in the
-[example] directory `example/cli`.  A more complete full example is given as a
-template as described in the main documentation [template
-section](../#template).
+[example] directory.  A more complete full example is given as a template as
+described in the main documentation [template section](../#template).
 
 
 ### Boilerplate
@@ -148,7 +146,6 @@ application:
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class Tracker(object):
     def print_employees(self):
@@ -161,11 +158,9 @@ Finally, we need the entry point main, which is added to `main.py`:
 
 from zensols.cli import ApplicationFactory
 
-
 def main():
     cli = ApplicationFactory('payroll', 'app.conf')
     cli.invoke()
-
 
 if __name__ == '__main__':
     main()
@@ -801,7 +796,6 @@ from pathlib import Path
 from zensols.config import DictionaryConfig
 from zensols.cli import ApplicationFactory
 
-
 @dataclass
 class PayrollApplicationFactory(ApplicationFactory):
     @classmethod
@@ -810,7 +804,6 @@ class PayrollApplicationFactory(ApplicationFactory):
             {'appenv': {'root_dir': str(root_dir)},
              'financial': {'salary': 15.}})
         return cls('payroll', 'app.conf', children_configs=(dconf,))
-
 
 def main():
     cli = PayrollApplicationFactory.instance()
@@ -844,6 +837,72 @@ comprehensive [example](#complete-examples) of the final product of this
 tutorial.
 
 
+### Overriding Configuration and Harness
+
+The final version of our application will simplify the CLI by removing the
+`ApplicationFactory` class and using a `CliHarness` in its place.  Now the
+entire `main.py` class has:
+```python
+from zensols.cli import CliHarness
+
+if (__name__ == '__main__'):
+    harness = CliHarness(
+        package_resource='mycom.payroll',
+        proto_factory_kwargs={'reload_pattern': r'^mycom\.payroll'},
+    )
+    harness.run()
+```
+
+The `package_resource` tells the harness the application module to find the
+application as a package.  It also tells the framework where to find not only
+the `app.conf` but resolves the added `obj.conf` application resource file
+using `resource(mycom.payroll): resources/obj.conf`.
+
+The `app.conf` application context file is much more simple now as well as it
+now imports path and command line defaults from the `zensols.util` [resource
+library].  Also notice the how the configuration is loaded in the `config_imp`
+section:
+```ini
+[config_imp]
+config_files = list: 
+    ^{config_path},
+    ^{override},
+    resource(mycom.payroll): resources/obj.conf
+```
+
+The `config_imp` section is indicated as an importation section in the
+[cli-config.conf] resource library.  The special syntax `^{config_path}`
+indicates to load the file given by the `--config` option and `^{override}`
+loads the configuration given in the `--override` option.  Finally the
+`obj.conf` is loaded all in this order.  The developer can change this order to
+allow overriding or re-overriding configuration based on the needs of the
+application.
+
+Given we have one specific configuration file, we can set it as the default so
+the user need not specify it in the `app.conf` with:
+```ini
+# set the default configuration file
+[config_cli_decorator]
+option_overrides = dict: {'config_path': {'default': '${default:root_dir}/etc/payroll.conf'}}
+```
+
+The `--override` flag takes a configuration file, a directory of configuration
+files, or a string in the format `<section>.<option>=<value>` form.  For
+example, if we invoke the script and *override* Homer's salary by:
+```bash
+./main.py show -f verbose --override homer.salary=100.5
+```
+we get
+```
+name: hr
+employees:
+...
+    name: homer
+    age: 32
+    salary: 100.5
+```
+
+
 ## Conclusion
 
 This tutorial was meant to instruct quickly on how to create applications.
@@ -868,6 +927,8 @@ the `example/cli/1-boilerplate` directory in the source repository.
 [setuptools]: https://setuptools.readthedocs.io/en/latest/
 [dataclass]: https://docs.python.org/3/library/dataclasses.html
 [Jupyter notebooks]: https://jupyter.org
+[cli-config.conf]: https://github.com/plandes/util/blob/master/resources/cli-config.conf
+[resource library]: config.html#resource-libraries
 
 [Enum]: https://docs.python.org/3/library/enum.html
 [OptionParser]: https://docs.python.org/3/library/optparse.html
