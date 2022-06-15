@@ -344,6 +344,7 @@ class ActionCliManager(PersistableContainer, Dictable):
                         if sv is not None and tv is not None and\
                            isinstance(sv, dict) and isinstance(tv, dict):
                             targ_val[k] = tv | sv
+                            src_val[k] = tv | sv
                 target[attr] = targ_val | src_val
             elif src_val is not None:
                 target[attr] = cp.deepcopy(src_val)
