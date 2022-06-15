@@ -382,6 +382,10 @@ class Cleaner(DryRunApplication):
     clean_level: int = field(default=0)
     """The level at which to delete."""
 
+    def __post_init__(self):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'cleaner: created with paths: {self.paths}')
+
     def _remove_path(self, level: int, glob: Path) -> bool:
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'maybe removing glob: {glob}')
@@ -391,6 +395,8 @@ class Cleaner(DryRunApplication):
         else:
             parent = glob.parent
             pat = glob.name
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'cleaner: glob: {pat}')
         for path in parent.glob(pat):
             if path.exists():
                 if logger.isEnabledFor(logging.WARNING):
