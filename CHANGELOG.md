@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.10.1] - 2022-06-15
+### Changed
+- Command line configuration metadata with configuration decorators bug fix.
+
+
 ## [1.10.0] - 2022-06-13
 ### Added
 - Command line first pass applications and `--config` option added as resource
@@ -384,7 +389,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.10.0...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.10.1...HEAD
+[1.10.1]: https://github.com/plandes/util/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/plandes/util/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/plandes/util/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/plandes/util/compare/v1.7.3...v1.8.0
