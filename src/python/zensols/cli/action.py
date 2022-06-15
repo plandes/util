@@ -344,7 +344,7 @@ class ActionCliManager(PersistableContainer, Dictable):
                         if sv is not None and tv is not None and\
                            isinstance(sv, dict) and isinstance(tv, dict):
                             targ_val[k] = tv | sv
-                target[attr] = src_val | targ_val
+                target[attr] = targ_val | src_val
             elif src_val is not None:
                 target[attr] = cp.deepcopy(src_val)
             if logger.isEnabledFor(logging.DEBUG):
@@ -492,13 +492,14 @@ class ActionCliManager(PersistableContainer, Dictable):
     def _create_action_from_section(self, conf_sec: str,
                                     params: Dict[str, Any]) -> ActionCli:
         """Create an action from a section in the configuration.  If both the class
-        ``CLI_META`` exists, then this will replace all options (properties)
-        defined.
+        ``CLI_META`` and the decorator section exists, then this will replace
+        all options (properties) defined.
 
         :param conf_sec: the section name in the configuration that has the
                          action to create/overwrite the data
 
         :param params: the parameters used to create the :class:`.ActionCli`
+                       from the decorator
 
         :return: an instance of :class:`.ActionCli` that represents the what is
                  given in the configuration section
