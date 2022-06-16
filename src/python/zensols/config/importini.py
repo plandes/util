@@ -299,8 +299,9 @@ class ImportIniConfig(IniConfig):
             if refs is not None:
                 for ref in refs:
                     if ref not in config.sections:
-                        self._raise(f"Reference '{ref}' in section " +
-                                    f"'{conf_sec}' not found, got: '{refs}'")
+                        self._raise(
+                            f"Reference '{ref}' in section '{conf_sec}' not " +
+                            f"found, got: {set(config.sections)}")
 
     def _create_config(self, section: str,
                        params: Dict[str, Any]) -> Configurable:
