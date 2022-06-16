@@ -142,7 +142,7 @@ class CliHarness(object):
 
     def _handle_exit(self, se: SystemExit):
         """Handle attempts to exit the Python interpreter.  This default implementation
-    simplly prints the error if :obj:`no_exit` is ``True``.
+        simplly prints the error if :obj:`no_exit` is ``True``.
 
         :param se: the error caught
 
