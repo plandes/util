@@ -140,7 +140,7 @@ class CliHarness(object):
                          f'method: {meth}')
         return meth
 
-    def _handle_exist(self, se: SystemExit):
+    def _handle_exit(self, se: SystemExit):
         """Handle attempts to exit the Python interpreter.  This default implementation
     simplly prints the error if :obj:`no_exit` is ``True``.
 
@@ -305,7 +305,7 @@ class CliHarness(object):
         try:
             return cli.invoke(args[1:])
         except SystemExit as e:
-            self._handle_exist(e)
+            self._handle_exit(e)
 
     def get_instance(self, args: Union[List[str], str] = None,
                      **factory_kwargs: Dict[str, Any]) -> Any:
@@ -332,7 +332,7 @@ class CliHarness(object):
         try:
             return cli.get_instance(args[1:])
         except SystemExit as e:
-            self._handle_exist(e)
+            self._handle_exit(e)
 
     def _proto(self, args: Union[List[str], str],
                **factory_kwargs: Dict[str, Any]):
@@ -363,7 +363,7 @@ class CliHarness(object):
         try:
             return self._proto(args, **self.proto_factory_kwargs)
         except SystemExit as e:
-            self._handle_exist(e)
+            self._handle_exit(e)
 
     def __call__(self, args: Union[List[str], str] = None):
         """Invoke the command line with arguments.  This is useful for calling from the
@@ -378,7 +378,7 @@ class CliHarness(object):
         try:
             return self.proto(args)
         except SystemExit as e:
-            self._handle_exist(e)
+            self._handle_exit(e)
 
     def run(self) -> Optional[ActionResult]:
         """The command line script entry point."""
