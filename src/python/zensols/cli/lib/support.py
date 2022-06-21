@@ -292,6 +292,7 @@ class ProgramNameConfigurator(object):
     :class:`~zensols.cli.LogConfigurator` section's ``format`` property.
 
     Example::
+
         [add_prog_cli]
         class_name = zensols.cli.ProgramNameConfigurator
         default = someprog
