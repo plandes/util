@@ -271,7 +271,8 @@ class Configurable(Writable, metaclass=ABCMeta):
             if not isinstance(opts, dict):
                 raise ConfigurationError(
                     f"Expecting dict but got {type(opts)} in section '{sec}'")
-            for k, v in opts.items():
+            for k in sorted(opts.keys()):
+                v = opts[k]
                 self._write_line(f'{k}: {v}', depth + 1, writer)
 
     def _get_calling_module(self, depth: int = 0):
