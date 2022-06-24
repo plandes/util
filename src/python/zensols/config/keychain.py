@@ -52,8 +52,8 @@ class KeychainConfig(DictionaryConfig):
     entry.  The account (user name) and service (a grouping in Keychain.app) is
     provided and the password is fetched.
 
-
     Example::
+
         [import]
         sections = list: keychain_imp
 
