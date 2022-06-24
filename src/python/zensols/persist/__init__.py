@@ -11,3 +11,4 @@ from .domain import *
 from .stash import *
 from .composite import *
 from .shelve import *
+from .zip import *
