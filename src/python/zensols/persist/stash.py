@@ -225,8 +225,8 @@ class DirectoryStash(Stash):
         with open(path, 'rb') as f:
             try:
                 return pickle.load(f)
-            except EOFError as e:
-                raise PersistableError(f"Can not read {path}") from e
+            except Exception as e:
+                raise PersistableError(f"Can not read {path}: {e}") from e
 
     def _dump_file(self, inst: Any, path: Path):
         with open(path, 'wb') as f:
