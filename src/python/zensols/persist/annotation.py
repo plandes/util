@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Union, Any, Dict
+from typing import Union, Any, Dict, Type
 import logging
 import sys
 import re
@@ -21,6 +21,36 @@ logger = logging.getLogger(__name__)
 class PersistableError(APIError):
     """Thrown for any persistable API error"""
     pass
+
+
+class FileTextUtil(object):
+    """Basic file naming utility methods.
+
+    """
+    _NORMALIZE_NAME_REGEX = re.compile(r"""[ \[\]()\/(){}:;'!@#$%^&*,+-=.-]+""")
+
+    @classmethod
+    def normalize_text(cls: Type, name: str, replace_char: str = '-') -> str:
+        """Normalize the name in to a string that is more file system friendly.  This
+        removes special characters and replaces them with ``replace_char``.
+
+        :param name: the name to be normalized
+
+        :param replace_char: the character used to replace special characters
+
+        :return: the normalized name
+
+        """
+        name = name.lower()
+        name = re.sub(cls._NORMALIZE_NAME_REGEX, replace_char, name)
+        # remove beginning and trailing dashes
+        nlen = len(name)
+        if nlen > 1:
+            if name[0] == '-':
+                name = name[1:]
+            if nlen > 2 and name[-1] == '-':
+                name = name[:-1]
+        return name
 
 
 # class level persistance
@@ -78,7 +108,7 @@ class PersistedWork(Deallocatable):
         if isinstance(path, Path):
             self.path = path
             self.use_disk = True
-            fname = re.sub(r'[ /\\.]', '_', str(self.path.absolute()))
+            fname = FileTextUtil.normalize_text(str(self.path.absolute()), '_')
         else:
             self.path = Path(path)
             self.use_disk = False

@@ -1,9 +1,7 @@
 import logging
-from sys import platform
 from pathlib import Path
 import shutil
 import pickle
-import sys
 from io import BytesIO
 import unittest
 from zensols.persist import (
@@ -18,6 +16,7 @@ from zensols.persist import (
     OneShotFactoryStash,
     SortedStash,
     DictionaryStash,
+    FileTextUtil,
 )
 
 logger = logging.getLogger(__name__)
@@ -474,3 +473,16 @@ class TestPersistWork(unittest.TestCase):
         self._test_sorted_numeric(DictionaryStash(), True, float)
         path = Path('target/tmp10.dat')
         self._test_sorted_numeric(DirectoryStash(path), False, float)
+
+
+class TestFileText(unittest.TestCase):
+    def test_norm_name(self):
+        print()
+        norm = FileTextUtil.normalize_text('Test of File! Text@ Util')
+        self.assertEqual('test-of-file-text-util', norm)
+        norm = FileTextUtil.normalize_text('^first Test of File! Text@ Util.')
+        self.assertEqual('first-test-of-file-text-util', norm)
+        norm = FileTextUtil.normalize_text('Test of File! Text@ Util Last%')
+        self.assertEqual('test-of-file-text-util-last', norm)
+        norm = FileTextUtil.normalize_text('!--Test middle!@#$%^&*(){} Last!%')
+        self.assertEqual('test-middle-last', norm)
