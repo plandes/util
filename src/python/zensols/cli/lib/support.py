@@ -407,16 +407,14 @@ class Cleaner(DryRunApplication):
             logger.debug(f'cleaner: created with paths: {self.paths}')
 
     def _remove_path(self, level: int, glob: Path) -> bool:
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'maybe removing glob: {glob}')
+        if logger.isEnabledFor(logging.WARNING):
+            logger.warn(f'cleaning at level {level} using {glob}')
         if glob.parent.name == '**':
             parent = glob.parent.parent
             pat = f'{glob.parent}/{glob.name}'
         else:
             parent = glob.parent
             pat = glob.name
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'cleaner: glob: {pat}')
         for path in parent.glob(pat):
             if path.exists():
                 if logger.isEnabledFor(logging.WARNING):
@@ -429,8 +427,8 @@ class Cleaner(DryRunApplication):
 
     def clean(self):
         """Clean up unecessary files."""
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('cleaning unecessary files...')
+        if logger.isEnabledFor(logging.WARNING):
+            logger.warn(f'cleaning at max level {self.clean_level}')
         for level, paths in enumerate(self.paths):
             if level <= self.clean_level:
                 for path in paths:

@@ -477,7 +477,6 @@ class TestPersistWork(unittest.TestCase):
 
 class TestFileText(unittest.TestCase):
     def test_norm_name(self):
-        print()
         norm = FileTextUtil.normalize_text('Test of File! Text@ Util')
         self.assertEqual('test-of-file-text-util', norm)
         norm = FileTextUtil.normalize_text('^first Test of File! Text@ Util.')
