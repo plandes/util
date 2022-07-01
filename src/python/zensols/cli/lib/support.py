@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto, EnumMeta
 import sys
 import os
+import re
 import logging
 import inspect
 from json import JSONEncoder
@@ -206,16 +207,16 @@ class ShowConfiguration(object):
     # causing a name collision
     OUTPUT_FORMAT = 'config_output_format'
     OUTPUT_PATH = 'config_output_path'
+    SECTION_NAME = 'sections'
     CLI_META = {'mnemonic_overrides': {'show_config': 'config'},
-                'option_includes': {OUTPUT_FORMAT, OUTPUT_PATH},
+                'option_includes': {OUTPUT_FORMAT, OUTPUT_PATH, SECTION_NAME},
                 'option_overrides':
                 {OUTPUT_FORMAT: {'long_name': 'cnffmt',
                                  'short_name': None},
                  OUTPUT_PATH: {'long_name': 'cnfout',
-                               'short_name': None}}}
-
-    config: Configurable = field()
-    """The output format of the configuration."""
+                               'short_name': None},
+                 SECTION_NAME: {'long_name': 'secs',
+                                'short_name': None}}}
 
     config_factory: ConfigFactory = field()
     """The configuration factory which is returned from the app."""
@@ -226,20 +227,38 @@ class ShowConfiguration(object):
     config_output_format: ConfigFormat = field(default=ConfigFormat.text)
     """The output format."""
 
-    def show_config(self) -> Configurable:
-        """Print the configuration and exit."""
+    def _write_config(self, writer: TextIOBase, fmt: ConfigFormat,
+                      sections: str):
+        conf = self.config_factory.config
+        if sections is not None:
+            dconf = DictionaryConfig()
+            conf.copy_sections(dconf, re.split(r'\s*,\s*', sections))
+            conf = dconf
+        if fmt == ConfigFormat.text:
+            conf.write(writer=writer)
+        elif fmt == ConfigFormat.ini:
+            print(conf.get_raw_str().rstrip(), file=writer)
+        elif fmt == ConfigFormat.json:
+            print(conf.asjson(indent=4), file=writer)
+
+    def show_config(self, sections: str = None) -> Configurable:
+        """Print the configuration and exit.
+
+        :param sections: comma separated sections to show, all if not given, or
+                         - for names
+
+        """
         fmt = self.config_output_format
         if self.config_output_path is None:
             writer = sys.stdout
         else:
             writer = open(self.config_output_path, 'w')
         try:
-            if fmt == ConfigFormat.text:
-                self.config.write(writer=writer)
-            elif fmt == ConfigFormat.ini:
-                print(self.config.get_raw_str().rstrip(), file=writer)
-            elif fmt == ConfigFormat.json:
-                print(self.config.asjson(indent=4), file=writer)
+            if sections == '-':
+                secs = '\n'.join(sorted(self.config_factory.config.sections))
+                writer.write(secs + '\n')
+            else:
+                self._write_config(writer, fmt, sections)
         finally:
             if self.config_output_path is not None:
                 writer.close()
