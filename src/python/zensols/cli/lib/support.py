@@ -208,7 +208,8 @@ class ShowConfiguration(object):
     OUTPUT_FORMAT = 'config_output_format'
     OUTPUT_PATH = 'config_output_path'
     SECTION_NAME = 'sections'
-    CLI_META = {'mnemonic_overrides': {'show_config': 'config'},
+    CLI_META = {'first_pass': True,  # not a separate action
+                'mnemonic_overrides': {'show_config': 'config'},
                 'option_includes': {OUTPUT_FORMAT, OUTPUT_PATH, SECTION_NAME},
                 'option_overrides':
                 {OUTPUT_FORMAT: {'long_name': 'cnffmt',
@@ -389,7 +390,8 @@ class Cleaner(DryRunApplication):
     CLASS_INSPECTOR = {}
     CLI_META = ActionCliManager.combine_meta(
         DryRunApplication,
-        {'mnemonic_includes': {'clean'},
+        {'first_pass': True,  # not a separate action,
+         'mnemonic_includes': {'clean'},
          'option_excludes': {'paths'},
          'option_overrides': {'clean_level': {'long_name': 'clevel',
                                               'short_name': None}}})

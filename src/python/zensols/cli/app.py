@@ -500,19 +500,29 @@ class ApplicationFactory(PersistableContainer):
 
         This returns the class level documentation if there is only one class
         by all second pass actions that don't originate from this module's
-        parent (i.e. those, that come from :mod:`zensols.lib`).
+        parent (i.e. those, that come from :mod:`zensols.cli`).
 
         """
         def flt_act(action: ActionCli):
             name = action.class_meta.name
-            return not action.first_pass and not name.startswith(mod_name)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(
+                    f'name: {name}, single pass: {not action.first_pass}, ' +
+                    f'CLI lib: {not name.startswith(mod_pattern)}')
+            return not action.first_pass and not name.startswith(mod_pattern)
 
         mod_name: str = DocUtil.module_name()
+        mod_pattern: str = mod_name + '.'
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'module name: {mod_name}')
         ac_clis: Tuple[ActionCli] = tuple(cli_mng.actions.values())
         sp_actions = tuple(filter(flt_act, ac_clis))
         sp_metas = tuple(chain.from_iterable(
             map(lambda ac: ac.meta_datas, sp_actions)))
         doc = None
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'single pass actions: {sp_actions}, ' +
+                         f'single pass metas: {len(sp_metas)}')
         if len(sp_metas) == 1:
             doc = sp_metas[0].doc
             doc = DocUtil.unnormalize(doc)
@@ -521,6 +531,9 @@ class ApplicationFactory(PersistableContainer):
         else:
             actions: Dict[str, ActionCli] = \
                 {c.class_meta.name: c for c in sp_actions}
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'actions: {actions} in ' +
+                             f'sec pass actions: {sp_actions}')
             if len(actions) == 1:
                 doc = next(iter(actions.values())).class_meta.doc.text
             if logger.isEnabledFor(logging.DEBUG):
