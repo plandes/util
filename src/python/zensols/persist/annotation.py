@@ -27,7 +27,7 @@ class FileTextUtil(object):
     """Basic file naming utility methods.
 
     """
-    _NORMALIZE_NAME_REGEX = re.compile(r"""[ \[\]()\/(){}:;_'!@#$%^&*,+-=.-]+""")
+    _NORMALIZE_NAME_REGEX = re.compile(r"""[ \[\]()\/(){}:;_'"!@#$%^&*,+-=.-]+""")
 
     @classmethod
     def normalize_text(cls: Type, name: str, replace_char: str = '-') -> str:
