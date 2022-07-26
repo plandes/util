@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Union, Any, Dict, Type
+from typing import Union, Any, Dict, Type, Tuple
 import logging
 import sys
 import re
@@ -400,6 +400,16 @@ class PersistableContainer(Deallocatable):
             logger.debug(f'state keys for {self.__class__}: ' +
                          f'{", ".join(state.keys())}')
         return state
+
+    def _clear_persistable_state(self):
+        """Clear all cached state from all :class:`.PersistedWork` in this instance.
+
+        """
+        pws: Tuple[PersistedWork] = tuple(filter(
+            lambda v: isinstance(v, PersistedWork),
+            self.__dict__.values()))
+        for v in pws:
+            v.clear()
 
     def __setstate__(self, state: Dict[str, Any]):
         """Set the owner to containing instance and the worker function to the owner's
