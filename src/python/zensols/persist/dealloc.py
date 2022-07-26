@@ -30,18 +30,15 @@ class Deallocatable(ABC):
     :meth:`deallocate`.
 
     """
-
     ALLOCATION_TRACKING = False
     """Enables allocation tracking.  When this if ``False``, this functionality is
     not used and disabled.
 
     """
-
     _ALLOCATIONS = {}
     """The data structure that retains all allocated instances.
 
     """
-
     # when true, recurse through deallocatable instances while freeing
     _RECURSIVE = False
 
