@@ -95,13 +95,21 @@ class Writable(ABC):
         self._write_empty(writer)
 
     def _write_divider(self, depth: int, writer: TextIOBase, char: str = '-',
-                       width: int = None):
+                       width: int = None, header: str = None):
         """Write a text based dividing line (like <hr></hr> in html).
 
         """
         width = self.WRITABLE_MAX_COL if width is None else width
         width = width - (depth * self.WRITABLE_INDENT_SPACE)
-        line = self._sp(depth) + (char * width)
+        if header is None:
+            line = self._sp(depth) + (char * width)
+        else:
+            sp = self._sp(depth)
+            htext = self._trunc(header, width)
+            bar = ('-' * int((width - len(htext)) / 2))
+            line = sp + bar + htext + bar
+            if (len(htext) % 2) != 0:
+                line += '-'
         writer.write(line)
         self._write_empty(writer)
 
