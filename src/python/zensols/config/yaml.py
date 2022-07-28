@@ -181,8 +181,11 @@ class """ + class_name + """(Template):
             return node
         elif self.default_vars is not None and name in self.default_vars:
             return self.default_vars[name]
+        elif node is None:
+            # values in YAML can be set to ``null``
+            return None
         else:
-            self._raise(f'No such option: {name} ({type(node)})')
+            self._raise(f'Unknown type or state: {name} ({type(node)})')
 
     def set_option(self, name: str, value: str, section: str = None):
         """This is a no-op for now as client's don't expect an exception."""
