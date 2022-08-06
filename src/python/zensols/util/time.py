@@ -6,7 +6,6 @@ __author__ = 'Paul Landes'
 import logging
 import inspect
 import time as tm
-import traceback as trc
 from functools import wraps
 import errno
 import os
@@ -40,7 +39,7 @@ class time(object):
     loggers.
 
     """
-    def __init__(self, msg: str = 'finished', level=logging.INFO, logger=None):
+    def __init__(self, msg: str = 'finished', level: int = logging.INFO):
         """Create the time object.
 
         If a logger is not given, it is taken from the calling frame's global
@@ -50,22 +49,12 @@ class time(object):
         You can force standard out instead of a logger by using 
 
         :param msg: the message log when exiting the closure
-        :param logger: the logger to use for logging or the string ``stdout``
-                       for printing to standard
+
         :param level: the level at which the message is logged
 
         """
         self.msg = msg
-        self.logger = logger
         self.level = level
-        frame = inspect.currentframe()
-        try:
-            globs = frame.f_back.f_globals
-            if 'logger' in globs:
-                self.logger = globs['logger']
-        except Exception as e:
-            time_logger.error(f"Error in initializing time: {e} with '{msg}'")
-            trc.print_exc()
 
     @staticmethod
     def format_elapse(msg: str, seconds: int):
@@ -98,10 +87,7 @@ class time(object):
             time_logger.error(f"Error in exiting time: {e} with '{msg}'",
                               exc_info=True)
         msg = self.format_elapse(msg, seconds)
-        if self.logger is not None:
-            self.logger.log(self.level, msg)
-        else:
-            print(msg)
+        time_logger.log(self.level, msg, stacklevel=2)
 
 
 def timeout(seconds=TIMEOUT_DEFAULT, error_message=os.strerror(errno.ETIME)):
