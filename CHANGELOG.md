@@ -8,6 +8,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.11.0] - 2022-08-06
+### Added
+- Add a read-only zip file based stash.
+- File system and hashing utilities.
+- State clearing in `PersistableWork`.
+
+### Changed
+- Resource configuration (`conf_sec` for regular expressions).
+- Better error messages from `DirectoryStash`.
+- Robustly allow null YAML config values.
+
+### Removed
+- The `time` context manager removed the `logger` keyword parameter.
+
+
 ## [1.10.1] - 2022-06-15
 ### Changed
 - Command line configuration metadata with configuration decorators bug fix.
@@ -389,7 +404,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.10.1...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.11.0...HEAD
+[1.11.0]: https://github.com/plandes/util/compare/v1.10.1...v1.11.0
 [1.10.1]: https://github.com/plandes/util/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/plandes/util/compare/v1.9.0...v1.10.0
 [1.9.0]: https://github.com/plandes/util/compare/v1.8.0...v1.9.0
