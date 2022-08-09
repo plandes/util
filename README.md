@@ -2,7 +2,7 @@
 
 [![PyPI][pypi-badge]][pypi-link]
 [![Python 3.9][python39-badge]][python39-link]
-[![Python 3.10][python39-badge]][python310-link]
+[![Python 3.10][python310-badge]][python310-link]
 [![Build Status][build-badge]][build-link]
 
 Command line, configuration and persistence utilities generally used for any
