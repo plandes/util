@@ -83,7 +83,7 @@ class CliHarness(object):
     proto_factory_kwargs: Dict[str, Any] = field(default_factory=dict)
     """Factory keyword arguments given to the :class:`.ApplicationFactory`."""
 
-    proto_header: str = field(default='--> prototype')
+    proto_header: str = field(default=None)
     """Printed for each invocation of the prototype command line.  This is handy
     when running in environments such as Emacs REPL to clarify the invocation
     method.
