@@ -64,10 +64,10 @@ class Stash(ABC):
     """
     @abstractmethod
     def load(self, name: str) -> Any:
-        """Load a data value from the pickled data with key ``name``.  Semantically,
-        this method loads the using the stash's implementation.  For example
-        :class:`.DirectoryStash` loads the data from a file if it exists, but
-        factory type stashes will always re-generate the data.
+        """Load a data value from the pickled data with key ``name``.
+        Semantically, this method loads the using the stash's implementation.
+        For example :class:`.DirectoryStash` loads the data from a file if it
+        exists, but factory type stashes will always re-generate the data.
 
         :see: :meth:`get`
 
@@ -75,10 +75,10 @@ class Stash(ABC):
         pass
 
     def get(self, name: str, default: Any = None) -> Any:
-        """Load an object or a default if key ``name`` doesn't exist.  Semantically,
-        this method tries not to re-create the data if it already exists.  This
-        means that if a stash has built-in caching mechanisms, this method uses
-        it.
+        """Load an object or a default if key ``name`` doesn't exist.
+        Semantically, this method tries not to re-create the data if it already
+        exists.  This means that if a stash has built-in caching mechanisms,
+        this method uses it.
 
         :see: :meth:`load`
 
@@ -108,8 +108,8 @@ class Stash(ABC):
 
     @abstractmethod
     def delete(self, name: str = None):
-        """Delete the resource for data pointed to by ``name`` or the entire resource
-        if ``name`` is not given.
+        """Delete the resource for data pointed to by ``name`` or the entire
+        resource if ``name`` is not given.
 
         """
         pass
@@ -149,8 +149,8 @@ class Stash(ABC):
         return map(lambda k: (k, self.__getitem__(k)), self.keys())
 
     def _debug(self, msg: str):
-        """Utility debugging method that adds the class name to the message to document
-        the source stash.
+        """Utility debugging method that adds the class name to the message to
+        document the source stash.
 
         This makes no checks for if debugging is enabled since it is assumed
         the caller will do so for avoiding double checks of the logger level.
@@ -266,7 +266,8 @@ class DelegateDefaults(object):
 
 @dataclass
 class DelegateStash(CloseableStash, metaclass=ABCMeta):
-    """Delegate pattern.  It can also be used as a no-op if no delegate is given.
+    """Delegate pattern.  It can also be used as a no-op if no delegate is
+    given.
 
     A minimum functioning implementation needs the :meth:`load` and
     :meth:`keys` methods overriden.  Inheriting and implementing a
@@ -413,9 +414,9 @@ class KeyLimitStash(DelegateStash):
 
 @dataclass
 class PreemptiveStash(DelegateStash):
-    """Provide support for preemptively creating data in a stash.  It provides this
-    with :obj:`has_data` and provides a means of keeping track if the data has
-    yet been created.
+    """Provide support for preemptively creating data in a stash.  It provides
+    this with :obj:`has_data` and provides a means of keeping track if the data
+    has yet been created.
 
     **Implementation note**: This stash retrieves data from the delegate
     without checking to see if it exists first since the data might not have
@@ -484,8 +485,8 @@ class Primeable(ABC):
 
 @dataclass
 class PrimeableStash(Stash, Primeable):
-    """Any subclass that has the ability to do processing before any CRUD method is
-    invoked.
+    """Any subclass that has the ability to do processing before any CRUD method
+    is invoked.
 
     """
     def prime(self):
@@ -497,11 +498,11 @@ class PrimeableStash(Stash, Primeable):
         self.prime()
         return super().get(name, default)
 
-    def load(self, name: str):
+    def load(self, name: str) -> Any:
         self.prime()
         return super().load(name)
 
-    def keys(self):
+    def keys(self) -> Iterable[str]:
         self.prime()
         return super().keys()
 
@@ -515,8 +516,8 @@ class PrimablePreemptiveStash(PrimeableStash, PreemptiveStash):
 
 @dataclass
 class ProtectiveStash(DelegateStash):
-    """A stash that guards :meth:`dump` so that when :class:`Exception` is raised,
-    the instance of the exception is dumped instead the instance data.
+    """A stash that guards :meth:`dump` so that when :class:`Exception` is
+    raised, the instance of the exception is dumped instead the instance data.
 
     """
     log_errors: bool = field()
@@ -551,8 +552,8 @@ class FactoryStash(PreemptiveStash):
     """If ``False``, do not invoke the super class's data calculation."""
 
     dump_factory_nones: bool = field(default=True)
-    """Whether to pass on ``None`` values to the delegate when the factory creates
-    them.
+    """Whether to pass on ``None`` values to the delegate when the factory
+    creates them.
 
     """
     def _calculate_has_data(self) -> bool:
@@ -592,14 +593,14 @@ class FactoryStash(PreemptiveStash):
 
 @dataclass
 class CacheFactoryStash(FactoryStash):
-    """Like :class:`.FactoryStash` but suitable for :class:`.ReadOnlyStash` factory
-    instances that have a defined key set and only need a backing stash for
-    caching.
+    """Like :class:`.FactoryStash` but suitable for :class:`.ReadOnlyStash`
+    factory instances that have a defined key set and only need a backing stash
+    for caching.
 
     """
     dump_factory_nones: bool = field(default=False)
-    """Whether to pass on ``None`` values to the delegate when the factory creates
-    them.
+    """Whether to pass on ``None`` values to the delegate when the factory
+    creates them.
 
     """
     def keys(self) -> Iterable[str]:
