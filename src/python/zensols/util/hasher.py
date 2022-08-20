@@ -15,8 +15,8 @@ class Hasher(object):
     """Whether or not to generate a 32-bit or 64-bit key."""
 
     decode: str = field(default='hex')
-    """The decoded output representation.  Choices are those ``b2a_*`` functions in
-    :mod:`bin2ascii` such as ``hex``, ``base64``, etc.
+    """The decoded output representation.  Choices are those ``b2a_*`` functions
+    in :mod:`bin2ascii` such as ``hex``, ``base64``, etc.
 
     """
     def __post_init__(self):
@@ -31,8 +31,8 @@ class Hasher(object):
         self._algo.update(text.encode())
 
     def __call__(self) -> str:
-        """Create a hashed from ``text`` useful as file names representing the text
-        provided.
+        """Create a hashed from ``text`` useful as file names representing the
+        text provided.
 
         :param text: the text to hash
 
