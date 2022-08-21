@@ -7,6 +7,7 @@ from typing import Callable
 from dataclasses import dataclass, field
 import hashlib
 import binascii
+from . import APIError
 
 
 @dataclass
@@ -20,14 +21,25 @@ class Hasher(object):
 
     """
     def __post_init__(self):
+        self.reset()
+
+    def _create_algo(self):
         if self.short:
             self._algo = hashlib.blake2s()
         else:
             self._algo = hashlib.blake2b()
         self._ascii_fn = getattr(binascii, f'b2a_{self.decode}')
 
+    def _assert_algo(self):
+        if self._algo is None:
+            self._create_algo()
+
+    def reset(self):
+        self._algo = None
+
     def update(self, text: str):
         """Update the hash from the text provided."""
+        self._assert_algo()
         self._algo.update(text.encode())
 
     def __call__(self) -> str:
@@ -37,6 +49,8 @@ class Hasher(object):
         :param text: the text to hash
 
         """
+        if self._algo is None:
+            raise APIError('Must first call `update` to hash data')
         dig: bytes = self._algo.digest()
         fn: Callable = self._ascii_fn
         return fn(dig).decode().strip()
