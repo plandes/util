@@ -307,7 +307,7 @@ class CliHarness(object):
         except SystemExit as e:
             self._handle_exit(e)
 
-    def get_instance(self, args: Union[List[str], str] = None,
+    def get_instance(self, args: Union[List[str], str] = '',
                      **factory_kwargs: Dict[str, Any]) -> Any:
         """Create the invokable instance of the application.
 
