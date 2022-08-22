@@ -3,15 +3,19 @@
 """
 __author__ = 'Paul Landes'
 
+from typing import Union
 import logging
+from logging import Logger
 import inspect
 import time as tm
+import traceback as trc
 from functools import wraps
+from io import TextIOBase
 import errno
 import os
 import signal
 
-time_logger = logging.getLogger(__name__)
+_time_logger = logging.getLogger(__name__)
 TIMEOUT_DEFAULT = 10
 
 
@@ -39,22 +43,38 @@ class time(object):
     loggers.
 
     """
-    def __init__(self, msg: str = 'finished', level: int = logging.INFO):
+    def __init__(self, msg: str = 'finished', level=logging.INFO,
+                 logger: Union[Logger, TextIOBase] = None):
         """Create the time object.
 
         If a logger is not given, it is taken from the calling frame's global
         variable named ``logger``.  If this global doesn't exit it logs to
-        standard out.
-
-        You can force standard out instead of a logger by using 
+        standard out.  Otherwise, standard out/error can be used if given
+        :obj:`sys.stdout` or :obj:`sys.stderr`.
 
         :param msg: the message log when exiting the closure
+
+        :param logger: the logger to use for logging or a file like object
+                       (i.e. :obj:`sys.stdout`) as a data sync
 
         :param level: the level at which the message is logged
 
         """
         self.msg = msg
         self.level = level
+        if logger is None:
+            frame = inspect.currentframe()
+            try:
+                globs = frame.f_back.f_globals
+                if 'logger' in globs:
+                    self.logger = globs['logger']
+            except Exception as e:
+                _time_logger.error(
+                    f"Error in initializing time: {e} with '{msg}'",
+                    exc_info=True)
+                trc.print_exc()
+        else:
+            self.logger = logger
 
     @staticmethod
     def format_elapse(msg: str, seconds: int):
@@ -84,10 +104,16 @@ class time(object):
             locals = frame.f_back.f_locals
             msg = msg.format(**locals)
         except Exception as e:
-            time_logger.error(f"Error in exiting time: {e} with '{msg}'",
-                              exc_info=True)
+            _time_logger.error(
+                f"Error in exiting time: {e} with '{msg}'", exc_info=True)
         msg = self.format_elapse(msg, seconds)
-        time_logger.log(self.level, msg, stacklevel=2)
+        if isinstance(self.logger, Logger):
+            if self.logger is not None:
+                self.logger.log(self.level, msg, stacklevel=2)
+            else:
+                print(msg)
+        else:
+            self.logger.write(msg + '\n')
 
 
 def timeout(seconds=TIMEOUT_DEFAULT, error_message=os.strerror(errno.ETIME)):
@@ -156,7 +182,7 @@ class timeprotect(object):
                 try:
                     self.timeout_handler(self)
                 except Exception as e:
-                    time_logger.exception(
+                    _time_logger.exception(
                         f'could not recover from timeout handler: {e}')
                     self.timeout_handler_exception = e
             raise TimeoutError(self.error_message)
