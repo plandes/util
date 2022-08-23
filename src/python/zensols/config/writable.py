@@ -31,6 +31,7 @@ class Writable(ABC):
     .. automethod:: _set_indent
     .. automethod:: _write_line
     .. automethod:: _write_block
+    .. automethod:: _write_wrap
     .. automethod:: _write_object
     .. automethod:: _write_iterable
     .. automethod:: _write_dict
