@@ -82,6 +82,9 @@ class time(object):
         hours = mins / 60.
         mins = int(mins % 60)
         hours = int(hours)
+        sec_int = float(int(seconds % 60))
+        sec_dec = seconds - int(seconds)
+        lsd = sec_int + sec_dec
         tparts = []
         if hours > 0:
             suffix = 's' if hours > 1 else ''
@@ -89,8 +92,14 @@ class time(object):
         if mins > 0:
             suffix = 's' if mins > 1 else ''
             tparts.append(f'{mins} minute{suffix}')
-        seconds = int(seconds % 60)
-        tparts.append(f'{seconds}s')
+            sfmt = '{:.0f}s'
+        else:
+            if sec_int > 0:
+                sfmt = '{:.2f}s'
+            else:
+                lsd = int(lsd * 100)
+                sfmt = '{:d}ms'
+        tparts.append(sfmt.format(lsd))
         return f'{msg} in ' + ', '.join(tparts)
 
     def __enter__(self):
