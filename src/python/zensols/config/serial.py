@@ -56,6 +56,9 @@ class Settings(Dictable):
                        class_name_param: str = None) -> Dict[str, Any]:
         return self.__dict__
 
+    def __contains__(self, name: str) -> bool:
+        return name in self.__dict__
+
     def __getitem__(self, name: str) -> str:
         return self.__dict__[name]
 
