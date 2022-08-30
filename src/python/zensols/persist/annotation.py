@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Union, Any, Dict, Type, Tuple
+from typing import Union, Any, Dict, Type, Tuple, ClassVar
 import logging
 import sys
 import re
@@ -27,10 +27,13 @@ class FileTextUtil(object):
     """Basic file naming utility methods.
 
     """
-    _NORMALIZE_NAME_REGEX = re.compile(r"""[ \\\[\]()\/()<>{}:;_'"!@#$%^&*,+-=.-]+""")
+    _NORMALIZE_REGEX: ClassVar[re.Pattern] = re.compile(
+        r"""[ \\\[\]()\/()<>{}:;_`'"!@#$%^&*,+=.-]+""")
+    """The default regular expression for :meth:`normalize_text`."""
 
     @classmethod
-    def normalize_text(cls: Type, name: str, replace_char: str = '-') -> str:
+    def normalize_text(cls: Type, name: str, replace_char: str = '-',
+                       lower: bool = True, regex: re.Pattern = None) -> str:
         """Normalize the name in to a string that is more file system friendly.  This
         removes special characters and replaces them with ``replace_char``.
 
@@ -38,11 +41,17 @@ class FileTextUtil(object):
 
         :param replace_char: the character used to replace special characters
 
+        :param lower: whether to lowercase the text
+
+        :param regex: the regular expression that matches on text to remove
+
         :return: the normalized name
 
         """
-        name = name.lower()
-        name = re.sub(cls._NORMALIZE_NAME_REGEX, replace_char, name)
+        if lower:
+            name = name.lower()
+        regex = cls._NORMALIZE_REGEX if regex is None else regex
+        name = re.sub(regex, replace_char, name)
         # remove beginning and trailing dashes
         nlen = len(name)
         if nlen > 1:
