@@ -55,9 +55,9 @@ class FileTextUtil(object):
         # remove beginning and trailing dashes
         nlen = len(name)
         if nlen > 1:
-            if name[0] == '-':
+            if name[0] == replace_char:
                 name = name[1:]
-            if nlen > 2 and name[-1] == '-':
+            if nlen > 2 and name[-1] == replace_char:
                 name = name[:-1]
         return name
 
