@@ -42,6 +42,7 @@ class Tracker(object):
                 print(dept)
             else:
                 dept.write()
+        return dept
 
     def report_salary(self):
         """Report average of employees' salaries.

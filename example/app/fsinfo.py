@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+"""This example shows how to use an application context with a command-line
+interface (CLI) application all in one source file.  Below, the application
+context configuration file is defined as a string, then used directly by the CLI
+harness below.  The invoked application class :class:`.Application` is also
+defined below.
+
+"""
+
 from dataclasses import dataclass, field
 from enum import Enum, auto
 import logging
