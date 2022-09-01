@@ -5,6 +5,7 @@ PROJ_TYPE=		python
 PROJ_MODULES=		git python-doc python-doc-deploy python-resources
 CLEAN_DEPS +=		pycleancache
 ADD_CLEAN +=		example/config/counter.dat
+#PY_TEST_DEPS +=		runexamples
 
 #PY_SRC_TEST_PAT ?=	'test_impconfig.py'
 
@@ -17,9 +18,10 @@ check:
 
 .PHONY:			runexamples
 runexamples:
-			( cd example/app ; ./fsinfo.py ls --format long )
-			( cd example/config ; ./run.sh )
-			( cd example/cli ; ./run.sh )
+			( cd example/app ; ./fsinfo.py ls --format long > /dev/null 2>&1 )
+			( cd example/app ; ./extharness.py > /dev/null 2>&1 )
+			( cd example/config ; ./run.sh > /dev/null )
+			( cd example/cli ; ./run.sh > /dev/null 2>&1 )
 
 .PHONY:			testall
 testall:		test runexamples
