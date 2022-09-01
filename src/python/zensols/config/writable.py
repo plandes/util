@@ -123,15 +123,26 @@ class Writable(ABC):
                      writer: TextIOBase, limit: int = None):
         """Write a block of text with indentation.
 
+        :param limit: the max number of lines in the block to write
+
         """
+        add_ellipses = False
         sp = self._sp(depth)
         if isinstance(lines, str):
             lines = lines.split('\n')
         if limit is not None:
-            lines = it.islice(lines, limit)
+            all_lines = tuple(lines)
+            if len(all_lines) > limit:
+                add_ellipses = True
+                limit -= 1
+            lines = it.islice(all_lines, limit)
         for line in lines:
             writer.write(sp)
             writer.write(line)
+            self._write_empty(writer)
+        if add_ellipses:
+            writer.write(sp)
+            writer.write('...')
             self._write_empty(writer)
 
     def _write_object(self, obj: Any, depth: int, writer: TextIOBase):
