@@ -108,8 +108,14 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         if self._shared is not None:
             self._shared.clear()
 
-    def clear_instance(self, name: str):
+    def clear_instance(self, name: str) -> Any:
         """Remove a shared (cached) object instance.
+
+        :param name: the section name of the instance to evict and the same
+                     string used to create with :meth:`instance` or
+                     :meth:`new_instance`
+
+        :return: the instance that was removed (if present), otherwise ``None``
 
         """
         if self._shared is not None:
