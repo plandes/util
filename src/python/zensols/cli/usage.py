@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 import logging
 import os
 import sys
+import re
 from itertools import chain
 from pathlib import Path
 from io import TextIOBase
@@ -101,6 +102,13 @@ class _Formatter(Writable):
     """A formattingn base class that has utility methods.
 
     """
+    _BACKTICKS_REGEX = re.compile(r"``([^`]+)``")
+
+    def _format_doc(self, doc: str = None) -> str:
+        doc = '' if doc is None else doc
+        doc = re.sub(self._BACKTICKS_REGEX, r'"\1"', doc)
+        return doc
+
     def _write_three_col(self, a: str, b: str, c: str, depth: int = 0,
                          writer: TextIOBase = sys.stdout):
         a = '' if a is None else a
@@ -127,7 +135,7 @@ class _OptionFormatter(_Formatter):
     def __post_init__(self):
         self.WRITABLE_MAX_COL = self.usage_config.width
         opt = self.opt
-        self.doc = '' if self.opt.doc is None else self.opt.doc
+        self.doc = self._format_doc(self.opt.doc)
         left_indent: str = ' ' * self.usage_config.left_indent
         max_olen: int = self.usage_config.max_metavar_len
         sep: str = '' if opt.short_name is None else ', '
@@ -192,12 +200,13 @@ class _PositionalFormatter(_Formatter):
         if self.pos.metavar is not None:
             mv = f' {self.pos.metavar}'
         self.name = f'{sp}{self.pos.name}{mv}'
+        self.doc = self._format_doc(self.pos.doc)
 
     def add_first_col_width(self, widths: List[int]):
         widths.append(len(self.name))
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
-        self._write_three_col(self.name, '', self.pos.doc, depth, writer)
+        self._write_three_col(self.name, '', self.doc, depth, writer)
 
 
 @dataclass
@@ -231,6 +240,7 @@ class _ActionFormatter(_Formatter):
         self.pos = tuple(map(
             lambda pos: _PositionalFormatter(self.usage_formatter, pos),
             action.positional))
+        self.doc = self._format_doc(self.action.doc)
 
     def add_first_col_width(self, widths: List[int]):
         widths.append(len(self.action_name))
@@ -241,7 +251,7 @@ class _ActionFormatter(_Formatter):
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         self._write_three_col(
-            self.action_name, '', self.action.doc, depth, writer)
+            self.action_name, '', self.doc, depth, writer)
         for pos in self.pos:
             self._write_object(pos, depth, writer)
         for opt in self.opts:
@@ -371,7 +381,7 @@ class _UsageFormatter(_Formatter):
 
 
 @dataclass
-class _UsageWriter(Writable):
+class _UsageWriter(_Formatter):
     """Generates the usage and help messages for an :class:`optparse.OptionParser`.
 
     """
@@ -425,7 +435,8 @@ class _UsageWriter(Writable):
         self._write_line(f'Usage: {prog}', depth, writer)
         self._write_empty(writer)
         if self.doc is not None:
-            self._write_wrap(self.doc, depth, writer)
+            doc = self._format_doc(self.doc)
+            self._write_wrap(doc, depth, writer)
             self._write_empty(writer)
         self.usage_formatter.write(
             depth, writer,

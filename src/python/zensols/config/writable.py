@@ -4,7 +4,7 @@ with a hierarchical structure.
 """
 __author__ = 'Paul Landes'
 
-from typing import Union, Any, Iterable
+from typing import Union, Any, Iterable, ClassVar
 from abc import ABC, abstractmethod
 import sys
 import logging
@@ -37,8 +37,8 @@ class Writable(ABC):
     .. automethod:: _write_dict
 
     """
-    WRITABLE_INDENT_SPACE = 4
-    WRITABLE_MAX_COL = 80
+    WRITABLE_INDENT_SPACE: ClassVar[int] = 4
+    WRITABLE_MAX_COL: ClassVar[int] = 80
 
     @classmethod
     def _trunc(cls, s: str, max_len: int = None) -> str:
@@ -77,12 +77,20 @@ class Writable(ABC):
         writer.write('\n')
 
     def _write_line(self, line: str, depth: int, writer: TextIOBase,
-                    max_len: Union[bool, int] = False):
+                    max_len: Union[bool, int] = False,
+                    repl_newlines: bool = False):
         """Write a line of text ``line`` with the correct indentation per ``depth`` to
         ``writer``.
 
+        :param max_line: truncate to the given length if an :class:`int` or
+                         :obj:`WRITABLE_MAX_COL` if ``True``
+
+        :repl_newlines: whether to replace newlines with spaces
+
         """
         s = f'{self._sp(depth)}{line}'
+        if repl_newlines:
+            s = s.replace('\n', ' ')
         if max_len is True:
             s = self._trunc(s)
         elif max_len is False:
@@ -91,11 +99,11 @@ class Writable(ABC):
             s = self._trunc(s, max_len)
         else:
             raise ConfigurationError(
-                'Max_len must either be a boolean or integer')
+                "Parameter 'max_len' must either be a boolean or integer")
         writer.write(s)
         self._write_empty(writer)
 
-    def _write_divider(self, depth: int, writer: TextIOBase, char: str = '-',
+    def _write_divider(self, depth: int, writer: TextIOBase, char: str = '_',
                        width: int = None, header: str = None):
         """Write a text based dividing line (like <hr></hr> in html).
 
