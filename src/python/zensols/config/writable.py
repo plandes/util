@@ -122,9 +122,24 @@ class Writable(ABC):
         writer.write(line)
         self._write_empty(writer)
 
-    def _write_wrap(self, line: str, depth: int, writer: TextIOBase,
-                    **kwargs):
-        lines = tw.wrap(line, width=self.WRITABLE_MAX_COL, **kwargs)
+    def _write_wrap(self, text: str, depth: int, writer: TextIOBase,
+                    width: int = None, **kwargs):
+        """Like :meth:`_write_line` but wrap text per ``width``.
+
+        :param text: the text to word wrap
+
+        :param depth: the starting indentation depth
+
+        :param writer: the writer to dump the content of this writable
+
+        :param width: the width of the text before wrapping, which defaults to
+                      :obj:`WRITABLE_MAX_COL`
+
+        :param kwargs: the keyword arguments given to :meth:`textwarp.wrap`
+
+        """
+        width = self.WRITABLE_MAX_COL if width is None else width
+        lines = tw.wrap(text, width=width, **kwargs)
         self._write_block(lines, depth, writer)
 
     def _write_block(self, lines: Union[str, Iterable[str]], depth: int,
