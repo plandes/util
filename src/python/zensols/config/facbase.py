@@ -12,6 +12,7 @@ import logging
 import inspect
 import copy as cp
 from pathlib import Path
+import textwrap
 from time import time
 from zensols.util import APIError
 from zensols.introspect import (
@@ -216,8 +217,13 @@ class ConfigFactory(object):
             if isinstance(inst, FactoryStateObserver):
                 inst._notify_state(FactoryState.CREATED)
         except Exception as e:
+            llen = 200
+            kwstr = str(kwargs)
+            if len(kwstr) > llen:
+                kwstr = 'keys: ' + (', '.join(kwargs.keys()))
+            kwstr = textwrap.shorten(kwstr, llen)
             raise FactoryError(f'Can not create \'{cls_desc}\' for class ' +
-                               f'{cls}({args})({kwargs}): {e}', self) from e
+                               f'{cls}({args})({kwstr}): {e}', self) from e
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'inst: {inst.__class__}')
         return inst
