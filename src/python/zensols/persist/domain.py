@@ -227,20 +227,19 @@ class ReadOnlyStash(Stash):
     def __post_init__(self):
         self.strict = False
 
-    def dump(self, name: str, inst: Any):
+    def _ro_check(self):
         if self.strict:
             raise PersistableError(
-                'Dump not implemented for read only stashes')
+                f'Dump not implemented for read only stashes ({type(self)}')
+
+    def dump(self, name: str, inst: Any):
+        self._ro_check()
 
     def delete(self, name: str = None):
-        if self.strict:
-            raise PersistableError(
-                'Delete not implemented for read only stashes')
+        self._ro_check()
 
     def clear(self):
-        if self.strict:
-            raise PersistableError(
-                'Clear not implemented for read only stashes')
+        self._ro_check()
 
 
 @dataclass
@@ -592,7 +591,8 @@ class FactoryStash(PreemptiveStash):
 
     def clear(self):
         super().clear()
-        self.factory.clear()
+        if not isinstance(self.factory, ReadOnlyStash):
+            self.factory.clear()
 
 
 @dataclass
