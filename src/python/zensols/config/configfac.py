@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Any, Type, Union
+from typing import Dict, Any, Type, Union, ClassVar
 from dataclasses import dataclass, field
 import sys
 import logging
@@ -36,31 +36,37 @@ class ConfigurableFactory(object):
     :see: `.ImportIniConfig`
 
     """
-    EXTENSION_TO_TYPE = {'conf': 'ini',
-                         'ini': 'ini',
-                         'yml': 'yaml',
-                         'json': 'json'}
+    EXTENSION_TO_TYPE: ClassVar[Dict[str, str]] = {
+        'conf': 'ini',
+        'ini': 'ini',
+        'yml': 'yaml',
+        'json': 'json'}
     """The configuration factory extension to clas name."""
 
-    TYPE_TO_CLASS_PREFIX = {'importini': 'ImportIni',
-                            'importyaml': 'ImportYaml',
-                            'condyaml': 'ConditionalYaml'}
+    TYPE_TO_CLASS_PREFIX: ClassVar[Dict[str, str]]  = {
+        'importini': 'ImportIni',
+        'importyaml': 'ImportYaml',
+        'condyaml': 'ConditionalYaml'}
     """Mapping from :obj:`TYPE_NAME` option to class prefix."""
 
-    TYPE_NAME = 'type'
+    TYPE_NAME: ClassVar[str] = 'type'
     """The section entry for the configurable type (eg ``ini`` vs ``yaml``)."""
 
-    SINGLE_CONFIG_FILE = 'config_file'
+    SINGLE_CONFIG_FILE: ClassVar[str] = 'config_file'
     """The section entry for the configuration file."""
 
-    CLASS_NAME = 'class_name'
+    CLASS_NAME: ClassVar[str] = 'class_name'
     """The section entry for the class to use."""
 
     kwargs: Dict[str, Any] = field(default_factory=dict)
     """The keyword arguments given to the factory on creation."""
 
     type_map: Dict[str, str] = field(default_factory=dict)
+    """Adds more mappings from extension to configuration factory types.
 
+    :see: :obj:`EXTENSION_TO_TYPE`
+
+    """
     def _mod_name(self) -> str:
         """Return the ``config`` (parent) module name."""
         mname = sys.modules[__name__].__name__
