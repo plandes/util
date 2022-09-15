@@ -9,6 +9,7 @@ from abc import ABC
 import logging
 import importlib
 from functools import reduce
+import textwrap
 import re
 
 logger = logging.getLogger(__name__)
@@ -141,7 +142,9 @@ class ClassImporter(object):
             inst = cls(*args, **kwargs)
             inst = self._bless(inst)
         except Exception as e:
-            msg = f'Can not instantiate {cls}({args}, {kwargs})'
+            llen = 200
+            kwstr = textwrap.shorten(f'{args}, {kwargs}', llen)
+            msg = f'Can not instantiate {cls}({kwstr})'
             logger.error(msg)
             raise e
         if logger.isEnabledFor(logging.DEBUG):
