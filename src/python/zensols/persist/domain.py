@@ -511,6 +511,7 @@ class PrimablePreemptiveStash(PrimeableStash, PreemptiveStash):
     """A stash that's primable and preemptive.
 
     """
+    pass
 
 
 @dataclass
