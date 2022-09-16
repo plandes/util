@@ -84,7 +84,8 @@ class PersistedWork(Deallocatable):
     def __init__(self, path: Union[str, Path], owner: object,
                  cache_global: bool = False, transient: bool = False,
                  initial_value: Any = None, mkdir: bool = False,
-                 deallocate_recursive: bool = False):
+                 deallocate_recursive: bool = False,
+                 recover_empty: bool = False):
         """Create an instance of the class.
 
         :param path: if type of ``pathlib.Path`` then use disk storage to cache
@@ -105,6 +106,15 @@ class PersistedWork(Deallocatable):
         :param mkdir: if ``path`` is a :class`.Path` object, then recursively
                       create all directories needed to be able to persist the
                       file without missing directory IO errors
+
+        :deallocate_recursive: the ``recursive`` parameter passed to
+                               :meth:`.Deallocate._try_deallocate` to try to
+                               deallocate the object graph recursively
+
+        :param recover_empty: if ``True`` and a ``path`` points to a zero size
+                              file, treat it as data that has not yet been
+                              generated; this is useful when a previous
+                              exception was raised leaving a zero byte file
 
         """
         super().__init__()
@@ -128,6 +138,7 @@ class PersistedWork(Deallocatable):
             self.set(initial_value)
         self.mkdir = mkdir
         self.deallocate_recursive = deallocate_recursive
+        self.recover_empty = recover_empty
 
     def _info(self, msg, *args):
         if logger.isEnabledFor(logging.DEBUG):
@@ -189,7 +200,10 @@ class PersistedWork(Deallocatable):
 
         If the file does not exist, calling ``__do_work__`` and save it.
         """
-        if self.path.is_file():
+        load_file: bool = self.path.is_file()
+        if load_file and self.recover_empty and self.path.stat().st_size == 0:
+            load_file = False
+        if load_file:
             self._info('loading work from {}'.format(self.path))
             with open(self.path, 'rb') as f:
                 try:
@@ -462,7 +476,8 @@ class persisted(object):
     def __init__(self, name: str, path: Path = None,
                  cache_global: bool = False, transient: bool = False,
                  allocation_track: bool = True,
-                 deallocate_recursive: bool = False):
+                 deallocate_recursive: bool = False,
+                 recover_empty: bool = False):
         """Initialize.
 
         :param name: the name of the attribute on the instance to set with the
@@ -481,6 +496,11 @@ class persisted(object):
         :param allocation_track: if ``False``, immediately mark the backing
                                  :class:`PersistedWork` as deallocated
 
+        :param recover_empty: if ``True`` and a ``path`` points to a zero size
+                              file, treat it as data that has not yet been
+                              generated; this is useful when a previous
+                              exception was raised leaving a zero byte file
+
         """
         super().__init__()
         if logger.isEnabledFor(logging.DEBUG):
@@ -492,6 +512,7 @@ class persisted(object):
         self.transient = transient
         self.allocation_track = allocation_track
         self.deallocate_recursive = deallocate_recursive
+        self.recover_empty = recover_empty
 
     def __call__(self, fn):
         if logger.isEnabledFor(logging.DEBUG):
@@ -514,7 +535,8 @@ class persisted(object):
                 pwork = PersistedWork(
                     path, owner=inst, cache_global=self.cache_global,
                     transient=self.transient,
-                    deallocate_recursive=self.deallocate_recursive)
+                    deallocate_recursive=self.deallocate_recursive,
+                    recover_empty=self.recover_empty)
                 setattr(inst, self.attr_name, pwork)
                 if not self.allocation_track:
                     pwork._mark_deallocated()
