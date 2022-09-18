@@ -79,7 +79,8 @@ example = nlparse
 ```
 
 When the `sections` node is missing, then all root level nodes in the YAML are
-sections with children nodes as respective options, so the YAML: ```yaml
+sections with children nodes as respective options, so the YAML:
+```yaml
 project: example: nlparse
 
 context:
