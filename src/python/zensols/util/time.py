@@ -67,14 +67,13 @@ class time(object):
             try:
                 globs = frame.f_back.f_globals
                 if 'logger' in globs:
-                    self.logger = globs['logger']
+                    logger = globs['logger']
             except Exception as e:
                 _time_logger.error(
                     f"Error in initializing time: {e} with '{msg}'",
                     exc_info=True)
                 trc.print_exc()
-        else:
-            self.logger = logger
+        self.logger = logger
 
     @staticmethod
     def format_elapse(msg: str, seconds: int):
@@ -116,11 +115,10 @@ class time(object):
             _time_logger.error(
                 f"Error in exiting time: {e} with '{msg}'", exc_info=True)
         msg = self.format_elapse(msg, seconds)
-        if isinstance(self.logger, Logger):
-            if self.logger is not None:
-                self.logger.log(self.level, msg, stacklevel=2)
-            else:
-                print(msg)
+        if self.logger is None:
+            print(msg)
+        elif isinstance(self.logger, Logger):
+            self.logger.log(self.level, msg, stacklevel=2)
         else:
             self.logger.write(msg + '\n')
 
