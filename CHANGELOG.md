@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.11.1] - 2022-09-30
+A few functional `Stash` changes, but mostly a bug release.
+
+### Added
+- More options for file system name normalization.
+
+### Changed
+- Propagate clear method message in `FactoryStash`.
+- Skip clear for read only stashes from `FactoryStash`.
+
+
 ## [1.11.0] - 2022-08-06
 ### Added
 - Add a read-only zip file based stash.
@@ -404,7 +415,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.11.0...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.11.1...HEAD
+[1.11.1]: https://github.com/plandes/util/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/plandes/util/compare/v1.10.1...v1.11.0
 [1.10.1]: https://github.com/plandes/util/compare/v1.10.0...v1.10.1
 [1.10.0]: https://github.com/plandes/util/compare/v1.9.0...v1.10.0
