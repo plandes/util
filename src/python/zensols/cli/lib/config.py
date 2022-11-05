@@ -96,7 +96,11 @@ class ConfigurationOverrider(object):
     """
     override: str = field(default=None)
     """A config file/dir or a comma delimited section.key=value string that
-    overrides configuration."""
+    overrides configuration.
+
+    """
+    option_sep: str = field(default=',')
+    """The string used to delimit the each key/value pair."""
 
     disable: bool = field(default=False)
     """Whether to disable the application, which is useful to set to ``False`` when
@@ -110,7 +114,10 @@ class ConfigurationOverrider(object):
                 cf = ConfigurableFactory()
                 overrides = cf.from_path(path)
             else:
-                overrides = StringConfig(self.override)
+                overrides = StringConfig(
+                    self.override,
+                    option_sep=self.option_sep
+                )
             return overrides
 
     def merge(self) -> Configurable:
