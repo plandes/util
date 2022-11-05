@@ -227,16 +227,17 @@ class ReadOnlyStash(Stash):
     def __post_init__(self):
         self.strict = False
 
-    def _ro_check(self):
+    def _ro_check(self, meth: str):
         if self.strict:
+            meth: str = meth.capitalize()
             raise PersistableError(
-                f'Dump not implemented for read only stashes ({type(self)}')
+                f'{meth} not implemented for read only stashes ({type(self)}')
 
     def dump(self, name: str, inst: Any):
-        self._ro_check()
+        self._ro_check('dump')
 
     def delete(self, name: str = None):
-        self._ro_check()
+        self._ro_check('delete')
 
     def clear(self):
         self._ro_check()
