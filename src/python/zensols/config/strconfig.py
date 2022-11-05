@@ -34,7 +34,7 @@ class StringConfig(Configurable):
 
         :param config_str: the configuration
 
-        :param option_sep: the string used to delimit the section 
+        :param option_sep: the string used to delimit the each key/value pair
 
         :param default_section: used as the default section when non given on
                                 the get methds such as :meth:`get_option`
