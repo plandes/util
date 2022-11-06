@@ -240,7 +240,7 @@ class ReadOnlyStash(Stash):
         self._ro_check('delete')
 
     def clear(self):
-        self._ro_check()
+        self._ro_check('clear')
 
 
 @dataclass
