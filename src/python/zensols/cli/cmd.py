@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, List, Any, Dict, Iterable
+from typing import Tuple, List, Any, Dict, Iterable, Sequence
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -244,14 +244,17 @@ class CommandLineParser(Deallocatable, Dictable):
         return parser
 
     def write_help(self, writer: TextIOBase = sys.stdout,
-                   include_actions: bool = True):
+                   include_actions: bool = True,
+                   action_metas: Sequence[ActionMetaData] = None):
         """Write the usage information and help text.
 
         :param include_actions: if ``True`` write each actions' usage as well
 
+        :param actions: the list of actions to output, or ``None`` for all
+
         """
         parser = self._get_first_pass_parser(False)
-        parser.print_help(writer, include_actions)
+        parser.print_help(writer, include_actions, action_metas)
 
     def error(self, msg: str):
         """Print a usage with the error message and exit the program as fail.
@@ -296,6 +299,19 @@ class CommandLineParser(Deallocatable, Dictable):
             map(lambda x: self._parse_type(x[0], x[1].dtype, x[1].name),
                 zip(vals, metas)))
 
+    def _get_help_action(self, args: List[str]) -> \
+            Tuple[List[ActionMetaData], List[str]]:
+        goods: List[str] = []
+        bads: List[str] = []
+        arg: str
+        for arg in args:
+            action_meta: ActionMetaData = self.config.actions_by_name.get(arg)
+            if action_meta is None:
+                bads.append(arg)
+            else:
+                goods.append(action_meta)
+        return goods, bads
+
     def _parse_first_pass(self, args: List[str],
                           actions: List[CommandAction]) -> \
             Tuple[bool, str, Dict[str, Any], Dict[str, Any], Tuple[str]]:
@@ -307,7 +323,16 @@ class CommandLineParser(Deallocatable, Dictable):
         # make assoc array options in to a dict
         options = vars(options)
         if options['help'] is True:
-            self.write_help()
+            goods, bads = self._get_help_action(op_args)
+            if len(bads) > 0:
+                #self.write_help(include_actions=False)
+                raise CommandLineError(
+                    f"No such action{'s' if len(bads) > 1 else ''}: " +
+                    ', '.join(bads))
+            elif len(goods) > 0:
+                self.write_help(include_actions=True, action_metas=goods)
+            else:
+                self.write_help(include_actions=True)
             sys.exit(0)
         else:
             del options['help']

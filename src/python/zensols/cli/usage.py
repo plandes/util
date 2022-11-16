@@ -4,7 +4,7 @@ from __future__ import annotations
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, Iterable, List, Union, Optional
+from typing import Tuple, Iterable, List, Union, Optional, Sequence
 from dataclasses import dataclass, field
 import logging
 import os
@@ -93,8 +93,19 @@ class UsageActionOptionParser(OptionParser):
         self.add_option(help_op.create_option())
 
     def print_help(self, file: TextIOBase = sys.stdout,
-                   include_actions: bool = True):
-        self._usage_writer.write(writer=file, include_actions=include_actions)
+                   include_actions: bool = True,
+                   action_metas: Sequence[ActionMetaData] = None):
+        """Write the usage information and help text.
+
+        :param include_actions: if ``True`` write each actions' usage as well
+
+        :param actions: the list of actions to output, or ``None`` for all
+
+        """
+        self._usage_writer.write(
+            writer=file,
+            include_actions=include_actions,
+            action_metas=action_metas)
 
 
 @dataclass
@@ -352,19 +363,27 @@ class _UsageFormatter(_Formatter):
                 of.write(depth, writer)
         return has_opts
 
-    def _write_actions(self, depth: int, writer: TextIOBase):
-        n_fmt = len(self.action_formatters)
+    def _write_actions(self, depth: int, writer: TextIOBase,
+                       action_metas: Sequence[ActionMetaData] = None):
+        am_set: Set[str] = None
+        n_fmt: int = len(self.action_formatters)
+        if action_metas is not None:
+            am_set = set(map(lambda a: a.name, action_metas))
         if n_fmt > 0:
             self._write_line('Actions:', depth, writer)
+        i: int
+        fmt: _ActionFormatter
         for i, fmt in enumerate(self.action_formatters):
-            self._write_object(fmt, depth, writer)
-            if i < n_fmt - 1:
-                self._write_empty(writer)
+            if am_set is None or fmt.action.name in am_set:
+                self._write_object(fmt, depth, writer)
+                if i < n_fmt - 1:
+                    self._write_empty(writer)
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
               include_singleton_positional: bool = True,
               include_options: bool = True,
-              include_actions: bool = True):
+              include_actions: bool = True,
+              action_metas: Sequence[ActionMetaData] = None):
         if self.is_singleton_action and include_singleton_positional and \
            len(self.pos_formatters) > 0:
             self._write_line('Positional:', depth, writer)
@@ -377,7 +396,7 @@ class _UsageFormatter(_Formatter):
                len(self.action_formatters) > 0:
                 self._write_empty(writer)
         if include_actions:
-            self._write_actions(depth, writer)
+            self._write_actions(depth, writer, action_metas)
 
 
 @dataclass
@@ -430,7 +449,8 @@ class _UsageWriter(_Formatter):
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
               include_singleton_positional: bool = True,
               include_options: bool = True,
-              include_actions: bool = True):
+              include_actions: bool = True,
+              action_metas: Sequence[ActionMetaData] = None):
         prog = self.get_prog_usage()
         self._write_line(f'Usage: {prog}', depth, writer)
         self._write_empty(writer)
@@ -442,4 +462,5 @@ class _UsageWriter(_Formatter):
             depth, writer,
             include_singleton_positional=include_singleton_positional,
             include_options=include_options,
-            include_actions=include_actions)
+            include_actions=include_actions,
+            action_metas=action_metas)
