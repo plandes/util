@@ -203,25 +203,21 @@ class PositionalMetaData(Dictable, _MetavarFormatter):
     parsing the type.
 
     """
-
     dtype: Type = field(default=str)
     """The type of the positional argument.
 
     :see: :obj:`.Option.dtype`
 
     """
-
     doc: str = field(default=None)
     """The documentation of the positional metadata or ``None`` if missing.
 
     """
-
     choices: Tuple[str] = field(default=None)
     """The constant list of choices when :obj:`dtype` is :class:`list`.  Note that
     this class is a tuple so instances are hashable in :class:`.ActionCli`.
 
     """
-
     metavar: str = field(default=None, repr=False)
     """Used in the command line help for the type of the option."""
 
@@ -272,7 +268,6 @@ class ActionMetaData(PersistableContainer, Dictable):
     """The name of the action, which is also the mnemonic used on the command line.
 
     """
-
     doc: str = field(default=None)
     """A short human readable documentation string used in the usage."""
 
@@ -289,7 +284,6 @@ class ActionMetaData(PersistableContainer, Dictable):
     the main single action given as a mnemonic on the command line.
 
     """
-
     def __post_init__(self):
         if self.first_pass and len(self.positional) > 0:
             raise ActionCliError(
