@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- A programmatic method to get the config factory and application context using
+  the CLI application invocation API from the `CliHarness`.  This uses an
+  "invisible" application that returns the configuration factory enabling the
+  application access without "short cutting" the API to get instances.
+
+### Changes
+- Fix bug with config factories throwing the wrong exception when using
+  `type=import` in application configuration when using bad configuration files
+  with `-c` on the command line.
+
 
 ## [1.11.1] - 2022-09-30
 A few functional `Stash` changes, but mostly a bug release.
