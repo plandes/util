@@ -1,4 +1,4 @@
-from __future__ import annotations
+nfrom __future__ import annotations
 """Creates instances of :class:`.Configurable`.
 
 """
@@ -44,6 +44,7 @@ class ConfigurableFactory(object):
     """The configuration factory extension to clas name."""
 
     TYPE_TO_CLASS_PREFIX: ClassVar[Dict[str, str]]  = {
+        'import': 'ImportIni',
         'importini': 'ImportIni',
         'importyaml': 'ImportYaml',
         'condyaml': 'ConditionalYaml'}
