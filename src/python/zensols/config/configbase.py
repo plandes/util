@@ -183,6 +183,9 @@ class Configurable(Writable, metaclass=ABCMeta):
                 f"No section from which to populate: '{section}'")
         return self.serializer.populate_state(sec, obj, parse_types)
 
+    def __getitem__(self, section: str = None) -> Settings:
+        return self.populate(section=section)
+
     @property
     def sections(self) -> Set[str]:
         """All sections of the configuration file.
