@@ -1,4 +1,4 @@
-nfrom __future__ import annotations
+from __future__ import annotations
 """Creates instances of :class:`.Configurable`.
 
 """
