@@ -374,7 +374,8 @@ class _UsageFormatter(_Formatter):
         i: int
         fmt: _ActionFormatter
         for i, fmt in enumerate(self.action_formatters):
-            if am_set is None or fmt.action.name in am_set:
+            am: ActionMetaData = fmt.action
+            if (am_set is None or am.name in am_set) and am.is_usage_visible:
                 self._write_object(fmt, depth, writer)
                 if i < n_fmt - 1:
                     self._write_empty(writer)

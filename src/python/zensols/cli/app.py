@@ -29,7 +29,7 @@ from zensols.config import (
     Configurable, ConfigFactory, ImportIniConfig, ImportConfigFactory,
 )
 from . import (
-    ActionCliError, ApplicationError, DocUtil,
+    ActionCliError, ApplicationError, ApplicationFailure, DocUtil,
     ActionCliManager, ActionCli, ActionCliMethod, ActionMetaData,
     CommandAction, CommandActionSet, CommandLineConfig, CommandLineParser,
  )
@@ -453,6 +453,13 @@ class ApplicationFactory(PersistableContainer):
     .. automethod:: _handle_error
 
     """
+    error_handler: Callable = field(default=None)
+    """A callable that takes an :class:`Exception` and this instance as a
+    paramters to handle the error.  This can be set to
+    :class:`..ApplicationFailure` for programatic entry to this class (see
+    :class:`.CliHarness`).
+
+    """
     def __post_init__(self):
         if self.package_resource is None:
             raise ActionCliError('Missing package resource')
@@ -687,16 +694,19 @@ class ApplicationFactory(PersistableContainer):
         :see: :meth:`invoke`
 
         """
-        if isinstance(ex, ConfigurableFileNotFoundError):
-            # in some cases, the parser can not be created because it needs
-            # configuration that can not be loaded
-            prog = Path(sys.argv[0]).name
-            msg = self._error_to_str(ex)
-            print(f'{prog}: error: {msg}', file=sys.stderr)
-        elif isinstance(ex, ApplicationError):
-            self._dump_error(ex)
+        if self.error_handler is not None:
+            return self.error_handler(ex, self)
         else:
-            raise ex
+            if isinstance(ex, ConfigurableFileNotFoundError):
+                # in some cases, the parser can not be created because it needs
+                # configuration that can not be loaded
+                prog = Path(sys.argv[0]).name
+                msg = self._error_to_str(ex)
+                print(f'{prog}: error: {msg}', file=sys.stderr)
+            elif isinstance(ex, ApplicationError):
+                self._dump_error(ex)
+            else:
+                raise ex
 
     def invoke(self, args: Union[List[str], str] = None) -> ActionResult:
         """Creates and invokes the entire application returning the result of the
@@ -719,10 +729,10 @@ class ApplicationFactory(PersistableContainer):
             act_res: ActionResult = app_res()
             return act_res
         except Exception as e:
-            self._handle_error(e)
+            return self._handle_error(e)
 
     def invoke_protect(self, args: Union[List[str], str] = None) -> \
-            Union[ActionResult, Tuple[Type, Exception, traceback]]:
+            Union[ActionResult, ApplicationFailure]:
         """Same as :meth:`invoke`, but protect against :class:`Exception` and
         :class:`SystemExit`.  If an error is raised while invoking, it is
         logged and returned.
@@ -731,17 +741,15 @@ class ApplicationFactory(PersistableContainer):
                      will be converted to a list by splitting on whitespace;
                      this defaults to the output of :meth:`_get_default_args`
 
-        :return: the result of the second pass action or the output of
-                 :func:`sys.exec_info` when :class:`Exception` or
+        :return: the result of the second pass action or an
+                 :class:`.ApplicationFailure` if :class:`Exception` or
                  :class:`SystemExit` is raised
 
         """
         try:
             return self.invoke(args)
         except (Exception, SystemExit) as e:
-            exc_info = sys.exc_info()
-            logger.error(f'Invocation failed: {e}', exc_info=exc_info)
-            return exc_info
+            return ApplicationFailure(e, self)
 
     def get_instance(self, args: Union[List[str], str] = None) -> Any:
         """Create the invokable instance of the application.
@@ -764,7 +772,7 @@ class ApplicationFactory(PersistableContainer):
             app_res, invokable = app.invoke_but_second_pass()
             return invokable.instance
         except Exception as e:
-            self._handle_error(e)
+            return self._handle_error(e)
 
     @classmethod
     def create_harness(cls: Type, **kwargs):

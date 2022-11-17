@@ -12,10 +12,10 @@ import inspect
 from io import TextIOBase
 from pathlib import Path
 from zensols.util import PackageResource
-from zensols.config import DictionaryConfig
+from zensols.config import DictionaryConfig, ConfigFactory
 from zensols.introspect import ClassImporter
 from zensols.cli import (
-    ApplicationError, Action, ActionResult, OptionMetaData,
+    ApplicationError, ApplicationFailure, Action, ActionResult, OptionMetaData,
     Application, ApplicationFactory, ConfigurationImporter
 )
 from . import LogConfigurator
@@ -24,7 +24,34 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+class ConfigFactoryAccessor(object):
+    """Return an instance from a :class:`.ConfigFactory`, which is useful for
+    creating harnesses and accessing application context configured instances.
+
+    *Important*: if configured to access an application class in the application
+    context, you will need to remove the entry from the removes in the ``cli``
+    seciton of the ``app.conf`` file.
+
+    """
+    LONG_NAME = 'add_ConfigFactoryAccessor_to_app_config'
+    CLI_META = {'option_includes': {},
+                'mnemonic_overrides': {'access': LONG_NAME},
+                'is_usage_visible': False}
+
+    config_factory: ConfigFactory = field()
+    """The parent configuration factory that is returned when accessed."""
+
+    def access(self) -> ConfigFactory:
+        """Return the configuration factory."""
+        return self.config_factory
+
+
+@dataclass
 class _HarnessEnviron(object):
+    """A context to help the harness do things like relocate the environment
+    (i.e. root directory that has data and resource files).
+
+    """
     args: List[str]
     src_path: Path
     root_dir: Path
@@ -306,9 +333,11 @@ class CliHarness(object):
             return cli.invoke(args[1:])
         except SystemExit as e:
             self._handle_exit(e)
+            return e
 
     def get_instance(self, args: Union[List[str], str] = '',
-                     **factory_kwargs: Dict[str, Any]) -> Any:
+                     **factory_kwargs: Dict[str, Any]) -> \
+            Union[Any, ApplicationFailure]:
         """Create the invokable instance of the application.
 
         ;param args: the arguments to the application not including the program
@@ -329,10 +358,51 @@ class CliHarness(object):
             args = ['_'] + args
         cli: ApplicationFactory = self.create_application_factory(
             args, **factory_kwargs)
+        if cli.error_handler is None:
+            cli.error_handler = ApplicationFailure
         try:
             return cli.get_instance(args[1:])
         except SystemExit as e:
-            self._handle_exit(e)
+            return self._handle_exit(e)
+
+    def get_config_factory(self, args: Union[List[str], str] = None,
+                           throw: bool = True) -> \
+            Union[Any, ApplicationFailure]:
+        """The application configuration factory.
+
+        :param args: additional argument to give to the pseudo command line
+                     (i.e. ``-c <configuration file>``)
+
+        :param throw: whether to throw exceptions raised during executing the
+                      application; if ``False`` then return an
+                      :class:`.ApplicationFailure`
+
+        :return: the configuration factory used to create the application
+                 environment and application config or the
+                 :class:`.ApplicationFailure` if ``throw`` is ``True``
+
+        """
+        inst_args: List[str] = [ConfigFactoryAccessor.LONG_NAME]
+        if args is not None:
+            args = args.split() if isinstance(args, str) else args
+            inst_args.extend(args)
+        accessor: ConfigFactoryAccessor = self.get_instance(inst_args)
+        if isinstance(accessor, ApplicationFailure):
+            if throw:
+                raise accessor.exception
+            else:
+                return accessor
+        else:
+            return accessor.access()
+
+    def __getitem__(self, section_name: str) -> Optional[Any]:
+        """Index by section name binded application configuration instances.
+
+        :param section_name: the section used to create the instance
+
+        """
+        fac: ConfigFactory = self.get_config_factory()
+        return fac(section_name)
 
     def _proto(self, args: Union[List[str], str],
                **factory_kwargs: Dict[str, Any]):

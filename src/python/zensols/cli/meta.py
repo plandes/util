@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 import logging
 import sys
+import traceback
 from io import TextIOBase
 from pathlib import Path
 import optparse
@@ -26,6 +27,30 @@ class ApplicationError(ActionCliError):
 
     """
     pass
+
+
+@dataclass
+class ApplicationFailure(Dictable):
+    """Contains information for application invocation failures used by
+    programatic methods.
+
+    """
+    exception: Exception = field()
+    """The exception that was generated."""
+
+    thrower: Any = field(default=None)
+    """The insstance of the class that is throwing the exception."""
+
+    traceback: traceback = field(default=None, repr=False)
+    """The stack trace."""
+
+    def __post_init__(self):
+        self._exec_info = sys.exc_info()
+        if self.traceback is None:
+            self.traceback = self._exec_info[2]
+
+    def print_stack(self):
+        traceback.print_exception(*self._exec_info)
 
 
 @dataclass
@@ -282,6 +307,12 @@ class ActionMetaData(PersistableContainer, Dictable):
     Examples include the ``-w``/``--whine`` logging level, which applies to the
     entire application and can be configured in a separate class/process from
     the main single action given as a mnemonic on the command line.
+
+    """
+    is_usage_visible: bool = field(default=True)
+    """Whether to display the action in the help usage.  Applications such as
+    :class:`.ConfigFactoryAccessor`, which is only useful with a programatic
+    usage, is an example of where this is used.
 
     """
     def __post_init__(self):

@@ -108,6 +108,8 @@ class ActionCli(PersistableContainer, Dictable):
     called.
 
     """
+    is_usage_visible: bool = field(default=True)
+
     def _is_option_enabled(self, name: str) -> bool:
         """Return ``True`` if the option is enabled and eligible to be added to the
         command line.
@@ -232,7 +234,8 @@ class ActionCli(PersistableContainer, Dictable):
                 doc=doc,
                 options=tuple(sorted(meth_params)),
                 positional=tuple(pos_args),
-                first_pass=self.first_pass)
+                first_pass=self.first_pass,
+                is_usage_visible=self.is_usage_visible)
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'adding metadata: {meta}')
             meths[name] = ActionCliMethod(meta, meth)
