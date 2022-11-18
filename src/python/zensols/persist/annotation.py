@@ -475,7 +475,7 @@ class persisted(object):
     """
     def __init__(self, name: str, path: Path = None,
                  cache_global: bool = False, transient: bool = False,
-                 allocation_track: bool = True,
+                 allocation_track: bool = True, mkdir: bool = False,
                  deallocate_recursive: bool = False,
                  recover_empty: bool = False):
         """Initialize.
@@ -496,6 +496,14 @@ class persisted(object):
         :param allocation_track: if ``False``, immediately mark the backing
                                  :class:`PersistedWork` as deallocated
 
+        :param mkdir: if ``path`` is a :class`.Path` object, then recursively
+                      create all directories needed to be able to persist the
+                      file without missing directory IO errors
+
+        :deallocate_recursive: the ``recursive`` parameter passed to
+                               :meth:`.Deallocate._try_deallocate` to try to
+                               deallocate the object graph recursively
+
         :param recover_empty: if ``True`` and a ``path`` points to a zero size
                               file, treat it as data that has not yet been
                               generated; this is useful when a previous
@@ -511,6 +519,7 @@ class persisted(object):
         self.cache_global = cache_global
         self.transient = transient
         self.allocation_track = allocation_track
+        self.mkdir = mkdir
         self.deallocate_recursive = deallocate_recursive
         self.recover_empty = recover_empty
 
@@ -535,6 +544,7 @@ class persisted(object):
                 pwork = PersistedWork(
                     path, owner=inst, cache_global=self.cache_global,
                     transient=self.transient,
+                    mkdir=self.mkdir,
                     deallocate_recursive=self.deallocate_recursive,
                     recover_empty=self.recover_empty)
                 setattr(inst, self.attr_name, pwork)
