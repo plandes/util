@@ -58,9 +58,12 @@ class TemporaryFileName(object):
     def __iter__(self) -> TemporaryFileName:
         return self
 
+    def _format_name(self, fname: str) -> str:
+        return self._file_fmt.format(name=fname, index=len(self))
+
     def __next__(self) -> Path:
         fname = next(tf._get_candidate_names())
-        fname = self._file_fmt.format(**{'name': fname})
+        fname = self._format_name(fname)
         if self._create and not self._directory.exists():
             if logger.isEnabledFor(logging.INFO):
                 logger.info(f'creating directory {self._directory}')
@@ -73,7 +76,7 @@ class TemporaryFileName(object):
         return next(self)
 
     def __len__(self) -> int:
-        return len(self.__created)
+        return len(self._created)
 
     def clean(self):
         """Remove any files generated from this instance.  Note this only deletes the
