@@ -1,3 +1,10 @@
+from __future__ import annotations
+"""Classes to generate, track and clean up temporary files.
+
+"""
+__author__ = 'Paul Landes'
+
+from typing import Tuple, List
 import logging
 from pathlib import Path
 import tempfile as tf
@@ -35,29 +42,38 @@ class TemporaryFileName(object):
 
         """
         if directory is None:
-            self.directory = Path(tf._get_default_tempdir())
+            self._directory = Path(tf._get_default_tempdir())
         else:
-            self.directory = Path(directory)
-        self.file_fmt = file_fmt
-        self.create = create
-        self.remove = remove
-        self.created = []
+            self._directory = Path(directory)
+        self._file_fmt = file_fmt
+        self._create = create
+        self._remove = remove
+        self._created: List[Path] = []
 
-    def __iter__(self):
+    @property
+    def files(self) -> Tuple[Path]:
+        """Return the file that have been created thus far."""
+        return tuple(self._created)
+
+    def __iter__(self) -> TemporaryFileName:
         return self
 
-    def __next__(self):
+    def __next__(self) -> Path:
         fname = next(tf._get_candidate_names())
-        fname = self.file_fmt.format(**{'name': fname})
-        if self.create and not self.directory.exists():
-            logger.info(f'creating directory {self.directory}')
-            self.directory.mkdir(parents=True, exist_ok=True)
-        path = Path(self.directory, fname)
-        self.created.append(path)
+        fname = self._file_fmt.format(**{'name': fname})
+        if self._create and not self._directory.exists():
+            if logger.isEnabledFor(logging.INFO):
+                logger.info(f'creating directory {self._directory}')
+            self._directory.mkdir(parents=True, exist_ok=True)
+        path = Path(self._directory, fname)
+        self._created.append(path)
         return path
 
-    def __call__(self):
+    def __call__(self) -> Path:
         return next(self)
+
+    def __len__(self) -> int:
+        return len(self.__created)
 
     def clean(self):
         """Remove any files generated from this instance.  Note this only deletes the
@@ -66,8 +82,8 @@ class TemporaryFileName(object):
         This does nothing if ``remove`` is ``False`` in the initializer.
 
         """
-        if self.remove:
-            for path in self.created:
+        if self._remove:
+            for path in self._created:
                 logger.debug(f'delete candidate: {path}')
                 if path.exists():
                     logger.info(f'removing temorary file {path}')
