@@ -257,7 +257,7 @@ class Application(Dictable):
     """The list of actions to invoke in order."""
 
     def _create_instance(self, action: Action) -> Any:
-        """Instantiate the in memory application instance using the CLI input gathered
+        """Instantiate the in memory application using the CLI input gathered
         from the user and the configuration.
 
         """
