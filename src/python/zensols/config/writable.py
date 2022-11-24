@@ -38,7 +38,13 @@ class Writable(ABC):
 
     """
     WRITABLE_INDENT_SPACE: ClassVar[int] = 4
+    """The default number of spaces to indent each level."""
+
     WRITABLE_MAX_COL: ClassVar[int] = 80
+    """The default maximum column size before wrapping text."""
+
+    WRITABLE_INCLUDE_INDEX: ClassVar[bool] = False
+    """Whether to include index numbers with levels in sequences."""
 
     @classmethod
     def _trunc(cls, s: str, max_len: int = None) -> str:
@@ -189,7 +195,7 @@ class Writable(ABC):
         writer.write(f'{sp}{k}: {v}\n')
 
     def _write_iterable(self, data: Iterable[Any], depth: int,
-                        writer: TextIOBase, include_index: bool = False):
+                        writer: TextIOBase, include_index: bool = None):
         """Write list ``data`` with the correct indentation per ``depth`` to
         ``writer``.
 
@@ -197,6 +203,8 @@ class Writable(ABC):
                               element in the output
 
         """
+        if include_index is None:
+            include_index = self.WRITABLE_INCLUDE_INDEX
         for i, v in enumerate(data):
             if include_index:
                 self._write_line(f'i: {i}', depth, writer)
