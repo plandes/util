@@ -8,7 +8,6 @@ from typing import (
     Tuple, List, Dict, Iterable, Any, Callable, Optional, Union, Type
 )
 from dataclasses import dataclass, field
-import traceback
 from abc import ABC, abstractmethod
 import logging
 import sys
