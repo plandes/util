@@ -11,12 +11,12 @@ import logging
 import inspect
 from io import TextIOBase
 from pathlib import Path
-from zensols.util import PackageResource
+from zensols.util import PackageResource, APIError
 from zensols.config import DictionaryConfig, ConfigFactory
 from zensols.introspect import ClassImporter
 from zensols.cli import (
     ApplicationError, ApplicationFailure, Action, ActionResult, OptionMetaData,
-    Application, ApplicationFactory, ConfigurationImporter
+    Application, ApplicationResult, ApplicationFactory, ConfigurationImporter
 )
 from . import LogConfigurator
 
@@ -318,17 +318,19 @@ class CliHarness(object):
             logger.debug(f'environ: {env}')
         return self._create_app_fac(env, factory_kwargs)
 
-    def invoke(self, args: Union[List[str], str] = sys.argv,
-               **factory_kwargs: Dict[str, Any]) -> Any:
-        """Invoke the application.
+    def invoke(self, args: List[str] = sys.argv,
+               **factory_kwargs: Dict[str, Any]) -> ApplicationResult:
+        """Invoke the application using the standard command line arguments.
+        This is called from command line entry points.  To invoke from Python
+        use
 
         :param args: all command line arguments including the program name
 
         :param factory_kwargs: arguments given to the command line factory
 
+        :return: the application results
+
         """
-        if isinstance(args, str):
-            args = args.split()
         cli: ApplicationFactory = self.create_application_factory(
             args, **factory_kwargs)
         try:
@@ -367,6 +369,19 @@ class CliHarness(object):
         except SystemExit as e:
             return self._handle_exit(e)
 
+    def _normalize_args(self, args: Optional[Union[List[str], str]],
+                        create_if_none: bool = True) -> List[str]:
+        if args is None:
+            if create_if_none:
+                args = []
+        else:
+            if isinstance(args, str):
+                args = args.split()
+            elif not isinstance(args, list):
+                raise APIError(
+                    f'Expecting argument list of str but got: {args}')
+        return args
+
     def get_config_factory(self, args: Union[List[str], str] = None,
                            throw: bool = True) -> \
             Union[Any, ApplicationFailure]:
@@ -386,7 +401,7 @@ class CliHarness(object):
         """
         inst_args: List[str] = [ConfigFactoryAccessor.LONG_NAME]
         if args is not None:
-            args = args.split() if isinstance(args, str) else args
+            args = self._normalize_args(args)
             inst_args.extend(args)
         accessor: ConfigFactoryAccessor = self.get_instance(inst_args)
         if isinstance(accessor, ApplicationFailure):
@@ -407,7 +422,7 @@ class CliHarness(object):
         return fac(section_name)
 
     def _proto(self, args: Union[List[str], str],
-               **factory_kwargs: Dict[str, Any]):
+               **factory_kwargs: Dict[str, Any]) -> ApplicationResult:
         """Invoke the prototype.
 
         :param args: the command line arguments without the first argument (the
@@ -415,18 +430,22 @@ class CliHarness(object):
 
         :param factory_kwargs: arguments given to the command line factory
 
+        :return: the application results
+
         """
-        args = args.split() if isinstance(args, str) else args
-        args = ['_'] + args
+        args = ['_'] + self._normalize_args(args)
         self.no_exit = True
         return self.invoke(args, **factory_kwargs)
 
-    def proto(self, args: Union[List[str], str] = None):
+    def proto(self, args: Union[List[str], str] = None) -> \
+            Optional[ApplicationResult]:
         """Invoke the prototype using :obj:`proto_args` and
         :obj:`proto_factory_kwargs`.
 
         :param args: the command line arguments without the first argument (the
                      program name)
+
+        :return: the application results if it did not try to exit
 
         """
         if self.proto_header is not None:
@@ -437,23 +456,12 @@ class CliHarness(object):
         except SystemExit as e:
             self._handle_exit(e)
 
-    def __call__(self, args: Union[List[str], str] = None):
-        """Invoke the command line with arguments.  This is useful for calling
-        from the Python REPL.
+    def run(self) -> Optional[ActionResult]:
+        """The command line script (i.e. model harness scripts) entry point.
 
-        :param args: the command line arguments without the first argument (the
-                     program name)
+        :return: the application results if it did not exit
 
         """
-        self.proto_header = None
-        self.no_exit = True
-        try:
-            return self.proto(args)
-        except SystemExit as e:
-            self._handle_exit(e)
-
-    def run(self) -> Optional[ActionResult]:
-        """The command line script entry point."""
         invoke_method = self.invoke_method
         if invoke_method == 'main':
             # when running from a shell, run the CLI entry point
@@ -463,6 +471,29 @@ class CliHarness(object):
             return self.proto()
         else:
             logger.debug('skipping re-entry from interpreter re-evaluation')
+
+    def execute(self, args: Union[List[str], str] = None) -> \
+            Optional[ApplicationResult]:
+        """Invoke the application with command line with arguments from other
+        Python programs or the REPL.
+
+        :param args: the command line arguments without the first argument (the
+                     program name)
+
+        :return: the application results if it did not try to exit
+
+        """
+        self.proto_header = None
+        self.no_exit = True
+        try:
+            return self.proto(args)
+        except SystemExit as e:
+            self._handle_exit(e)
+
+    def __call__(self, args: Union[List[str], str] = None) -> \
+            Optional[ApplicationResult]:
+        """Invoke using :meth:`execute`."""
+        self.execute(args)
 
 
 @dataclass
@@ -532,9 +563,7 @@ class ConfigurationImporterCliHarness(CliHarness):
 
     def get_instance(self, args: Union[List[str], str] = None,
                      **factory_kwargs: Dict[str, Any]) -> Any:
-        args = args.split() if isinstance(args, str) else args
-        if args is None:
-            args = []
+        args = self._normalize_args(args)
         args.insert(0, '_')
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'get inst: {args}, factory: {factory_kwargs}')
