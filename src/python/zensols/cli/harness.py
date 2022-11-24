@@ -318,7 +318,7 @@ class CliHarness(object):
             logger.debug(f'environ: {env}')
         return self._create_app_fac(env, factory_kwargs)
 
-    def invoke(self, args: List[str] = sys.argv,
+    def invoke(self, args: Union[List[str], str] = sys.argv,
                **factory_kwargs: Dict[str, Any]) -> Any:
         """Invoke the application.
 
@@ -327,6 +327,8 @@ class CliHarness(object):
         :param factory_kwargs: arguments given to the command line factory
 
         """
+        if isinstance(args, str):
+            args = args.split()
         cli: ApplicationFactory = self.create_application_factory(
             args, **factory_kwargs)
         try:
@@ -436,8 +438,8 @@ class CliHarness(object):
             self._handle_exit(e)
 
     def __call__(self, args: Union[List[str], str] = None):
-        """Invoke the command line with arguments.  This is useful for calling from the
-        Python REPL.
+        """Invoke the command line with arguments.  This is useful for calling
+        from the Python REPL.
 
         :param args: the command line arguments without the first argument (the
                      program name)
