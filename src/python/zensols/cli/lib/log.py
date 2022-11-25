@@ -131,7 +131,8 @@ class LogConfigurator(object):
                         f'({app_level})')
             modified_logger = logging.getLogger(self.log_name)
             modified_logger.setLevel(level)
-        if self.loggers is not None:
+        # avoid clobbering CLI given level with app config ``loggers`` entry
+        if self.level is None and self.loggers is not None:
             for name, level in self.loggers.items():
                 level = self._to_level(name, level)
                 assert isinstance(level, int)
