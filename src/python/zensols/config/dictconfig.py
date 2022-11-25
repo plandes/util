@@ -84,6 +84,7 @@ class DictionaryConfig(Configurable, Dictable):
         return set(self._get_config().keys())
 
     def set_option(self, name: str, value: str, section: str = None):
+        section = self.default_section if section is None else section
         if section not in self.sections:
             dct = {}
             self._dict_config[section] = dct
