@@ -163,11 +163,9 @@ class CacheStash(DelegateStash):
                 self._debug(f'loading cached: {name}')
             return self.cache_stash.load(name)
         else:
-            obj = None
-            if self.delegate.exists(name):
-                obj = self.delegate.load(name)
-                if logger.isEnabledFor(logging.DEBUG):
-                    self._debug('loading from delegate; dump to cache: {name}')
+            obj = self.delegate.load(name)
+            if logger.isEnabledFor(logging.DEBUG):
+                self._debug(f'loading from delegate, dumping to cache: {name}')
             self.cache_stash.dump(name, obj)
             return obj
 
