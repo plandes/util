@@ -341,7 +341,7 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         if prev_defined_sec is not None and prev_defined_sec != sec_name:
             # fail when redefining injections, and thus class metadata,
             # configuration
-            msg = ('attempt redefine or reuse injection for class ' +
+            msg = ('Attempt redefine or reuse injection for class ' +
                    f'{class_name} in section {sec_name} previously ' +
                    f'defined in section {prev_defined_sec}')
             raise RedefinedInjectionError(msg, self)
