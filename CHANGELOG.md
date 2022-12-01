@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   the CLI application invocation API from the `CliHarness`.  This uses an
   "invisible" application that returns the configuration factory enabling the
   application access without "short cutting" the API to get instances.
+- An `instance:` parameter in application context configurations that allow
+  new/deep instances.
 
 ### Changes
 - Fix bug with config factories throwing the wrong exception when using

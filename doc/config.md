@@ -237,13 +237,15 @@ single instance of each object instance per section.  Once a class is
 *referred* by name, the instance is looked up by the [ImportConfigFactory] and
 created if it does not exist already per the [parsing](#parsing) rules.
 
-
 Each section contains the data for an instance along with a option (variable)
 entry `class_name`, which is the fully qualified class name (`<module>.<class
-name>`).  Each option value contained in the respective section is set as an
-attribute on the instantiated object instance.
+name>`).  When this entry is missing, the section is instantiated as a `dict`
+like object as detailed in [dictionary sections](#dictionary-sections).
 
-For example, say you have the classes defined in a module called `domain`:
+Each option value contained in the respective section is set as an attribute on
+the instantiated object instance.  For example, say you have the classes
+defined in a module called `domain`:
+
 ```python
 from typing import List
 from dataclasses import dataclass
@@ -298,6 +300,28 @@ Parameters to the initialization method of the configuration factory indicate
 whether to reload the module or not, which is the default.  This is
 particularly hand when prototyping your code from a different module in the
 Python REPL.
+
+
+### Dictionary Sections
+
+Sections that have no `class_name` that are instantiated using entries with
+`instance:` are created as [Settings] objects.  These instances act in a Python
+dictionary manner and can be converted to `dict` instances with `asdict`.
+
+While the [Settings] class has the advantage of accessing configuration entries
+as both by index (`obj['key']`) but also by attribute (`obj.key`), it is
+sometimes desirable to use a `dict` without having to call `asdict`.  To
+accomplish this, simply change the class used as an [evaluation
+parameter](#evaluation-parameters) such as:
+
+```ini
+[bart]
+class_name = domain.Person
+age = 16
+
+[school_attendance]
+bart_info = instance({'class_name': 'builtins.dict'}): bart
+```
 
 
 ### Evaluation Parameters
@@ -404,8 +428,9 @@ boss = instance({'param': {'age': 69}}): homer
 
 A shorthand using `object:` and specifying the class name inline is useful in
 cases where you don't want to create an additional section and/or don't want to
-share the instance.  The equivalent configuration for not sharing the `homer`
-object is:
+share the instance (see [shared instance memory
+space](#shared-instance-memory-space)).  The equivalent configuration for not
+sharing the `homer` object is:
 ```ini
 [bobs_senior_center]
 class_name = domain.Organization
@@ -434,6 +459,42 @@ class_name = domain.Organization
 boss = instance({'param': {'age': 69}}): homer
 employees = instance: tuple: bob, bart
 ```
+
+
+### Shared Instance Memory Space
+
+The [configuration factory] by default shares all instances in memory provided
+by `instance:` entries using the lazy load method.  When these are encountered,
+the factory looks to see if the instance has been created, and returns shared
+references to those that already have.
+
+This can be turned off by settings `shared = False` to the [ImportConfigFactory
+initializer], but in most cases this is called by other framework code.  Other
+ways to create new instances in separate memory spaces are to use the
+[new_instance] method in your calling client instead of [instance], but even
+this does not address how to create separate instances in the [application
+context](#application-context).
+
+For this, a special `share` parameter can be provided in the `instance:` entry
+clause to use the aforementioned methods to create the new instance.  There are
+three methods, which include:
+
+* `default`: [instance] which uses the factory instance's `shared`
+  initializer parameter to indicate whether to create shared instances,
+* `evict`: [new_instance] which returns the current instance in the
+  shared space (if there is one), then immediately evicts that instance,
+* `deep`: [new_deep_instance] which creates a new object graph, all of which
+  will have a completely new memory space, regardless of the shared space
+  state.
+
+For example:
+```ini
+[larrys_senior_center]
+class_name = domain.Organization
+boss = instance({'share': 'deep'}): homer
+```
+creates a new instance of `homer` that is not shared with `bobs_senior_center`.
+
 
 
 ### Dataclasses
@@ -602,6 +663,7 @@ this documentation.
 [INI format]: #ini-format
 [INI formatted]: #ini-format
 
+[Settings]: ../api/zensols.config.html#zensols.config.serial.Settings
 [Configurable]: ../api/zensols.config.html#zensols.config.configbase.Configurable
 [IniConfig]: ../api/zensols.config.html#zensols.config.iniconfig.IniConfig
 [ImportIniConfig]: ../api/zensols.config.html#zensols.config.importini.ImportIniConfig
@@ -614,6 +676,10 @@ this documentation.
 [StringConfig]: ../api/zensols.config.html#zensols.config.strconfig.StringConfig
 [ConfigFactory]: ../api/zensols.config.html#zensols.config.facbase.ConfigFactory
 [ImportConfigFactory]: ../api/zensols.config.html#zensols.config.importfac.ImportConfigFactory
+[ImportConfigFactory initializer]: ../api/zensols.config.html#zensols.config.importfac.ImportConfigFactory.__init__
+[instance]: ../api/zensols.config.html#zensols.config.importfac.ImportConfigFactory.instance
+[new_instance]: ../api/zensols.config.html#zensols.config.importfac.ImportConfigFactory.new_instance
+[new_deep_instance]: ../api/zensols.config.html#zensols.config.importfac.ImportConfigFactory.new_deep_instance
 [ExtendedInterpolationEnvConfig]: ../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig
 [populate]: ../api/zensols.config.html#zensols.config.configbase.Configurable.populate
 [resource_filename]: ../api/zensols.config.html#zensols.config.configbase.Configurable.resource_filename

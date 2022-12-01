@@ -4,7 +4,7 @@
 __author__ = 'Paul Landes'
 
 import typing
-from typing import Tuple, Dict, Optional, Union, Any, Type, Iterable
+from typing import Tuple, Dict, Optional, Union, Any, Type, Iterable, Callable
 import dataclasses
 import logging
 import types
@@ -52,6 +52,11 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
     _DATACLASS_REGEXP = re.compile(r'^dataclass\((.+)\):\s*(.+)$', re.DOTALL)
     """The ``dataclass`` regular expression used to create Python dataclasses with
     nested data in formats such as YAML.
+
+    """
+    _CHILD_PARAM_DIRECTIVES = frozenset('param reload type share'.split())
+    """The set of allowed directives for ``instance`` (:obj:``INSTANCE_REGEXP`)
+    entries parsed by :meth:`_parse_child_params`.
 
     """
     _INJECTS = {}
@@ -150,9 +155,9 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         return inst
 
     def new_instance(self, name: str = None, *args, **kwargs):
-        """Create a new instance without it being shared.  This is done by purging the
-        existing instance from the shared cache when it is created next time
-        the contained instances are shared.
+        """Create a new instance without it being shared.  This is done by
+        evicting the existing instance from the shared cache when it is created
+        next time the contained instances are shared.
 
         :param name: the name of the class (by default) or the key name of the
                      class used to find the class
@@ -210,8 +215,19 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 v = self.instance(v, **params)
                 inst[k] = v
         elif isinstance(secs, str):
+            create_type: str = None
             try:
-                inst = self.instance(secs, **params)
+                if config_params is not None:
+                    create_type: str = config_params.get('share')
+                meth: Callable = {
+                    None: self.instance,
+                    'default': self.instance,
+                    'evict': self.new_instance,
+                    'deep': self.new_deep_instance,
+                }.get(create_type)
+                if meth is None:
+                    raise FactoryError('Unknown create type: {create_type}')
+                inst = meth(secs, **params)
             except Exception as e:
                 raise FactoryError(
                     f"Could not create instance from section '{section}'",
@@ -224,16 +240,17 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                          f'with {params}, config: {config_params}')
         return inst
 
-    def _parse_child_params(self, pconfig: str) -> Tuple[Dict[str, str], bool]:
-        child_params = {}
-        inst_conf = None
-        reload = False
-        defined_directives = set('param reload type'.split())
+    def _parse_child_params(self, pconfig: str) -> \
+            Tuple[Dict[str, Any], Dict[str, Any]]:
+        child_params: Dict[str, Any] = {}
+        inst_conf: Dict[str, Any] = None
+        reload: bool = False
         if pconfig is not None:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'parsing param config: {pconfig}')
             inst_conf = eval(pconfig)
-            unknown = set(inst_conf.keys()) - defined_directives
+            unknown: Set[str] = set(inst_conf.keys()) - \
+                self._CHILD_PARAM_DIRECTIVES
             if len(unknown) > 0:
                 raise FactoryError(f'Unknown directive(s): {unknown}', self)
             if 'param' in inst_conf:
@@ -249,11 +266,11 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         self._set_reload(reload)
         return child_params, inst_conf
 
-    def _populate_instances(self, pconfig: str, section: str):
+    def _populate_instances(self, pconfig: str, section: str) -> Any:
         child_params, inst_conf = self._parse_child_params(pconfig)
         return self._create_instance(section, inst_conf, child_params)
 
-    def _object_instance(self, pconfig: str, class_name: str):
+    def _object_instance(self, pconfig: str, class_name: str) -> Any:
         params, inst_conf = self._parse_child_params(pconfig)
         cls: Type = self._find_class(class_name)
         desc = f'object instance {class_name}'
