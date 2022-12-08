@@ -516,7 +516,6 @@ croot:
           age: 21
           salary: 15.5
         - name: jill
-		...
 ```
 Creates a dataclass instance of `test_yaml_dataclass.Department` whose
 definition is given with configuration starting with `dept:`.  Inline
