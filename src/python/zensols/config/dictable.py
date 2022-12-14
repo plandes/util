@@ -5,7 +5,7 @@ primitives handy for creating JSON.
 __author__ = 'Paul Landes'
 
 from typing import Dict, Any, Iterable, Tuple, Optional
-from dataclasses import dataclass, fields, asdict
+from dataclasses import dataclass, fields, asdict, field
 import dataclasses
 import sys
 import logging
@@ -275,3 +275,17 @@ class Dictable(Writable):
 
 
 _DICTABLE_CLASS = Dictable
+
+
+@dataclass
+class DefaultDictable(Dictable):
+    """A convenience utiltiy class that provides access to methods such as
+    :meth:`write` and :meth:`asjson`.
+
+    """
+    data: Dict[str, Any] = field()
+    """The data used to be JSON or written."""
+
+    def _from_dictable(self, recurse: bool, readable: bool,
+                       class_name_param: str = None) -> Dict[str, Any]:
+        return self.data
