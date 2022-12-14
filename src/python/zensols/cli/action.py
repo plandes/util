@@ -109,6 +109,7 @@ class ActionCli(PersistableContainer, Dictable):
 
     """
     is_usage_visible: bool = field(default=True)
+    """Whether the action is included in the usage help."""
 
     def _is_option_enabled(self, name: str) -> bool:
         """Return ``True`` if the option is enabled and eligible to be added to the
