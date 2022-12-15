@@ -53,7 +53,9 @@ class UsageConfig(Dictable):
         if self.width is None:
             try:
                 self.width = os.get_terminal_size()[0]
-            except OSError:
+            except OSError as e:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'can not get terminal size: {e}')
                 self.width = 0
         if self.width == 0:
             self.width = 80
@@ -334,7 +336,9 @@ class _UsageFormatter(_Formatter):
             self.usage_config.inter_col_space
 
     def get_option_usage_names(self, expand: bool = True) -> str:
-        action_names = tuple(map(lambda a: a.name, self.actions))
+        actions: Iterable[Action] = filter(
+            lambda a: a.is_usage_visible, self.actions)
+        action_names: Tuple[str] = tuple(map(lambda a: a.name, actions))
         if len(action_names) > 1:
             if expand:
                 names = '|'.join(action_names)
@@ -440,15 +444,16 @@ class _UsageWriter(_Formatter):
             self, actions, self.usage_config, self.global_options)
 
     def get_prog_usage(self) -> str:
-        prog = '<python>'
+        opt_usage: str = '[options]:'
+        prog: str = '<python>'
         if len(sys.argv) > 0:
             prog_path: Path = Path(sys.argv[0])
             prog = prog_path.name
         opts = self.usage_formatter.get_option_usage_names()
-        usage = f'{prog} {opts}[options]:'
-        if len(usage) > (self.usage_config.width - 7):
+        usage = f'{prog} {opts}{opt_usage}'
+        if len(usage) > (self.usage_config.width - len(opt_usage)):
             opts = self.usage_formatter.get_option_usage_names(expand=False)
-            usage = f'{prog} {opts}[options]:'
+            usage = f'{prog} {opts}{opt_usage}'
         return usage
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
