@@ -85,7 +85,10 @@ class UsageActionOptionParser(OptionParser):
                  doc: str = None, default_action: str = None, *args, **kwargs):
         super().__init__(*args, add_help_option=False, **kwargs)
         help_op = OptionMetaData(
-            'help', 'h', dtype=bool, doc='show this help message and exit')
+            'help', 'h',
+            metavar='[actions]',
+            dtype=bool,
+            doc='show this help message and exit')
         version_op = OptionMetaData(
             'version', None, dtype=bool,
             doc='show the program version and exit')
