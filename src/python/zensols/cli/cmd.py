@@ -325,7 +325,6 @@ class CommandLineParser(Deallocatable, Dictable):
         if options['help'] is True:
             goods, bads = self._get_help_action(op_args)
             if len(bads) > 0:
-                #self.write_help(include_actions=False)
                 raise CommandLineError(
                     f"No such action{'s' if len(bads) > 1 else ''}: " +
                     ', '.join(bads))
