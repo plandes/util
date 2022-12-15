@@ -501,29 +501,36 @@ class ApplicationFactory(PersistableContainer):
                                    reload_pattern=self.reload_pattern)
 
     def _find_app_doc(self, cli_mng: ActionCliManager) -> str:
-        """Try to find documentation suitable for the program as a fallback if the
-        command line parser can't find anything.
+        """Try to find documentation suitable for the program as a fallback if
+        the command line parser can't find anything.
 
-        This returns the class level documentation if there is only one class
-        by all second pass actions that don't originate from this module's
-        parent (i.e. those, that come from :mod:`zensols.cli`).
+        This returns the class level documentation if there is only one class by
+        all second pass actions that don't originate from this module's parent
+        (i.e. those, that come from :mod:`zensols.cli`).
 
         """
-        def flt_act(action: ActionCli):
+        def filter_action(action: ActionCli):
+            """Filter documentation action candidates."""
             name = action.class_meta.name
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(
                     f'name: {name}, single pass: {not action.first_pass}, ' +
                     f'CLI lib: {not name.startswith(mod_pattern)}')
-            return not action.first_pass and not name.startswith(mod_pattern)
+            return not action.first_pass and \
+                not name.startswith(mod_pattern) and \
+                action.is_usage_visible
+
+        def filter_doc(action: ActionCli):
+            """Filter private classes."""
+            return not action.class_meta.doc.text.startswith('_')
 
         mod_name: str = DocUtil.module_name()
         mod_pattern: str = mod_name + '.'
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'module name: {mod_name}')
         ac_clis: Tuple[ActionCli] = tuple(cli_mng.actions.values())
-        sp_actions = tuple(filter(flt_act, ac_clis))
-        sp_metas = tuple(chain.from_iterable(
+        sp_actions = tuple(filter(filter_action, ac_clis))
+        sp_metas: Tuple[ActionMetaData] = tuple(chain.from_iterable(
             map(lambda ac: ac.meta_datas, sp_actions)))
         doc = None
         if logger.isEnabledFor(logging.DEBUG):
@@ -535,6 +542,8 @@ class ApplicationFactory(PersistableContainer):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'using second pass doc: {doc}')
         else:
+            # filter application classes are public
+            sp_actions: Tuple[ActionCli] = tuple(filter(filter_doc, sp_actions))
             actions: Dict[str, ActionCli] = \
                 {c.class_meta.name: c for c in sp_actions}
             if logger.isEnabledFor(logging.DEBUG):
@@ -547,7 +556,8 @@ class ApplicationFactory(PersistableContainer):
         return doc
 
     def _get_app_doc(self, cli_mng: ActionCliManager) -> Optional[str]:
-        """Return the application documentation, or ``None`` if it is unavailable.
+        """Return the application documentation, or ``None`` if it is
+        unavailable.
 
         :see: :meth:`_find_app_doc`
 
