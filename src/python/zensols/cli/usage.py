@@ -370,23 +370,23 @@ class _UsageFormatter(_Formatter):
     def _write_actions(self, depth: int, writer: TextIOBase,
                        action_metas: Sequence[ActionMetaData] = None):
         am_set: Set[str] = None
-        # get only visible actions
-        fmts: Tuple[_ActionFormatter] = tuple(filter(
-            lambda f: f.action.is_usage_visible,
-            self.action_formatters))
-        n_fmt: int = len(fmts)
         if action_metas is not None:
             am_set = set(map(lambda a: a.name, action_metas))
+        # get only visible actions
+        fmts: Tuple[_ActionFormatter] = tuple(filter(
+            lambda f: f.action.is_usage_visible and \
+                (am_set is None or f.action.name in am_set),
+            self.action_formatters))
+        n_fmt: int = len(fmts)
         if n_fmt > 0:
             self._write_line('Actions:', depth, writer)
         i: int
         fmt: _ActionFormatter
         for i, fmt in enumerate(fmts):
             am: ActionMetaData = fmt.action
-            if am_set is None or am.name in am_set:
-                self._write_object(fmt, depth, writer)
-                if i < n_fmt - 1:
-                    self._write_empty(writer)
+            self._write_object(fmt, depth, writer)
+            if i < n_fmt - 1:
+                self._write_empty(writer)
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
               include_singleton_positional: bool = True,
@@ -462,13 +462,16 @@ class _UsageWriter(_Formatter):
               include_actions: bool = True,
               action_metas: Sequence[ActionMetaData] = None):
         prog = self.get_prog_usage()
-        self._write_line(f'Usage: {prog}', depth, writer)
-        self._write_empty(writer)
-        if self.doc is not None:
-            doc = self._format_doc(self.doc)
-            self._write_wrap(doc, depth, writer)
+        # if user specified help action(s) on the command line, only print the
+        # action(s)
+        if action_metas is None:
+            self._write_line(f'Usage: {prog}', depth, writer)
             self._write_empty(writer)
-        if action_metas is not None:
+            if self.doc is not None:
+                doc = self._format_doc(self.doc)
+                self._write_wrap(doc, depth, writer)
+                self._write_empty(writer)
+        else:
             include_options = False
         self.usage_formatter.write(
             depth, writer,
