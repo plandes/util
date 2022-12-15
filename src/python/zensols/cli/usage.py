@@ -366,16 +366,20 @@ class _UsageFormatter(_Formatter):
     def _write_actions(self, depth: int, writer: TextIOBase,
                        action_metas: Sequence[ActionMetaData] = None):
         am_set: Set[str] = None
-        n_fmt: int = len(self.action_formatters)
+        # get only visible actions
+        fmts: Tuple[_ActionFormatter] = tuple(filter(
+            lambda f: f.action.is_usage_visible,
+            self.action_formatters))
+        n_fmt: int = len(fmts)
         if action_metas is not None:
             am_set = set(map(lambda a: a.name, action_metas))
         if n_fmt > 0:
             self._write_line('Actions:', depth, writer)
         i: int
         fmt: _ActionFormatter
-        for i, fmt in enumerate(self.action_formatters):
+        for i, fmt in enumerate(fmts):
             am: ActionMetaData = fmt.action
-            if (am_set is None or am.name in am_set) and am.is_usage_visible:
+            if am_set is None or am.name in am_set:
                 self._write_object(fmt, depth, writer)
                 if i < n_fmt - 1:
                     self._write_empty(writer)
