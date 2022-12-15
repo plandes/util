@@ -157,13 +157,13 @@ class PersistedWork(Deallocatable):
             del globals()[vname]
 
     def clear(self):
-        """Clear the data, and thus, force it to be created on the next fetch.  This is
-        done by removing the attribute from ``owner``, deleting it from globals
-        and removing the file from the disk.
+        """Clear the data, and thus, force it to be created on the next fetch.
+        This is done by removing the attribute from ``owner``, deleting it from
+        globals and removing the file from the disk.
 
         """
         vname = self.varname
-        if self.path.is_file():
+        if self.use_disk and self.path.is_file():
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug('deleting cached work: {}'.format(self.path))
             self.path.unlink()
