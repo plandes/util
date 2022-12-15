@@ -433,7 +433,7 @@ class Cleaner(DryRunApplication):
             if level <= self.clean_level:
                 for path in paths:
                     if isinstance(path, str):
-                        path = Path(path)
+                        path = Path(path).expanduser()
                     self._remove_path(level, path)
 
     def __call__(self):
