@@ -14,11 +14,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   application access without "short cutting" the API to get instances.
 - An `instance:` parameter in application context configurations that allow
   new/deep instances.
+- A convenience utility class `DefaultDictable` that provides access to methods
+  such as `write` and `asjson` without needing inheritance.
 
 ### Changes
 - Fix bug with config factories throwing the wrong exception when using
   `type=import` in application configuration when using bad configuration files
   with `-c` on the command line.
+- The `persisted` decorator and `PersistedWork` skip file system checks when
+  configured as in memory rather with file system paths.
+- The CLI `Cleaner` app now expands the user home directory when the syntax is
+  provided with `pathlib.Path.expanduser`.
 
 
 ## [1.11.1] - 2022-09-30

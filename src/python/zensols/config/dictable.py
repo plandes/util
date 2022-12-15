@@ -279,8 +279,8 @@ _DICTABLE_CLASS = Dictable
 
 @dataclass
 class DefaultDictable(Dictable):
-    """A convenience utiltiy class that provides access to methods such as
-    :meth:`write` and :meth:`asjson`.
+    """A convenience utility class that provides access to methods such as
+    :meth:`write` and :meth:`asjson` without needing inheritance.
 
     """
     data: Dict[str, Any] = field()
