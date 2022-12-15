@@ -468,6 +468,8 @@ class _UsageWriter(_Formatter):
             doc = self._format_doc(self.doc)
             self._write_wrap(doc, depth, writer)
             self._write_empty(writer)
+        if action_metas is not None:
+            include_options = False
         self.usage_formatter.write(
             depth, writer,
             include_singleton_positional=include_singleton_positional,
