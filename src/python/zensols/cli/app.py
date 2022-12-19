@@ -17,7 +17,7 @@ from itertools import chain
 from pathlib import Path
 from frozendict import frozendict
 from zensols.introspect import (
-    Class, ClassMethod, ClassField, ClassMethodArg, ClassImporter
+    Class, ClassMethod, ClassField, ClassMethodArg, ClassDoc, ClassImporter
 )
 from zensols.persist import (
     persisted, PersistedWork, PersistableContainer, Deallocatable
@@ -510,7 +510,7 @@ class ApplicationFactory(PersistableContainer):
         (i.e. those, that come from :mod:`zensols.cli`).
 
         """
-        def filter_action(action: ActionCli):
+        def filter_action(action: ActionCli) -> bool:
             """Filter documentation action candidates."""
             name = action.class_meta.name
             if logger.isEnabledFor(logging.DEBUG):
@@ -521,9 +521,14 @@ class ApplicationFactory(PersistableContainer):
                 not name.startswith(mod_pattern) and \
                 action.is_usage_visible
 
-        def filter_doc(action: ActionCli):
+        def filter_doc(action: ActionCli) -> bool:
             """Filter private classes."""
-            return not action.class_meta.doc.text.startswith('_')
+            doc: ClassDoc = action.class_meta.doc
+            if doc is None:
+                return False
+            else:
+                return not action.class_meta.doc.text.startswith('_')
+
 
         mod_name: str = DocUtil.module_name()
         mod_pattern: str = mod_name + '.'
