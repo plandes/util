@@ -133,7 +133,7 @@ class Deallocatable(ABC):
             delattr(self, attrib)
         return deallocd
 
-    def _deallocate_attributes(self, attribs: Tuple[str]) -> int:
+    def _deallocate_attributes(self, attribs: Tuple[str, ...]) -> int:
         """Deallocates all attributes in ``attribs`` using
         :meth:`_deallocate_attribute`.
 

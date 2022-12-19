@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Tuple, Type, Sequence, Dict
+from typing import Any, Tuple, Type, Sequence, Dict, ClassVar
 from types import ModuleType
 from abc import ABC
 import logging
@@ -28,7 +28,7 @@ class ClassImporter(object):
     class name.  This is handy for prototyping code in a Python REPL.
 
     """
-    CLASS_REGEX = re.compile(r'^(.+)\.(.+?)$')
+    CLASS_REGEX: ClassVar[re.Pattern] = re.compile(r'^(.+)\.(.+?)$')
 
     def __init__(self, class_name: str, reload: bool = True):
         """Initialize with the class name.

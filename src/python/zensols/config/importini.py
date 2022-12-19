@@ -70,7 +70,8 @@ class _SharedExtendedInterpolation(ExtendedInterpolation):
     substitute.
 
     """
-    def __init__(self, children: Tuple[Configurable], robust: bool = False):
+    def __init__(self, children: Tuple[Configurable, ...],
+                 robust: bool = False):
         super().__init__()
         defs = {}
         for child in children:
@@ -114,7 +115,7 @@ class _BootstrapConfig(IniConfig):
     includes nested configruation imports when we *descend* recursively.
 
     """
-    def __init__(self, parent: IniConfig, children: Tuple[Configurable]):
+    def __init__(self, parent: IniConfig, children: Tuple[Configurable, ...]):
         """Initialize.
 
         :param parent: the initial config having only the import, load and
@@ -202,7 +203,7 @@ class ImportIniConfig(IniConfig):
     def __init__(self, *args,
                  config_section: str = IMPORT_SECTION,
                  exclude_config_sections: bool = True,
-                 children: Tuple[Configurable] = (),
+                 children: Tuple[Configurable, ...] = (),
                  use_interpolation: bool = True,
                  **kwargs):
         """Initialize.

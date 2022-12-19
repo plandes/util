@@ -153,7 +153,7 @@ class ApplicationResult(Dictable):
     in :obj:`actions`.
 
     """
-    action_results: Tuple[ActionResult] = field()
+    action_results: Tuple[ActionResult, ...] = field()
     """Both first and second pass action results.  These are provided in the same
     order for which was executed when the class:`.Application` ran, which is
     that same order provided to the :class:`.ActionCliManager`.
@@ -220,7 +220,7 @@ class Invokable(object):
     method: Callable = field()
     """The object method bound to :obj:`instance` to be called."""
 
-    args: Tuple[Any] = field()
+    args: Tuple[Any, ...] = field()
     """The arguments used when calling :obj:`method`."""
 
     kwargs: Dict[str, Any] = field()
@@ -252,7 +252,7 @@ class Application(Dictable):
     factory: ApplicationFactory = field(repr=False)
     """The factory that created this application."""
 
-    actions: Tuple[Action] = field()
+    actions: Tuple[Action, ...] = field()
     """The list of actions to invoke in order."""
 
     def _create_instance(self, action: Action) -> Any:
@@ -291,7 +291,7 @@ class Application(Dictable):
         return inst
 
     def _get_meth_params(self, action: Action, meth_meta: ClassMethod) -> \
-            Tuple[Tuple[Any], Dict[str, Any]]:
+            Tuple[Tuple[Any, ...], Dict[str, Any]]:
         """Get the method argument and keyword arguments gathered from the user input
         and configuration.
 
@@ -378,7 +378,7 @@ class Application(Dictable):
         assert len(acts) == 1
         return acts[0]
 
-    def _invoke_first_pass(self) -> Tuple[ActionResult]:
+    def _invoke_first_pass(self) -> Tuple[ActionResult, ...]:
         """Invokes only the first pass actions and returns the results.
 
         """
@@ -390,7 +390,8 @@ class Application(Dictable):
             results.append(ActionResult(action, invokable.instance, res))
         return tuple(results)
 
-    def invoke_but_second_pass(self) -> Tuple[Tuple[ActionResult], Invokable]:
+    def invoke_but_second_pass(self) -> \
+            Tuple[Tuple[ActionResult, ...], Invokable]:
         """Invoke first pass actions but not the second pass action.
 
         :return: the results from the first pass actions and an invokable for
@@ -432,7 +433,7 @@ class ApplicationFactory(PersistableContainer):
     object.
 
     """
-    children_configs: Tuple[Configurable] = field(default=None)
+    children_configs: Tuple[Configurable, ...] = field(default=None)
     """Any children configurations added to the root level configuration."""
 
     reload_factory: bool = field(default=False)
@@ -528,9 +529,9 @@ class ApplicationFactory(PersistableContainer):
         mod_pattern: str = mod_name + '.'
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'module name: {mod_name}')
-        ac_clis: Tuple[ActionCli] = tuple(cli_mng.actions.values())
+        ac_clis: Tuple[ActionCli, ...] = tuple(cli_mng.actions.values())
         sp_actions = tuple(filter(filter_action, ac_clis))
-        sp_metas: Tuple[ActionMetaData] = tuple(chain.from_iterable(
+        sp_metas: Tuple[ActionMetaData, ...] = tuple(chain.from_iterable(
             map(lambda ac: ac.meta_datas, sp_actions)))
         doc = None
         if logger.isEnabledFor(logging.DEBUG):
@@ -543,7 +544,8 @@ class ApplicationFactory(PersistableContainer):
                 logger.debug(f'using second pass doc: {doc}')
         else:
             # filter application classes are public
-            sp_actions: Tuple[ActionCli] = tuple(filter(filter_doc, sp_actions))
+            sp_actions: Tuple[ActionCli, ...] = \
+                tuple(filter(filter_doc, sp_actions))
             actions: Dict[str, ActionCli] = \
                 {c.class_meta.name: c for c in sp_actions}
             if logger.isEnabledFor(logging.DEBUG):
@@ -603,7 +605,7 @@ class ApplicationFactory(PersistableContainer):
         fac: ConfigFactory = self._create_config_factory(config)
         # add class name to relax missing class_name
         cli_mng: ActionCliManager = fac(cli_sec, class_name=cl_name)
-        actions: Tuple[ActionMetaData] = tuple(chain.from_iterable(
+        actions: Tuple[ActionMetaData, ...] = tuple(chain.from_iterable(
             map(lambda a: a.meta_datas, cli_mng.actions.values())))
         config = CommandLineConfig(actions)
         parser = CommandLineParser(config, self.package_resource.version,
@@ -633,7 +635,7 @@ class ApplicationFactory(PersistableContainer):
         """
         return self._create_resources()[2]
 
-    def _parse(self, args: List[str]) -> Tuple[Action]:
+    def _parse(self, args: List[str]) -> Tuple[Action, ...]:
         """Parse the command line.
 
         """
@@ -683,7 +685,7 @@ class ApplicationFactory(PersistableContainer):
             args = self._get_default_args()
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'application arguments: {args}')
-        actions: Tuple[Action] = self._parse(args)
+        actions: Tuple[Action, ...] = self._parse(args)
         return Application(fac, self, actions)
 
     def _error_to_str(self, ex: Exception) -> str:

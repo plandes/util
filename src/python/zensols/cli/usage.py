@@ -80,8 +80,8 @@ class UsageActionOptionParser(OptionParser):
     exit.
 
     """
-    def __init__(self, actions: Tuple[ActionMetaData],
-                 options: Tuple[OptionMetaData], usage_config: UsageConfig,
+    def __init__(self, actions: Tuple[ActionMetaData, ...],
+                 options: Tuple[OptionMetaData, ...], usage_config: UsageConfig,
                  doc: str = None, default_action: str = None, *args, **kwargs):
         super().__init__(*args, add_help_option=False, **kwargs)
         help_op = OptionMetaData(
@@ -280,9 +280,9 @@ class _UsageFormatter(_Formatter):
 
     """
     writer: _UsageWriter
-    actions: Tuple[ActionMetaData]
+    actions: Tuple[ActionMetaData, ...]
     usage_config: UsageConfig
-    global_options: Tuple[OptionMetaData]
+    global_options: Tuple[OptionMetaData, ...]
     glob_option_formatters: List[_OptionFormatter] = field(default=None)
     action_formatters: List[_ActionFormatter] = field(default=None)
     pos_formatters: List[_PositionalFormatter] = field(default=None)
@@ -341,7 +341,7 @@ class _UsageFormatter(_Formatter):
     def get_option_usage_names(self, expand: bool = True) -> str:
         actions: Iterable[Action] = filter(
             lambda a: a.is_usage_visible, self.actions)
-        action_names: Tuple[str] = tuple(map(lambda a: a.name, actions))
+        action_names: Tuple[str, ...] = tuple(map(lambda a: a.name, actions))
         if len(action_names) > 1:
             if expand:
                 names = '|'.join(action_names)
@@ -419,10 +419,10 @@ class _UsageWriter(_Formatter):
     parser: OptionParser = field()
     """Parses the command line in to primitive Python data structures."""
 
-    actions: Tuple[ActionMetaData] = field()
+    actions: Tuple[ActionMetaData, ...] = field()
     """The set of actions to document as a usage."""
 
-    global_options: Tuple[OptionMetaData] = field()
+    global_options: Tuple[OptionMetaData, ...] = field()
     """Application level options (i.e. level, config, verbose etc)."""
 
     doc: str = field()

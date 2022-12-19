@@ -352,7 +352,7 @@ class UnionStash(ReadOnlyStash):
     """A stash joins the data of many other stashes.
 
     """
-    stashes: Tuple[Stash] = field()
+    stashes: Tuple[Stash, ...] = field()
     """The delegate constituent stashes used for each operation."""
 
     def load(self, name: str) -> Any:

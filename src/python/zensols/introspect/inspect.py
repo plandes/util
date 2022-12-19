@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import List, Tuple, Dict, Any, Type, Optional
+from typing import List, Tuple, Dict, Any, Type, Optional, ClassVar
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -24,13 +24,13 @@ class ClassError(Exception):
     pass
 
 
-def _create_data_types():
+def _create_data_types() -> Dict[str, Type]:
     types = {t.__name__: t for t in [str, int, float, bool, list, Path]}
     types['pathlib.Path'] = Path
     return types
 
 
-DEFAULT_DATA_TYPES = _create_data_types()
+DEFAULT_DATA_TYPES: Dict[str, Type] = _create_data_types()
 
 
 @dataclass
@@ -39,7 +39,7 @@ class TypeMapper(object):
     to Python types.
 
     """
-    DEFAULT_DATA_TYPES = _create_data_types()
+    DEFAULT_DATA_TYPES: ClassVar[Dict[str, Type]] = _create_data_types()
     """Supported data types mapped from data class fields."""
 
     cls: Type = field()
@@ -196,7 +196,7 @@ class ClassMethod(object):
     doc: ClassDoc = field()
     """The docstring of the method."""
 
-    args: Tuple[ClassMethodArg] = field()
+    args: Tuple[ClassMethodArg, ...] = field()
     """The arguments of the method."""
 
 
@@ -235,7 +235,7 @@ class ClassInspector(object):
     cls: type = field()
     """The class to inspect."""
 
-    attrs: Tuple[str] = field(default=None)
+    attrs: Tuple[str, ...] = field(default=None)
     """The class attributes to inspect, or all found are returned when ``None``.
 
     """

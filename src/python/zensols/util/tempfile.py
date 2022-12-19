@@ -51,7 +51,7 @@ class TemporaryFileName(object):
         self._created: List[Path] = []
 
     @property
-    def files(self) -> Tuple[Path]:
+    def files(self) -> Tuple[Path, ...]:
         """Return the file that have been created thus far."""
         return tuple(self._created)
 

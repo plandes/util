@@ -50,7 +50,7 @@ class CommandAction(Dictable):
     options: Dict[str, Any] = field()
     """The options given as switches."""
 
-    positional: Tuple[str] = field()
+    positional: Tuple[str, ...] = field()
     """The positional arguments parsed."""
 
     @property
@@ -73,7 +73,7 @@ class CommandActionSet(Deallocatable, Dictable):
     """
     _DICTABLE_WRITABLE_DESCENDANTS = True
 
-    actions: Tuple[CommandAction] = field()
+    actions: Tuple[CommandAction, ...] = field()
     """The actions parsed.  The first N actions are first pass where as the last is
     the second pass action.
 
@@ -113,17 +113,17 @@ class CommandLineConfig(PersistableContainer, Dictable):
 
     """
 
-    actions: Tuple[ActionMetaData] = field()
+    actions: Tuple[ActionMetaData, ...] = field()
     """The action meta data used to parse and print help."""
 
     @property
     @persisted('_first_pass_actions')
-    def first_pass_actions(self) -> Tuple[ActionMetaData]:
+    def first_pass_actions(self) -> Tuple[ActionMetaData, ...]:
         return tuple(filter(lambda a: a.first_pass, self.actions))
 
     @property
     @persisted('_second_pass_actions')
-    def second_pass_actions(self) -> Tuple[ActionMetaData]:
+    def second_pass_actions(self) -> Tuple[ActionMetaData, ...]:
         return tuple(filter(lambda a: not a.first_pass, self.actions))
 
     @property
@@ -133,7 +133,7 @@ class CommandLineConfig(PersistableContainer, Dictable):
 
     @property
     @persisted('_first_pass_options')
-    def first_pass_options(self) -> Tuple[OptionMetaData]:
+    def first_pass_options(self) -> Tuple[OptionMetaData, ...]:
         return tuple(chain.from_iterable(
             map(lambda a: a.options, self.first_pass_actions)))
 
@@ -185,7 +185,8 @@ class CommandLineParser(Deallocatable, Dictable):
     """The default mnemonic use when the user does not supply one."""
 
     application_doc: str = field(default=None)
-    """The program documentation to use when it can not be deduced from the action.
+    """The program documentation to use when it can not be deduced from the
+    action.
 
     """
     usage_config: UsageConfig = field(default_factory=UsageConfig)
@@ -196,7 +197,8 @@ class CommandLineParser(Deallocatable, Dictable):
             raise CommandLineConfigError(
                 'Must create parser with at least one action')
 
-    def _create_parser(self, actions: Tuple[ActionMetaData]) -> OptionParser:
+    def _create_parser(self, actions: Tuple[ActionMetaData, ...]) -> \
+            OptionParser:
         return UsageActionOptionParser(
             actions=actions,
             options=self.config.first_pass_options,
@@ -292,7 +294,7 @@ class CommandLineParser(Deallocatable, Dictable):
         return parsed
 
     def _parse_positional(self, metas: List[PositionalMetaData],
-                          vals: List[str]) -> Tuple[Any]:
+                          vals: List[str]) -> Tuple[Any, ...]:
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'parsing positional args: {metas} <--> {vals}')
         return tuple(
@@ -314,7 +316,7 @@ class CommandLineParser(Deallocatable, Dictable):
 
     def _parse_first_pass(self, args: List[str],
                           actions: List[CommandAction]) -> \
-            Tuple[bool, str, Dict[str, Any], Dict[str, Any], Tuple[str]]:
+            Tuple[bool, str, Dict[str, Any], Dict[str, Any], Tuple[str, ...]]:
         second_pass = False
         fp_opts = set(map(lambda o: o.dest, self.config.first_pass_options))
         # first fish out the action name (if given) as a positional parameter
@@ -385,7 +387,7 @@ class CommandLineParser(Deallocatable, Dictable):
 
     def _parse_second_pass(self, action_name: str, second_pass: bool,
                            args: List[str], options: Dict[str, Any],
-                           op_args: Tuple[str]):
+                           op_args: Tuple[str, ...]):
         # now that we have parsed the action name, get the meta data
         action_meta: ActionMetaData = \
             self.config.actions_by_name.get(action_name)

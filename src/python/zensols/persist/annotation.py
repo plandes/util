@@ -428,7 +428,7 @@ class PersistableContainer(Deallocatable):
         """Clear all cached state from all :class:`.PersistedWork` in this instance.
 
         """
-        pws: Tuple[PersistedWork] = tuple(filter(
+        pws: Tuple[PersistedWork, ...] = tuple(filter(
             lambda v: isinstance(v, PersistedWork),
             self.__dict__.values()))
         for v in pws:

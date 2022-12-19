@@ -382,7 +382,8 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
         # import using ImportIniConfig as a section
         elif self.type == self.IMPORT_TYPE:
             args: dict = {} if self.arguments is None else self.arguments
-            children: Tuple[Configurable] = self._app.factory.children_configs
+            children: Tuple[Configurable, ...] = \
+                self._app.factory.children_configs
             ini: IniConfig = IniConfig(self.config)
             dconf: Configurable
             preload_keys: Set[str]

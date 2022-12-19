@@ -99,7 +99,7 @@ class Serializer(object):
     allow_types: Set[type] = field(
         default_factory=lambda:
         set([str, int, float, bool, list, tuple, dict]))
-    allow_classes: Tuple[type] = field(default_factory=lambda: (Path,))
+    allow_classes: Tuple[type, ...] = field(default_factory=lambda: (Path,))
 
     def is_allowed_type(self, value: Any) -> bool:
         if isinstance(value, (tuple, list, set)):

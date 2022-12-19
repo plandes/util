@@ -245,7 +245,7 @@ class ActionCli(PersistableContainer, Dictable):
 
     @property
     @persisted('_meta_datas', deallocate_recursive=True)
-    def meta_datas(self) -> Tuple[ActionMetaData]:
+    def meta_datas(self) -> Tuple[ActionMetaData, ...]:
         """Return action meta data across all methods.
 
         """
@@ -292,10 +292,10 @@ class ActionCliManager(PersistableContainer, Dictable):
     """The configuration factory used to create :class:`.ActionCli` instances.
 
     """
-    apps: Tuple[str] = field()
+    apps: Tuple[str, ...] = field()
     """The application section names."""
 
-    cleanups: Tuple[str] = field(default=None)
+    cleanups: Tuple[str, ...] = field(default=None)
     """The sections to remove after the application is built."""
 
     app_removes: InitVar[Set[str]] = field(default=None)
@@ -604,7 +604,7 @@ class ActionCliManager(PersistableContainer, Dictable):
 
     @property
     @persisted('_actions_ordered', deallocate_recursive=True)
-    def actions_ordered(self) -> Tuple[ActionCli]:
+    def actions_ordered(self) -> Tuple[ActionCli, ...]:
         """Return all actions in the order they were given in the configuration.
 
         """
@@ -623,7 +623,7 @@ class ActionCliManager(PersistableContainer, Dictable):
         actions = {}
         action: ActionCli
         for action in self.actions.values():
-            meta: Tuple[ActionMetaData]
+            meta: Tuple[ActionMetaData, ...]
             for meta in action.meta_datas:
                 if meta.name in actions:
                     raise ActionCliError(f'Duplicate meta data: {meta.name}')

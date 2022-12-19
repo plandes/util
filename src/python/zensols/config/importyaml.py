@@ -31,7 +31,7 @@ class ImportYamlConfig(YamlConfig):
                  default_section: str = None, sections_name: str = 'sections',
                  sections: Set[str] = None, import_name: str = 'import',
                  parse_values: bool = False,
-                 children: Tuple[Configurable] = ()):
+                 children: Tuple[Configurable, ...] = ()):
         """Initialize with importation configuration.  The usage of ``default_vars`` in
         the super class is disabled since this implementation uses a mix of dot
         and colon (configparser) variable substitution (the later used when

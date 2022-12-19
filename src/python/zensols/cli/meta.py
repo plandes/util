@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 
 
 class ApplicationError(ActionCliError):
-    """Thrown for any application error that should result in a user error rather
-    than produce a full stack trace.
+    """Thrown for any application error that should result in a user error
+    rather than produce a full stack trace.
 
     """
     pass
@@ -63,8 +63,8 @@ class _MetavarFormatter(object):
 
     @property
     def is_choice(self) -> bool:
-        """Whether or not this option represents string combinations that map to a
-        :class:`enum.Enum` Python class.
+        """Whether or not this option represents string combinations that map to
+        a :class:`enum.Enum` Python class.
 
         """
         return (self.choices is not None) or issubclass(self.dtype, Enum)
@@ -110,9 +110,9 @@ class OptionMetaData(PersistableContainer, Dictable, _MetavarFormatter):
     directories.
 
     """
-    choices: Tuple[str] = field(default=None)
-    """The constant list of choices when :obj:`dtype` is :class:`list`.  Note that
-    this class is a tuple so instances are hashable in :class:`.ActionCli`.
+    choices: Tuple[str, ...] = field(default=None)
+    """The constant list of choices when :obj:`dtype` is :class:`list`.  Note
+    that this class is a tuple so instances are hashable in :class:`.ActionCli`.
 
     """
     default: str = field(default=None)
@@ -150,8 +150,8 @@ class OptionMetaData(PersistableContainer, Dictable, _MetavarFormatter):
 
     @property
     def default_str(self) -> str:
-        """Get the default as a string usable in printing help and as a default using
-        the :class:`optparse.OptionParser` class.
+        """Get the default as a string usable in printing help and as a default
+        using the :class:`optparse.OptionParser` class.
 
         """
         return self._str_vals()[1]
@@ -238,9 +238,9 @@ class PositionalMetaData(Dictable, _MetavarFormatter):
     """The documentation of the positional metadata or ``None`` if missing.
 
     """
-    choices: Tuple[str] = field(default=None)
-    """The constant list of choices when :obj:`dtype` is :class:`list`.  Note that
-    this class is a tuple so instances are hashable in :class:`.ActionCli`.
+    choices: Tuple[str, ...] = field(default=None)
+    """The constant list of choices when :obj:`dtype` is :class:`list`.  Note
+    that this class is a tuple so instances are hashable in :class:`.ActionCli`.
 
     """
     metavar: str = field(default=None, repr=False)
@@ -283,23 +283,25 @@ class OptionFactory(object):
 
 @dataclass
 class ActionMetaData(PersistableContainer, Dictable):
-    """An action represents a link between a command line mnemonic *action* and a
-    method on a class to invoke.
+    """An action represents a link between a command line mnemonic *action* and
+    a method on a class to invoke.
 
     """
     _DICTABLE_WRITABLE_DESCENDANTS = True
 
     name: str = field(default=None)
-    """The name of the action, which is also the mnemonic used on the command line.
+    """The name of the action, which is also the mnemonic used on the command
+    line.
 
     """
     doc: str = field(default=None)
     """A short human readable documentation string used in the usage."""
 
-    options: Tuple[OptionMetaData] = field(default_factory=lambda: ())
+    options: Tuple[OptionMetaData, ...] = field(default_factory=lambda: ())
     """The command line options for the action."""
 
-    positional: Tuple[PositionalMetaData] = field(default_factory=lambda: ())
+    positional: Tuple[PositionalMetaData, ...] = \
+        field(default_factory=lambda: ())
     """The positional arguments expected for the action."""
 
     first_pass: bool = field(default=False)
