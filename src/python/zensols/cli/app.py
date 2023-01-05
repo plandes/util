@@ -699,10 +699,25 @@ class ApplicationFactory(PersistableContainer):
         s = s[0].lower() + s[1:]
         return s
 
-    def _dump_error(self, ex: Exception):
-        """Output an exception message using the parser error API."""
+    def _dump_error(self, ex: Exception, add_usage: bool = True,
+                    exit_err: bool = True):
+        """Output an exception message using the parser error API.
+
+        :param: ex: the exception raised to be written to standard error
+
+        :param add_usage: whether to add the short usage (one line)
+
+        :param exit_err: whether to exit the interpreter
+
+        """
         msg = self._error_to_str(ex)
-        self.parser.error(msg)
+        if add_usage:
+            self.parser.error(msg)
+        else:
+            prog = Path(sys.argv[0]).name
+            print(f'{prog}: error: {msg}', file=sys.stderr)
+        if exit_err:
+            sys.exit(1)
 
     def _handle_error(self, ex: Exception):
         """Handle errors raised during the execution of the application.
@@ -714,11 +729,7 @@ class ApplicationFactory(PersistableContainer):
             return self.error_handler(ex, self)
         else:
             if isinstance(ex, ConfigurableFileNotFoundError):
-                # in some cases, the parser can not be created because it needs
-                # configuration that can not be loaded
-                prog = Path(sys.argv[0]).name
-                msg = self._error_to_str(ex)
-                print(f'{prog}: error: {msg}', file=sys.stderr)
+                self._dump_error(ex, False)
             elif isinstance(ex, ApplicationError):
                 self._dump_error(ex)
             else:
