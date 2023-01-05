@@ -781,7 +781,7 @@ class ApplicationFactory(PersistableContainer):
     def get_instance(self, args: Union[List[str], str] = None) -> Any:
         """Create the invokable instance of the application.
 
-        ;param args: the arguments to the application; if this is a string, it
+        :param args: the arguments to the application; if this is a string, it
                      will be converted to a list by splitting on whitespace;
                      this defaults to the output of :meth:`_get_default_args`
 
