@@ -266,10 +266,15 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
         else:
             pkg_res: PackageResource = self._app.factory.package_resource
             name: str = pkg_res.name
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"match environment variable '{name}' " +
+                             f'on {self.ENVIRON_VAR_REGEX}')
             m = self.ENVIRON_VAR_REGEX.match(name)
             if m is not None:
                 name = m.group(1)
             name = f'{name}rc'.upper()
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"using environment variable '{name}'")
         return name
 
     def _get_config_option(self) -> str:
@@ -480,9 +485,10 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
         rc_path: Path = None
         if self.config_path is None:
             env_var: str = self.get_environ_var_from_app()
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"loading config from env var '{env_var}'")
             env_var_path: str = os.environ.get(env_var)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug('loading config from environment ' +
+                             f"varaibles '{env_var}' = {env_var_path}")
             if env_var_path is not None:
                 rc_path = Path(env_var_path)
                 if rc_path.exists():

@@ -530,6 +530,9 @@ class ConfigurationImporterCliHarness(CliHarness):
                 lnop: str = f'--{op.long_name}'
                 envvar: str = ci.get_environ_var_from_app()
                 envval: str = os.environ.get(envvar)
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug('harness loading config from environment ' +
+                                 f"varaibles '{envvar}' = {envval}")
                 config_path: Path = None
                 if self.config_path is not None:
                     config_path = self.config_path
