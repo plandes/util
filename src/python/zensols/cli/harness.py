@@ -591,19 +591,12 @@ class NotebookHarness(CliHarness):
 
     """
     def __post_init__(self):
-        """
-        :param factory_kwargs: the keyword arguments used to create the
-                               application factory; such as reloading
-        """
         super().__post_init__()
         self._app_factory = None
         self.reset()
 
     def reset(self):
         """Reset the notebook and recreate all resources.
-
-        :param factory_kwargs: the keyword arguments used to create the
-                               application factory; such as reloading
 
         """
         self.set_browser_width()
