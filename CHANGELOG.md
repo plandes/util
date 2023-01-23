@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [1.12.0] - 2023-01-22
 ### Added
 - A programmatic method to get the config factory and application context using
   the CLI application invocation API from the `CliHarness`.  This uses an
@@ -16,8 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   new/deep instances.
 - A convenience utility class `DefaultDictable` that provides access to methods
   such as `write` and `asjson` without needing inheritance.
+- Command line help available on specified action only.
 
 ### Changes
+- Upgraded the `configparser` package from 5.2 to 5.3.
 - Fix bug with config factories throwing the wrong exception when using
   `type=import` in application configuration when using bad configuration files
   with `-c` on the command line.
@@ -25,6 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   configured as in memory rather with file system paths.
 - The CLI `Cleaner` app now expands the user home directory when the syntax is
   provided with `pathlib.Path.expanduser`.
+- Better command line help and usage formatting.
 
 
 ## [1.11.1] - 2022-09-30
@@ -434,7 +439,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.11.1...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.12.0...HEAD
+[1.12.0]: https://github.com/plandes/util/compare/v1.11.1...v1.12.0
 [1.11.1]: https://github.com/plandes/util/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/plandes/util/compare/v1.10.1...v1.11.0
 [1.10.1]: https://github.com/plandes/util/compare/v1.10.0...v1.10.1
