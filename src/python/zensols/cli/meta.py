@@ -52,6 +52,9 @@ class ApplicationFailure(Dictable):
     def print_stack(self):
         traceback.print_exception(*self._exec_info)
 
+    def __str__(self):
+        return str(self.exception)
+
 
 @dataclass
 class _MetavarFormatter(object):

@@ -322,7 +322,7 @@ class CliHarness(object):
                **factory_kwargs: Dict[str, Any]) -> ApplicationResult:
         """Invoke the application using the standard command line arguments.
         This is called from command line entry points.  To invoke from Python
-        use
+        use :meth:`execute`.
 
         :param args: all command line arguments including the program name
 
@@ -384,7 +384,7 @@ class CliHarness(object):
 
     def get_config_factory(self, args: Union[List[str], str] = None,
                            throw: bool = True) -> \
-            Union[Any, ApplicationFailure]:
+            Union[ConfigFactory, ApplicationFailure]:
         """The application configuration factory.
 
         :param args: additional argument to give to the pseudo command line
@@ -411,6 +411,24 @@ class CliHarness(object):
                 return accessor
         else:
             return accessor.access()
+
+    def get_application(self, args: Union[List[str], str] = None,
+                        throw: bool = True) -> \
+            Union[Application, ApplicationFailure]:
+        """Get the application from the configuration factory.  For this to
+        work, the ``app`` section most not be in the cleanups.  Otherwise the
+        framework will remove the section before the call to the configuration
+        factory to create it.
+
+        """
+        config_factory: Union[ConfigFactory, ApplicationFailure] = \
+            self.get_config_factory(args, throw)
+        if isinstance(config_factory, ConfigFactory):
+            if not 'app' in config_factory.config.sections:
+                raise ApplicationError(
+                    "No 'app' section in configuration. " +
+                    "Remove it from cleanups?")
+            return config_factory('app')
 
     def __getitem__(self, section_name: str) -> Optional[Any]:
         """Index by section name binded application configuration instances.
