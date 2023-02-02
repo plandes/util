@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.12.1] - 2023-02-02
+### Added
+- `CliHarness` application getter.
+
+
 ## [1.12.0] - 2023-01-22
 ### Added
 - A programmatic method to get the config factory and application context using
@@ -439,7 +444,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.12.0...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.12.1...HEAD
+[1.12.1]: https://github.com/plandes/util/compare/v1.12.0...v1.12.1
 [1.12.0]: https://github.com/plandes/util/compare/v1.11.1...v1.12.0
 [1.11.1]: https://github.com/plandes/util/compare/v1.11.0...v1.11.1
 [1.11.0]: https://github.com/plandes/util/compare/v1.10.1...v1.11.0
