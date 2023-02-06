@@ -176,6 +176,7 @@ class ActionCli(PersistableContainer, Dictable):
             for arg in meth.args:
                 if arg.is_positional:
                     opt: Dict[str, str] = None
+                    pdoc: str = None if arg.doc is None else arg.doc.text
                     if self.option_overrides is not None:
                         opt = self.option_overrides.get(arg.name)
                     # first try to get it from any mapping from the long name
@@ -185,8 +186,11 @@ class ActionCli(PersistableContainer, Dictable):
                         # use the argument name in the method but normalize it
                         # to make it appear in CLI parlance
                         pname = self._normalize_name(arg.name)
-                    pdoc = None if arg.doc is None else arg.doc.text
                     pmeta = PositionalMetaData(pname, arg.dtype, pdoc)
+                    if opt is not None:
+                        poverridess = dict(opt)
+                        poverridess.pop('long_name', None)
+                        pmeta.__dict__.update(poverridess)
                     pos_args.append(pmeta)
                 else:
                     if logger.isEnabledFor(logging.DEBUG):

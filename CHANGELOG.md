@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.12.1] - 2023-02-02
 ### Added
 - `CliHarness` application getter.
+- Override all optional positional metadata.
 
 
 ## [1.12.0] - 2023-01-22
