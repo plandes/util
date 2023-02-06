@@ -1,8 +1,8 @@
-from __future__ import annotations
 """A more object oriented data driven command line set of classes.
 
 """
-
+from __future__ import annotations
+__author__ = 'Paul Landes'
 from typing import Dict, Tuple, Iterable, Set, List, Any, Type
 from dataclasses import dataclass, field, InitVar
 import dataclasses
