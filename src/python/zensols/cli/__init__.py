@@ -9,7 +9,7 @@ from .peraction import *
 from .util import *
 from .meta import *
 from .usage import *
-from .cmd import *
+from .command import *
 from .action import *
 from .app import *
 from .lib.log import LogConfigurator, LogLevel
