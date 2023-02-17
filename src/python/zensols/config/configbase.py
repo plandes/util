@@ -57,7 +57,10 @@ class Configurable(Writable, metaclass=ABCMeta):
             self.default_section = 'default'
         else:
             self.default_section = default_section
-        self.serializer = Serializer()
+        self.serializer = self._create_serializer()
+
+    def _create_serializer(self) -> Serializer:
+        return Serializer()
 
     @abstractmethod
     def get_options(self, section: str = None) -> Dict[str, str]:
@@ -155,7 +158,7 @@ class Configurable(Writable, metaclass=ABCMeta):
         """Just like :meth:`get_option` but parse as an object per object syntax
         rules.
 
-        :see: :meth:`parse_object`
+        :see: :meth:`.Serializer.parse_object`
 
         """
         val = self.get_option(name, section)
