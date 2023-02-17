@@ -1,10 +1,9 @@
-from __future__ import annotations
 """Classes that create new instances of classes from application configuration
 objects and files.
 
 """
+from __future__ import annotations
 __author__ = 'Paul Landes'
-
 from typing import Any, Type, Optional, Tuple, Dict
 from abc import ABC, abstractmethod
 from enum import Enum
