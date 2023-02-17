@@ -50,32 +50,34 @@ class ModulePrototype(Dictable):
     name: str = field()
     config_str: str = field()
 
-    @persisted('_parse_pw')
+    @persisted('_parse_pw', allocation_track=False)
     def _parse(self) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         conf: str = self.config_str
         instance_params: Dict[str, Any] = {}
         inst_conf: Dict[str, Any] = None
         reload: bool = False
-        if conf is not None:
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'parsing param config: {conf}')
-            inst_conf = eval(conf)
-            unknown: Set[str] = set(inst_conf.keys()) - \
-                self._CHILD_PARAM_DIRECTIVES
-            if len(unknown) > 0:
-                raise FactoryError(f'Unknown directive(s): {unknown}',
-                                   self.factory)
-            if 'param' in inst_conf:
-                cparams = inst_conf['param']
-                cparams = self.factory.config.serializer.populate_state(
-                    cparams, {})
-                instance_params.update(cparams)
-            if 'reload' in inst_conf:
-                reload = inst_conf['reload']
+        try:
+            if conf is not None:
                 if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'setting reload: {reload}')
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'applying param config: {inst_conf}')
+                    logger.debug(f'parsing param config: {conf}')
+                inst_conf = eval(conf)
+                unknown: Set[str] = set(inst_conf.keys()) - \
+                    self._CHILD_PARAM_DIRECTIVES
+                if len(unknown) > 0:
+                    raise FactoryError(f'Unknown directive(s): {unknown}',
+                                       self.factory)
+                if 'param' in inst_conf:
+                    cparams = inst_conf['param']
+                    cparams = self.factory.config.serializer.populate_state(
+                        cparams, {})
+                    instance_params.update(cparams)
+                if 'reload' in inst_conf:
+                    reload = inst_conf['reload']
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug(f'setting reload: {reload}')
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'applying param config: {inst_conf}')
+        finally:
             self.factory._set_reload(reload)
         return instance_params, inst_conf
 
