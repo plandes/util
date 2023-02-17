@@ -5,7 +5,7 @@ objects and files.
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Type, Optional
+from typing import Any, Type, Optional, Tuple, Dict
 from abc import ABC, abstractmethod
 from enum import Enum
 import logging
