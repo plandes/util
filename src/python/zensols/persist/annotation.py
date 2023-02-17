@@ -187,9 +187,8 @@ class PersistedWork(Deallocatable):
         self.owner = None
 
     def _do_work(self, *argv, **kwargs):
-        if logger.isEnabledFor(logging.INFO):
-            t0 = tm.time()
-        obj = self.__do_work__(*argv, **kwargs)
+        t0: float = tm.time()
+        obj: Any = self.__do_work__(*argv, **kwargs)
         if logger.isEnabledFor(logging.INFO):
             self._info('created work in {:2f}s, saving to {}'.format(
                 (tm.time() - t0), self.path))
