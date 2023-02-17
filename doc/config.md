@@ -226,6 +226,8 @@ in how it reads data, which uses the following rules:
 * A string starting with `class:` a class/type specified by a class name.
 * A string starting with `dataclass(<class name>)` a dataclass (see
   [Dataclasses](#dataclasses)).
+* A string starting with `application` an application context (see
+  [Applications](#applications)).
 * Anything else as a string.
 
 
@@ -496,7 +498,6 @@ boss = instance({'share': 'deep'}): homer
 creates a new instance of `homer` that is not shared with `bobs_senior_center`.
 
 
-
 ### Dataclasses
 
 Instances of [dataclasses](https://docs.python.org/3/library/dataclasses.html)
@@ -523,6 +524,23 @@ dataclasses in are also supported by creating a `dataclass: <class name>` entry
 with the following caveats:
 * It must be in a YAML configuration file.
 * It must be defined as a section (see [YAML sections](#yaml-sections)).
+
+
+### Applications
+
+Application contexts of other installed Zensols applications can be accessed in
+a completely separate memory space.  This creates a new application context
+using a [CliHarness] and sets the property to the value of the instance of the
+given section name.  For example, if we have an installed payroll application,
+we can access it with:
+```ini
+[conglomerate]
+business1 = application(zensols.payroll): larrys_senior_center
+```
+This has the advantage over importing applications using resource libraries
+since the application context is set up and configured how it is meant to be as
+a standalone application.  This is essential when using applications with paths
+pointing to large trained ML models.
 
 
 ### Import INI Configuration
@@ -679,6 +697,7 @@ this documentation.
 [instance]: ../api/zensols.config.html#zensols.config.importfac.ImportConfigFactory.instance
 [new_instance]: ../api/zensols.config.html#zensols.config.importfac.ImportConfigFactory.new_instance
 [new_deep_instance]: ../api/zensols.config.html#zensols.config.importfac.ImportConfigFactory.new_deep_instance
+[CliHarness]: ../api/zensols.cli.html#zensols.cli.harness.CliHarness
 [ExtendedInterpolationEnvConfig]: ../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig
 [populate]: ../api/zensols.config.html#zensols.config.configbase.Configurable.populate
 [resource_filename]: ../api/zensols.config.html#zensols.config.configbase.Configurable.resource_filename

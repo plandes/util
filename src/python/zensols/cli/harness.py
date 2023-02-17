@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import List, Dict, Any, Union, Type, Optional, Tuple
+from typing import List, Dict, Any, Union, Type, Optional, Tuple, ClassVar
 from dataclasses import dataclass, field
 import sys
 import os
@@ -13,6 +13,9 @@ from io import TextIOBase
 from pathlib import Path
 from zensols.util import PackageResource, APIError
 from zensols.config import DictionaryConfig, ConfigFactory
+from zensols.config import (
+    ModulePrototype, ImportConfigFactoryModule, ImportConfigFactory
+)
 from zensols.introspect import ClassImporter
 from zensols.cli import (
     ApplicationError, ApplicationFailure, Action, ActionResult, OptionMetaData,
@@ -638,3 +641,35 @@ class NotebookHarness(CliHarness):
     def __call__(self, args: str) -> Any:
         """Return the invokable instance."""
         return self._app_factory.get_instance(args)
+
+
+@dataclass
+class _ApplicationImportConfigFactoryModule(ImportConfigFactoryModule):
+    """A module that creates instance from the context of a *different*
+    application.
+
+    The configuration string prototype has the form::
+
+        application(<package name>): <instance section name>
+
+    """
+    _NAME: ClassVar[str] = 'application'
+
+    def __post_init__(self):
+        self._factories: Dict[str, ConfigFactory] = {}
+
+    def _get_factory(self, proto: ModulePrototype) -> ConfigFactory:
+        pkg: str = proto.config_str
+        fac: ConfigFactory = self._factories.get(pkg)
+        if fac is None:
+            harness: CliHarness = CliHarness(package_resource=pkg)
+            fac = harness.get_config_factory()
+            self._factories[pkg] = fac
+        return fac
+
+    def _instance(self, proto: ModulePrototype) -> Any:
+        fac: ConfigFactory = self._get_factory(proto)
+        return fac(proto.name)
+
+
+ImportConfigFactory.register_module(_ApplicationImportConfigFactoryModule)

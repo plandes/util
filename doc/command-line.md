@@ -840,7 +840,7 @@ tutorial.
 ### Overriding Configuration and Harness
 
 The final version of our application will simplify the CLI by removing the
-`ApplicationFactory` class and using a `CliHarness` in its place.  Now the
+`ApplicationFactory` class and using a [CliHarness] in its place.  Now the
 entire `main.py` class has:
 ```python
 from zensols.cli import CliHarness
@@ -938,6 +938,7 @@ the `example/cli/1-boilerplate` directory in the source repository.
 [import ini configuration]: config.html#import-ini-configuration
 [ConfigurationOverrider]: ../api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationOverrider
 [EnvironmentConfig]: ../api/zensols.config.html#zensols.config.envconfig.EnvironmentConfig
+[CliHarness]: ../api/zensols.cli.html#zensols.cli.harness.CliHarness
 [ActionCli]: ../api/zensols.cli.html#zensols.cli.action.ActionCli
 [ActionCliManager]: ../api/zensols.cli.html#zensols.cli.action.ActionCliManager
 [ActionCliManager]: ../api/zensols.cli.html#zensols.cli.action.ActionCliManager
