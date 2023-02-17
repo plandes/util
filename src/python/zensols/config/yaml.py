@@ -263,7 +263,7 @@ class """ + class_name + """(Template):
             if level < s_level:
                 for k, child in node.items():
                     path.append(k)
-                    ns = self._get_at_depth(child, s_level, level+1, path)
+                    ns = self._get_at_depth(child, s_level, level + 1, path)
                     path.pop()
                     nodes.update(ns)
             elif level == s_level:
