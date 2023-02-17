@@ -146,7 +146,7 @@ class ClassExplorer(Writable):
                        writer: TextIOBase = sys.stdout,
                        metadata: dict = None):
         self._write(metadata, depth, None, writer)
-        
+
     def _write(self, metadata: dict, depth: int, attr: str, writer):
         cn = f'{attr}: ' if attr is not None else ''
         name = f" ({metadata['name']})" if 'name' in metadata else ''
