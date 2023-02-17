@@ -26,7 +26,7 @@ from .yaml import *
 from .iniconfig import *
 from .dictconfig import *
 from .diff import *
-from .json import *
+from .jsonconfig import *
 from .configfac import *
 from .importyaml import *
 from .condyaml import *
