@@ -48,7 +48,12 @@ class ModulePrototype(Dictable):
     """The factory that created this prototype."""
 
     name: str = field()
+    """The name of the instance to create, which is usually the application
+    config section name.
+
+    """
     config_str: str = field()
+    """The string parsed from the parethesis in the prototype string."""
 
     @persisted('_parse_pw', allocation_track=False)
     def _parse(self) -> Tuple[Dict[str, Any], Dict[str, Any]]:
@@ -440,7 +445,7 @@ class ImportConfigFactoryModule(metaclass=ABCMeta):
 
     def _create_instance(self, section: str, config_params: Dict[str, str],
                          params: Dict[str, Any]) -> Any:
-        """Create the instance using of an object using the 
+        """Create the instance using of an object using :obj:`factory`.
 
         :param section: the name of the section in the app config
 
@@ -495,6 +500,17 @@ class ImportConfigFactoryModule(metaclass=ABCMeta):
 
 @dataclass
 class _InstanceImportConfigFactoryModule(ImportConfigFactoryModule):
+    """A module that uses the :obj:`factory` to create the instance from a
+    section.
+
+    The configuration string prototype has the form::
+
+        instance[(<parameters>)]: <instance section name>
+
+    Parameters are option, but when included are used as parameters to the new
+    instance's initializer.
+
+    """
     _NAME: ClassVar[str] = 'instance'
 
     def _instance(self, proto: ModulePrototype) -> Any:
@@ -506,6 +522,16 @@ ImportConfigFactory.register_module(_InstanceImportConfigFactoryModule)
 
 @dataclass
 class _ObjectImportConfigFactoryModule(ImportConfigFactoryModule):
+    """A module that creates an instance from a fully qualified class name.
+
+    The configuration string prototype has the form::
+
+        object[(<parameters>)]: <fully qualified class name>
+
+    Parameters are option, but when included are used as parameters to the new
+    instance's initializer.
+
+    """
     _NAME: ClassVar[str] = 'object'
 
     def _instance(self, proto: ModulePrototype) -> Any:
@@ -520,6 +546,17 @@ ImportConfigFactory.register_module(_ObjectImportConfigFactoryModule)
 
 @dataclass
 class _DataClassImportConfigFactoryModule(ImportConfigFactoryModule):
+    """A module that creates an instance of a dataclass using the class's
+    metadata.
+
+    The configuration string prototype has the form::
+
+        dataclass(<fully qualified class name>): <instance section name>
+
+    This is most useful in YAML for nested structure composite dataclass
+    configurations.
+
+    """
     _NAME: ClassVar[str] = 'dataclass'
 
     def _dataclass_from_dict(self, cls: Type, data: Any):
