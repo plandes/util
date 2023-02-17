@@ -171,12 +171,20 @@ class ConfigFactory(object):
         """Resolve the class from the name."""
         return self.class_resolver.find_class(class_name)
 
-    def _class_name_params(self, name: str):
-        """Get the class name and parameters to use for ``__init__``."""
+    def _class_name_params(self, name: str) -> Tuple[str, Dict[str, Any]]:
+        """Get the class name and parameters to use to create an instance.
+
+        :param name: the configuration section name, which is the object name
+
+        :return: a tuple of the fully qualified class name and the parameters
+                 used as arguments to the class initializer; if a class is not
+                 provided it defaults to :class:`.Settings`
+
+        """
         sec = self.pattern.format(**{'name': name})
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'section: {sec}')
-        params = {}
+        params: Dict[str, Any] = {}
         try:
             params.update(self.config.populate({}, section=sec))
         except Exception as e:
