@@ -1,6 +1,9 @@
 croot:
   instances:
     dept: 'dataclass(test_yaml_dataclass.Department): croot.referenced.dept'
+  instances-bad:
+    #dept: 'dataclass(test_yaml_dataclass.Department): croot.referenced.dept'
+    dept: "dataclass({'param': {'color': 'brown'}}): croot.referenced.dept"
   referenced:
     dept:
       name: hr

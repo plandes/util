@@ -1,16 +1,20 @@
 """A configuration factory that (re)imports based on class name.
 
 """
+from __future__ import annotations
 __author__ = 'Paul Landes'
-
 import typing
-from typing import Tuple, Dict, Optional, Union, Any, Type, Iterable, Callable
+from typing import (
+    Tuple, Dict, Optional, Union, Any, Type, Iterable, Callable, ClassVar, Set
+)
+from abc import ABCMeta, abstractmethod
+from dataclasses import dataclass, field
 import dataclasses
 import logging
 import types
 import re
 from frozendict import frozendict
-from zensols.introspect import ClassResolver
+from zensols.introspect import ClassResolver, ClassImporter
 from zensols.persist import persisted, PersistedWork, Deallocatable
 from . import Settings, FactoryError, ImportClassResolver, ConfigFactory
 
@@ -31,38 +35,16 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
     parameter.
 
     """
-    DATACLASS = 'dataclass'
-    """Similar to :obj:`~zensols.config.facbase.ConfigFactory.CLASS_NAME`, an
-    attribute in a section that allows for creating instances of dataclasses
-    inline (i.e in YAML).
+    _MODULES: ClassVar[Type[ImportConfigFactoryModule]] = []
 
-    """
-    _INSTANCE_REGEXP = re.compile(r'^instance(?:\((.+)\))?:\s*(.+)$',
-                                  re.DOTALL)
+    _MODULE_REGEXP: ClassVar[str] = r'(?:\((.+)\))?:\s*(.+)'
     """The ``instance`` regular expression used to identify children attributes to
     set on the object.  The process if creation can chain from parent to
     children recursively.
 
     """
-    _OBJECT_REGEXP = re.compile(r'^object(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
-    """The ``object`` regular expression used to instantiate non-shared singleton
-    instances tied to the outside instance..
-
-    """
-    _DATACLASS_REGEXP = re.compile(r'^dataclass\((.+)\):\s*(.+)$', re.DOTALL)
-    """The ``dataclass`` regular expression used to create Python dataclasses with
-    nested data in formats such as YAML.
-
-    """
-    _CHILD_PARAM_DIRECTIVES = frozenset('param reload type share'.split())
-    """The set of allowed directives for ``instance`` (:obj:``INSTANCE_REGEXP`)
-    entries parsed by :meth:`_parse_child_params`.
-
-    """
-    _INJECTS = {}
+    _INJECTS: ClassVar[Dict[str, str]] = {}
     """Track injections to fail on any attempts to redefine."""
-
-    _EMPTY_CHILD_PARAMS = frozendict()
 
     def __init__(self, *args, reload: Optional[bool] = False,
                  shared: Optional[bool] = True,
@@ -81,6 +63,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                                qualified name that match the regular expression
                                regarless of the setting ``reload``
 
+        :param kwargs: the key word arguments given to the super class
+
         """
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating import config factory, reload: {reload}')
@@ -95,16 +79,37 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             self.reload_pattern = re.compile(reload_pattern)
         else:
             self.reload_pattern = reload_pattern
+        self._init_modules()
+
+    @classmethod
+    def register_module(cls: Type, mod: ImportConfigFactoryModule):
+        if cls not in cls._MODULES:
+            cls._MODULES.append(mod)
+
+    def _init_modules(self):
+        mod_type: Type[ImportConfigFactoryModule]
+        modules: Tuple[ImportConfigFactoryModule] = tuple(
+            map(lambda t: t(self), self._MODULES))
+        mod_names: str = '|'.join(map(lambda m: m.name, modules))
+        self._module_regexes: re.Pattern = re.compile(
+            '^(' + mod_names + ')' + self._MODULE_REGEXP + '$', re.DOTALL)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'mod regex: {self._module_regexes}')
+        self._modules: Dict[str, ImportConfigFactoryModule] = {
+            m.name: m for m in modules}
 
     def __getstate__(self):
         state = dict(self.__dict__)
         state['_shared'] = None if self._shared is None else {}
         del state['class_resolver']
+        del state['_modules']
+        del state['_module_regexes']
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
         self.class_resolver = ImportClassResolver()
+        self._init_modules()
 
     def clear(self):
         """Clear any shared instances.
@@ -198,142 +203,24 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         new_meth = types.MethodType(new_meth, inst)
         setattr(inst, name, new_meth)
 
-    def _create_instance(self, section: str, config_params: Dict[str, str],
-                         params: Dict[str, Any]) -> Any:
-        secs = self.config.serializer.parse_object(section)
-        if isinstance(secs, (tuple, list)):
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'list instance: {type(secs)}')
-            inst = list(map(lambda s: self.instance(s, **params), secs))
-            if isinstance(secs, tuple):
-                inst = tuple(inst)
-        elif isinstance(secs, dict):
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'dict instance: {type(secs)}')
-            inst = {}
-            for k, v in secs.items():
-                v = self.instance(v, **params)
-                inst[k] = v
-        elif isinstance(secs, str):
-            create_type: str = None
-            try:
-                if config_params is not None:
-                    create_type: str = config_params.get('share')
-                meth: Callable = {
-                    None: self.instance,
-                    'default': self.instance,
-                    'evict': self.new_instance,
-                    'deep': self.new_deep_instance,
-                }.get(create_type)
-                if meth is None:
-                    raise FactoryError('Unknown create type: {create_type}')
-                inst = meth(secs, **params)
-            except Exception as e:
-                raise FactoryError(
-                    f"Could not create instance from section '{section}'",
-                    self) from e
-        else:
-            raise FactoryError(
-                f'Unknown instance type {type(secs)}: {secs}', self)
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'creating instance in section {section} ' +
-                         f'with {params}, config: {config_params}')
-        return inst
-
-    def _parse_child_params(self, pconfig: str) -> \
-            Tuple[Dict[str, Any], Dict[str, Any]]:
-        child_params: Dict[str, Any] = {}
-        inst_conf: Dict[str, Any] = None
-        reload: bool = False
-        if pconfig is not None:
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'parsing param config: {pconfig}')
-            inst_conf = eval(pconfig)
-            unknown: Set[str] = set(inst_conf.keys()) - \
-                self._CHILD_PARAM_DIRECTIVES
-            if len(unknown) > 0:
-                raise FactoryError(f'Unknown directive(s): {unknown}', self)
-            if 'param' in inst_conf:
-                cparams = inst_conf['param']
-                cparams = self.config.serializer.populate_state(cparams, {})
-                child_params.update(cparams)
-            if 'reload' in inst_conf:
-                reload = inst_conf['reload']
-                if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'setting reload: {reload}')
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'applying param config: {inst_conf}')
-        self._set_reload(reload)
-        return child_params, inst_conf
-
-    def _populate_instances(self, pconfig: str, section: str) -> Any:
-        child_params, inst_conf = self._parse_child_params(pconfig)
-        return self._create_instance(section, inst_conf, child_params)
-
-    def _object_instance(self, pconfig: str, class_name: str) -> Any:
-        params, inst_conf = self._parse_child_params(pconfig)
-        cls: Type = self._find_class(class_name)
-        desc = f'object instance {class_name}'
-        return super()._instance(desc, cls, **params)
-
-    def _dataclass_from_dict(self, cls: Type, data: Any):
-        if isinstance(data, str):
-            data = self.from_config_string(data)
-            if isinstance(data, str):
-                data = self.config.serializer.parse_object(data)
-        if dataclasses.is_dataclass(cls) and isinstance(data, dict):
-            fieldtypes = {f.name: f.type for f in dataclasses.fields(cls)}
-            try:
-                param = {f: self._dataclass_from_dict(fieldtypes[f], data[f])
-                         for f in data}
-            except KeyError as e:
-                raise FactoryError(
-                    f"No datacalass field {e} in '{cls}, data: {data}'")
-            data = cls(**param)
-        elif isinstance(data, (tuple, list)):
-            origin: Type = typing.get_origin(cls)
-            cls: Type = typing.get_args(cls)
-            if isinstance(cls, (tuple, list, set)) and len(cls) == 1:
-                cls = next(iter(cls))
-            data: Iterable[Any] = map(
-                lambda x: self._dataclass_from_dict(cls, x), data)
-            data = origin(data)
-        return data
-
-    def _dataclass_instance(self, class_name: str, section: str):
-        from_dict = self._dataclass_from_dict
-        cls: Type = self._find_class(class_name)
-        params = self._EMPTY_CHILD_PARAMS
-        inst: Settings = self._create_instance(section, params, params)
-        if isinstance(inst, (tuple, list)):
-            elems = map(lambda x: from_dict(cls, x.asdict()), inst)
-            inst = inst.__class__(elems)
-        else:
-            inst = from_dict(cls, inst.asdict())
-        return inst
-
     def from_config_string(self, v: str) -> Any:
-        """Create an instance from a string that looks like :obj:`_INSTANCE_REGEXP` or
-        :obj:`_OBJECT_REGEXP` used as option values in the configuration.
+        """Create an instance from a string used as option values in the
+        configuration.
 
         """
-        m = self._INSTANCE_REGEXP.match(v)
+        m: re.Match = self._module_regexes.match(v)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'match: <{v}> -> {m}')
         if m is not None:
-            pconfig, section = m.groups()
-            v = self._populate_instances(pconfig, section)
-        else:
-            m = self._OBJECT_REGEXP.match(v)
-            if m is not None:
-                pconfig, class_name = m.groups()
-                v = self._object_instance(pconfig, class_name)
-            else:
-                m = self._DATACLASS_REGEXP.match(v)
-                if m is not None:
-                    class_name, section = m.groups()
-                    v = self._dataclass_instance(class_name, section)
+            mod_name, pconfig, section = m.groups()
+            mod: ImportConfigFactoryModule = self._modules.get(mod_name)
+            if mod is not None:
+                v = mod.instance(pconfig, section)
         return v
 
-    def _class_name_params(self, name):
+    def _class_name_params(self, name: str) -> Tuple[str, Dict[str, Any]]:
+        class_name: str
+        params: Dict[str, Any]
         class_name, params = super()._class_name_params(name)
         insts = {}
         initial_reload = self.reload
@@ -393,20 +280,10 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             self._set_reload(initial_reload)
 
         self._add_injects(inst, pw_injects, reset_props)
-        if isinstance(inst, Settings) and len(inst) == 1:
-            self._populate_dataclass(inst)
+        mod: ImportConfigFactoryModule
+        for mod in self._modules.values():
+            inst = mod.post_populate(inst)
         return inst
-
-    def _populate_dataclass(self, inst: Any):
-        inst_dict = inst.asdict()
-        k = next(iter(inst_dict.keys()))
-        v = inst_dict[k]
-        if isinstance(v, dict):
-            cls: Optional[str] = v.pop(self.DATACLASS, None)
-            if cls is not None:
-                cls: Type = self._find_class(cls)
-                dc: Any = self._dataclass_from_dict(cls, v)
-                inst_dict[k] = dc
 
     def _process_injects(self, sec_name, kwargs):
         pname = 'injects'
@@ -458,3 +335,202 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
                 setattr(cls, prop_name, prop)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'create instance {cls}')
+
+
+@dataclass
+class ImportConfigFactoryModule(metaclass=ABCMeta):
+    _CHILD_PARAM_DIRECTIVES: ClassVar[Set[str]] = frozenset(
+        'param reload type share'.split())
+    """The set of allowed directives for ``instance`` (:obj:``INSTANCE_REGEXP`)
+    entries parsed by :meth:`_parse_child_params`.
+
+    """
+    _EMPTY_CHILD_PARAMS: ClassVar[Dict[str, Any]] = frozendict()
+    """Constant used to create object instances with initializers that have no
+    parameters.
+
+    """
+    factory: ImportConfigFactory = field()
+    """The parent/owning configuration factory instance."""
+
+    @abstractmethod
+    def _instance(self, name: str, inst_conf: Dict[str, Any],
+                  params: Dict[str, Any]) -> Any:
+        pass
+
+    def post_populate(self, inst: Any) -> Any:
+        return inst
+
+    @property
+    def name(self) -> str:
+        return self._NAME
+
+    def instance(self, pconfig: str, section: str) -> Any:
+        child_params: Dict[str, Any]
+        inst_conf: Dict[str, Any]
+        child_params, inst_conf = self._parse_child_params(pconfig)
+        return self._instance(section, inst_conf, child_params)
+
+    def _parse_child_params(self, pconfig: str) -> \
+            Tuple[Dict[str, Any], Dict[str, Any]]:
+        child_params: Dict[str, Any] = {}
+        inst_conf: Dict[str, Any] = None
+        reload: bool = False
+        try:
+            if pconfig is not None:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'parsing param config: {pconfig}')
+                inst_conf = eval(pconfig)
+                unknown: Set[str] = set(inst_conf.keys()) - \
+                    self._CHILD_PARAM_DIRECTIVES
+                if len(unknown) > 0:
+                    raise FactoryError(f'Unknown directive(s): {unknown}',
+                                       self.factory)
+                if 'param' in inst_conf:
+                    cparams = inst_conf['param']
+                    cparams = self.factory.config.serializer.populate_state(
+                        cparams, {})
+                    child_params.update(cparams)
+                if 'reload' in inst_conf:
+                    reload = inst_conf['reload']
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug(f'setting reload: {reload}')
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'applying param config: {inst_conf}')
+        finally:
+            self.factory._set_reload(reload)
+        return child_params, inst_conf
+
+    def _create_instance(self, section: str, config_params: Dict[str, str],
+                         params: Dict[str, Any]) -> Any:
+        fac: ImportConfigFactory = self.factory
+        secs = fac.config.serializer.parse_object(section)
+        if isinstance(secs, (tuple, list)):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'list instance: {type(secs)}')
+            inst = list(map(lambda s: fac.instance(s, **params), secs))
+            if isinstance(secs, tuple):
+                inst = tuple(inst)
+        elif isinstance(secs, dict):
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'dict instance: {type(secs)}')
+            inst = {}
+            for k, v in secs.items():
+                v = fac.instance(v, **params)
+                inst[k] = v
+        elif isinstance(secs, str):
+            create_type: str = None
+            try:
+                if config_params is not None:
+                    create_type: str = config_params.get('share')
+                meth: Callable = {
+                    None: fac.instance,
+                    'default': fac.instance,
+                    'evict': fac.new_instance,
+                    'deep': fac.new_deep_instance,
+                }.get(create_type)
+                if meth is None:
+                    raise FactoryError('Unknown create type: {create_type}')
+                inst = meth(secs, **params)
+            except Exception as e:
+                raise FactoryError(
+                    f"Could not create instance from section '{section}'",
+                    fac) from e
+        else:
+            raise FactoryError(
+                f'Unknown instance type {type(secs)}: {secs}', fac)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'creating instance in section {section} ' +
+                         f'with {params}, config: {config_params}')
+        return inst
+
+
+@dataclass
+class _InstanceImportConfigFactoryModule(ImportConfigFactoryModule):
+    _NAME: ClassVar[str] = 'instance'
+
+    def _instance(self, name: str, inst_conf: Dict[str, Any],
+                  params: Dict[str, Any]) -> Any:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'inst mod: {name}')
+        return self._create_instance(name, inst_conf, params)
+
+
+ImportConfigFactory.register_module(_InstanceImportConfigFactoryModule)
+
+
+@dataclass
+class _ObjectImportConfigFactoryModule(ImportConfigFactoryModule):
+    _NAME: ClassVar[str] = 'object'
+
+    def _instance(self, name: str, inst_conf: Dict[str, Any],
+                  params: Dict[str, Any]) -> Any:
+        cls: Type = self.factory._find_class(name)
+        desc = f'object instance {name}'
+        return ConfigFactory._instance(self.factory, desc, cls, **params)
+
+
+ImportConfigFactory.register_module(_ObjectImportConfigFactoryModule)
+
+
+@dataclass
+class _DataClassImportConfigFactoryModule(ImportConfigFactoryModule):
+    _NAME: ClassVar[str] = 'dataclass'
+
+    def _dataclass_from_dict(self, cls: Type, data: Any):
+        if isinstance(data, str):
+            data = self.factory.from_config_string(data)
+            if isinstance(data, str):
+                data = self.factory.config.serializer.parse_object(data)
+        if dataclasses.is_dataclass(cls) and isinstance(data, dict):
+            fieldtypes = {f.name: f.type for f in dataclasses.fields(cls)}
+            try:
+                param = {f: self._dataclass_from_dict(fieldtypes[f], data[f])
+                         for f in data}
+            except KeyError as e:
+                raise FactoryError(
+                    f"No datacalass field {e} in '{cls}, data: {data}'")
+            data = cls(**param)
+        elif isinstance(data, (tuple, list)):
+            origin: Type = typing.get_origin(cls)
+            cls: Type = typing.get_args(cls)
+            if isinstance(cls, (tuple, list, set)) and len(cls) == 1:
+                cls = next(iter(cls))
+            data: Iterable[Any] = map(
+                lambda x: self._dataclass_from_dict(cls, x), data)
+            data = origin(data)
+        return data
+
+    def _instance(self, name: str, inst_conf: Dict[str, Any],
+                  params: Dict[str, Any]) -> Any:
+        pass
+
+    def instance(self, pconfig: str, section: str) -> Any:
+        if not ClassImporter.is_valid_class_name(pconfig):
+            raise FactoryError(f'Not a valid class name: {pconfig}')
+        from_dict: Callable = self._dataclass_from_dict
+        cls: Type = self.factory._find_class(pconfig)
+        params = self._EMPTY_CHILD_PARAMS
+        inst: Settings = self._create_instance(section, params, params)
+        if isinstance(inst, (tuple, list)):
+            elems = map(lambda x: from_dict(cls, x.asdict()), inst)
+            inst = inst.__class__(elems)
+        else:
+            inst = from_dict(cls, inst.asdict())
+        return inst
+
+    def post_populate(self, inst: Any) -> Any:
+        if isinstance(inst, Settings) and len(inst) == 1:
+            inst_dict = inst.asdict()
+            k = next(iter(inst_dict.keys()))
+            v = inst_dict[k]
+            if isinstance(v, dict):
+                cls: Optional[str] = v.pop(self._NAME, None)
+                if cls is not None:
+                    cls: Type = self.factory._find_class(cls)
+                    dc: Any = self._dataclass_from_dict(cls, v)
+                    inst_dict[k] = dc
+        return inst
+
+
+ImportConfigFactory.register_module(_DataClassImportConfigFactoryModule)

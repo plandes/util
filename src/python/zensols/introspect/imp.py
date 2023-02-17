@@ -28,7 +28,8 @@ class ClassImporter(object):
     class name.  This is handy for prototyping code in a Python REPL.
 
     """
-    CLASS_REGEX: ClassVar[re.Pattern] = re.compile(r'^(.+)\.(.+?)$')
+    _CLASS_REGEX: ClassVar[re.Pattern] = re.compile(
+        r'^([a-zA-Z0-9_.]+)\.([a-zA-Z_][a-zA-Z0-9_]*)$')
 
     def __init__(self, class_name: str, reload: bool = True):
         """Initialize with the class name.
@@ -40,6 +41,11 @@ class ClassImporter(object):
         """
         self.class_name = class_name
         self.reload = reload
+
+    @classmethod
+    def is_valid_class_name(cls: Type, class_name: str) -> bool:
+        """Return whether a string represents a valid class name."""
+        return cls._CLASS_REGEX.match(class_name)
 
     @staticmethod
     def full_classname(cls: Type) -> str:
@@ -75,7 +81,7 @@ class ClassImporter(object):
         """
 
         cname: str = self.class_name
-        match: re.Match = re.match(self.CLASS_REGEX, cname)
+        match: re.Match = re.match(self._CLASS_REGEX, cname)
         if not match:
             raise ClassImporterError(
                 f'Not a fully qualified class name: {cname}')

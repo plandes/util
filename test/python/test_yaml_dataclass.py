@@ -1,7 +1,9 @@
 from typing import Tuple
 from dataclasses import dataclass, field
 import unittest
-from zensols.config import Dictable, Settings, YamlConfig, ImportConfigFactory
+from zensols.config import (
+    Dictable, Settings, YamlConfig, ImportConfigFactory, FactoryError
+)
 
 
 @dataclass
@@ -57,3 +59,7 @@ class TestYamlDataclass(unittest.TestCase):
                          drivers_license=DriversLicense(
                              state='CA', number='6901')))
         self.assertEqual(should, dept.employees)
+
+    def test_bad_config(self):
+        with self.assertRaisesRegex(FactoryError, '^Not a valid class name:'):
+            self.fac('croot.instances-bad')

@@ -12,6 +12,11 @@ from zensols.persist import (
 )
 
 
+if 0:
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
+
+
 class RangeStashThisMod(ReadOnlyStash):
     def __init__(self, n):
         super(RangeStashThisMod, self).__init__()
