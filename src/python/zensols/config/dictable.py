@@ -13,7 +13,7 @@ from collections import OrderedDict
 from itertools import chain
 import inspect
 import json
-from io import TextIOBase
+from io import TextIOBase, StringIO
 from zensols.introspect import ClassResolver
 from . import ConfigurationError, Writable
 
@@ -190,12 +190,23 @@ class Dictable(Writable):
             logger.debug(f'asdict: {type(self)}')
         return self._from_dictable(recurse, readable, class_name_param)
 
+    def asflatdict(self, *args, **kwargs) -> Dict[str, Any]:
+        """Like :meth:`asdict` but flatten in to a data structure suitable for
+        writing to JSON or YAML.
+
+        """
+        dct: Dict[str, Any] = self.asdict(*args, **kwargs)
+        io = StringIO()
+        json.dump(dct, io)
+        io.seek(0)
+        return json.load(io)
+
     def asjson(self, writer: TextIOBase = None,
                recurse: bool = True, readable: bool = True, **kwargs) -> str:
         """Return a JSON string representing the data in this instance.
 
         """
-        dct = self.asdict(recurse=recurse, readable=readable)
+        dct: Dict[str, Any] = self.asdict(recurse=recurse, readable=readable)
         if writer is None:
             return json.dumps(dct, **kwargs)
         else:
