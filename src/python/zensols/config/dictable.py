@@ -13,6 +13,7 @@ from collections import OrderedDict
 from itertools import chain
 import inspect
 import json
+import yaml
 from io import TextIOBase, StringIO
 from zensols.introspect import ClassResolver
 from . import ConfigurationError, Writable
@@ -211,6 +212,18 @@ class Dictable(Writable):
             return json.dumps(dct, **kwargs)
         else:
             return json.dump(dct, writer, **kwargs)
+
+    def asyaml(self, writer: TextIOBase = None,
+               recurse: bool = True, readable: bool = True, **kwargs) -> str:
+        """Return a YAML string representing the data in this instance.
+
+        """
+        dct: Dict[str, Any] = self.asflatdict(
+            recurse=recurse, readable=readable)
+        if writer is None:
+            return yaml.dumps(dct, **kwargs)
+        else:
+            return yaml.dump(dct, writer, **kwargs)
 
     def _get_description(self, include_type: bool = False) -> str:
         def fmap(desc: str, name: str) -> str:
