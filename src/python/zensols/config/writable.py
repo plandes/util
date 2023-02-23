@@ -76,11 +76,13 @@ class Writable(ABC):
         self._indent = indent
         _get_str_space.cache_clear()
 
-    def _write_empty(self, writer: TextIOBase):
-        """Write an empty line.
+    def _write_empty(self, writer: TextIOBase, count: int = 1):
+        """Write an empty line(s).
+
+        :param count: the number of newlines to add
 
         """
-        writer.write('\n')
+        writer.write('\n'.join([''] * (count + 1)))
 
     def _write_line(self, line: str, depth: int, writer: TextIOBase,
                     max_len: Union[bool, int] = False,

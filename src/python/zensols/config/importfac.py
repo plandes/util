@@ -613,3 +613,32 @@ class _DataClassImportConfigFactoryModule(ImportConfigFactoryModule):
 
 
 ImportConfigFactory.register_module(_DataClassImportConfigFactoryModule)
+
+
+@dataclass
+class _CallImportConfigFactoryModule(ImportConfigFactoryModule):
+    """A module that calls a method of another instance in the application
+    context.
+
+    The configuration string prototype has the form::
+
+        call[(<parameters>)]: <instance section name>
+
+    Parameters may have a ``method`` key with the name of the method.  The
+    remainder of the paraemters are used in the method call.
+
+    """
+    _NAME: ClassVar[str] = 'call'
+
+    def _instance(self, proto: ModulePrototype) -> Any:
+        cble: Any = self.factory.instance(proto.name)
+        params: Dict[str, Any] = proto.params
+        method: Optional[str] = params.pop('method', None)
+        if method is None:
+            return cble(**params)
+        else:
+            meth = getattr(cble, method)
+            return meth(**params)
+
+
+ImportConfigFactory.register_module(_CallImportConfigFactoryModule)
