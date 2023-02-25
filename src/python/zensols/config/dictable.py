@@ -221,7 +221,9 @@ class Dictable(Writable):
         dct: Dict[str, Any] = self.asflatdict(
             recurse=recurse, readable=readable)
         if writer is None:
-            return yaml.dumps(dct, **kwargs)
+            writer = StringIO()
+            yaml.dump(dct, writer, **kwargs)
+            return writer.getvalue()
         else:
             return yaml.dump(dct, writer, **kwargs)
 
