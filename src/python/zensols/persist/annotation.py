@@ -61,6 +61,23 @@ class FileTextUtil(object):
                 name = name[:-1]
         return name
 
+    @staticmethod
+    def byte_format(num: int, suffix: str = 'B') -> str:
+        """Return a human readable string of the number of bytes ``num``.
+
+        :param num: the number of bytes to format
+
+        :param suffix: the suffix to append to the resulting string
+
+        :attribution: `Fred Cirera <https://stackoverflow.com/questions/1094841/get-human-readable-version-of-file-size>`
+
+        """
+        for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
+            if abs(num) < 1024.0:
+                return f'{num:3.1f}{unit}{suffix}'
+            num /= 1024.0
+        return f'{num:.1f}Yi{suffix}'
+
 
 # class level persistance
 class PersistedWork(Deallocatable):
