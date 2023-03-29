@@ -12,6 +12,19 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - `CliHarness` application getter.
 - Override all optional positional metadata.
+- Configuration operand `application` to create instances of the context from a
+  an external application.
+- Create YAML from `Dictable` instances.
+- A `Dictable` flat nested dictionary structure suitable for writing to JSON or
+  YAML.
+- A context manager that multiplexes between standard out or the file system.
+- A byte formatting utility in `FileTextUtil`.
+
+### Changed
+- Refactor to uncouple configuration factory operands (i.e. `instance`,
+  `object`) in `ImportConfigFactory` as separate classes.
+- Allow overriding of positional metadata for the CLI package.
+- Fix Sphinx API generated documentation and human readable documentation.
 
 
 ## [1.12.0] - 2023-01-22
