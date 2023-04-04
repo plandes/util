@@ -239,9 +239,9 @@ class PersistedWork(Deallocatable):
         return obj
 
     def set(self, obj):
-        """Set the contents of the object on the owner as if it were persisted from the
-        source.  If this is a global cached instance, then add it to global
-        memory.
+        """Set the contents of the object on the owner as if it were persisted
+        from the source.  If this is a global cached instance, then add it to
+        global memory.
 
         """
         if logger.isEnabledFor(logging.DEBUG):
@@ -256,7 +256,8 @@ class PersistedWork(Deallocatable):
                 globals()[vname] = obj
 
     def is_set(self) -> bool:
-        """Return whether or not the persisted work has been engaged and has data.
+        """Return whether or not the persisted work has been engaged and has
+        data.
 
         """
         vname = self.varname
@@ -277,9 +278,9 @@ class PersistedWork(Deallocatable):
         return d
 
     def __call__(self, *argv, **kwargs):
-        """Return the cached data if it doesn't yet exist.  If it doesn't exist, create
-        it and cache it on the file system, optionally ``owner`` and optionally
-        the globals.
+        """Return the cached data if it doesn't yet exist.  If it doesn't exist,
+        create it and cache it on the file system, optionally ``owner`` and
+        optionally the globals.
 
         """
         vname = self.varname
@@ -394,6 +395,9 @@ class PersistableContainer(Deallocatable):
     If the class level attribute ``_PERSITABLE_METHODS`` is set, all method
     given will be accessed for force creation before pickling.
 
+    .. document private functions
+    .. automethod:: _clear_persistable_state
+
     """
     def __getstate__(self) -> Dict[str, Any]:
         if logger.isEnabledFor(logging.DEBUG):
@@ -441,7 +445,8 @@ class PersistableContainer(Deallocatable):
         return state
 
     def _clear_persistable_state(self):
-        """Clear all cached state from all :class:`.PersistedWork` in this instance.
+        """Clear all cached state from all :class:`.PersistedWork` in this
+        instance.
 
         """
         pws: Tuple[PersistedWork, ...] = tuple(filter(
@@ -451,8 +456,8 @@ class PersistableContainer(Deallocatable):
             v.clear()
 
     def __setstate__(self, state: Dict[str, Any]):
-        """Set the owner to containing instance and the worker function to the owner's
-        function by name.
+        """Set the owner to containing instance and the worker function to the
+        owner's function by name.
 
         """
         self.__dict__.update(state)
