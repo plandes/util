@@ -1,9 +1,8 @@
-from __future__ import annotations
 """Abstract base class for a configuration read from a file.
 
 """
+from __future__ import annotations
 __author__ = 'Paul Landes'
-
 from typing import Dict, Set, Iterable, List, Any, Union, Optional
 from abc import ABCMeta, abstractmethod
 import sys

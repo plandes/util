@@ -1,9 +1,8 @@
-from __future__ import annotations
 """Creates instances of :class:`.Configurable`.
 
 """
+from __future__ import annotations
 __author__ = 'Paul Landes'
-
 from typing import Dict, Any, Type, Union, ClassVar
 from dataclasses import dataclass, field
 import sys

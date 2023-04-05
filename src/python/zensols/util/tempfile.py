@@ -1,9 +1,8 @@
-from __future__ import annotations
 """Classes to generate, track and clean up temporary files.
 
 """
+from __future__ import annotations
 __author__ = 'Paul Landes'
-
 from typing import Tuple, List
 import logging
 from pathlib import Path

@@ -1,9 +1,8 @@
-from __future__ import annotations
 """Utility classes to write command line help.
 
 """
+from __future__ import annotations
 __author__ = 'Paul Landes'
-
 from typing import Tuple, Iterable, List, Union, Optional, Sequence
 from dataclasses import dataclass, field
 import logging

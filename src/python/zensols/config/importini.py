@@ -1,9 +1,8 @@
-from __future__ import annotations
 """Contains a class for importing child configurations.
 
 """
+from __future__ import annotations
 __author__ = 'Paul Landes'
-
 from typing import Iterable, Tuple, List, Dict, Any, Set, Sequence, Union
 import logging
 from itertools import chain

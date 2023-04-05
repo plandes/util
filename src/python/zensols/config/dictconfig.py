@@ -1,9 +1,8 @@
-from __future__ import annotations
 """Implementation of a dictionary backing configuration.
 
 """
+from __future__ import annotations
 __author__ = 'Paul Landes'
-
 from typing import Dict, Set, Type, Any
 import logging
 from . import ConfigurableError, Configurable, Dictable
