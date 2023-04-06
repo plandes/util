@@ -8,9 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
-## [1.12.1] - 2023-02-02
+## [1.12.2] - 2023-04-05
 ### Added
-- `CliHarness` application getter.
 - Override all optional positional metadata.
 - Configuration operand `application` to create instances of the context from a
   an external application.
@@ -27,6 +26,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fix Sphinx API generated documentation and human readable documentation.
 
 
+## [1.12.1] - 2023-02-02
+### Added
+- `CliHarness` application get method.
+
+
 ## [1.12.0] - 2023-01-22
 ### Added
 - A programmatic method to get the config factory and application context using
@@ -39,7 +43,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   such as `write` and `asjson` without needing inheritance.
 - Command line help available on specified action only.
 
-### Changes
+### Changed
 - Upgraded the `configparser` package from 5.2 to 5.3.
 - Fix bug with config factories throwing the wrong exception when using
   `type=import` in application configuration when using bad configuration files
@@ -458,7 +462,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.12.1...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.12.2...HEAD
+[1.12.2]: https://github.com/plandes/util/compare/v1.12.1...v1.12.2
 [1.12.1]: https://github.com/plandes/util/compare/v1.12.0...v1.12.1
 [1.12.0]: https://github.com/plandes/util/compare/v1.11.1...v1.12.0
 [1.11.1]: https://github.com/plandes/util/compare/v1.11.0...v1.11.1
