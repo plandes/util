@@ -632,6 +632,9 @@ class resource(object):
                 getattr(inst, self.destroy_method_name)(resource)
             return result
 
+        # copy documentation over for Sphinx docs
         wrapped.__doc__ = fn.__doc__
+        # copy annotations (i.e. type hints) over for Sphinx docs
+        wrapped.__annotations__ = fn.__annotations__
 
         return wrapped
