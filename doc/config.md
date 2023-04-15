@@ -40,6 +40,16 @@ class_name = zensols.someproj.app.MainApplication
 path = path: ${default:temporary_dir}/app.dat
 ```
 
+Note that user home relative directories are interpolated with
+[os.path.expanduser], for example:
+```ini
+[app]
+class_name = zensols.someproj.app.MainApplication
+path = path: ~/app.dat
+```
+may be used to store the `app.dat` file in the user's home directory.
+
+
 ### Directory Based Path
 
 The first parameter to all [INI] based configuration parser is either a file or
@@ -669,6 +679,7 @@ this documentation.
 [Java Spring]: https://spring.io
 [setuptools]: https://setuptools.readthedocs.io/en/latest/
 [pkg_resources]: https://setuptools.readthedocs.io/en/latest/pkg_resources.html
+[os.path.expanduser]: https://docs.python.org/3/library/os.path.html#os.path.expanduser
 
 [Zensols deep learning natural language processing library]: https://github.com/plandes/deepnlp
 [zensols.deepnlp resource library]: https://github.com/plandes/deepnlp/tree/master/resources
