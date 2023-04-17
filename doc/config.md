@@ -332,7 +332,7 @@ class_name = domain.Person
 age = 16
 
 [school_attendance]
-bart_info = instance({'class_name': 'builtins.dict'}): bart
+bart_info = instance({'param': {'class_name': 'builtins.dict'}}): bart
 ```
 
 
