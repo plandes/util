@@ -228,16 +228,19 @@ in how it reads data, which uses the following rules:
 * A string starting with `json:` parsed as standard JSON.
 * A string staring with `eval:` parsed by the Python code reader (see the
   [Evaluation Parameters](#evaluation-parameters) section).
-* A string starting with `instance:` an object instance (see the [Configuration
-  Factory] and [Instance Parameters](#instance-parameters) sections).
-* A string starting with `object:` an object specified by class name (see the
+* A string starting with `instance:` as an object instance (see the
   [Configuration Factory] and [Instance Parameters](#instance-parameters)
   sections).
-* A string starting with `class:` a class/type specified by a class name.
-* A string starting with `dataclass(<class name>)` a dataclass (see
+* A string starting with `object:` as an object specified by class name (see
+  the [Configuration Factory] and [Instance Parameters](#instance-parameters)
+  sections).
+* A string starting with `class:` as a class/type specified by a class name.
+* A string starting with `dataclass(<class name>)` as a dataclass (see
   [Dataclasses](#dataclasses)).
-* A string starting with `application` an application context (see
+* A string starting with `application` as an application context (see
   [Applications](#applications)).
+* A string starting with `call` as a Python method invocation (see
+  [Calls](#calls)).
 * Anything else as a string.
 
 
@@ -551,6 +554,22 @@ This has the advantage over importing applications using resource libraries
 since the application context is set up and configured how it is meant to be as
 a standalone application.  This is essential when using applications with paths
 pointing to large trained ML models.
+
+
+### Calls
+
+*Callables* and methods on Python object instances created in the application
+context can be used to set values.  The parameters and the instance are given, such as:
+```ini
+[tracker]
+class_name = payroll.Tracker
+
+[employees]
+db = call({'param': {'method': 'print_employees', 'format': 'short'}}): tracker
+```
+This sets the `db` parameter on the `employees` instance to the return value of
+the tracker's `print_employees` method.  The `method` parameter may be omitted
+if the referenced instance is *Callable*.
 
 
 ### Import INI Configuration
