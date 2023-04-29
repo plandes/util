@@ -77,7 +77,8 @@ class DictionaryConfig(Configurable, Dictable):
 
     @property
     def sections(self) -> Set[str]:
-        """Return the top level keys of the dictionary as sections (see class doc).
+        """Return the top level keys of the dictionary as sections (see class
+        doc).
 
         """
         return set(self._get_config().keys())
