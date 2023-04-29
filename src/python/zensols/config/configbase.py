@@ -23,8 +23,8 @@ class ConfigurableError(ConfigurationError):
 
 
 class ConfigurableFileNotFoundError(ConfigurableError):
-    """Raised when a configuration file is not found for those file based instances
-    of :class:`.Configurable`.
+    """Raised when a configuration file is not found for those file based
+    instances of :class:`.Configurable`.
 
     """
     def __init__(self, path: Path, source: Union[Path, Any] = None):
@@ -143,8 +143,8 @@ class Configurable(Writable, metaclass=ABCMeta):
             return float(val)
 
     def get_option_path(self, name: str, section: str = None):
-        """Just like :meth:`get_option` but return a ``pathlib.Path`` object of the
-        string.
+        """Just like :meth:`get_option` but return a ``pathlib.Path`` object of
+        the string.
 
         """
         val = self.get_option(name, section)
@@ -256,8 +256,8 @@ class Configurable(Writable, metaclass=ABCMeta):
         raise NotImplementedError()
 
     def merge(self, to_populate: Configurable):
-        """Copy all data from this configuruable to ``to_populate``, and clobber any
-        overlapping properties in the process.
+        """Copy all data from this configuruable to ``to_populate``, and clobber
+        any overlapping properties in the process.
 
         :param to_populate: the target configuration object
 
@@ -281,8 +281,8 @@ class Configurable(Writable, metaclass=ABCMeta):
                 self._write_line(f'{k}: {v}', depth + 1, writer)
 
     def _get_calling_module(self, depth: int = 0):
-        """Get the last module in the call stack that is not this module or ``None`` if
-        the call originated from this module.
+        """Get the last module in the call stack that is not this module or
+        ``None`` if the call originated from this module.
 
         """
         for frame in inspect.stack():
@@ -294,9 +294,9 @@ class Configurable(Writable, metaclass=ABCMeta):
                     return mod
 
     def resource_filename(self, resource_name: str, module_name: str = None):
-        """Return a resource based on a file name.  This uses the ``pkg_resources``
-        package first to find the resources.  If it doesn't find it, it returns
-        a path on the file system.
+        """Return a resource based on a file name.  This uses the
+        ``pkg_resources`` package first to find the resources.  If it doesn't
+        find it, it returns a path on the file system.
 
         :param: resource_name the file name of the resource to obtain (or name
                 if obtained from an installed module)
@@ -321,8 +321,8 @@ class Configurable(Writable, metaclass=ABCMeta):
             return ''
 
     def asdict(self, sort: bool = True) -> Dict[str, Dict[str, Any]]:
-        """Return a two-tier :class:`dict` with sections at the first level, and the
-        keyv/values at the second level.
+        """Return a two-tier :class:`dict` with sections at the first level, and
+        the keyv/values at the second level.
 
         """
         cls = OrderedDict if sort else dict
@@ -336,8 +336,8 @@ class Configurable(Writable, metaclass=ABCMeta):
         return secs
 
     def as_flat_dict(self) -> Dict[str, Any]:
-        """Return a flat one-tier :class:`dict` with keys in ``<section>:<option>``
-        format.
+        """Return a flat one-tier :class:`dict` with keys in
+        ``<section>:<option>`` format.
 
         """
         flat: Dict[str, Any] = {}
@@ -347,8 +347,8 @@ class Configurable(Writable, metaclass=ABCMeta):
         return flat
 
     def asjson(self, *args, sort: bool = True, **kwargs) -> str:
-        """Return a JSON string that represents this configuration.  For structure, see
-        :meth:`asdict`.
+        """Return a JSON string that represents this configuration.  For
+        structure, see :meth:`asdict`.
 
         """
         return json.dumps(self.asdict(sort), *args, **kwargs)
