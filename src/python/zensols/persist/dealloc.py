@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Union, Callable, Tuple
+from typing import Any, Union, Callable, Tuple, ClassVar, Dict
 from abc import ABC
 import logging
 import collections
@@ -15,9 +15,9 @@ logger = logging.getLogger(__name__)
 
 
 class Deallocatable(ABC):
-    """All subclasses have the ability to deallocate any resources.  This is useful
-    for cases where there could be reference cycles or deallocation (i.e. CUDA
-    tensors) need happen implicitly and faster.
+    """All subclasses have the ability to deallocate any resources.  This is
+    useful for cases where there could be reference cycles or deallocation
+    (i.e. CUDA tensors) need happen implicitly and faster.
 
     .. document private functions
     .. automethod:: _print_undeallocated
@@ -25,22 +25,22 @@ class Deallocatable(ABC):
     .. automethod:: _try_deallocate
 
     """
-    PRINT_TRACE = False
+    PRINT_TRACE: ClassVar[bool] = False
     """When ``True``, print the stack trace when deallocating with
     :meth:`deallocate`.
 
     """
-    ALLOCATION_TRACKING = False
-    """Enables allocation tracking.  When this if ``False``, this functionality is
-    not used and disabled.
+    ALLOCATION_TRACKING: ClassVar[bool] = False
+    """Enables allocation tracking.  When this if ``False``, this functionality
+    is not used and disabled.
 
     """
-    _ALLOCATIONS = {}
+    _ALLOCATIONS: Dict[int, Any] = {}
     """The data structure that retains all allocated instances.
 
     """
     # when true, recurse through deallocatable instances while freeing
-    _RECURSIVE = False
+    _RECURSIVE: ClassVar[bool] = False
 
     def __init__(self):
         super().__init__()
@@ -120,8 +120,8 @@ class Deallocatable(ABC):
         return False
 
     def _deallocate_attribute(self, attrib: str) -> bool:
-        """Deallocate attribute ``attrib`` if possible, which means it both exists and
-        extends from this class.
+        """Deallocate attribute ``attrib`` if possible, which means it both
+        exists and extends from this class.
 
         """
         deallocd = False
