@@ -21,8 +21,8 @@ class MissingDataKeys(PersistableError):
 
 
 class DirectoryCompositeStash(DirectoryStash):
-    """A stash distributes the data of each item out over several directories.  On
-    dumping, an attribute holding a ``dict`` is removed from the item, it's
+    """A stash distributes the data of each item out over several directories.
+    On dumping, an attribute holding a ``dict`` is removed from the item, it's
     data is persisted over multiple directories, then the attribute is restored
     after pickling.
 
@@ -84,16 +84,16 @@ class DirectoryCompositeStash(DirectoryStash):
 
     @property
     def groups(self) -> Tuple[Set[str]]:
-        """The groups of the ``dict`` composite attribute, which are sets of keys, each
-        of which are persisted to their respective directory.
+        """The groups of the ``dict`` composite attribute, which are sets of
+        keys, each of which are persisted to their respective directory.
 
         """
         return self._groups
 
     @groups.setter
     def groups(self, groups: Tuple[Set[str]]):
-        """The groups of the ``dict`` composite attribute, which are sets of keys, each
-        of which are persisted to their respective directory.
+        """The groups of the ``dict`` composite attribute, which are sets of
+        keys, each of which are persisted to their respective directory.
 
         """
         def map_group(group: Union[set, list, tuple]):
@@ -110,7 +110,6 @@ class DirectoryCompositeStash(DirectoryStash):
         self._stash_by_group = {}
         self._stash_by_attribute = stashes
         self._all_keys = frozenset(reduce(lambda a, b: a | b, groups))
-        comps: Set[str]
         for group in groups:
             name = '-'.join(sorted(group))
             path = comp_path / name
@@ -128,7 +127,8 @@ class DirectoryCompositeStash(DirectoryStash):
         self._groups = groups
 
     def _to_composite(self, data: dict) -> Tuple[str, Any, Tuple[str, Any]]:
-        """Create the composite data used to by the composite stashes to persist.
+        """Create the composite data used to by the composite stashes to
+        persist.
 
         :param data: the data item stored as the attribute in ``inst`` to
                      persist
