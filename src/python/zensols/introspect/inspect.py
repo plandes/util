@@ -7,10 +7,12 @@ from typing import List, Tuple, Dict, Any, Type, Optional, ClassVar
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
-from pathlib import Path
+from collections import OrderedDict
 import re
 import ast
 import inspect
+from inspect import Parameter, Signature
+from pathlib import Path
 from . import ClassImporter
 
 logger = logging.getLogger(__name__)
@@ -25,7 +27,7 @@ class ClassError(Exception):
 
 
 def _create_data_types() -> Dict[str, Type]:
-    types = {t.__name__: t for t in [str, int, float, bool, list, Path]}
+    types = {t.__name__: t for t in [str, int, float, bool, list, dict, Path]}
     types['pathlib.Path'] = Path
     return types
 
@@ -52,17 +54,14 @@ class TypeMapper(object):
     default_type: Type = field(default=str)
     """Default type for when no type is given."""
 
-    allow_enum: bool = field(default=True)
-    """Whether or not to allow :class:`.Enum` as an acceptable type.  When the
-    mapper encouters these classes, the class is loaded from the module and
-    returned as a type.
+    allow_class: bool = field(default=True)
+    """Whether or not to allow classes acceptable types.  When the mapper
+    encouters these classes, the class is loaded from the module and returned as
+    a type.
 
     """
-
-    def _try_enum(self, stype: str) -> Type:
-        """Try to resolve ``stype`` as an :class:`.Enum' class.
-
-        """
+    def _try_class(self, stype: str) -> Type:
+        """Try to resolve ``stype`` as class."""
         mod = self.cls.__module__
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'module: {mod}')
@@ -73,9 +72,6 @@ class TypeMapper(object):
         cls: type = ci.get_class()
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'successfully loaded class {cls}')
-        if issubclass(cls, Enum):
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'mapping {cls} from {stype}')
         return cls
 
     def map_type(self, stype: str) -> Type:
@@ -84,11 +80,11 @@ class TypeMapper(object):
             tpe = self.default_type
         else:
             tpe = self.data_types.get(stype)
-        if tpe is None and self.allow_enum:
+        if tpe is None and self.allow_class:
             try:
-                tpe = self._try_enum(stype)
+                tpe = self._try_class(stype)
             except Exception as e:
-                logger.error(f'Could not narrow to enum: {stype}: {e}',
+                logger.error(f'Could not narrow to class: {stype}: {e}',
                              exc_info=True)
         if tpe is None:
             raise ClassError(f'Non-supported data type: {stype}')
@@ -216,7 +212,13 @@ class Class(object):
 
     @property
     def name(self) -> str:
+        """The fully qualified class name."""
         return ClassImporter.full_classname(self.class_type)
+
+    @property
+    def is_dataclass(self) -> bool:
+        """Whether or not the class is a :class:`dataclasses.dataclass`."""
+        return dataclasses.is_dataclass(something)
 
 
 @dataclass
@@ -231,7 +233,6 @@ class ClassInspector(object):
     traversed (i.e. ``include_fields``).
 
     """
-
     cls: type = field()
     """The class to inspect."""
 
@@ -239,13 +240,26 @@ class ClassInspector(object):
     """The class attributes to inspect, or all found are returned when ``None``.
 
     """
-
     data_type_mapper: TypeMapper = field(default=None)
     """The mapper used for narrowing a type from a string parsed from the Python
     AST.
 
     """
+    include_private: bool = field(default=False)
+    """Whether to include private methods that start with ``_``."""
 
+    include_init: bool = field(default=False)
+    """Whether to include the ``__init__`` method."""
+
+    strict: str = field(default='y')
+    """Indicates what to do for undefined or unsupported structures.
+
+    One of:
+
+      * y: raise errors
+      * n: ignore
+      * w: log as warning
+    """
     def __post_init__(self):
         self.data_type_mapper = TypeMapper(self.cls)
 
@@ -279,7 +293,16 @@ class ClassInspector(object):
             if isinstance(def_node, ast.Attribute):
                 enum_name: str = def_node.attr
                 cls: type = self.data_type_mapper.map_type(def_node.value.id)
-                default = cls.__members__[enum_name]
+                if hasattr(cls, '__members__'):
+                    default = cls.__members__[enum_name]
+                else:
+                    msg = f'No default found for class: {cls}.{enum_name}'
+                    if self.strict == 'y':
+                        raise ClassError(msg)
+                    elif self.strict == 'w' and \
+                         logger.isEnabledFor(logging.WARN):
+                        logger.warning(msg)
+                    default = None
             # ast.Num and ast.Str added for Python 3.7 backward compat
             elif isinstance(def_node, ast.Num):
                 default = def_node.n
@@ -298,8 +321,12 @@ class ClassInspector(object):
             elif isinstance(def_node, ast.UnaryOp):
                 op = def_node.operand
                 default = op.value
-            else:
+            elif isinstance(def_node, ast.Name):
+                default = self.data_type_mapper.map_type(def_node.id)
+            elif hasattr(def_node, 'value'):
                 default = def_node.value
+            else:
+                default = str(def_node)
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'default: {default} ({type(default)})/' +
                              f'({type(def_node)})')
@@ -322,7 +349,10 @@ class ClassInspector(object):
                     default = self._map_default(f'arg {arg}', defaults[didx])
                     is_positional = False
                 if arg.annotation is not None:
-                    dtype = arg.annotation.id
+                    if isinstance(arg.annotation, ast.Subscript):
+                        dtype = arg.annotation.value.id
+                    else:
+                        dtype = arg.annotation.id
                 mtype = self.data_type_mapper.map_type(dtype)
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'mapped {name}:{dtype} -> {mtype}, ' +
@@ -340,7 +370,7 @@ class ClassInspector(object):
         is_prop = any(map(lambda n: hasattr(n, 'id') and n.id,
                           node.decorator_list))
         # only public methods (not properties) are parsed for now
-        if not is_prop and not is_priv:
+        if not is_prop and (self.include_private or not is_priv):
             args = self._get_args(node.args)
             node = None if len(node.body) == 0 else node.body[0]
             # parse the docstring for instance methods only
@@ -372,6 +402,26 @@ class ClassInspector(object):
                         arg.doc = ClassDoc(param, None)
         return method
 
+    def _get_inspect_method(self, cls: Type, meth_name: str) -> ClassMethod:
+        mems = filter(lambda t: t[0] == meth_name, inspect.getmembers(cls))
+        for mem_name, mem in mems:
+            sig: Signature = inspect.signature(mem)
+            meth_args: List[ClassMethodArg] = []
+            for param_name, param in sig.parameters.items():
+                if param_name == 'self':
+                    continue
+                positional = param.kind == Parameter.POSITIONAL_ONLY
+                meth_args.append(ClassMethodArg(
+                    name=param.name,
+                    dtype=None if param.annotation == Parameter.empty else param.annotation,
+                    doc=None,
+                    default=None if param.default == Parameter.empty else param.default,
+                    is_positional=positional))
+            return ClassMethod(
+                name=mem_name,
+                doc=inspect.cleandoc(inspect.getdoc(mem)),
+                args=tuple(meth_args))
+
     def _get_class(self, cls: Type) -> Class:
         """Return a dict of attribute (field) to metadata and docstring.
 
@@ -385,9 +435,13 @@ class ClassInspector(object):
         for node in cnode.body:
             # parse the dataclass attribute/field defintion
             if isinstance(node, ast.AnnAssign) and \
-               isinstance(node.annotation, ast.Name):
+               isinstance(node.annotation, (ast.Name, ast.Subscript)):
+                str_dtype: str
+                if isinstance(node.annotation, ast.Name):
+                    str_dtype = node.annotation.id
+                elif isinstance(node.annotation, ast.Subscript):
+                    str_dtype = node.annotation.value.id
                 name: str = node.target.id
-                str_dtype: str = node.annotation.id
                 dtype: type = self.data_type_mapper.map_type(str_dtype)
                 item: str = f"kwarg: '{name}'"
                 if logger.isEnabledFor(logging.DEBUG):
@@ -422,15 +476,31 @@ class ClassInspector(object):
                         f'could not parse method in {node}', e)
                 if meth is not None:
                     methods.append(meth)
+            elif isinstance(node, ast.AnnAssign):
+                if self.strict == 'w' and logger.isEnabledFor(logging.WARNING):
+                    logger.warning(f'assign: {node.target.id}, {node.annotation}')
             else:
-                if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'not processed node: {type(node)}: ' +
-                                 f'{node.value}')
+                msg = f'not processed node: {type(node)}: {node.value}'
+                if self.strict == 'w' and logger.isEnabledFor(logging.WARNING):
+                    logger.warning(msg)
+                else:
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug(msg)
+        if self.include_init:
+            meth = self._get_inspect_method(cls, '__init__')
+            if meth is not None:
+                methods.append(meth)
+        field_dict = OrderedDict()
+        meth_dict = OrderedDict()
+        for f in fields:
+            field_dict[f.name] = f
+        for m in methods:
+            meth_dict[m.name] = m
         return Class(
             cls,
             None if self.cls.__doc__ is None else ClassDoc(self.cls.__doc__),
-            fields={d.name: d for d in fields},
-            methods={m.name: m for m in methods})
+            fields=field_dict,
+            methods=meth_dict)
 
     def _get_super_class(self, cls: Type) -> List[Class]:
         """Traverse all superclasses of ``cls``.
