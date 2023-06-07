@@ -45,7 +45,7 @@ class ClassImporter(object):
     @classmethod
     def is_valid_class_name(cls: Type, class_name: str) -> bool:
         """Return whether a string represents a valid class name."""
-        return cls._CLASS_REGEX.match(class_name)
+        return cls._CLASS_REGEX.match(class_name) is not None
 
     @staticmethod
     def full_classname(cls: Type) -> str:
@@ -119,6 +119,21 @@ class ClassImporter(object):
 
         """
         return self.get_module_class()[1]
+
+    def get_class_or_global(self) -> Type:
+        """Like :meth:`get_class` but try globals if the class isn't fully
+        qualified (i.e. sans module).
+
+        """
+        if self.is_valid_class_name(self.class_name):
+            return self.get_class()
+        else:
+            cls = globals().get(self.class_name)
+            if cls is None:
+                raise ClassImporterError(
+                    'Not a fully qualified class name and not in globals: ' +
+                    self.class_name)
+            return cls
 
     def _bless(self, inst: Any) -> Any:
         """A template method to modify a nascent instance just created.  The returned
