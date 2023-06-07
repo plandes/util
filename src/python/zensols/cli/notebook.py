@@ -22,7 +22,9 @@ logger = logging.getLogger()
 @dataclass
 class NotebookManager(object):
     """Bootstrap and import libraries to automate notebook testing.  It also
-    contains utility methods for rendering data.
+    contains utility methods for rendering data.  This class integrates with
+    :class:`~zensols.cli.harness.NotebookHarness` to access Zensols applications
+    via Jupyter.
 
     """
     package_resource: str = field()
