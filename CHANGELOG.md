@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.12.3] - 2023-06-07
+### Added
+- Jupyter notebook utility class `NotebookManager`.  This class integrates with
+  access Zensols applications via Jupyter.
+- Flexible module agnostic class resolution methods.
+
+### Changed
+- More comprehensive parsing of Python source files in `ClassInspector`.
+
+
 ## [1.12.2] - 2023-04-05
 ### Added
 - Override all optional positional metadata.
@@ -462,7 +472,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.12.2...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.12.3...HEAD
+[1.12.3]: https://github.com/plandes/util/compare/v1.12.2...v1.12.3
 [1.12.2]: https://github.com/plandes/util/compare/v1.12.1...v1.12.2
 [1.12.1]: https://github.com/plandes/util/compare/v1.12.0...v1.12.1
 [1.12.0]: https://github.com/plandes/util/compare/v1.11.1...v1.12.0
