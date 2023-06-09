@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.12.4] - 2023-06-09
+### Changed
+- CLI bug fixes.
+
+
 ## [1.12.3] - 2023-06-07
 ### Added
 - Jupyter notebook utility class `NotebookManager`.  This class integrates with
@@ -472,7 +477,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.12.3...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.12.4...HEAD
+[1.12.4]: https://github.com/plandes/util/compare/v1.12.3...v1.12.4
 [1.12.3]: https://github.com/plandes/util/compare/v1.12.2...v1.12.3
 [1.12.2]: https://github.com/plandes/util/compare/v1.12.1...v1.12.2
 [1.12.1]: https://github.com/plandes/util/compare/v1.12.0...v1.12.1
