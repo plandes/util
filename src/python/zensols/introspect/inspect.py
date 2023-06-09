@@ -446,7 +446,7 @@ class ClassInspector(object):
                 item: str = f"kwarg: '{name}'"
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'mapped dtype {name} {str_dtype} -> {dtype}')
-                if node.value is not None:
+                if node.value is not None and hasattr(node.value, 'keywords'):
                     kwlst: List[ast.keyword] = node.value.keywords
                     kwargs = {k.arg: self._map_default(item, k.value)
                               for k in kwlst}

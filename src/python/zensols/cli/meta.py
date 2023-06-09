@@ -59,8 +59,15 @@ class ApplicationFailure(Dictable):
 @dataclass
 class _MetavarFormatter(object):
     def __post_init__(self):
-        if issubclass(self.dtype, Enum) and self.choices is None:
+        is_enum: bool
+        try:
+            is_enum = issubclass(self.dtype, Enum) and self.choices is None
+        except Exception:
+            is_enum = False
+        if is_enum:
             self.choices = tuple(sorted(self.dtype.__members__.keys()))
+        else:
+            self.choices = ()
         if self.metavar is None:
             self._set_metvar()
 
@@ -70,7 +77,7 @@ class _MetavarFormatter(object):
         a :class:`enum.Enum` Python class.
 
         """
-        return (self.choices is not None) or issubclass(self.dtype, Enum)
+        return len(self.choices) > 0
 
     def _set_metvar(self) -> str:
         if self.is_choice:
