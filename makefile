@@ -7,7 +7,7 @@ CLEAN_DEPS +=		pycleancache
 ADD_CLEAN +=		example/config/counter.dat
 #PY_TEST_DEPS +=		runexamples
 
-PY_SRC_TEST_PAT ?=	'test_app_config.py'
+#PY_SRC_TEST_PAT ?=	'test_app_config.py'
 
 include ./zenbuild/main.mk
 
