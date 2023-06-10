@@ -232,7 +232,10 @@ class ActionCli(PersistableContainer, Dictable):
             else:
                 doc = meth.doc
             if doc is not None:
-                doc = DocUtil.normalize(doc.text)
+                if doc.text is None:
+                    doc = ''
+                else:
+                    doc = DocUtil.normalize(doc.text)
             # add the meta data
             meta = ActionMetaData(
                 name=name,
