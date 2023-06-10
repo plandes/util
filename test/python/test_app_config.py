@@ -1,5 +1,6 @@
 from typing import Any
 from dataclasses import dataclass
+import sys
 from io import StringIO
 from pathlib import Path
 from zensols.util import stdwrite
@@ -40,6 +41,7 @@ CONFIG_METH = """\
 [cli]
 apps = list: app
 cleanups = list: app, cli
+usage_config = object({'param': {'width': 80}}): zensols.cli.UsageConfig
 
 [app]
 class_name = test_app_config.App2
@@ -160,6 +162,7 @@ class TestMethodParse(LogTestCase):
         self.harness = CliHarness(
             package_resource='zensols.util',
             app_config_resource=StringIO(CONFIG_METH))
+        self.maxDiff = sys.maxsize
 
     def _test_meth_primitive(self):
         harness = self.harness
@@ -193,7 +196,7 @@ class TestMethodParse(LogTestCase):
         sio = StringIO()
         with stdwrite(stdout=sio, stderr=sio):
             self.harness.execute('-h')
-        if 0:
+        if False:
             print(f'should = <{sio.getvalue()}>')
             return
         should = """\
