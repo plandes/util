@@ -5,7 +5,6 @@ __author__ = 'Paul Landes'
 
 from typing import List, Tuple, Dict, Any, Type, Optional, ClassVar
 from dataclasses import dataclass, field
-from enum import Enum
 import logging
 from collections import OrderedDict
 import re
