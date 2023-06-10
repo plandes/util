@@ -245,16 +245,19 @@ class CommandLineParser(Deallocatable, Dictable):
         self._configure_parser(parser, opts)
         return parser
 
-    def write_help(self, writer: TextIOBase = sys.stdout,
+    def write_help(self, writer: TextIOBase = None,
                    include_actions: bool = True,
                    action_metas: Sequence[ActionMetaData] = None):
         """Write the usage information and help text.
+
+        :param writer: the data sync, or :obj:`sys.stdout` if ``None``
 
         :param include_actions: if ``True`` write each actions' usage as well
 
         :param actions: the list of actions to output, or ``None`` for all
 
         """
+        writer = sys.stdout if writer is None else writer
         parser = self._get_first_pass_parser(False)
         parser.print_help(writer, include_actions, action_metas)
 
