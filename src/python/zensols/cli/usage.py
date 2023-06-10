@@ -13,6 +13,7 @@ from itertools import chain
 from pathlib import Path
 from io import TextIOBase
 from optparse import OptionParser
+from zensols.introspect import IntegerSelection
 from zensols.config import Writable, Dictable
 from zensols.persist import persisted
 from . import OptionMetaData, ActionMetaData, PositionalMetaData
@@ -159,7 +160,8 @@ class _OptionFormatter(_Formatter):
         metavar: str = '' if opt.metavar is None else opt.metavar
         mlen, over = self._get_min_default_len()
         self._opt_str = f'{left_indent}{short_opt}{sep}{long_opt}'
-        if len(metavar) > max_olen:
+        if not issubclass(opt.dtype, IntegerSelection) and \
+           len(metavar) > max_olen:
             if metavar.find('|') > -1:
                 metavar = metavar[1:-1]
                 if len(self.doc) > 0:

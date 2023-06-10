@@ -111,4 +111,4 @@ class IntegerSelection(object):
         return sum(1 for _ in self)
 
     def __str__(self) -> str:
-        return f'{self.selection} ({self.kind})'
+        return str(self.selection)

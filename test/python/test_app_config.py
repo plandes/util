@@ -83,7 +83,7 @@ class App2(object):
         """
         return input_file
 
-    def meth4(self, isel: IntegerSelection):
+    def meth4(self, isel: IntegerSelection = IntegerSelection('0')):
         """Invoke an int selection method.
 
         isel: the integer selection
@@ -205,43 +205,50 @@ Usage: python -m unittest <meth1|meth2|meth3|meth4> [options]:
 Application doc.
 
 Options:
-  -h, --help [actions]               show this help message and exit
-  --version                          show the program version and exit
+  -h, --help [actions]                    show this help message and exit
+  --version                               show the program version and exit
 
 Actions:
-meth1                                no-op method
+meth1                                     no-op method
 
-meth2 <fv>                           invoke a test method
-  fv INT                             first param
-  -s, --sv INT          5            second param
+meth2 <fv>                                invoke a test method
+  fv INT                                  first param
+  -s, --sv INT               5            second param
 
-meth3                                invoke a test method with a path default
-  -i, --inputfile FILE  a-defaul...  the input file with default a-default.txt
+meth3                                     invoke a test method with a path
+                                          default
+  -i, --inputfile FILE       a-defaul...  the input file with default
+                                          a-default.txt
 
-meth4 <isel>                         invoke an int selection method. isel: the
-                                     integer selection
-  isel INT[,INT|-INT]
+meth4                                     invoke an int selection method. isel:
+                                          the integer selection
+  -e, --isel INT[,INT|-INT]  0
 exit: 0\n"""
         self.assertEqual(should, sio.getvalue())
 
     def test_integer_selection(self):
         harness = self.harness
-        res: ActionResult = harness.execute('meth4 3')
+        res: ActionResult = harness.execute('meth4')
+        self.assertTrue(isinstance(res.result, IntegerSelection))
+        self.assertEqual(0, res.result.selection)
+        self.assertEqual(Kind.single, res.result.kind)
+
+        res: ActionResult = harness.execute('meth4 -e 3')
         self.assertTrue(isinstance(res.result, IntegerSelection))
         self.assertEqual(3, res.result.selection)
         self.assertEqual(Kind.single, res.result.kind)
 
-        res: ActionResult = harness.execute('meth4 3,4')
+        res: ActionResult = harness.execute('meth4 --isel 3,4')
         self.assertTrue(isinstance(res.result, IntegerSelection))
         self.assertEqual([3, 4], res.result.selection)
         self.assertEqual(Kind.list, res.result.kind)
 
-        res: ActionResult = harness.execute('meth4 3,4,5')
+        res: ActionResult = harness.execute('meth4 --isel 3,4,5')
         self.assertTrue(isinstance(res.result, IntegerSelection))
         self.assertEqual([3, 4, 5], res.result.selection)
         self.assertEqual(Kind.list, res.result.kind)
 
-        res: ActionResult = harness.execute('meth4 3-4')
+        res: ActionResult = harness.execute('meth4 --isel 3-4')
         self.assertTrue(isinstance(res.result, IntegerSelection))
         self.assertEqual((3, 4), res.result.selection)
         self.assertEqual(Kind.interval, res.result.kind)
