@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from io import StringIO
 from pathlib import Path
 from zensols.util import stdwrite
-from zensols.introspect import IntegerSelection
+from zensols.introspect import IntegerSelection, Kind
 from zensols.config import FactoryError
 from zensols.cli import ActionResult, CliHarness, ApplicationFactory
 from logutil import LogTestCase
@@ -125,6 +125,36 @@ class TestArgumentParse(LogTestCase):
         self._test_config_param(config, '1', 'val2')
 
 
+class TestIntegerSel(LogTestCase):
+    def test_parse(self):
+        arr = list(range(1, 10))
+
+        i = IntegerSelection('3')
+        self.assertEqual(3, i.selection)
+        self.assertEqual(Kind.single, i.kind)
+        self.assertEqual(4, i.select(arr))
+
+        i = IntegerSelection('3,4')
+        self.assertEqual([3, 4], i.selection)
+        self.assertEqual(Kind.list, i.kind)
+        self.assertEqual([4, 5], i.select(arr))
+
+        i = IntegerSelection('3,4,5')
+        self.assertEqual([3, 4, 5], i.selection)
+        self.assertEqual(Kind.list, i.kind)
+        self.assertEqual([4, 5, 6], i.select(arr))
+
+        i = IntegerSelection('3-4')
+        self.assertEqual((3, 4), i.selection)
+        self.assertEqual(Kind.interval, i.kind)
+        self.assertEqual([4, 5], i(arr))
+
+        i = IntegerSelection('-1')
+        self.assertEqual(-1, i.selection)
+        self.assertEqual(Kind.single, i.kind)
+        self.assertEqual(9, i(arr))
+
+
 class TestMethodParse(LogTestCase):
     def setUp(self):
         self.harness = CliHarness(
@@ -195,20 +225,20 @@ exit: 0\n"""
         harness = self.harness
         res: ActionResult = harness.execute('meth4 3')
         self.assertTrue(isinstance(res.result, IntegerSelection))
-        self.assertEqual(3, res.result.select)
-        self.assertEqual('single', res.result.kind)
+        self.assertEqual(3, res.result.selection)
+        self.assertEqual(Kind.single, res.result.kind)
 
         res: ActionResult = harness.execute('meth4 3,4')
         self.assertTrue(isinstance(res.result, IntegerSelection))
-        self.assertEqual([3, 4], res.result.select)
-        self.assertEqual('list', res.result.kind)
+        self.assertEqual([3, 4], res.result.selection)
+        self.assertEqual(Kind.list, res.result.kind)
 
         res: ActionResult = harness.execute('meth4 3,4,5')
         self.assertTrue(isinstance(res.result, IntegerSelection))
-        self.assertEqual([3, 4, 5], res.result.select)
-        self.assertEqual('list', res.result.kind)
+        self.assertEqual([3, 4, 5], res.result.selection)
+        self.assertEqual(Kind.list, res.result.kind)
 
         res: ActionResult = harness.execute('meth4 3-4')
         self.assertTrue(isinstance(res.result, IntegerSelection))
-        self.assertEqual((3, 4), res.result.select)
-        self.assertEqual('interval', res.result.kind)
+        self.assertEqual((3, 4), res.result.selection)
+        self.assertEqual(Kind.interval, res.result.kind)

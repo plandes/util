@@ -3,7 +3,8 @@
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import ClassVar, Union, Any, Set, Tuple, Iterable
+from typing import ClassVar, Union, Any, Set, Tuple, Iterable, Type, List
+from enum import Enum, auto
 from ..util import APIError
 import re
 
@@ -15,19 +16,43 @@ class IntegerSelectionError(APIError):
     pass
 
 
+class Kind(Enum):
+    """The kind of integer selection provided by :class:`.IntegerSelection`.
+
+    """
+    single = auto()
+    list = auto()
+    interval = auto()
+
+    @staticmethod
+    def from_class(cls: Type) -> Kind:
+        kind: str = {
+            int: Kind.single,
+            list: Kind.list,
+            tuple: Kind.interval
+        }.get(cls)
+        if kind is None:
+            raise IntegerSelectionError(f'Unknown selection kind: {cls}')
+        return kind
+
+
 class IntegerSelection(object):
     """Parses an string that selects integers.  These (:obj:`kind`) include:
 
-      * single: ``<int>``: a singleton integers
-      * interval: ``<int>-<int>``: all the integers in the inclusive interval
-      * list: ``<int>,<int>,...``: a comma separated list (space optional)
+      * :obj:`Kind.single`: ``<int>``: a singleton integers
+
+      * :obj:`Kind.interval`: ``<int>-<int>``: all the integers in the inclusive
+        interval
+
+      * :obj:`Kind.list`: ``<int>,<int>,...``: a comma separated list (space
+        optional)
 
     To use, create it with :meth:`from_string` and use :meth:`tuple`,
     :meth:`list`, then use as an iterable.
 
     """
     _DICTABLE_ATTRIBUTES: ClassVar[Set[str]] = {'kind'}
-    _INTEGER_REGEX: ClassVar[re.Pattern] = re.compile(r'^\d+$')
+    _INTEGER_REGEX: ClassVar[re.Pattern] = re.compile(r'^[-]?\d+$')
     _INTERVAL_REGEX: ClassVar[re.Pattern] = re.compile(r'^(\d+?)-(\d+)$')
     _LIST_REGEX: ClassVar[re.Pattern] = re.compile(r'^\d+(?:,\s*\d+)+$')
 
@@ -47,32 +72,43 @@ class IntegerSelection(object):
         self._select = v
 
     @property
-    def select(self) -> Union[int, Tuple[int, int], Tuple[int]]:
-        """The selection data based on what was parsed in the initializer."""
+    def selection(self) -> Union[int, Tuple[int, int], Tuple[int]]:
+        """The selection data based on what was parsed in the initializer (see
+        class docs).
+
+        """
         return self._select
 
     @property
-    def kind(self) -> str:
+    def kind(self) -> Kind:
         """The kind of selection (see class docs)."""
-        kind: str = {
-            int: 'single',
-            list: 'list',
-            tuple: 'interval',
-        }.get(type(self.select))
-        if kind is None:
-            raise IntegerSelectionError(
-                f'Unknown selection kind: {self.select}')
-        return kind
+        return Kind.from_class(type(self.selection))
+
+    def select(self, arr: Tuple[Any, ...]) -> Union[Any, List[Any, ...]]:
+        """Return element(s) ``arr`` based on the :obj:`selection`.
+
+        """
+        if self.kind == Kind.single:
+            return arr[self.selection]
+        elif self.kind == Kind.interval:
+            return arr[self.selection[0]:self.selection[1] + 1]
+        else:
+            return list(map(lambda i: arr[i], self.selection))
+
+    def __call__(self, arr: Tuple[Any, ...]) -> Union[Any, List[Any, ...]]:
+        """See :meth:`select`."""
+        return self.select(arr)
 
     def __iter__(self) -> Iterable[int]:
         return {
-            'single': lambda: iter((self.select,)),
-            'interval': lambda: iter(range(self.select[0], self.select[1] + 1)),
-            'list': lambda: iter(self.select),
+            Kind.single: lambda: iter((self.selection,)),
+            Kind.interval: lambda: iter(
+                range(self.selection[0], self.selection[1] + 1)),
+            Kind.list: lambda: iter(self.selection),
         }[self.kind]()
 
     def __len__(self) -> int:
         return sum(1 for _ in self)
 
     def __str__(self) -> str:
-        return f'{self.select} ({self.kind})'
+        return f'{self.selection} ({self.kind})'
