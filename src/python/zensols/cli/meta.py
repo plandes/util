@@ -13,7 +13,7 @@ from io import TextIOBase
 from pathlib import Path
 import optparse
 from frozendict import frozendict
-from zensols.introspect import TypeMapper
+from zensols.introspect import TypeMapper, IntegerSelection
 from zensols.persist import persisted, PersistableContainer
 from zensols.config import Dictable
 from . import ActionCliError
@@ -84,6 +84,8 @@ class _MetavarFormatter(object):
             metavar = f"<{'|'.join(self.choices)}>"
         elif self.dtype == Path:
             metavar = 'FILE'
+        elif self.dtype == IntegerSelection:
+            metavar = 'INT[,INT|-INT]'
         elif self.dtype == bool:
             metavar = None
         elif self.dtype == str:

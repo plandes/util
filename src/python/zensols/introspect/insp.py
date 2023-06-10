@@ -12,7 +12,7 @@ import ast
 import inspect
 from inspect import Parameter, Signature
 from pathlib import Path
-from . import ClassImporter
+from . import ClassImporter, IntegerSelection
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,8 @@ class ClassError(Exception):
 
 
 def _create_data_types() -> Dict[str, Type]:
-    types = {t.__name__: t for t in [str, int, float, bool, list, dict, Path]}
+    types = {t.__name__: t for t in
+             [str, int, float, bool, list, dict, Path, IntegerSelection]}
     types['pathlib.Path'] = Path
     return types
 
