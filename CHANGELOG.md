@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- Integer selection parsing and CLI interaction.
+
+
 ## [1.12.4] - 2023-06-09
 ### Changed
 - CLI bug fixes.
