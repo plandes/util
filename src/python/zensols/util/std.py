@@ -56,7 +56,8 @@ class stdout(object):
 
         :param path: the path to write, or ``None``
 
-        :param args: the arguments given to :func:`open`
+        :param args: the arguments given to :func:`open`, which defaults to
+                     ``w`` if none are given
 
         """
         path = Path(path) if isinstance(path, str) else path
@@ -66,6 +67,8 @@ class stdout(object):
         else:
             self._path = path
             self._args = args
+            if len(self._args) == 0:
+                self._args = ['w']
 
     def __enter__(self):
         if self._path is None:
