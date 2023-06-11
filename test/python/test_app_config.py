@@ -134,7 +134,7 @@ class TestIntegerSel(LogTestCase):
         i = IntegerSelection('3')
         self.assertEqual(3, i.selection)
         self.assertEqual(Kind.single, i.kind)
-        self.assertEqual(4, i.select(arr))
+        self.assertEqual([4], i.select(arr))
 
         i = IntegerSelection('3,4')
         self.assertEqual([3, 4], i.selection)
@@ -146,7 +146,7 @@ class TestIntegerSel(LogTestCase):
         self.assertEqual(Kind.list, i.kind)
         self.assertEqual([4, 5, 6], i.select(arr))
 
-        i = IntegerSelection('3-4')
+        i = IntegerSelection('3:4')
         self.assertEqual((3, 4), i.selection)
         self.assertEqual(Kind.interval, i.kind)
         self.assertEqual([4, 5], i(arr))
@@ -154,7 +154,7 @@ class TestIntegerSel(LogTestCase):
         i = IntegerSelection('-1')
         self.assertEqual(-1, i.selection)
         self.assertEqual(Kind.single, i.kind)
-        self.assertEqual(9, i(arr))
+        self.assertEqual([9], i(arr))
 
 
 class TestMethodParse(LogTestCase):
@@ -222,7 +222,7 @@ meth3                                     invoke a test method with a path
 
 meth4                                     invoke an int selection method. isel:
                                           the integer selection
-  -e, --isel INT[,INT|-INT]  0
+  -e, --isel INT[,INT|:INT]  0
 exit: 0\n"""
         self.assertEqual(should, sio.getvalue())
 
@@ -248,7 +248,7 @@ exit: 0\n"""
         self.assertEqual([3, 4, 5], res.result.selection)
         self.assertEqual(Kind.list, res.result.kind)
 
-        res: ActionResult = harness.execute('meth4 --isel 3-4')
+        res: ActionResult = harness.execute('meth4 --isel 3:4')
         self.assertTrue(isinstance(res.result, IntegerSelection))
         self.assertEqual((3, 4), res.result.selection)
         self.assertEqual(Kind.interval, res.result.kind)

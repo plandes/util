@@ -51,9 +51,11 @@ class IntegerSelection(object):
     :meth:`list`, then use as an iterable.
 
     """
+    INTERVAL_DELIM: ClassVar[str] = ':'
     _DICTABLE_ATTRIBUTES: ClassVar[Set[str]] = {'kind'}
     _INTEGER_REGEX: ClassVar[re.Pattern] = re.compile(r'^[-]?\d+$')
-    _INTERVAL_REGEX: ClassVar[re.Pattern] = re.compile(r'^(\d+?)-(\d+)$')
+    _INTERVAL_REGEX: ClassVar[re.Pattern] = re.compile(
+        r'^(\d+?)' + INTERVAL_DELIM + r'(\d+)$')
     _LIST_REGEX: ClassVar[re.Pattern] = re.compile(r'^\d+(?:,\s*\d+)+$')
 
     def __init__(self, raw: str) -> IntegerSelection:
@@ -84,12 +86,12 @@ class IntegerSelection(object):
         """The kind of selection (see class docs)."""
         return Kind.from_class(type(self.selection))
 
-    def select(self, arr: Tuple[Any, ...]) -> Union[Any, List[Any, ...]]:
+    def select(self, arr: Tuple[Any, ...]) -> List[Any, ...]:
         """Return element(s) ``arr`` based on the :obj:`selection`.
 
         """
         if self.kind == Kind.single:
-            return arr[self.selection]
+            return [arr[self.selection]]
         elif self.kind == Kind.interval:
             return arr[self.selection[0]:self.selection[1] + 1]
         else:

@@ -85,7 +85,7 @@ class _MetavarFormatter(object):
         elif self.dtype == Path:
             metavar = 'FILE'
         elif self.dtype == IntegerSelection:
-            metavar = 'INT[,INT|-INT]'
+            metavar = f'INT[,INT|{IntegerSelection.INTERVAL_DELIM}INT]'
         elif self.dtype == bool:
             metavar = None
         elif self.dtype == str:
