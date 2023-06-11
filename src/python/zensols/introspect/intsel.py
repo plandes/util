@@ -93,7 +93,7 @@ class IntegerSelection(object):
         if self.kind == Kind.single:
             return [arr[self.selection]]
         elif self.kind == Kind.interval:
-            return arr[self.selection[0]:self.selection[1] + 1]
+            return arr[self.selection[0]:self.selection[1]]
         else:
             return list(map(lambda i: arr[i], self.selection))
 

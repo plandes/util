@@ -133,26 +133,38 @@ class TestIntegerSel(LogTestCase):
 
         i = IntegerSelection('3')
         self.assertEqual(3, i.selection)
+        self.assertEqual((3,), tuple(i))
         self.assertEqual(Kind.single, i.kind)
         self.assertEqual([4], i.select(arr))
 
         i = IntegerSelection('3,4')
         self.assertEqual([3, 4], i.selection)
+        self.assertEqual((3, 4,), tuple(i))
         self.assertEqual(Kind.list, i.kind)
         self.assertEqual([4, 5], i.select(arr))
 
         i = IntegerSelection('3,4,5')
         self.assertEqual([3, 4, 5], i.selection)
+        self.assertEqual((3, 4, 5), tuple(i))
         self.assertEqual(Kind.list, i.kind)
         self.assertEqual([4, 5, 6], i.select(arr))
+        self.assertEqual((3, 4, 5), tuple(i))
 
         i = IntegerSelection('3:4')
         self.assertEqual((3, 4), i.selection)
+        self.assertEqual((3, 4), tuple(i))
+        self.assertEqual(Kind.interval, i.kind)
+        self.assertEqual([4], i(arr))
+
+        i = IntegerSelection('3:5')
+        self.assertEqual((3, 5), i.selection)
+        self.assertEqual((3, 4, 5), tuple(i))
         self.assertEqual(Kind.interval, i.kind)
         self.assertEqual([4, 5], i(arr))
 
         i = IntegerSelection('-1')
         self.assertEqual(-1, i.selection)
+        self.assertEqual((-1,), tuple(i))
         self.assertEqual(Kind.single, i.kind)
         self.assertEqual([9], i(arr))
 
