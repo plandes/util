@@ -123,6 +123,12 @@ class ListActions(ApplicationObserver, Dictable):
     """List command line actions with their help information.
 
     """
+    LONG_NAME_SKIP = 'add_ConfigFactoryAccessor_to_app_config'
+    """The :class:`.ActionCliMethod` name to skip,which indicates the first pass
+    action used to get the application in the :class:`.CliHarness` used by
+    :class:`.ConfigFactoryAccessor`.
+
+    """
     # we can't use "output_format" because ExportEnvironment would use the same
     # causing a name collision
     OUTPUT_FORMAT = 'list_output_format'
@@ -156,8 +162,11 @@ class ListActions(ApplicationObserver, Dictable):
         ac_docs: Dict[str, str] = {}
         for action_cli in self._app.factory.cli_manager.actions_ordered:
             if not action_cli.first_pass:
+                name: str
                 meth: ActionCliMethod
                 for name, meth in action_cli.methods.items():
+                    if name == self.LONG_NAME_SKIP:
+                        continue
                     meta: ActionMetaData = meth.action_meta_data
                     if self._command_line:
                         md = meta.asdict()

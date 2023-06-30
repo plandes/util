@@ -22,6 +22,7 @@ from zensols.cli import (
     Application, ApplicationResult, ApplicationFactory, ConfigurationImporter
 )
 from . import LogConfigurator
+from .lib.support import ListActions
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,13 @@ class ConfigFactoryAccessor(object):
     seciton of the ``app.conf`` file.
 
     """
-    LONG_NAME = 'add_ConfigFactoryAccessor_to_app_config'
+    LONG_NAME = ListActions.LONG_NAME_SKIP
+    """The long name of the first pass option to denote the application is to be
+    returned in a pragmatic context as a client to :class:`.CliHarness`.
+
+    :see: :class:`.ListActions`
+
+    """
     CLI_META = {'option_includes': {},
                 'mnemonic_overrides': {'access': LONG_NAME},
                 'is_usage_visible': False}
