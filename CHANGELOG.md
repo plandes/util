@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Fix the CLI app returned first pass action showing up in action list.
+
+
 ## [1.12.5] - 2023-06-11
 ### Added
 - Integer selection parsing and CLI interaction.
