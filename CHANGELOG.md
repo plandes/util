@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
-s## [1.12.6] - 2023-07-02
+## [1.12.6] - 2023-07-02
 ### Changed
 - Fix the CLI app returned first pass action showing up in action list.
 
