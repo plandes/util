@@ -423,7 +423,8 @@ class CliHarness(object):
             return accessor.access()
 
     def get_application(self, args: Union[List[str], str] = None,
-                        throw: bool = True) -> \
+                        throw: bool = True,
+                        app_section: str = 'app') -> \
             Union[Application, ApplicationFailure]:
         """Get the application from the configuration factory.  For this to
         work, the ``app`` section most not be in the cleanups.  Otherwise the
@@ -434,11 +435,11 @@ class CliHarness(object):
         config_factory: Union[ConfigFactory, ApplicationFailure] = \
             self.get_config_factory(args, throw)
         if isinstance(config_factory, ConfigFactory):
-            if not 'app' in config_factory.config.sections:
+            if app_section not in config_factory.config.sections:
                 raise ApplicationError(
-                    "No 'app' section in configuration. " +
+                    f"No '{app_section}' section in configuration. " +
                     "Remove it from cleanups?")
-            return config_factory('app')
+            return config_factory(app_section)
 
     def __getitem__(self, section_name: str) -> Optional[Any]:
         """Index by section name binded application configuration instances.
