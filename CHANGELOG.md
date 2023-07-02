@@ -8,12 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
-## [1.12.7] - 2023-07-02
-### Changed
-- Fix the first pass app fetch action showing up in action list.
-
-
-## [1.12.6] - 2023-07-02
+s## [1.12.6] - 2023-07-02
 ### Changed
 - Fix the CLI app returned first pass action showing up in action list.
 
