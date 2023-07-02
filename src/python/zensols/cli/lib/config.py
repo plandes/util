@@ -165,8 +165,11 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
     _OVERRIDES_PRELOAD = _PreLoadImportIniConfig.format_preload(_OVERRIDES_KEY)
 
     CONFIG_PATH_FIELD = 'config_path'
-    """The field name in this class of the child configuration path."""
+    """The field name in this class of the child configuration path.
 
+    :see: :obj:`config_path`
+
+    """
     CLI_META = {'first_pass': True,  # not a separate action
                 # the mnemonic must be unique and used to referece the method
                 'mnemonic_overrides': {'merge': '_merge_config_as_import'},
@@ -250,9 +253,10 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
     debug: bool = field(default=False)
     """Printn the configuration after the merge operation."""
 
-    # name of this field must match :obj:`ConfigurationImporter.CONFIG_PATH_FIELD`
+    # name of this field must match
+    # :obj:`ConfigurationImporter.CONFIG_PATH_FIELD`
     config_path: Path = field(default=None)
-    """The path to the configuration file."""
+    """The configuration file."""
 
     def get_environ_var_from_app(self) -> str:
         """Return the environment variable based on the name of the application.  This
@@ -347,7 +351,8 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
                             logger.debug(f'{sec}:{k}: {v} -> {vr}')
                         pls = self.config.serializer.parse_object(vr)
                         if isinstance(pls, (list, tuple)):
-                            pls = map(_PreLoadImportIniConfig.parse_preload, pls)
+                            pls = map(
+                                _PreLoadImportIniConfig.parse_preload, pls)
                             pls = filter(lambda x: x is not None, pls)
                             preload_keys.update(pls)
                         repl_sec[k] = vr
@@ -461,10 +466,13 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
         """
         modified_config = self._load_configuration()
         if self.config_path_option_name is not None:
-            self.config.set_option(
-                self.config_path_option_name,
-                f'path: {str(self.config_path)}',
-                section=self.name)
+            val: str
+            if self.config_path is None:
+                val = 'None'
+            else:
+                val = f'path: {str(self.config_path)}'
+            self.config.set_option(self.config_path_option_name,
+                                   val, section=self.name)
         return modified_config
 
     def _reset(self):

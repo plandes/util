@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.12.6] - 2023-07-02
 ### Changed
 - Fix the CLI app returned first pass action showing up in action list.
 
@@ -486,7 +487,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.12.5...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.12.6...HEAD
+[1.12.6]: https://github.com/plandes/util/compare/v1.12.5...v1.12.6
 [1.12.5]: https://github.com/plandes/util/compare/v1.12.4...v1.12.5
 [1.12.4]: https://github.com/plandes/util/compare/v1.12.3...v1.12.4
 [1.12.3]: https://github.com/plandes/util/compare/v1.12.2...v1.12.3

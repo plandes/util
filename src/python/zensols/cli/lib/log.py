@@ -49,13 +49,13 @@ class LogConfigurator(object):
     """The log name space."""
 
     default_level: LogLevel = field(default=None)
-    """The level to set the root logger."""
+    """The root logger level."""
 
     level: LogLevel = field(default=None)
-    """The level to set the application logger."""
+    """The application logger level."""
 
     default_app_level: LogLevel = field(default=LogLevel.info)
-    """The default log level to set the applicatiohn logger when not given on the
+    """The default log level to set the application logger when not given on the
     command line.
 
     """
