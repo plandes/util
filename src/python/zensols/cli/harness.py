@@ -527,15 +527,20 @@ class CliHarness(object):
 
 @dataclass
 class ConfigurationImporterCliHarness(CliHarness):
-    """A harness that adds command line argument for the configuration file when
-    they are available.  It does this by finding an instance of
-    :class:`.ConfigurationImporter` in the command line metadata.  When it
-    finds it, if not set from the given set of arguments it:
+    """A harness that adds command line arguments for the configuration file
+    when they are available.  It does this by finding an instance of
+    :class:`.ConfigurationImporter` in the command line metadata.  When it finds
+    it, if not set from the given set of arguments it:
 
       1. Uses :obj:`config_path`
 
       2. Gets the path from the environment variable set using
       :class:`.ConfigurationImporter`
+
+    **Implementation note**: One disadvantage to using this over
+    :class:`.CliHarness` is that it has to parse the application configuration
+    and create the application twice.  This can slow the start of the
+    application and is noticable for larger configurations.
 
     """
     config_path: Union[str, Path] = field(default=None)
