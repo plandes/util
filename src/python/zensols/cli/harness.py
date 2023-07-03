@@ -354,7 +354,7 @@ class CliHarness(object):
             Union[Any, ApplicationFailure]:
         """Create the invokable instance of the application.
 
-        ;param args: the arguments to the application not including the program
+        :param args: the arguments to the application not including the program
                      name (as it makes no sense in the context of this call);
                      if this is a string, it will be converted to a list by
                      splitting on whitespace; this defaults to the output of
