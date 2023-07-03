@@ -29,17 +29,17 @@ from zensols.config import (
 from . import (
     ActionCliError, ApplicationError, ApplicationFailure, DocUtil,
     ActionCliManager, ActionCli, ActionCliMethod, ActionMetaData,
-    CommandAction, CommandActionSet, CommandLineConfig, CommandLineParser,
- )
+    CommandAction, CommandActionSet, CommandLineConfig, CommandLineParser
+)
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
 class Action(Deallocatable, Dictable):
-    """An invokable action from the command line the :class:`.Application` class.
-    This class combines the user input from the command line with the meta data
-    from the Python classes given in the configuration.
+    """An invokable action from the command line the :class:`.Application`
+    class.  This class combines the user input from the command line with the
+    meta data from the Python classes given in the configuration.
 
     Combined, these two data sources provide a means to execute an action,
     which is conceptually one functionality of the application and literally a
@@ -53,16 +53,16 @@ class Action(Deallocatable, Dictable):
     _DICTABLE_WRITABLE_DESCENDANTS = True
 
     command_action: CommandAction = field()
-    """The result of the command line parsing of the action.  It contains the data
-    parsed on a per action level.
+    """The result of the command line parsing of the action.  It contains the
+    data parsed on a per action level.
 
     """
     cli: ActionCli = field()
     """Command line interface of the action meta data."""
 
     meta_data: ActionMetaData = field()
-    """An action represents a link between a command line mnemonic *action* and a
-    method on a class to invoke.
+    """An action represents a link between a command line mnemonic *action* and
+    a method on a class to invoke.
 
     """
     method_meta: ClassMethod = field()
@@ -123,8 +123,8 @@ class Action(Deallocatable, Dictable):
 
 @dataclass
 class ActionResult(Dictable):
-    """The results of a single method call to an :class:`.Action` instance.  There
-    is one of these per action (both first and second pass) provided in
+    """The results of a single method call to an :class:`.Action` instance.
+    There is one of these per action (both first and second pass) provided in
     :class:`.ApplicationResult`.
 
     """
@@ -148,14 +148,14 @@ class ActionResult(Dictable):
 @dataclass
 class ApplicationResult(Dictable):
     """A container class of the results of an application invocation with
-    :meth:`.Application.invoke`.  This is keyed by index of the actions given
-    in :obj:`actions`.
+    :meth:`.Application.invoke`.  This is keyed by index of the actions given in
+    :obj:`actions`.
 
     """
     action_results: Tuple[ActionResult, ...] = field()
-    """Both first and second pass action results.  These are provided in the same
-    order for which was executed when the class:`.Application` ran, which is
-    that same order provided to the :class:`.ActionCliManager`.
+    """Both first and second pass action results.  These are provided in the
+    same order for which was executed when the class:`.Application` ran, which
+    is that same order provided to the :class:`.ActionCliManager`.
 
     """
     @property
@@ -166,8 +166,8 @@ class ApplicationResult(Dictable):
 
     @property
     def second_pass_result(self) -> ActionResult:
-        """The single second pass result of that action indicated to invoke on the
-        command line by the user.
+        """The single second pass result of that action indicated to invoke on
+        the command line by the user.
 
         """
         sec_pass = tuple(filter(lambda r: not r.action.meta_data.first_pass,
@@ -186,8 +186,8 @@ class ApplicationResult(Dictable):
 
 
 class ApplicationObserver(ABC):
-    """Extended by application targets to get call backs and information from the
-    controlling :class:`.Application`.  Method :meth:`_application_created`
+    """Extended by application targets to get call backs and information from
+    the controlling :class:`.Application`.  Method :meth:`_application_created`
     is invoked for each call back.
 
     .. document private functions
@@ -232,9 +232,9 @@ class Invokable(object):
 
 @dataclass
 class Application(Dictable):
-    """An invokable application created using command line and application context
-    data.  This class creates an instance of the *target application instance*,
-    then invokes the corresponding action method.
+    """An invokable application created using command line and application
+    context data.  This class creates an instance of the *target application
+    instance*, then invokes the corresponding action method.
 
     The application has all the first pass actions configured to run and/or
     given options indicating by the user to run (see
@@ -291,8 +291,8 @@ class Application(Dictable):
 
     def _get_meth_params(self, action: Action, meth_meta: ClassMethod) -> \
             Tuple[Tuple[Any, ...], Dict[str, Any]]:
-        """Get the method argument and keyword arguments gathered from the user input
-        and configuration.
+        """Get the method argument and keyword arguments gathered from the user
+        input and configuration.
 
         :return: a tuple of the positional arguments (think ``*args``) followed
                  by the keyword arguments map (think ``**kwargs`)
@@ -360,8 +360,8 @@ class Application(Dictable):
 
     @property
     def first_pass_actions(self) -> Iterable[Action]:
-        """All first pass actions registered in the application and/or indicated by the
-        user to run via the command line.
+        """All first pass actions registered in the application and/or indicated
+        by the user to run via the command line.
 
         """
         return filter(lambda a: a.meta_data.first_pass, self.actions)
@@ -421,14 +421,15 @@ class ApplicationFactory(PersistableContainer):
 
     """
     package_resource: Union[str, PackageResource] = field()
-    """The application package resource (i.e. ``zensols.someappname``).  This field
-    is converted to a package if given as a string during post initialization.
+    """The application package resource (i.e. ``zensols.someappname``).  This
+    field is converted to a package if given as a string during post
+    initialization.
 
     """
     app_config_resource: Union[str, TextIOBase] = field(
         default='resources/app.conf')
-    """The relative resource path to the application's context if :class:`str`.  If
-    the type is an instance of :class:`io.TextIOBase`, then read it as a file
+    """The relative resource path to the application's context if :class:`str`.
+    If the type is an instance of :class:`io.TextIOBase`, then read it as a file
     object.
 
     """
@@ -490,8 +491,8 @@ class ApplicationFactory(PersistableContainer):
         return ImportIniConfig(app_context, children=children)
 
     def _create_config_factory(self, config: Configurable) -> ConfigFactory:
-        """Factory method to create the configuration factory from the application
-        context created in :meth:`_get_app_context`.
+        """Factory method to create the configuration factory from the
+        application context created in :meth:`_get_app_context`.
 
         """
         if logger.isEnabledFor(logging.DEBUG):
@@ -527,7 +528,6 @@ class ApplicationFactory(PersistableContainer):
                 return False
             else:
                 return not action.class_meta.doc.text.startswith('_')
-
 
         mod_name: str = DocUtil.module_name()
         mod_pattern: str = mod_name + '.'
@@ -586,8 +586,9 @@ class ApplicationFactory(PersistableContainer):
     @persisted('_resources')
     def _create_resources(self) -> \
             Tuple[ConfigFactory, ActionCliManager, CommandLineParser]:
-        """Create the config factory, the command action line manager, and command line
-        parser resources.  The data is cached and use in property getters.
+        """Create the config factory, the command action line manager, and
+        command line parser resources.  The data is cached and use in property
+        getters.
 
         """
         cl_name: str = ClassImporter.full_classname(ActionCliManager)
@@ -665,8 +666,8 @@ class ApplicationFactory(PersistableContainer):
         return actions
 
     def _get_default_args(self) -> List[str]:
-        """Return the arguments to parse when none are given.  This defaults to the
-        system arguments skipping the firt (program) argument.
+        """Return the arguments to parse when none are given.  This defaults to
+        the system arguments skipping the firt (program) argument.
 
         """
         return sys.argv[1:]
@@ -735,8 +736,8 @@ class ApplicationFactory(PersistableContainer):
                 raise ex
 
     def invoke(self, args: Union[List[str], str] = None) -> ActionResult:
-        """Creates and invokes the entire application returning the result of the
-        second pass action.
+        """Creates and invokes the entire application returning the result of
+        the second pass action.
 
         ;param args: the arguments to the application; if this is a string, it
                      will be converted to a list by splitting on whitespace;
