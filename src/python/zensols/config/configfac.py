@@ -42,7 +42,7 @@ class ConfigurableFactory(object):
         'json': 'json'}
     """The configuration factory extension to clas name."""
 
-    TYPE_TO_CLASS_PREFIX: ClassVar[Dict[str, str]]  = {
+    TYPE_TO_CLASS_PREFIX: ClassVar[Dict[str, str]] = {
         'import': 'ImportIni',
         'importini': 'ImportIni',
         'importyaml': 'ImportYaml',
