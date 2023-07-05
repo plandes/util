@@ -32,5 +32,6 @@ from .importyaml import *
 from .condyaml import *
 from .importini import *
 from .envconfig import *
+from .treeimpmod import *
 from .keychain import *
 from .meta import *

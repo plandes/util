@@ -241,6 +241,8 @@ in how it reads data, which uses the following rules:
   [Applications](#applications)).
 * A string starting with `call` as a Python method invocation (see
   [Calls](#calls)).
+* A string starting with `tree` as a Python method invocation (see
+  [Tree](#tree)).
 * Anything else as a string.
 
 
@@ -570,6 +572,29 @@ db = call({'param': {'method': 'print_employees', 'format': 'short'}}): tracker
 This sets the `db` parameter on the `employees` instance to the return value of
 the tracker's `print_employees` method.  The `method` parameter may be omitted
 if the referenced instance is *Callable*.
+
+### Tree
+
+Deep nested dictionaries for hierarchical data can also be used to create new
+instances of objects.  A section name, dot separated path to the data and
+optionally additional parameters to create the instance are provided.  For example:
+```yaml
+instance:
+  employee: >-
+    tree({'param': {'name': 'data.person',
+                    'age': 25}}): data
+data:
+  person:
+    class_name: Person
+    name: Paul
+    age: 23
+    deep_record:
+      more:
+        nodes: here
+```
+
+Creates an instance of `Person` overriding the `age` parameter.  See the
+`tree.py` in the [examples] for the full source code.
 
 
 ### Import INI Configuration

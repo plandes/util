@@ -52,6 +52,9 @@ class Settings(Dictable):
     def get(self, name: str, default: Any = None) -> Any:
         return self.__dict__.get(name, default)
 
+    def items(self) -> Tuple[Tuple[Any, Any], ...]:
+        return self.__dict__.items()
+
     def _from_dictable(self, recurse: bool, readable: bool,
                        class_name_param: str = None) -> Dict[str, Any]:
         return self.__dict__

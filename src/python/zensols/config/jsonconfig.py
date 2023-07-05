@@ -9,7 +9,7 @@ import logging
 from pathlib import Path
 from io import TextIOBase
 import json
-from zensols.persist import persisted
+from zensols.persist import persisted, PersistedWork
 from . import (
     ConfigurableError, ConfigurableFileNotFoundError, DictionaryConfig
 )
@@ -29,7 +29,7 @@ class JsonConfig(DictionaryConfig):
 
     """
     def __init__(self, config_file: Union[Path, TextIOBase],
-                 default_section: str = None):
+                 default_section: str = None, deep: bool = False):
         """Initialize.
 
         :param config_file: the configuration file path to read from; if the
@@ -42,11 +42,14 @@ class JsonConfig(DictionaryConfig):
                                 the get methds such as :meth:`get_option`
 
         """
-        super().__init__(None, default_section)
         if isinstance(config_file, str):
             self.config_file = Path(config_file).expanduser()
         else:
             self.config_file = config_file
+        self._parsed_config = PersistedWork('_parsed_config', self)
+        super().__init__(config=None,
+                         default_section=default_section,
+                         deep=deep)
 
     def _narrow_root(self, conf: Dict[str, Any]) -> Dict[str, str]:
         if not isinstance(conf, dict):
@@ -54,12 +57,15 @@ class JsonConfig(DictionaryConfig):
                 f'Expecting a root level dict: {self.config_file}')
         return conf
 
-    @persisted('_config')
-    def _get_config(self) -> Dict[str, Dict[str, str]]:
+    @persisted('_parsed_config')
+    def _get_config(self) -> Dict[str, Dict[str, Any]]:
+        if hasattr(self, '_ext_config'):
+            return self._ext_config
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'loading config: {self.config_file}')
         if isinstance(self.config_file, TextIOBase):
             conf = json.load(self.config_file)
+            self.config_file.seek(0)
         else:
             if not self.config_file.is_file():
                 raise ConfigurableFileNotFoundError(self.config_file)
@@ -76,3 +82,8 @@ class JsonConfig(DictionaryConfig):
         if has_terminals:
             conf = {self.default_section: conf}
         return conf
+
+    def _set_config(self, source: Dict[str, Any]):
+        self._ext_config = source
+        self._parsed_config.clear()
+        self.invalidate()

@@ -3,7 +3,7 @@
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import Dict, Set, Iterable, List, Any, Union, Optional
+from typing import Dict, Set, Iterable, List, Any, Union, Optional, Type, Tuple
 from abc import ABCMeta, abstractmethod
 import sys
 import logging
@@ -11,8 +11,7 @@ from collections import OrderedDict
 import inspect
 from pathlib import Path
 from io import TextIOBase
-import json
-from . import ConfigurationError, Serializer, Writable, Settings
+from . import ConfigurationError, Serializer, Dictable, Settings
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +35,7 @@ class ConfigurableFileNotFoundError(ConfigurableError):
         self.source = source
 
 
-class Configurable(Writable, metaclass=ABCMeta):
+class Configurable(Dictable, metaclass=ABCMeta):
     """An abstract base class that represents an application specific
     configuration.
 
@@ -165,8 +164,8 @@ class Configurable(Writable, metaclass=ABCMeta):
             return self.serializer.parse_object(val)
 
     @property
-    def options(self) -> Dict[str, str]:
-        """Return all options from the default section.
+    def options(self) -> Dict[str, Any]:
+        """All options from the default section.
 
         """
         return self.get_options()
@@ -264,22 +263,6 @@ class Configurable(Writable, metaclass=ABCMeta):
         """
         to_populate.copy_sections(self, to_populate.sections)
 
-    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
-        """Print a human readable list of sections and options.
-
-        """
-        for sec in sorted(self.sections):
-            self._write_line(sec, depth, writer)
-            opts: Dict[str, str] = self.get_options(sec)
-            if opts is None:
-                raise ConfigurationError(f'No such section: {sec}')
-            if not isinstance(opts, dict):
-                raise ConfigurationError(
-                    f"Expecting dict but got {type(opts)} in section '{sec}'")
-            for k in sorted(opts.keys()):
-                v = opts[k]
-                self._write_line(f'{k}: {v}', depth + 1, writer)
-
     def _get_calling_module(self, depth: int = 0):
         """Get the last module in the call stack that is not this module or
         ``None`` if the call originated from this module.
@@ -314,29 +297,43 @@ class Configurable(Writable, metaclass=ABCMeta):
                 module_name = mod.__name__
         return self.serializer.resource_filename(resource_name, module_name)
 
-    def _get_section_short_str(self):
-        try:
-            return next(iter(self.sections))
-        except StopIteration:
-            return ''
-
-    def asdict(self, sort: bool = True) -> Dict[str, Dict[str, Any]]:
-        """Return a two-tier :class:`dict` with sections at the first level, and
-        the keyv/values at the second level.
-
-        """
-        cls = OrderedDict if sort else dict
-        secs = cls()
+    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         for sec in sorted(self.sections):
-            svs = cls()
+            self._write_line(sec, depth, writer)
+            opts: Dict[str, str] = self.get_options(sec)
+            if opts is None:
+                raise ConfigurationError(f'No such section: {sec}')
+            if not isinstance(opts, dict):
+                raise ConfigurationError(
+                    f"Expecting dict but got {type(opts)} in section '{sec}'")
+            for k in sorted(opts.keys()):
+                v = opts[k]
+                self._write_line(f'{k}: {v}', depth + 1, writer)
+
+    def asdict(self, *args, **kwargs) -> Dict[str, Any]:
+        secs = OrderedDict()
+        for sec in sorted(self.sections):
+            svs = OrderedDict()
             secs[sec] = svs
             opts = self.get_options(sec)
             for k in sorted(opts.keys()):
                 svs[k] = opts[k]
         return secs
 
-    def as_flat_dict(self) -> Dict[str, Any]:
-        """Return a flat one-tier :class:`dict` with keys in
+    def as_deep_dict(self) -> Dict[str, Any]:
+        """Return a deep :class:`builtins.dict` with the top level with section
+        names as keys and deep (i.e. ``json:``) values as nested dictionaries.
+
+        """
+        secs = OrderedDict()
+        for sec in sorted(self.sections):
+            svs = OrderedDict()
+            secs[sec] = svs
+            self.populate(svs, sec)
+        return secs
+
+    def as_one_tier_dict(self, *args, **kwargs) -> Dict[str, Any]:
+        """Return a flat one-tier :class:`builtins.dict` with keys in
         ``<section>:<option>`` format.
 
         """
@@ -346,16 +343,19 @@ class Configurable(Writable, metaclass=ABCMeta):
                 flat[f'{sec}:{k}'] = v
         return flat
 
-    def asjson(self, *args, sort: bool = True, **kwargs) -> str:
-        """Return a JSON string that represents this configuration.  For
-        structure, see :meth:`asdict`.
-
-        """
-        return json.dumps(self.asdict(sort), *args, **kwargs)
+    def _get_section_short_str(self):
+        try:
+            return next(iter(self.sections))
+        except StopIteration:
+            return ''
 
     def _get_short_str(self) -> str:
         sec = self._get_section_short_str()
         return f'{self.__class__.__name__}{{{sec}}}'
+
+    def _get_container_desc(self, include_type: bool = True,
+                            max_path_len: int = 3) -> str:
+        return self.__class__.__name__
 
     def _raise(self, msg: str, err: Exception = None):
         config_file: Optional[Union[Path, str]] = None
@@ -377,3 +377,251 @@ class Configurable(Writable, metaclass=ABCMeta):
 
     def __repr__(self):
         return self.__str__()
+
+
+class TreeConfigurable(Configurable, metaclass=ABCMeta):
+    """A hierarchical configuration.  The sections are the root nodes, but each
+    section's values can be nested :class:`~builtins.dict` instances.  These
+    values are traversable with a string dot path notation.
+
+    """
+    def __init__(self, default_section: str = None,
+                 default_vars: Dict[str, Any] = None,
+                 sections_name: str = 'sections',
+                 sections: Set[str] = None):
+        """Initialize.
+
+        :param default_section: used as the default section when non given on
+                                the get methds such as :meth:`get_option`;
+                                which defaults to ``defualt``
+
+        :param default_vars: used in place of missing variables duing value
+                             interpolation; **deprecated**: this will go away in
+                             a future release
+
+        :param sections_name: the dot notated path to the variable that has a
+                              list of sections
+
+        :param sections: used as the set of sections for this instance
+
+        """
+        super().__init__(default_section=default_section)
+        self.sections_name = sections_name
+        self.default_vars = default_vars if default_vars else {}
+        self._sections = sections
+        self._options = None
+
+    @abstractmethod
+    def _get_config(self) -> Dict[str, Any]:
+        pass
+
+    @abstractmethod
+    def _set_config(self, source: Dict[str, Any]):
+        pass
+
+    @property
+    def config(self) -> Dict[str, Any]:
+        """The configuration as a nested set of :class:`~builtins.dict`.
+
+        :see: :meth:`invalidate`
+
+        """
+        return self._get_config()
+
+    @config.setter
+    def config(self, source: Dict[str, Any]):
+        """The configuration as a nested set of :class:`~builtins.dict`.
+
+        :see: :meth:`invalidate`
+
+        """
+        self._set_config(source)
+
+    @property
+    def root(self) -> Optional[str]:
+        """The root name of the configuration file, if one exists.  If more than
+        one root exists, return the first.
+
+        """
+        if not hasattr(self, '_root'):
+            root_keys: Iterable[str] = self.config.keys()
+            if len(root_keys) > 0:
+                self._root = next(iter(root_keys))
+            else:
+                self._root = None
+        return self._root
+
+    @classmethod
+    def _is_primitive(cls, obj) -> bool:
+        return isinstance(obj, (float, int, bool, str, set,
+                                list, tuple, Type, Path))
+
+    def _flatten(self, context: Dict[str, Any], path: str,
+                 n: Dict[str, Any], sep: str = '.'):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'path: {path}, n: <{n}>, context: <{context}>')
+        if n is None:
+            context[path] = None
+        elif self._is_primitive(n):
+            context[path] = n
+        elif isinstance(n, (dict, Settings)):
+            for k, v in n.items():
+                k = path + sep + k if len(path) else k
+                self._flatten(context, k, v, sep)
+        else:
+            self._raise(f'Unknown yaml type {type(n)}: {n}')
+
+    def invalidate(self):
+        """This should be called when the underlying :obj:`config` object graph
+        changes *under the nose* of this instance.
+
+        """
+        context = {}
+        context.update(self.default_vars)
+        self._flatten(context, '', self.config)
+        self._all_keys = set(context.keys())
+        self._sections = None
+        self._options = None
+        if hasattr(self, '_root'):
+            del self._root
+
+    def _find_node(self, n: Union[Dict, Any], path: str, name: str):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'search: n={n}, path={path}, name={name}')
+        if path == name:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'found: <{n}>')
+            return n
+        elif isinstance(n, dict):
+            for k, v in n.items():
+                k = path + '.' + k if len(path) else k
+                v = self._find_node(v, k, name)
+                if v is not None:
+                    if logger.isEnabledFor(logging.DEBUG):
+                        logger.debug(f'found {name} -> {v}')
+                    return v
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug('not found: {}'.format(name))
+
+    def get_tree(self, name: Optional[str] = None) -> Dict[str, Any]:
+        """Get the node in the configuration, which is a nested set
+        :class:`~builtins.dict` instances as an object graph.
+
+        :param name: the doted notation indicating which node in the tree to
+                     retrieve
+
+        """
+        if name is None:
+            return self.config
+        return self._find_node(self.config, '', name)
+
+    def _get_option(self, name: str) -> str:
+        node = self.get_tree(name)
+        if self._is_primitive(node):
+            return node
+        elif self.default_vars is not None and name in self.default_vars:
+            return self.default_vars[name]
+        elif node is None:
+            # values in YAML can be set to ``null``
+            return None
+        else:
+            self._raise(f'Unknown type or state: {name} ({type(node)})')
+
+    @property
+    def options(self) -> Dict[str, Any]:
+        if self._options is None:
+            self.config
+            self._options = {}
+            for k in self._all_keys:
+                self._options[k] = self._get_option(k)
+        return self._options
+
+    def has_option(self, name: str, section: str = None) -> bool:
+        opts = self.options
+        return name in opts
+
+    def get_option(self, name: str, section: str = None) -> str:
+        """Return an option using a dot encoded path.
+
+        :param section: ignored
+
+        """
+        if self.default_vars is not None and name in self.default_vars:
+            return self.default_vars[name]
+        else:
+            ops = self.options
+            if name in ops:
+                return ops[name]
+            else:
+                self._raise(f'No such option: {name}')
+
+    def get_options(self, name: str = None) -> Dict[str, Any]:
+        name = self.default_section if name is None else name
+        if self.default_vars is not None and name in self.default_vars:
+            return self.default_vars[name]
+        else:
+            node = self.get_tree(name)
+            if not isinstance(node, str) or isinstance(node, list):
+                return node
+            elif name in self.default_vars:
+                return self.default_vars[name]
+            else:
+                self._raise(f'No such option: {name}')
+
+    def _get_at_depth(self, node: Any, s_level: int, level: int,
+                      path: List[str]) -> Set[str]:
+        def map_node(x: Tuple[str, Any]) -> str:
+            k, v = x
+            if isinstance(v, dict):
+                if len(path) > 0:
+                    k = '.'.join(path) + '.' + k
+            else:
+                k = None
+            return k
+
+        nodes: Set[str] = set()
+        if isinstance(node, dict):
+            if level < s_level:
+                for k, child in node.items():
+                    path.append(k)
+                    ns = self._get_at_depth(child, s_level, level + 1, path)
+                    path.pop()
+                    nodes.update(ns)
+            elif level == s_level:
+                return set(filter(lambda x: x is not None,
+                                  map(map_node, node.items())))
+        return nodes
+
+    def _find_sections(self) -> Set[str]:
+        secs: Set[str]
+        sec_key = f'{self.root}.{self.sections_name}'
+        if self.has_option(sec_key):
+            secs: Dict[str, Any] = self.get_tree(sec_key)
+            if isinstance(secs, str):
+                secs = self.get_option_list(sec_key)
+            elif isinstance(secs, int):
+                secs = self._get_at_depth(self.get_tree(None), secs, 0, [])
+            secs = frozenset(secs)
+        else:
+            secs = self._get_at_depth(self.get_tree(None), 0, 0, [])
+        return secs
+
+    @property
+    def sections(self) -> Set[str]:
+        """The sections by finding the :obj:`section_name` based from the
+        :obj:`root`.
+
+        """
+        if self._sections is None:
+            self._sections = self._find_sections()
+        return self._sections
+
+    @sections.setter
+    def sections(self, sections: Set[str]):
+        self._sections = sections
+
+    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
+        self._write_dict(self.config, depth, writer)
+
+    def asdict(self, *args, **kwargs) -> Dict[str, Any]:
+        return self.config

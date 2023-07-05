@@ -624,6 +624,7 @@ class _CallImportConfigFactoryModule(ImportConfigFactoryModule):
 
         call[(<parameters>)]: <instance section name>
 
+
     Parameters may have a ``method`` key with the name of the method.  The
     remainder of the paraemters are used in the method call.
 

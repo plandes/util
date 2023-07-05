@@ -110,7 +110,7 @@ class ImportYamlConfig(YamlConfig):
             dconf = DictionaryConfig()
             for child in self.children:
                 child.copy_sections(dconf)
-            tpl_context.update(dconf.as_flat_dict())
+            tpl_context.update(dconf.as_one_tier_dict())
         tpl_context.update(context)
 
         new_keys = set(map(lambda k: k.replace(':', '.'), context.keys()))
