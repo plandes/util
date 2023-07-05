@@ -5,6 +5,7 @@ __author__ = 'Paul Landes'
 
 from typing import List, Tuple, Dict, Any, Type, Optional, ClassVar
 from dataclasses import dataclass, field
+import dataclasses
 import logging
 from collections import OrderedDict
 import re
@@ -218,7 +219,7 @@ class Class(object):
     @property
     def is_dataclass(self) -> bool:
         """Whether or not the class is a :class:`dataclasses.dataclass`."""
-        return dataclasses.is_dataclass(something)
+        return dataclasses.is_dataclass(self.class_type)
 
 
 @dataclass
@@ -227,10 +228,19 @@ class ClassInspector(object):
     (field) documentation.
 
     """
-    INSPECT_META = 'CLASS_INSPECTOR'
-    """Attribute to set to indicate to traverse superclasses as well.  This is set
-    as an empty ``dict`` to allow future implementations to filter on what's
+    INSPECT_META: ClassVar[str] = 'CLASS_INSPECTOR'
+    """Attribute to set to indicate to traverse superclasses as well.  This is
+    set as an empty ``dict`` to allow future implementations to filter on what's
     traversed (i.e. ``include_fields``).
+
+    """
+    DECORATOR_META: ClassVar[str] = 'CLASS_DECORATOR'
+    """Attribute to set which must be a :class:`builtins.dict` with the
+    following keys:
+
+      * ``includes``: as a set of decorator names that can be set on methods to
+        indicate inclusion on introspected method set.  Otherwise the decorated
+        method (such as `@property`) is omitted from the class metadata
 
     """
     cls: type = field()
@@ -365,10 +375,13 @@ class ClassInspector(object):
 
     def _get_method(self, node: ast.FunctionDef) -> ClassMethod:
         method: ClassMethod = None
-        name = node.name
-        is_priv = name.startswith('_')
-        is_prop = any(map(lambda n: hasattr(n, 'id') and n.id,
-                          node.decorator_list))
+        decorators = filter(lambda n: n not in self._decorator_includes,
+                            map(lambda n: hasattr(n, 'id') and n.id,
+                                node.decorator_list))
+        decorators = tuple(decorators)
+        name: str = node.name
+        is_priv: bool = name.startswith('_')
+        is_prop: bool = any(decorators)
         # only public methods (not properties) are parsed for now
         if not is_prop and (self.include_private or not is_priv):
             args = self._get_args(node.args)
@@ -520,6 +533,11 @@ class ClassInspector(object):
         """Return a dict of attribute (field) to metadata and docstring.
 
         """
+        if hasattr(self.cls, self.DECORATOR_META):
+            meta: Dict[str, Any] = getattr(self.cls, self.DECORATOR_META)
+            self._decorator_includes = meta.get('includes', set())
+        else:
+            self._decorator_includes = set()
         cls = self._get_class(self.cls)
         if hasattr(self.cls, self.INSPECT_META):
             meta: Dict[str, str] = getattr(self.cls, self.INSPECT_META)

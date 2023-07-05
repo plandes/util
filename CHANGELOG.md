@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   `DictionaryConfig` and `JsonConfig`.
 - A new instance directive (``tree``) to create new instances from deep nested
   dictionary configuration.
+- A decorator to catch an exception type and re-throw as an `ApplicationError`
+  as a command line application convenience.
 
 
 ## [1.12.6] - 2023-07-02

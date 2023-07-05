@@ -3,16 +3,16 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, Dict, Any, Type
+from typing import Tuple, Dict, Any, Type, Callable
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
 import sys
-import traceback
 from io import TextIOBase
 from pathlib import Path
 import optparse
 from frozendict import frozendict
+from zensols.util import Failure
 from zensols.introspect import TypeMapper, IntegerSelection
 from zensols.persist import persisted, PersistableContainer
 from zensols.config import Dictable
@@ -30,30 +30,40 @@ class ApplicationError(ActionCliError):
 
 
 @dataclass
-class ApplicationFailure(Dictable):
+class ApplicationFailure(Failure, Dictable):
     """Contains information for application invocation failures used by
     programatic methods.
 
     """
-    exception: Exception = field()
-    """The exception that was generated."""
-
-    thrower: Any = field(default=None)
-    """The insstance of the class that is throwing the exception."""
-
-    traceback: traceback = field(default=None, repr=False)
-    """The stack trace."""
-
-    def __post_init__(self):
-        self._exec_info = sys.exc_info()
-        if self.traceback is None:
-            self.traceback = self._exec_info[2]
-
-    def print_stack(self):
-        traceback.print_exception(*self._exec_info)
-
     def __str__(self):
-        return str(self.exception)
+        return self.message if self.message is not None else str(self.exception)
+
+
+def apperror(method: Callable = None, *,
+             exception: Type[Exception] = Exception):
+    """A decorator that rethrows any method's exception as an
+    :class:`.ApplicationError`.  This is helpful for application classes that
+    should print a usage rather than an exception stack trace.
+
+    An optional exception parameter can be provided so the exception is rethrown
+    for only certain caught exceptions.
+
+    """
+    def no_args(*args, **kwargs):
+        if method is not None:
+            ref = args[0]
+            try:
+                return method(ref, *args[1:], **kwargs)
+            except exception as e:
+                raise ApplicationError(str(e)) from e
+        else:
+            def with_args(*wargs, **wkwargs):
+                try:
+                    return args[0](wargs[0], *wargs[1:], **wkwargs)
+                except exception as e:
+                    raise ApplicationError(str(e)) from e
+            return with_args
+    return no_args
 
 
 @dataclass
