@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- A new tree-like `Configurable` that allows for nested dictionary access
+  previously only available in the `YamlConfig`.  This is now available in
+  `DictionaryConfig` and `JsonConfig`.
+- A new instance directive (``tree``) to create new instances from deep nested
+  dictionary configuration.
+
+
 ## [1.12.6] - 2023-07-02
 ### Changed
 - Fix the CLI app returned first pass action showing up in action list.
