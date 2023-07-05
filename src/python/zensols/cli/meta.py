@@ -68,6 +68,10 @@ def apperror(method: Callable = None, *,
 
 @dataclass
 class _MetavarFormatter(object):
+    """Formats the meta variable string for options.  This is the data type or
+    example printed next to the argument or option in the usage help.
+
+    """
     def __post_init__(self):
         is_enum: bool
         try:
