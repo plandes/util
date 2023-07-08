@@ -35,6 +35,15 @@ class ApplicationFailure(Failure, Dictable):
     programatic methods.
 
     """
+    def raise_exception(self):
+        """Raise the contained exception.  The exception will include
+        :obj:`message` if available.
+
+        :throws ApplicationError: every time for the contained exception
+
+        """
+        raise ApplicationError(str(self)) from self.exception
+
     def __str__(self):
         return self.message if self.message is not None else str(self.exception)
 
