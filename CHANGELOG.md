@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   dictionary configuration.
 - A decorator to catch an exception type and re-throw as an `ApplicationError`
   as a command line application convenience.
+- Bug fix parsing empty YAML files.
 
 
 ## [1.12.6] - 2023-07-02
