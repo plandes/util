@@ -77,6 +77,9 @@ class YamlConfig(TreeConfigurable):
             with open(cfile) as f:
                 content = f.read()
         struct = yaml.load(content, yaml.FullLoader)
+        # struct is None is the file was empty
+        if struct is None:
+            struct = {}
         context = {}
         context.update(self.default_vars)
         self._flatten(context, '', struct)
@@ -114,8 +117,10 @@ class """ + class_name + """(Template):
                 # TODO: raise here for missing keys embedded in the file rather
                 # than KeyError
                 content = cls(content).substitute(context)
-        a = yaml.load(content, yaml.FullLoader)
-        return a
+        conf: Dict[str, Any] = yaml.load(content, yaml.FullLoader)
+        if conf is None:
+            conf = {}
+        return conf
 
     def _get_config(self) -> Dict[str, Any]:
         if self._config is None:

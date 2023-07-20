@@ -91,3 +91,10 @@ class TestYaml(unittest.TestCase):
         should = {'net_settings': 'instance: classify_net_settings',
                   'second_level': {'aval': 2}, 'slcon': 3}
         self.assertEqual(should, conf.populate({}, 'executor'))
+
+    def test_empy(self):
+        conf = YamlConfig(StringIO())
+        self.assertEqual(set(), conf.sections)
+        sio = StringIO()
+        conf.write(writer=sio)
+        self.assertEqual(0, len(sio.getvalue()))
