@@ -46,6 +46,11 @@ class stdout(object):
     """Write to a file or standard out.  Arguments are the same as :func:`open`,
     but standard out is used depending on the provided path.
 
+    Example::
+
+        with stdout(Path('out.txt')) as f:
+            f.write('test')
+
     """
     STANDARD_OUT_PATH: ClassVar[str] = '-'
 
