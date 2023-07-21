@@ -284,6 +284,10 @@ class Dictable(Writable):
         instance hierarchy since writing the object instance graph is done
         recursively.
 
+        :param depth: the starting indentation depth
+
+        :param writer: the writer to dump the content of this writable
+
         """
         name = '_DICTABLE_WRITABLE_DESCENDANTS'
         if hasattr(self, name) and (getattr(self, name) is True):
