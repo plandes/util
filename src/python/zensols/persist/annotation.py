@@ -269,7 +269,7 @@ class PersistedWork(Deallocatable):
     def __getstate__(self):
         """We must null out the owner and worker as they are not pickelable.
 
-        :seealso: PersistableContainer
+        :see: :class:`.PersistableContainer`
 
         """
         d = copy(self.__dict__)
