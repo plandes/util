@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- CLI `stdout` context manager is more CLI friendly.  Initial parameter is the
+  same, but open arguments are now a list.
+
+
 ### Added
 - A new tree-like `Configurable` that allows for nested dictionary access
   previously only available in the `YamlConfig`.  This is now available in
