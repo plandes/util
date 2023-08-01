@@ -4,7 +4,7 @@ with a hierarchical structure.
 """
 __author__ = 'Paul Landes'
 
-from typing import Union, Any, Iterable, ClassVar
+from typing import Union, Any, Iterable, ClassVar, Dict
 from abc import ABC, abstractmethod
 import sys
 import logging
@@ -219,23 +219,33 @@ class Writable(ABC):
         """
         return isinstance(v, (dict, list, tuple, _WRITABLE_CLASS))
 
-    def _write_dict(self, data: dict, depth: int, writer: TextIOBase,
-                    inline: bool = False):
-        """Write dictionary ``data`` with the correct indentation per ``depth`` to
-        ``writer``.
+    def _write_dict(self, data: Dict, depth: int, writer: TextIOBase,
+                    inline: bool = False, one_line: bool = False):
+        """Write dictionary ``data`` with the correct indentation per ``depth``
+        to ``writer``.
+
+        :param data: the data wto write
+
+        :param inline: whether to write values in one line (separate from key)
+
+        :param one_line: whether to print all of ``data`` on one line
 
         """
         sp = self._sp(depth)
         keys = data.keys()
         if not isinstance(data, OrderedDict):
             keys = sorted(keys)
-        for k in keys:
-            v = data[k]
-            if not inline and self._is_container(v):
-                writer.write(f'{sp}{k}:\n')
-                self._write_object(v, depth + 1, writer)
-            else:
-                self._write_key_value(k, v, depth, writer)
+        if one_line:
+            kvs: str = ', '.join(map(lambda t: f'{t[0]}={t[1]}', data.items()))
+            writer.write(f'{sp}{kvs}\n')
+        else:
+            for k in keys:
+                v = data[k]
+                if not inline and self._is_container(v):
+                    writer.write(f'{sp}{k}:\n')
+                    self._write_object(v, depth + 1, writer)
+                else:
+                    self._write_key_value(k, v, depth, writer)
 
     @abstractmethod
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
