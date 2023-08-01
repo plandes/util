@@ -97,7 +97,7 @@ class stdout(object):
 
         """
         path = Path(path) if isinstance(path, str) else path
-        if path is None or path.name == self.STANDARD_OUT_PATH:
+        if path is None or self.is_stdout(path):
             path = None
         elif (path is not None and
               path.name == self.FILE_RECOMMEND_NAME and
@@ -114,6 +114,11 @@ class stdout(object):
         self._logger: logging.Logger = logger
         self._capture: bool = capture
         self._stdwrite: stdwrite = None
+
+    @classmethod
+    def is_stdout(self, path: Path) -> bool:
+        """Return whether the path indicates to use to standard out."""
+        return path.name == self.STANDARD_OUT_PATH
 
     def __enter__(self):
         if self._path is None:
