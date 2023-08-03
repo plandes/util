@@ -3,10 +3,10 @@
 """
 __author__ = 'Paul Landes'
 
-import logging
-from typing import Any, Iterable, Tuple
-from dataclasses import dataclass, field
+from typing import Any, Iterable, Tuple, Set
+from dataclasses import dataclass, field, InitVar
 from abc import abstractmethod, ABC, ABCMeta
+import logging
 import itertools as it
 from . import PersistableError
 
@@ -405,11 +405,54 @@ class KeyLimitStash(DelegateStash):
     """
     ATTR_EXP_META = ('n_limit',)
 
-    n_limit: int
+    n_limit: int = field()
+    """The max number of keys provided as a slice of the delegate's keys."""
 
     def keys(self) -> Iterable[str]:
         ks = super().keys()
         return it.islice(ks, self.n_limit)
+
+    def exists(self, name: str) -> bool:
+        return name in self.keys()
+
+
+@dataclass
+class KeySubsetStash(ReadOnlyDelegateStash):
+    """A stash that exposes a subset of the keys available in the
+    :obj:`delegate`.
+
+    """
+    key_subset: InitVar[Set[str]] = field()
+    """A subset of the keys availble."""
+
+    dynamic_subset: InitVar[bool] = field()
+    """Whether the delegate keys are dynamic, which forces inefficient key
+    checks on the delegate.
+
+    """
+    def __post_init__(self, key_subset: Set[str], dynamic_subset: bool):
+        super().__post_init__()
+        self._key_subset = frozenset(key_subset)
+        self._dynamic_subset = dynamic_subset
+
+    def load(self, name: str) -> Any:
+        if self.exists(name):
+            return super().load(name)
+
+    def get(self, name: str, default: Any = None) -> Any:
+        if self.exists(name):
+            return super().get(name)
+
+    def keys(self) -> Iterable[str]:
+        if self._dynamic_subset:
+            return self._key_subset | super().keys()
+        else:
+            return self._key_subset
+
+    def exists(self, name: str) -> bool:
+        if self._dynamic_subset and not super().exists(name):
+            return False
+        return name in self._key_subset
 
 
 @dataclass

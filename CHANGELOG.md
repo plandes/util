@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- Key subset stash class.
+
 ### Changed
 - CLI `stdout` context manager is more CLI friendly.  Initial parameter is the
   same, but open arguments are now a list.
