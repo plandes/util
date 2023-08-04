@@ -181,6 +181,30 @@ class Stash(ABC):
 
 
 @dataclass
+class NoopStash(Stash):
+    """A stash that does nothing.
+
+    """
+    def load(self, name: str) -> Any:
+        return None
+
+    def get(self, name: str, default: Any = None) -> Any:
+        return default
+
+    def exists(self, name: str) -> bool:
+        return False
+
+    def dump(self, name: str, inst: Any):
+        pass
+
+    def delete(self, name: str = None):
+        pass
+
+    def keys(self) -> Iterable[str]:
+        return iter(())
+
+
+@dataclass
 class ReadOnlyStash(Stash):
     """An abstract base class for subclasses that do not support write methods
     (i.e. :meth:`dump`).  This class is useful to extend for factory type
