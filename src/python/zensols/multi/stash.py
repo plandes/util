@@ -24,7 +24,8 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ChunkProcessor(object):
-    """Represents a chunk of work created by the parent and processed on the child.
+    """Represents a chunk of work created by the parent and processed on the
+    child.
 
     """
     config: Configurable = field()
@@ -51,7 +52,8 @@ class ChunkProcessor(object):
             return fac, inst
 
     def process(self) -> int:
-        """Create the stash used to process the data, then persisted in the stash.
+        """Create the stash used to process the data, then persisted in the
+        stash.
 
         """
         factory, stash = self._create_stash()
@@ -85,10 +87,10 @@ class ChunkProcessor(object):
 
 @dataclass
 class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
-    """A stash that forks processes to process data in a distributed fashion.  The
-    stash is typically created by a :class:`.ImportConfigFactory` in the child
-    process.  Work is chunked (grouped) and then sent to child processes.  In
-    each, a new instance of this same stash is created using
+    """A stash that forks processes to process data in a distributed fashion.
+    The stash is typically created by a :class:`.ImportConfigFactory` in the
+    child process.  Work is chunked (grouped) and then sent to child processes.
+    In each, a new instance of this same stash is created using
     :class:`.ImportConfigFactory` and then an abstract method is called to dump
     the data.
 
@@ -133,10 +135,10 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
 
     """
     workers: Union[int, float] = field()
-    """The number of processes spawned to accomplish the work or 0 to use all CPU
-    cores.  If this is a negative number, add the number of CPU processors with
-    this number, so -1 would result in one fewer works utilized than the number
-    of CPUs, which is a good policy for a busy server.
+    """The number of processes spawned to accomplish the work or 0 to use all
+    CPU cores.  If this is a negative number, add the number of CPU processors
+    with this number, so -1 would result in one fewer works utilized than the
+    number of CPUs, which is a good policy for a busy server.
 
     If the number is a float, then it is taken to be the percentage of the
     number of processes.  If it is a float, the value must be in range (0, 1].
@@ -148,9 +150,9 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
 
     @abstractmethod
     def _create_data(self) -> Iterable[Any]:
-        """Create data in the parent process to be processed in the child process(es)
-        in chunks.  The returned data is grouped in to sub lists and passed to
-        :meth:`_process`.
+        """Create data in the parent process to be processed in the child
+        process(es) in chunks.  The returned data is grouped in to sub lists and
+        passed to :meth:`_process`.
 
         :return: an iterable of data to be processed
 
@@ -244,8 +246,8 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
         return cnt
 
     def _spawn_work(self) -> int:
-        """Chunks and invokes a multiprocessing pool to invokes processing on the
-        children.
+        """Chunks and invokes a multiprocessing pool to invokes processing on
+        the children.
 
         """
         chunk_size, workers = self.chunk_size, self.workers
@@ -284,9 +286,9 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
 
 @dataclass(init=False)
 class MultiProcessFactoryStash(MultiProcessStash):
-    """Like :class:`~zensols.persist.FactoryStash`, but uses a subordinate factory
-    stash to generate the data in a subprocess(es) in the same manner as the
-    super class :class:`.MultiProcessStash`.
+    """Like :class:`~zensols.persist.FactoryStash`, but uses a subordinate
+    factory stash to generate the data in a subprocess(es) in the same manner as
+    the super class :class:`.MultiProcessStash`.
 
     Attributes :obj:`chunk_size` and :obj:`workers` both default to ``0``.
 
@@ -297,11 +299,11 @@ class MultiProcessFactoryStash(MultiProcessStash):
 
     """
     enable_preemptive: bool = field(default=True)
-    """If ``False``, do not invoke the :obj:`factory` instance's data calculation.
-    If the value is ``always``, then always assume the data is not calcuated,
-    which forces the factory prime.  Otherwise, if ``None``, then call the
-    super class data calculation falling back on the :obj:`factory` if the
-    super returns ``False``.
+    """If ``False``, do not invoke the :obj:`factory` instance's data
+    calculation.  If the value is ``always``, then always assume the data is not
+    calcuated, which forces the factory prime.  Otherwise, if ``None``, then
+    call the super class data calculation falling back on the :obj:`factory` if
+    the super returns ``False``.
 
     """
     def __init__(self, config: Configurable, name: str,
