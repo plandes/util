@@ -10,6 +10,8 @@ import re
 from copy import copy
 import pickle
 import time as tm
+from datetime import datetime
+import os
 from pathlib import Path
 from zensols.util import APIError
 import zensols.util.time as time
@@ -34,8 +36,8 @@ class FileTextUtil(object):
     @classmethod
     def normalize_text(cls: Type, name: str, replace_char: str = '-',
                        lower: bool = True, regex: re.Pattern = None) -> str:
-        """Normalize the name in to a string that is more file system friendly.  This
-        removes special characters and replaces them with ``replace_char``.
+        """Normalize the name in to a string that is more file system friendly.
+        This removes special characters and replaces them with ``replace_char``.
 
         :param name: the name to be normalized
 
@@ -77,6 +79,30 @@ class FileTextUtil(object):
                 return f'{num:3.1f}{unit}{suffix}'
             num /= 1024.0
         return f'{num:.1f}Yi{suffix}'
+
+    @staticmethod
+    def unique_tracked_name(prefix: str, include_user: bool = True,
+                            include_time: bool = True,
+                            extension: str = None) -> str:
+        """Create a unique file name useful for tracking files.
+
+        :param prefix: the file name that identifier
+
+        :param include_user: whether to add the user name in the file
+
+        """
+        time: str = ''
+        user: str = ''
+        if include_time:
+            time = '-' + datetime.now().strftime('%b%d-%H%M')
+        if include_user:
+            user = os.environ['USER'] if 'USER' in os.environ else os.getlogin()
+            user = f'-{user}'
+        if extension is None:
+            extension = ''
+        else:
+            extension = f'.{extension}'
+        return f'{prefix}{user}{time}{extension}'.lower()
 
 
 # class level persistance
