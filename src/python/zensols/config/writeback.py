@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Set, Any, Dict
+from typing import Set, Any, Dict, ClassVar
 from dataclasses import dataclass, field
 import logging
 from collections import OrderedDict
@@ -39,9 +39,14 @@ class Writeback(FactoryStateObserver, Dictable):
     this behavior, you will need to overide this method.
 
     """
-    DEFAULT_SKIP_ATTRIBUTES = set([ConfigFactory.NAME_ATTRIBUTE,
-                                   ConfigFactory.CONFIG_ATTRIBUTE,
-                                   ConfigFactory.CONFIG_FACTORY_ATTRIBUTE])
+    DEFAULT_SKIP_ATTRIBUTES: ClassVar[Set[str]] = set(
+        [ConfigFactory.NAME_ATTRIBUTE,
+         ConfigFactory.CONFIG_ATTRIBUTE,
+         ConfigFactory.CONFIG_FACTORY_ATTRIBUTE])
+    """Default set of attributes to skip when writing back to the configuration
+    on attribute sets.
+
+    """
     name: str = field()
     """The name of the section given in the configuration.
 
@@ -51,7 +56,6 @@ class Writeback(FactoryStateObserver, Dictable):
     serialization functions.
 
     """
-
     def _notify_state(self, state: FactoryState):
         """Called to update the object of a new state.  This is currently only called
         by instances of :class:`.ConfigFactory`.
