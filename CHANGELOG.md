@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.13.0] - 2023-08-16
 ### Added
 - Key subset stash class.
 - A no-operation `Stash`.
@@ -511,7 +512,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.12.7...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.13.0...HEAD
+[1.13.0]: https://github.com/plandes/util/compare/v1.12.7...v1.13.0
 [1.12.7]: https://github.com/plandes/util/compare/v1.12.6...v1.12.7
 [1.12.6]: https://github.com/plandes/util/compare/v1.12.5...v1.12.6
 [1.12.5]: https://github.com/plandes/util/compare/v1.12.4...v1.12.5
