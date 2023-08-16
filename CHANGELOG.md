@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [1.13.0] - 2023-08-16
+Moderate risk update release that changes tree structured application
+configuration.
+
 ### Added
 - Key subset stash class.
 - A no-operation `Stash`.
