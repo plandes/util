@@ -10,10 +10,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Key subset stash class.
+- A no-operation `Stash`.
 
 ### Changed
+- Introduce a tree based `Configurable` for YAML and JSON type configurations.
+- Fix YAML bug for empty configuration files.
 - CLI `stdout` context manager is more CLI friendly.  Initial parameter is the
   same, but open arguments are now a list.
+- Fix multi-processing stash by adding a call to `MultiProcessStash.prime`.
+- Raise `ApplicationError`s from `ApplicationFailure`s.
 
 
 ### Added
