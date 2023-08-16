@@ -547,7 +547,8 @@ class Primeable(ABC):
 
     """
     def prime(self):
-        pass
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'priming {type(self)}...')
 
 
 @dataclass
