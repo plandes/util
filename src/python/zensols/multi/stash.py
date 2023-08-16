@@ -353,7 +353,7 @@ class MultiProcessFactoryStash(MultiProcessStash):
         k: str
         for k in chunk:
             if logger.isEnabledFor(logging.INFO):
-                pid = os.getpid()
+                pid: int = os.getpid()
                 logger.info(f'processing key {k} in process {pid}')
             val: Any = self.factory.load(k)
             yield (k, val)
