@@ -8,6 +8,7 @@ import sys
 from typing import Any
 from dataclasses import dataclass, field
 import traceback
+from io import TextIOBase
 
 
 class APIError(Exception):
@@ -40,8 +41,8 @@ class Failure(object):
         if self.traceback is None:
             self.traceback = self._exec_info[2]
 
-    def print_stack(self):
-        traceback.print_exception(*self._exec_info)
+    def print_stack(self, writer: TextIOBase = sys.stdout):
+        traceback.print_exception(*self._exec_info, file=writer)
 
     def __str__(self) -> str:
         msg: str = str(self.exception) if self.message is None else self.message
