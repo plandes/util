@@ -286,7 +286,8 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
             print(f'warning: can not configure child process logging: {warn}',
                   file=sys.stderr)
 
-    def _create_chunk_processor(self, chunk_id: int, data: Any):
+    def _create_chunk_processor(self, chunk_id: int, data: Any) -> \
+            ChunkProcessor:
         """Factory method to create the ``ChunkProcessor`` instance.
 
         """
