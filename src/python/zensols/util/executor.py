@@ -30,13 +30,11 @@ class Executor(object):
     something.
 
     """
-
     check_exit_value: int = field(default=0)
     """Compare and raise an exception if the exit value of the process is not
     this number, or ``None`` to not check.
 
     """
-
     timeout: int = field(default=None)
     """The wait timeout in :meth:`wait`."""
 
@@ -45,7 +43,6 @@ class Executor(object):
     :meth:`wait`.
 
     """
-
     working_dir: Path = field(default=None)
     """Used as the `cwd` when creating :class:`.Popen`.
 
@@ -67,7 +64,7 @@ class Executor(object):
                     :class:`subprocess.Popen`)
 
         :return: the process if :obj:`async_proc` is ``True``, otherwise,
-                 return return value
+                 the exit status of the subprocess
 
         """
         if logger.isEnabledFor(logging.INFO):
