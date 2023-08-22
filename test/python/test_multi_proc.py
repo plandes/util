@@ -1,5 +1,5 @@
 from typing import List, Tuple, Iterable, Any
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import unittest
 import shutil
 import os
@@ -24,7 +24,7 @@ class RangeStash(ReadOnlyStash):
 
 @dataclass
 class RangeMultiProcessStash(MultiProcessStash):
-    n: int
+    n: int = field()
 
     def _create_data(self) -> Iterable[Any]:
         return range(self.n)

@@ -3,9 +3,9 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Iterable, List, Any, Tuple, Callable, Union
+from typing import Iterable, List, Any, Tuple, Callable, Union, Type
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
 import sys
 import os
 import logging
@@ -86,6 +86,73 @@ class ChunkProcessor(object):
 
 
 @dataclass
+class MultiProcessor(object, metaclass=ABCMeta):
+    """A base class used by :class:`.MultiProcessStash` to divid the work up
+    into chunks.  This should be subclassed if the behavior of how divided work
+    is to be processed is needed.
+
+    """
+    name: str = field()
+    """The name of the multi-processor."""
+
+    @staticmethod
+    def _process_work(processor: ChunkProcessor) -> int:
+        """Process a chunk of data in the child process that was created by the parent
+        process.
+
+        """
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.info(f'processing processor {processor}')
+        with time(f'processed processor {processor}'):
+            return processor.process()
+
+    def _invoke_pool(self, pool: Pool, fn: Callable, data: iter) -> List[int]:
+        if pool is None:
+            return tuple(map(fn, data))
+        else:
+            return pool.map(fn, data)
+
+    def invoke_work(self, workers: int, chunk_size: int,
+                    data: Iterable[Any]) -> int:
+        fn = self.__class__._process_work
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'{self.name}: spawning work in {type(self)} with ' +
+                        f'chunk size {chunk_size} across {workers} workers')
+        return self._invoke_work(workers, chunk_size, data, fn)
+
+    @abstractmethod
+    def _invoke_work(self, workers: int, chunk_size: int,
+                     data: Iterable[Any], fn: Callable) -> int:
+        pass
+
+
+class SingleMultiProcessor(MultiProcessor):
+    """Does all work in the current process.
+
+    """
+    def _invoke_work(self, workers: int, chunk_size: int,
+                     data: Iterable[Any], fn: Callable) -> int:
+        with time('processed chunks'):
+            return self._invoke_pool(None, fn, data)
+
+
+class PoolMultiProcessor(MultiProcessor):
+    """Uses :class:`multiprocessing.Pool` to fork/exec processes to do the work.
+
+    """
+    def _invoke_work(self, workers: int, chunk_size: int,
+                     data: Iterable[Any], fn: Callable) -> int:
+        if workers == 1:
+            with time('processed chunks'):
+                cnt = self._invoke_pool(None, fn, data)
+        else:
+            with Pool(workers) as p:
+                with time('processed chunks'):
+                    cnt = self._invoke_pool(p, fn, data)
+        return cnt
+
+
+@dataclass
 class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     """A stash that forks processes to process data in a distributed fashion.
     The stash is typically created by a :class:`.ImportConfigFactory` in the
@@ -94,11 +161,17 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     :class:`.ImportConfigFactory` and then an abstract method is called to dump
     the data.
 
-    The :obj:`delegate` stash is used to manage the actual persistence of the
-    data.
+    Implementation details:
 
-    This implemetation of :meth:`prime` is to fork processes to accomplish the
-    work.
+      * The :obj:`delegate` stash is used to manage the actual persistence of
+        the data.
+
+      * This implemetation of :meth:`prime` is to fork processes to accomplish
+        the work.
+
+      * The ``process_class`` attribute is not set directly on this class since
+        subclasses already have non-default fields.  However it is set to
+        :class:`.PoolMultiProcessor` by default.
 
     The :meth:`_create_data` and :meth:`_process` methods must be
     implemented.
@@ -144,9 +217,16 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     number of processes.  If it is a float, the value must be in range (0, 1].
 
     """
+    processor_class: Type[MultiProcessor] = field(init=False)
+    """The class of the processor to use for the handling of the work."""
+
     def __post_init__(self):
         super().__post_init__()
         self.is_child = False
+        if not hasattr(self, 'processor_class'):
+            # sub classes like `MultiProcessDefaultStash` add this as a field,
+            # which will already be set by the time this is called
+            self.processor_class: Type[MultiProcessor] = None
 
     @abstractmethod
     def _create_data(self) -> Iterable[Any]:
@@ -206,17 +286,6 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
             print(f'warning: can not configure child process logging: {warn}',
                   file=sys.stderr)
 
-    @staticmethod
-    def _process_work(processor: ChunkProcessor) -> int:
-        """Process a chunk of data in the child process that was created by the parent
-        process.
-
-        """
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.info(f'processing processor {processor}')
-        with time(f'processed processor {processor}'):
-            return processor.process()
-
     def _create_chunk_processor(self, chunk_id: int, data: Any):
         """Factory method to create the ``ChunkProcessor`` instance.
 
@@ -225,32 +294,16 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
             self._debug(f'creating chunk processor for id {chunk_id}')
         return ChunkProcessor(self.config, self.name, chunk_id, data)
 
-    def _invoke_pool(self, pool: Pool, fn: Callable, data: iter) -> List[int]:
-        if pool is None:
-            return tuple(map(fn, data))
-        else:
-            return pool.map(fn, data)
-
-    def _invoke_work(self, workers: int, chunk_size: int,
-                     data: Iterable[Any]) -> int:
-        fn = self.__class__._process_work
-        if logger.isEnabledFor(logging.INFO):
-            logger.info(f'{self.name}: spawning work with ' +
-                        f'chunk size {chunk_size} across {workers} workers')
-        if workers == 1:
-            with time('processed chunks'):
-                cnt = self._invoke_pool(None, fn, data)
-        else:
-            with Pool(workers) as p:
-                with time('processed chunks'):
-                    cnt = self._invoke_pool(p, fn, data)
-        return cnt
-
     def _spawn_work(self) -> int:
         """Chunks and invokes a multiprocessing pool to invokes processing on
         the children.
 
         """
+        multi_proc: MultiProcessor
+        if self.processor_class is None:
+            multi_proc = PoolMultiProcessor(self.name)
+        else:
+            multi_proc = self.processor_class(self.name)
         chunk_size, workers = self.chunk_size, self.workers
         if workers <= 0:
             workers = os.cpu_count() + workers
@@ -267,7 +320,7 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
             chunk_size = math.ceil(len(data) / workers)
         data = map(lambda x: self._create_chunk_processor(*x),
                    enumerate(chunks(data, chunk_size)))
-        return self._invoke_work(workers, chunk_size, data)
+        return multi_proc.invoke_work(workers, chunk_size, data)
 
     def prime(self):
         """If the delegate stash data does not exist, use this implementation to
@@ -286,8 +339,36 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
             self._reset_has_data()
 
 
+@dataclass
+class MultiProcessDefaultStash(MultiProcessStash):
+    """Just like :class:`.MultiProcessStash`, but provide defaults as a
+    convenience.
+
+    """
+    chunk_size: int = field(default=0)
+    """The size of each group of data sent to the child process to be handled;
+    in some cases the child process will get a chunk of data smaller than this
+    (the last) but never more; if this number is 0, then evenly divide the work
+    so that each worker takes the largets amount of work to minimize the number
+    of chunks (in this case the data is tupleized).
+
+    """
+    workers: Union[int, float] = field(default=1)
+    """The number of processes spawned to accomplish the work or 0 to use all
+    CPU cores.  If this is a negative number, add the number of CPU processors
+    with this number, so -1 would result in one fewer works utilized than the
+    number of CPUs, which is a good policy for a busy server.
+
+    If the number is a float, then it is taken to be the percentage of the
+    number of processes.  If it is a float, the value must be in range (0, 1].
+
+    """
+    processor_class: Type[MultiProcessor] = field(default=PoolMultiProcessor)
+    """The class of the processor to use for the handling of the work."""
+
+
 @dataclass(init=False)
-class MultiProcessFactoryStash(MultiProcessStash):
+class MultiProcessFactoryStash(MultiProcessDefaultStash):
     """Like :class:`~zensols.persist.FactoryStash`, but uses a subordinate
     factory stash to generate the data in a subprocess(es) in the same manner as
     the super class :class:`.MultiProcessStash`.
@@ -300,7 +381,7 @@ class MultiProcessFactoryStash(MultiProcessStash):
     :obj:`delegate`, which persists the data.
 
     """
-    enable_preemptive: bool = field(default=True)
+    enable_preemptive: bool = field()
     """If ``False``, do not invoke the :obj:`factory` instance's data
     calculation.  If the value is ``always``, then always assume the data is not
     calcuated, which forces the factory prime.  Otherwise, if ``None``, then
@@ -308,9 +389,8 @@ class MultiProcessFactoryStash(MultiProcessStash):
     the super returns ``False``.
 
     """
-    def __init__(self, config: Configurable, name: str,
-                 factory: Stash, enable_preemptive: bool = False,
-                 **kwargs):
+    def __init__(self, config: Configurable, name: str, factory: Stash,
+                 enable_preemptive: bool = False, **kwargs):
         """Initialize with attributes :obj:`chunk_size` and :obj:`workers` both
         defaulting to ``0``.
 
@@ -321,6 +401,7 @@ class MultiProcessFactoryStash(MultiProcessStash):
                      subsequently process this chunk
 
         """
+        print('KWA', kwargs)
         if 'chunk_size' not in kwargs:
             kwargs['chunk_size'] = 0
         if 'workers' not in kwargs:
