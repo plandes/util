@@ -106,15 +106,9 @@ class MultiProcessor(object, metaclass=ABCMeta):
         with time(f'processed processor {processor}'):
             return processor.process()
 
-    def _invoke_pool(self, pool: Pool, fn: Callable, data: iter) -> List[int]:
-        if pool is None:
-            return tuple(map(fn, data))
-        else:
-            return pool.map(fn, data)
-
     def invoke_work(self, workers: int, chunk_size: int,
                     data: Iterable[Any]) -> int:
-        fn = self.__class__._process_work
+        fn: Callable = self.__class__._process_work
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'{self.name}: spawning work in {type(self)} with ' +
                         f'chunk size {chunk_size} across {workers} workers')
@@ -126,30 +120,35 @@ class MultiProcessor(object, metaclass=ABCMeta):
         pass
 
 
-class SingleMultiProcessor(MultiProcessor):
-    """Does all work in the current process.
-
-    """
-    def _invoke_work(self, workers: int, chunk_size: int,
-                     data: Iterable[Any], fn: Callable) -> int:
-        with time('processed chunks'):
-            return self._invoke_pool(None, fn, data)
-
-
 class PoolMultiProcessor(MultiProcessor):
     """Uses :class:`multiprocessing.Pool` to fork/exec processes to do the work.
 
     """
+    def _invoke_pool(self, pool: Pool, fn: Callable, data: iter) -> List[int]:
+        if pool is None:
+            return tuple(map(fn, data))
+        else:
+            return pool.map(fn, data)
+
     def _invoke_work(self, workers: int, chunk_size: int,
                      data: Iterable[Any], fn: Callable) -> int:
         if workers == 1:
-            with time('processed chunks'):
+            with time('processed singleton chunk'):
                 cnt = self._invoke_pool(None, fn, data)
         else:
             with Pool(workers) as p:
                 with time('processed chunks'):
                     cnt = self._invoke_pool(p, fn, data)
         return cnt
+
+
+class SingleMultiProcessor(PoolMultiProcessor):
+    """Does all work in the current process.
+
+    """
+    def _invoke_work(self, workers: int, chunk_size: int,
+                     data: Iterable[Any], fn: Callable) -> int:
+        return super()._invoke_work(1, chunk_size, data, fn)
 
 
 @dataclass
