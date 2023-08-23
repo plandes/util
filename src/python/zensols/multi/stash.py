@@ -401,7 +401,6 @@ class MultiProcessFactoryStash(MultiProcessDefaultStash):
                      subsequently process this chunk
 
         """
-        print('KWA', kwargs)
         if 'chunk_size' not in kwargs:
             kwargs['chunk_size'] = 0
         if 'workers' not in kwargs:
