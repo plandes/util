@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.13.1] - 2023-08-25
+### Added
+- Multiprocessing strategy (`Multiprocessor`) split from owning stash
+  (`MultiProcessStash`).
+
+
 ## [1.13.0] - 2023-08-16
 Moderate risk update release that changes tree structured application
 configuration.
@@ -515,7 +521,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.13.0...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.13.1...HEAD
+[1.13.1]: https://github.com/plandes/util/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/plandes/util/compare/v1.12.7...v1.13.0
 [1.12.7]: https://github.com/plandes/util/compare/v1.12.6...v1.12.7
 [1.12.6]: https://github.com/plandes/util/compare/v1.12.5...v1.12.6
