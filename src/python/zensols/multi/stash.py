@@ -91,6 +91,8 @@ class MultiProcessor(object, metaclass=ABCMeta):
     into chunks.  This should be subclassed if the behavior of how divided work
     is to be processed is needed.
 
+    .. automethod:: _process_work
+
     """
     name: str = field()
     """The name of the multi-processor."""
@@ -178,7 +180,6 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     .. document private functions
     .. automethod:: _create_data
     .. automethod:: _process
-    .. automethod:: _process_work
     .. automethod:: _create_chunk_processor
 
     :see: :class:`zensols.config.factory.ImportConfigFactory`
