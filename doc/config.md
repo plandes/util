@@ -409,7 +409,7 @@ fake_path = resource(zensols.someproj): resources/obj.txt
 
 ### Resource Libraries
 
-Resource libraries are just a collection of files that are deployed with a
+Resource libraries are just a collection of configuration files that are deployed with a
 library and accessible when that library is installed.  These are useful when a
 lot of configuration is needed to make a library useful, such as the [Zensols
 deep learning natural language processing library].  The convention if to have
@@ -427,6 +427,17 @@ The `type = importini` tells it to use a [ImportIniConfig] (see the [Configurati
 Implementations](#configuration-implementations) section).  This parameter can
 also be set to `import` to use [ImportIniConfig] for `.conf` and `.ini` files,
 and [ImportYamlConfig] for `.yml` files.
+
+The `type` directive in import sections is not needed as long as standard
+extensions are used.  However, if they are not, or specialized configurations
+are desired, use the `type_map` directive to map extensions to configuration
+implementations.  For example, the following maps `.yml` files to
+[ConditionalYamlConfig] and `.conf` to [ImportIniConfig] implementations.
+```ini
+type_map = dict: {'yml': 'condyaml', 'conf': 'importini'}
+```
+You can also use `type = import` to automatically choose the importation
+variant configuration implementation for each extension.
 
 For an example of how to use a resource library, see the [nlparse example].
 
@@ -573,6 +584,7 @@ This sets the `db` parameter on the `employees` instance to the return value of
 the tracker's `print_employees` method.  The `method` parameter may be omitted
 if the referenced instance is *Callable*.
 
+
 ### Tree
 
 Deep nested dictionaries for hierarchical data can also be used to create new
@@ -685,25 +697,26 @@ listed below:
 * File based:
   * [IniConfig]: Application configuration utility in [INI
     format](#ini-format).  This reads from a configuration and returns sets or
-    subsets of options/
-  * [YamlConfig]: Parse configuration from [YAML files](#yaml-format).
+    subsets of options (`type_map = ini`).
+  * [YamlConfig]: Parse configuration from [YAML files](#yaml-format)
+    (`type_map = yml`).
   * [JsonConfig]: A configurator that reads [JSON](#json-format) as a two level
-    dictionary.
+    dictionary (`type_map = json`).
   * [ImportIniConfig]: An [INI Configuration](#import-ini-configuration) that
-    uses other [Configurable] classes to load other sections.
+    uses other [Configurable] classes to load other sections (`type_map = importini`).
   * [ImportYamlConfig]: like [ImportIniConfig] but more limited in
     functionality using the YAML format (see [YAML
-    Importation](#yaml-importation)).
+    Importation](#yaml-importation)) (`type_map = importyaml`).
   * [ConditionalYamlConfig]: like [ImportYamlConfig] but replaces (sub)trees in
     the YAML configuration based on simple if/then/else logic (see [YAML
-    Conditions](#yaml-conditions)).
+    Conditions](#yaml-conditions)) (`type_map = condyaml`).
 * Memory based:
   * [DictionaryConfig]: This is a simple implementation of a dictionary backing
     configuration.
   * [EnvironmentConfig]: An implementation configuration class that holds
     environment variables.
   * [StringConfig]: A simple string based configuration that takes a single
-    comma delimited key/value pair string
+    comma delimited key/value pair string.
 
 
 ## Complete Examples
