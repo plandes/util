@@ -32,10 +32,11 @@ class ImportYamlConfig(YamlConfig):
                  sections: Set[str] = None, import_name: str = 'import',
                  parse_values: bool = False,
                  children: Tuple[Configurable, ...] = ()):
-        """Initialize with importation configuration.  The usage of ``default_vars`` in
-        the super class is disabled since this implementation uses a mix of dot
-        and colon (configparser) variable substitution (the later used when
-        imported from an :class:`.ImportIniConfig`.
+        """Initialize with importation configuration.  The usage of
+        ``default_vars`` in the super class is disabled since this
+        implementation uses a mix of dot and colon (configparser) variable
+        substitution (the later used when imported from an
+        :class:`.ImportIniConfig`.
 
         :param config_file: the configuration file path to read from; if the
                             type is an instance of :class:`io.TextIOBase`, then
