@@ -10,7 +10,7 @@ import logging
 from pathlib import Path
 from zensols.introspect import ClassImporter
 from zensols.persist import persisted
-from . import Configurable, IniConfig, DictionaryConfig
+from . import ConfigurableError, Configurable, IniConfig, DictionaryConfig
 
 logger = logging.getLogger(__name__)
 
@@ -27,10 +27,10 @@ class ConfigurableFactory(object):
     An example of this is the :class:`.ConfigurationImporter` loading user
     specific configuration.
 
-    If the class uses type type ``import``, the type is prepended with
-    ``import`` and then mapped using :obj:`EXTENSION_TO_TYPE`.  This allows
-    mixing of different files in one ``config_files`` entry and avoids multiple
-    import sections.
+    If the class uses ``type = import``, the type is prepended with ``import``
+    and then mapped using :obj:`EXTENSION_TO_TYPE`.  This allows mixing of
+    different files in one ``config_files`` entry and avoids multiple import
+    sections.
 
     :see: `.ImportIniConfig`
 
@@ -178,7 +178,8 @@ class ConfigurableFactory(object):
             del params[self.SINGLE_CONFIG_FILE]
             config = self.from_path(Path(config_file))
         else:
-            self._raise(f"No loader information for '{section}': {params}")
+            raise ConfigurableError(
+                f"No loader information for '{section}': {params}")
         if logger.isEnabledFor(logging.INFO):
             logger.info(f'created config: {config}')
         return config
