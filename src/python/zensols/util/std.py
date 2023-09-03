@@ -120,6 +120,11 @@ class stdout(object):
         """Return whether the path indicates to use to standard out."""
         return path.name == self.STANDARD_OUT_PATH
 
+    @classmethod
+    def is_file_recommend(self, path: Path) -> bool:
+        """Return whether the path indicates to recommmend a file."""
+        return path.name == self.FILE_RECOMMEND_NAME
+
     def __enter__(self):
         if self._path is None:
             self._sink = sys.stdout
