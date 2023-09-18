@@ -272,13 +272,14 @@ class Writable(ABC):
         :param split_lines: if ``True`` each line is logged separately
 
         """
-        sio = StringIO()
-        self.write(depth, sio)
-        lines = (sio.getvalue(),)
-        if split_lines:
-            lines = lines[0].strip().split('\n')
-        for line in lines:
-            logger.log(level, line)
+        if logger.isEnabledFor(level):
+            sio = StringIO()
+            self.write(depth, sio)
+            lines = (sio.getvalue(),)
+            if split_lines:
+                lines = lines[0].strip().split('\n')
+            for line in lines:
+                logger.log(level, line)
 
 
 _WRITABLE_CLASS = Writable
