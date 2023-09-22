@@ -207,7 +207,8 @@ class Dictable(Writable):
         """Return a JSON string representing the data in this instance.
 
         """
-        dct: Dict[str, Any] = self.asdict(recurse=recurse, readable=readable)
+        dct: Dict[str, Any] = self.asflatdict(
+            recurse=recurse, readable=readable)
         if writer is None:
             return json.dumps(dct, **kwargs)
         else:
