@@ -11,6 +11,7 @@ import logging
 import inspect
 from io import TextIOBase
 from pathlib import Path
+import shlex
 from zensols.util import PackageResource, APIError
 from zensols.config import DictionaryConfig, ConfigFactory
 from zensols.config import (
@@ -386,7 +387,7 @@ class CliHarness(object):
                 args = []
         else:
             if isinstance(args, str):
-                args = args.split()
+                args = shlex.split(args)
             elif not isinstance(args, list):
                 raise APIError(
                     f'Expecting argument list of str but got: {args}')
