@@ -68,8 +68,8 @@ class _PreLoadImportIniConfig(ImportIniConfig):
 
 @dataclass
 class ConfigurationOverrider(object):
-    """Overrides configuration in the app config.  This is useful for replacing on
-    a per command line invocation basis.  Examples could include changing the
+    """Overrides configuration in the app config.  This is useful for replacing
+    on a per command line invocation basis.  Examples could include changing the
     number of epochs trained for a model.
 
     The :obj:`override` field either contains a path to a file that contains
@@ -103,8 +103,8 @@ class ConfigurationOverrider(object):
     """The string used to delimit the each key/value pair."""
 
     disable: bool = field(default=False)
-    """Whether to disable the application, which is useful to set to ``False`` when
-    used with :class:`.ConfigurationImporter`.
+    """Whether to disable the application, which is useful to set to ``False``
+    when used with :class:`.ConfigurationImporter`.
 
     """
     def get_configurable(self) -> Optional[Configurable]:
@@ -136,8 +136,8 @@ class ConfigurationOverrider(object):
 
 @dataclass
 class ConfigurationImporter(ApplicationObserver, Dictable):
-    """This class imports a child configuration in to the application context.  It
-    does this by:
+    """This class imports a child configuration in to the application context.
+    It does this by:
 
       1. Attempt to load the configuration indicated by the ``--config``
          option.
@@ -186,8 +186,8 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
 
     """
     IMPORT_TYPE = 'import'
-    """The string value of the ``type`` parameter in the section config identifying
-    an :class:`.ImportIniConfig` import section.
+    """The string value of the ``type`` parameter in the section config
+    identifying an :class:`.ImportIniConfig` import section.
 
     """
     ENVIRON_VAR_REGEX = re.compile(r'^.+\.([a-z]+?)$')
@@ -205,7 +205,8 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
 
     """
     expect: bool = field(default=True)
-    """If ``True``, raise an :class:`.ApplicationError` if the option is not given.
+    """If ``True``, raise an :class:`.ApplicationError` if the option is not
+    given.
 
     """
     default: Path = field(default=None)
@@ -234,10 +235,10 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
 
     """
     section: str = field(default=None)
-    """Additional which section to load as an import.  This is only valid and used
-    when :obj:`type` is set to `import`.  When it is, the section will replace
-    the string ``^{config_apth}`` (and any other field in this instance using
-    the same syntax) and load indicated remaining configuration using
+    """Additional which section to load as an import.  This is only valid and
+    used when :obj:`type` is set to `import`.  When it is, the section will
+    replace the string ``^{config_apth}`` (and any other field in this instance
+    using the same syntax) and load indicated remaining configuration using
     :class:`~zensols.config.ImportIniConfig`.
 
     See the `API documentation
@@ -259,8 +260,8 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
     """The configuration file."""
 
     def get_environ_var_from_app(self) -> str:
-        """Return the environment variable based on the name of the application.  This
-        returns the :obj:`config_path_environ_name` if set, otherwise, it
+        """Return the environment variable based on the name of the application.
+        This returns the :obj:`config_path_environ_name` if set, otherwise, it
         generates it based on the name returned from the packge + ``RC`` and
         capitalizes it.
 
@@ -282,7 +283,8 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
         return name
 
     def _get_config_option(self) -> str:
-        """Return the long option name (with dashes) as given on the command line.
+        """Return the long option name (with dashes) as given on the command
+        line.
 
         """
         ameta: ActionMetaData = self._action.meta_data
@@ -359,8 +361,8 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
         return DictionaryConfig(secs), preload_keys
 
     def _load_configuration(self) -> Configurable:
-        """Once we have the path and the class used to load the configuration, create
-        the instance and load it.
+        """Once we have the path and the class used to load the configuration,
+        create the instance and load it.
 
         Special handling is required to make options forward *and* backward
         propogate.
