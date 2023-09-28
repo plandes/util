@@ -14,6 +14,7 @@ import parse as par
 import re
 from pathlib import Path
 from zensols.util import PackageResource
+from zensols.persist import persisted
 from zensols.config import (
     rawconfig, Configurable, ConfigurableFactory,
     IniConfig, ImportIniConfig, StringConfig, DictionaryConfig,
@@ -143,11 +144,17 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
          option.
 
       2. If the option doesn't exist, attempt to get the path to load from an
-         environment variable (see :meth:`get_environ_var_from_app`).
+         environment variable (see :meth:`get_environ_var_from_app`).  For
+         example, for package ``zensols.util``, the environment variable
+         ``UTILRC`` environment variable's path is used.
 
-      3. Loads the *child* configuration.
+      3. If the environment variable is not found, then look for the UNIX style
+         resource file (see :meth:`get_environ_path`).  For example, package
+         ``zensols.util`` would point to ``~/.utilrc``.
 
-      4. Copy all sections from the child configuration to :obj:`config`.
+      4. Loads the *child* configuration.
+
+      5. Copy all sections from the child configuration to :obj:`config`.
 
     The child configuration is created by :class:`.ConfigurableFactory`.  If
     the child has a `.conf` extension, :class:`.ImportIniConfig` is used with
@@ -259,6 +266,22 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
     config_path: Path = field(default=None)
     """The configuration file."""
 
+    @persisted('_rc_prefix')
+    def _get_rc_prefix(self) -> str:
+        """Return the resource prefix.  For example, if the package resource is
+        ``zensols.util`` the outupt is ``util``.
+
+        """
+        pkg_res: PackageResource = self._app.factory.package_resource
+        name: str = pkg_res.name
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"match environment variable '{name}' " +
+                         f'on {self.ENVIRON_VAR_REGEX}')
+        m = self.ENVIRON_VAR_REGEX.match(name)
+        if m is not None:
+            name = m.group(1)
+        return name
+
     def get_environ_var_from_app(self) -> str:
         """Return the environment variable based on the name of the application.
         This returns the :obj:`config_path_environ_name` if set, otherwise, it
@@ -266,21 +289,44 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
         capitalizes it.
 
         """
+        name: str
         if self.config_path_environ_name is not None:
             name = self.config_path_environ_name
         else:
-            pkg_res: PackageResource = self._app.factory.package_resource
-            name: str = pkg_res.name
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"match environment variable '{name}' " +
-                             f'on {self.ENVIRON_VAR_REGEX}')
-            m = self.ENVIRON_VAR_REGEX.match(name)
-            if m is not None:
-                name = m.group(1)
-            name = f'{name}rc'.upper()
+            name = f'{self._get_rc_prefix()}rc'.upper()
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f"using environment variable '{name}'")
         return name
+
+    def get_environ_path(self) -> Optional[Path]:
+        """Return the path to the resource configuration file.  This first uses
+        :meth:`get_environ_var_from_app` to attempt to find an environment
+        variable with a reference to file, then looks for it using the UNIX
+        style file naming conventions (i.e. package ``zensols.util`` would point
+        to ``~/.utilrc``).
+
+        """
+        env_var: str = self.get_environ_var_from_app()
+        env_var_path: str = os.environ.get(env_var)
+        rc_path: Path = None
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug('loading config from environment ' +
+                         f"varaibles '{env_var}' = {env_var_path}")
+        if env_var_path is None:
+            prefix: str = self._get_rc_prefix()
+            path = Path(f'~/.{prefix}rc').expanduser()
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'trying UNIX style resource file: {path}')
+            if path.is_file():
+                rc_path = path
+        else:
+            path = Path(env_var_path)
+            if path.exists():
+                rc_path = path
+            else:
+                logger.warning(f'Environment variable {env_var} set to ' +
+                               f'non-existant path: {env_var_path}')
+        return rc_path
 
     def _get_config_option(self) -> str:
         """Return the long option name (with dashes) as given on the command
@@ -491,18 +537,11 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
         """
         # the modified configuration that will returned
         modified_config: Configurable = self.config
-        env_var: str = None
         rc_path: Path = None
         if self.config_path is None:
-            env_var: str = self.get_environ_var_from_app()
-            env_var_path: str = os.environ.get(env_var)
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug('loading config from environment ' +
-                             f"varaibles '{env_var}' = {env_var_path}")
-            if env_var_path is not None:
-                rc_path = Path(env_var_path)
-                if rc_path.exists():
-                    self.config_path = rc_path
+            rc_path: Path = self.get_environ_path()
+            if rc_path is not None:
+                self.config_path = rc_path
             elif self.default is not None:
                 if self.default == 'skip':
                     self.config_path = None
@@ -510,11 +549,8 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
                     self.config_path = self.default
         if self.config_path is None:
             if self.expect:
-                lopt = self._get_config_option()
-                if env_var is not None and env_var_path is not None:
-                    logger.warning(f'Environment variable {env_var} set to ' +
-                                   f'non-existant path: {rc_path}')
-                raise ApplicationError(f'Missing option {lopt}')
+                long_opt: str = self._get_config_option()
+                raise ApplicationError(f'Missing option {long_opt}')
             else:
                 modified_config = self._load()
         else:

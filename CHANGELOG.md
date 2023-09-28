@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changes
+- Default configuration searches UNIX style resource files for configuration
+  (i.e. package `zensols.util` would point to `~/.zensols.util`).
+- Harness CLI uses better shell parsing to create applications and resources.
+
 
 ## [1.13.1] - 2023-08-25
 ### Added
