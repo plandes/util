@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [1.13.2] - 2023-09-30
 ### Add
 - Functionality to force usage of the default action by argument reprocessing.
 
@@ -529,7 +531,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.13.1...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.13.2...HEAD
+[1.13.2]: https://github.com/plandes/util/compare/v1.13.1...v1.13.2
 [1.13.1]: https://github.com/plandes/util/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/plandes/util/compare/v1.12.7...v1.13.0
 [1.12.7]: https://github.com/plandes/util/compare/v1.12.6...v1.12.7
