@@ -3,7 +3,7 @@
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import Tuple, Iterable, List, Union, Optional, Sequence
+from typing import Tuple, Iterable, List, Union, Optional, Sequence, Set
 from dataclasses import dataclass, field
 import logging
 import os
@@ -306,7 +306,7 @@ class _UsageFormatter(_Formatter):
 
     @property
     def is_singleton_action(self) -> bool:
-        return len(self.actions) == 1
+        return len(self.visible_actions) == 1
 
     @property
     def default_action(self):
@@ -340,9 +340,13 @@ class _UsageFormatter(_Formatter):
         return max(len(a.default) for a in self._get_opt_formatters()) + \
             self.usage_config.inter_col_space
 
+    @property
+    @persisted('_visible_actions')
+    def visible_actions(self) -> Tuple[ActionMetaData]:
+        return tuple(filter(lambda a: a.is_usage_visible, self.actions))
+
     def get_option_usage_names(self, expand: bool = True) -> str:
-        actions: Iterable[ActionMetaData] = filter(
-            lambda a: a.is_usage_visible, self.actions)
+        actions: Tuple[ActionMetaData] = self.visible_actions
         action_names: Tuple[str, ...] = tuple(map(lambda a: a.name, actions))
         if len(action_names) > 1:
             if expand:
@@ -356,7 +360,7 @@ class _UsageFormatter(_Formatter):
         elif len(action_names) > 0:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'action: {self.actions[0]}')
-            opts = ', '.join(map(lambda p: p.name, self.actions[0].positional))
+            opts = ', '.join(map(lambda p: p.name, actions[0].positional))
             if len(opts) > 0:
                 opts = f'<{opts}> '
         else:
