@@ -42,7 +42,12 @@ class Failure(object):
             self.traceback = self._exec_info[2]
 
     def print_stack(self, writer: TextIOBase = sys.stdout):
+        """Print the stack trace of the exception that caused the failure."""
         traceback.print_exception(*self._exec_info, file=writer)
+
+    def rethrow(self):
+        """Raises :obj:`exception`."""
+        raise self.exception
 
     def __str__(self) -> str:
         msg: str = str(self.exception) if self.message is None else self.message
