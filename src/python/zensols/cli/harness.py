@@ -553,6 +553,7 @@ class ConfigurationImporterCliHarness(CliHarness):
 
     def _get_config_path_args(self, env: _HarnessEnviron,
                               app: Application) -> List[str]:
+        """Return the configuration arguments (i.e. ``--config app.conf``)."""
         args: List[str] = []
         capp: Action = tuple(filter(
             lambda a: a.class_meta.class_type == ConfigurationImporter,
@@ -580,7 +581,13 @@ class ConfigurationImporterCliHarness(CliHarness):
 
     def _update_args(self, args: List[str],
                      **factory_kwargs: Dict[str, Any]) -> \
-            Tuple[str, ApplicationFactory]:
+            Tuple[ApplicationFactory, List[str]]:
+        """Add the configuration arguments (i.e. ``--config app.conf``) to
+        ``args``.
+
+        :return: a tuple of the app factory and the updated arguments
+
+        """
         env: _HarnessEnviron = self._create_harness_environ(args)
         app_fac: ApplicationFactory = self._create_app_fac(env, factory_kwargs)
         try:
