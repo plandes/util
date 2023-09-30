@@ -184,6 +184,16 @@ class CommandLineParser(Deallocatable, Dictable):
     default_action: str = field(default=None)
     """The default mnemonic use when the user does not supply one."""
 
+    force_default: str = field(default=False)
+    """Choice of action becomes ambiguous when the positional arguments are
+    given and the action name matches the argument.  An error is raised when the
+    application is configured in this way.
+
+    When this attribute is ``True``, the command parsing will insert the default
+    action when the first non-option isn't found as an action.  However, this
+    leads to the mentioned ambiguouity and is inefficient.
+
+    """
     application_doc: str = field(default=None)
     """The program documentation to use when it can not be deduced from the
     action.
@@ -436,7 +446,7 @@ class CommandLineParser(Deallocatable, Dictable):
 
     def _validate_setup(self):
         """Make sure we don't have a default action with positional args."""
-        if self.default_action is not None:
+        if self.default_action is not None and not self.force_default:
             action_meta: ActionMetaData
             for action_meta in self.config.second_pass_actions:
                 if len(action_meta.positional) > 0:
@@ -465,6 +475,12 @@ class CommandLineParser(Deallocatable, Dictable):
         # first pass parse
         second_pass, action_name, fp_opts, options, op_args, args = \
             self._parse_first_pass(args, actions)
+        if self.default_action is not None and \
+           self.force_default and\
+           action_name not in self.config.actions_by_name:
+            args = [self.default_action] + args
+            second_pass, action_name, fp_opts, options, op_args, args = \
+                self._parse_first_pass(args, actions)
         # second pass parse
         action_meta, options, op_args = self._parse_second_pass(
             action_name, second_pass, args, options, op_args)

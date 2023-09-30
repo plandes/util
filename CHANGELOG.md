@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Add
+- Functionality to force usage of the default action by argument reprocessing.
+
 ### Changes
 - Default configuration searches UNIX style resource files for configuration
   (i.e. package `zensols.util` would point to `~/.zensols.util`).

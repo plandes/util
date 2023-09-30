@@ -322,8 +322,19 @@ class ActionCliManager(PersistableContainer, Dictable):
     """The application documentation."""
 
     default_action: str = field(default=None)
-    """The default mnemonic use when the user does not supply one."""
+    """The default mnemonic use when the user does not supply one.
 
+    :see: :obj:`.CommandLineParser.default_action`
+
+    """
+    force_default: str = field(default=False)
+    """When `True``, the command parsing will insert the default action when the
+    first non-option isn't found as an action.  However, this leads to
+    ambiguouity in identifiction of the action and is inefficient.
+
+    :see: :obj:`.CommandLineParser.force_default`
+
+    """
     usage_config: UsageConfig = field(default_factory=UsageConfig)
     """Configuraiton information for the command line help."""
 

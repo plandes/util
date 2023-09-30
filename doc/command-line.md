@@ -631,7 +631,18 @@ Conversely, we link from the `default` section's `high_cost` parameter to the
 
 A `default_action` attribute can be set on the [ActionCliManager] in the `cli`
 section when it is created to use an action by name if the user does not supply
-one.  Usage identifies which action is the default.
+one.  Usage identifies which action is the default and will condense the output
+when possible.
+
+The choice of action becomes ambiguous when the positional arguments are given
+and the action name matches the argument.  An error is raised when the
+application is configured in this way.
+
+However, if the `cli` section contains `force_default = True`, the command
+parsing will insert the default action when the first non-option is not found
+as an action.  However, this leads to the mentioned ambiguity and is
+inefficient (arguments are re-parsed) so exercise caution when using this
+setting.
 
 
 ### Logging

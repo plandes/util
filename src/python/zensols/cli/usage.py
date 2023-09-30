@@ -242,13 +242,14 @@ class _ActionFormatter(_Formatter):
     def __post_init__(self):
         self.WRITABLE_MAX_COL = self.usage_config.width
         action = self.action
+        is_def: bool = self.usage_formatter.default_action == action.name
         if len(action.positional) == 0:
             args = ''
         else:
             pargs = ', '.join(map(lambda p: p.name, action.positional))
             args = f' <{pargs}>'
         self.action_name = action.name + args
-        if self.usage_formatter.default_action == self.action_name:
+        if is_def:
             self.action_name = f'{self.action_name} (default)'
         self.opts = tuple(map(
             lambda of: _OptionFormatter(
@@ -340,7 +341,7 @@ class _UsageFormatter(_Formatter):
             self.usage_config.inter_col_space
 
     def get_option_usage_names(self, expand: bool = True) -> str:
-        actions: Iterable[Action] = filter(
+        actions: Iterable[ActionMetaData] = filter(
             lambda a: a.is_usage_visible, self.actions)
         action_names: Tuple[str, ...] = tuple(map(lambda a: a.name, actions))
         if len(action_names) > 1:
