@@ -227,7 +227,7 @@ class IniConfig(Configurable, Primeable):
         mod = ''
         if isinstance(self.config_file, (str, Path)):
             parts = self.config_file.parts
-            path = Path(*parts[max(0, len(parts)-max_path_len):])
+            path = Path(*parts[max(0, len(parts) - max_path_len):])
             tpe = 'f=' if include_type else ''
             mod = f'{tpe}{path}'
         elif isinstance(self.config_file, Configurable):
@@ -235,7 +235,7 @@ class IniConfig(Configurable, Primeable):
             mod = f'{tpe}[{self.config_file}]'
         return mod
 
-    def _get_section_short_str(self):
+    def _get_section_short_str(self) -> str:
         if self._conf is None:
             # getting sections invokes parsing, which causes issues if used in
             # a debugging statement when we're not yet ready to parse
@@ -246,8 +246,9 @@ class IniConfig(Configurable, Primeable):
         return ''
 
     def _get_short_str(self) -> str:
-        sec = self._get_section_short_str()
-        return f'{self.__class__.__name__}({self._get_container_desc()}){{{sec}}}'
+        sec: str = self._get_section_short_str()
+        cname: str = self.__class__.__name__
+        return f'{cname}({self._get_container_desc()}){{{sec}}}'
 
 
 class rawconfig(object):

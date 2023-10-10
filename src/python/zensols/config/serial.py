@@ -85,13 +85,15 @@ class Serializer(object):
 
     """
     FLOAT_REGEXP = re.compile(r'^[-+]?\d*\.\d+$')
-    SCI_REGEXP = re.compile(r'^([+-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+))$')
+    SCI_REGEXP = re.compile(
+        r'^([+-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+))$')
     INT_REGEXP = re.compile(r'^[-+]?[0-9]+$')
     BOOL_REGEXP = re.compile(r'^True|False')
     PATH_REGEXP = re.compile(r'^path:\s*(.+)$')
     RESOURCE_REGEXP = re.compile(r'^resource(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     STRING_REGEXP = re.compile(r'^str:\s*(.+)$', re.DOTALL)
-    LIST_REGEXP = re.compile(r'^(list|set|tuple)(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
+    LIST_REGEXP = re.compile(
+        r'^(list|set|tuple)(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     EVAL_REGEXP = re.compile(r'^(?:eval|dict)(?:\((.+)\))?:\s*(.+)$', re.DOTALL)
     JSON_REGEXP = re.compile(r'^json:\s*(.+)$', re.DOTALL)
     CLASS_REGEXP = re.compile(r'^class:\s*(.+)$')
@@ -323,7 +325,8 @@ class Serializer(object):
         try:
             if module_name is not None and \
                pkg_resources.resource_exists(module_name, resource_name):
-                res = pkg_resources.resource_filename(module_name, resource_name)
+                res = pkg_resources.resource_filename(
+                    module_name, resource_name)
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'resource exists: {res}')
         except ModuleNotFoundError as e:

@@ -105,8 +105,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
     _MODULES: ClassVar[Type[ImportConfigFactoryModule]] = []
 
     _MODULE_REGEXP: ClassVar[str] = r'(?:\((.+)\))?:\s*(.+)'
-    """The ``instance`` regular expression used to identify children attributes to
-    set on the object.  The process if creation can chain from parent to
+    """The ``instance`` regular expression used to identify children attributes
+    to set on the object.  The process if creation can chain from parent to
     children recursively.
 
     """
@@ -199,8 +199,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             return self._shared.pop(name, None)
 
     def clone(self) -> Any:
-        """Return a copy of this configuration factory that functionally works the
-        same.  However, it does not copy over any resources generated during
+        """Return a copy of this configuration factory that functionally works
+        the same.  However, it does not copy over any resources generated during
         the life of the factory.
 
         """
@@ -248,8 +248,8 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
         return inst
 
     def new_deep_instance(self, name: str = None, *args, **kwargs):
-        """Like :meth:`new_instance` but copy all recursive instances as new objects as
-        well.
+        """Like :meth:`new_instance` but copy all recursive instances as new
+        objects as well.
 
         """
         prev_shared = self._shared
