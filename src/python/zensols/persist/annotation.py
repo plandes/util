@@ -292,7 +292,7 @@ class PersistedWork(Deallocatable):
         else:
             return self.owner is not None and hasattr(self.owner, vname)
 
-    def __getstate__(self):
+    def __getstate__(self) -> Dict[str, Any]:
         """We must null out the owner and worker as they are not pickelable.
 
         :see: :class:`.PersistableContainer`
