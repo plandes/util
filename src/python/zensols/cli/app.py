@@ -262,7 +262,7 @@ class Application(Dictable):
         const_params: Dict[str, Any] = {}
         sec = action.section
         # gather fields
-        field: ClassField
+        f: ClassField
         for f in action.class_meta.fields.values():
             val: str = cmd_opts.get(f.name)
             if logger.isEnabledFor(logging.DEBUG):
