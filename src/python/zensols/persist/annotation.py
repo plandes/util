@@ -107,8 +107,8 @@ class FileTextUtil(object):
 
 # class level persistance
 class PersistedWork(Deallocatable):
-    """This class caches data in the instance of the contained class and/or global
-    level.  In addition, the data is also pickled to disk to avoid any
+    """This class caches data in the instance of the contained class and/or
+    global level.  In addition, the data is also pickled to disk to avoid any
     expensive recomputation of the data.
 
     In order, it first looks for the data in ``owner``, then in globals (if
@@ -332,8 +332,8 @@ class PersistedWork(Deallocatable):
         return obj
 
     def __do_work__(self, *argv, **kwargs):
-        """You can extend this class and overriding this method.  This method will
-        invoke the worker to do the work.
+        """You can extend this class and overriding this method.  This method
+        will invoke the worker to do the work.
 
         """
         return self.worker(*argv, **kwargs)

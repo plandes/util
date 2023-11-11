@@ -63,10 +63,10 @@ class ShelveStash(CloseableStash):
     @property
     @persisted('_real_path')
     def real_path(self) -> Path:
-        """The path the shelve API created on this file system.  This is provided since
-        :obj:`path` does *not* take in to account that some (G)DBM
-        implementations add an extension and others do not This differes across
-        libraries compiled against the Python interpreter and platorm.
+        """The path the shelve API created on this file system.  This is
+        provided since :obj:`path` does *not* take in to account that some
+        (G)DBM implementations add an extension and others do not This differes
+        across libraries compiled against the Python interpreter and platorm.
 
         """
         ext = ShelveStash.get_extension()
@@ -144,10 +144,9 @@ class ShelveStash(CloseableStash):
 
 
 class shelve(object):
-    """Object used with a ``with`` scope that creates the closes a shelve object.
-
-    For example, the following opens a file ``path``, sets a temporary variable
-    ``stash``, prints all the data from the shelve, and then closes it.
+    """Object used with a ``with`` scope that creates the closes a shelve
+    object.  For example, the following opens a file ``path``, sets a temporary
+    variable ``stash``, prints all the data from the shelve, and then closes it:
 
     Example::
 
