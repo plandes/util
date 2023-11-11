@@ -12,9 +12,9 @@ from . import PersistableError, persisted, PersistedWork, ReadOnlyStash
 
 @dataclass(init=False)
 class ZipStash(ReadOnlyStash):
-    """Acesss a zip file by using the entry file names as keys and the content of
-    the entries as items.  The returned items are either byte arrays if created
-    without an encoding, otherwise decode strings are returned.
+    """Acesss a zip file by using the entry file names as keys and the content
+    of the entries as items.  The returned items are either byte arrays if
+    created without an encoding, otherwise decode strings are returned.
 
     A root path can be specified so the zip file appears to have been created
     in a sub-directory.
@@ -82,7 +82,7 @@ class ZipStash(ReadOnlyStash):
         with ZipFile(self.path) as z:
             keys.extend(filter(lambda n: not n.endswith('/'), z.namelist()))
         if self._root is not None:
-            keys = map(lambda k: k[rlen+1:] if k.startswith(root) else None,
+            keys = map(lambda k: k[rlen + 1:] if k.startswith(root) else None,
                        keys)
             keys = filter(lambda k: k is not None, keys)
         return set(keys)
