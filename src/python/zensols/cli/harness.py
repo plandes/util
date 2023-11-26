@@ -428,9 +428,20 @@ class CliHarness(object):
                         app_section: str = 'app') -> \
             Union[Application, ApplicationFailure]:
         """Get the application from the configuration factory.  For this to
-        work, the ``app`` section most not be in the cleanups.  Otherwise the
-        framework will remove the section before the call to the configuration
-        factory to create it.
+        work, the ``app_section`` section most not be in the cleanups.
+        Otherwise the framework will remove the section before the call to the
+        configuration factory to create it.
+
+        :param args: additional argument to give to the pseudo command line
+                     (i.e. ``-c <configuration file>``)
+
+        :param throw: whether to throw exceptions raised during executing the
+                      application; if ``False`` then return an
+                      :class:`.ApplicationFailure`
+
+        :param app_section: the name of the section that defines the app to get
+
+        :return: the application instance specified in the ``app_section``
 
         """
         config_factory: Union[ConfigFactory, ApplicationFailure] = \
