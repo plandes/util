@@ -4,9 +4,9 @@ and fork/exec operations.
 """
 __author__ = 'Paul Landes'
 
-import sys
 from typing import Any
 from dataclasses import dataclass, field
+import sys
 import traceback
 from io import TextIOBase
 
@@ -49,12 +49,14 @@ class Failure(object):
         """Raises :obj:`exception`."""
         raise self.exception
 
+    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
+        sp = ' ' * (2 * depth)
+        writer.write(f'{sp}{self.message}:\n')
+        self.print_stack(writer)
+
     def __str__(self) -> str:
         msg: str = str(self.exception) if self.message is None else self.message
         return str(f'{type(self.exception).__name__}: {msg}')
-
-    def __repr__(self) -> str:
-        return self.__str__()
 
 
 from .std import *
