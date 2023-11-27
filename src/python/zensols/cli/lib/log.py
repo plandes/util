@@ -19,10 +19,12 @@ class LogLevel(Enum):
     include all so as to not overwhelm the help usage.
 
     """
+    notset = logging.NOTSET
     debug = logging.DEBUG
     info = logging.INFO
     warn = logging.WARNING
     err = logging.ERROR
+    crit = logging.CRITICAL
 
 
 @dataclass
