@@ -23,7 +23,8 @@ logger = logging.getLogger(__name__)
 
 
 class FactoryError(APIError):
-    """Raised when an object can not be instantianted by a :class:`.ConfigFactory`.
+    """Raised when an object can not be instantianted by a
+    :class:`.ConfigFactory`.
 
     """
     def __init__(self, msg: str, factory: ConfigFactory = None):
@@ -50,8 +51,8 @@ class FactoryState(Enum):
 
 
 class FactoryStateObserver(ABC):
-    """An interface that recieves notifications that the factory has created this
-    instance.  This is useful for classes such as :class:`.Writeback`.
+    """An interface that recieves notifications that the factory has created
+    this instance.  This is useful for classes such as :class:`.Writeback`.
 
     :see: :class:`.Writeback`
 
@@ -98,15 +99,15 @@ class ConfigFactory(object):
 
     """
     NAME_ATTRIBUTE = 'name'
-    """The *name* of the parameter given to ``__init__``.  If a parameter of this
-    name is on the instance being created it will be set from the name of the
-    section.
+    """The *name* of the parameter given to ``__init__``.  If a parameter of
+    this name is on the instance being created it will be set from the name of
+    the section.
 
     """
     CONFIG_ATTRIBUTE = 'config'
-    """The *configuration* of the parameter given to ``__init__``.  If a parameter
-    of this name is on the instance being created it will be set as the
-    instance of the configuration given to the initializer of this factory
+    """The *configuration* of the parameter given to ``__init__``.  If a
+    parameter of this name is on the instance being created it will be set as
+    the instance of the configuration given to the initializer of this factory
     instance.
 
     """
@@ -117,8 +118,8 @@ class ConfigFactory(object):
 
     """
     CLASS_NAME = 'class_name'
-    """The class name attribute in the section that identifies the fully qualified
-    instance to create.
+    """The class name attribute in the section that identifies the fully
+    qualified instance to create.
 
     """
     def __init__(self, config: Configurable, pattern: str = '{name}',
@@ -150,8 +151,8 @@ class ConfigFactory(object):
 
     @classmethod
     def register(cls, instance_class: Type, name: str = None):
-        """Register a class with the factory.  This method assumes the factory instance
-        was created with a (default) :class:`.DictionaryClassResolver`.
+        """Register a class with the factory.  This method assumes the factory
+        instance was created with a (default) :class:`.DictionaryClassResolver`.
 
         :param instance_class: the class to register with the factory (not a
                                string)
@@ -295,7 +296,8 @@ class ConfigFactory(object):
         return self._find_class(class_name)
 
     def from_config_string(self, v: str) -> Any:
-        """Create an instance from a string used as option values in the configuration.
+        """Create an instance from a string used as option values in the
+        configuration.
 
         """
         try:
@@ -305,8 +307,8 @@ class ConfigFactory(object):
         return self.instance(v)
 
     def clone(self) -> Any:
-        """Return a copy of this configuration factory that functionally works the
-        same.
+        """Return a copy of this configuration factory that functionally works
+        the same.
 
         """
         return cp.copy(self)

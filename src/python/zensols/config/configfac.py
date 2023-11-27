@@ -129,8 +129,8 @@ class ConfigurableFactory(object):
         return class_type
 
     def from_path(self, path: Path) -> Configurable:
-        """Create a configurable from a path.  This updates the :obj:`kwargs` to set
-        ``config_file`` to the given path for the duration of this method.
+        """Create a configurable from a path.  This updates the :obj:`kwargs` to
+        set ``config_file`` to the given path for the duration of this method.
 
         """
         if path.is_dir():

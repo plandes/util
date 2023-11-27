@@ -151,10 +151,10 @@ class _BootstrapConfig(IniConfig):
 
 
 class ImportIniConfig(IniConfig):
-    """A configuration that uses other :class:`.Configurable` classes to load other
-    sections.  A special ``import`` section is given that indicates what other
-    sections to load as children configuration.  Each of those indicated to
-    import are processed in order by:
+    """A configuration that uses other :class:`.Configurable` classes to load
+    other sections.  A special ``import`` section is given that indicates what
+    other sections to load as children configuration.  Each of those indicated
+    to import are processed in order by:
 
       1. Creating the delegate child :class:`Configurable` given in the
          section.
@@ -310,12 +310,13 @@ class ImportIniConfig(IniConfig):
 
     def _create_configs(self, section: str, params: Dict[str, Any],
                         bs_config: _BootstrapConfig) -> List[Configurable]:
-        """Create one or more :class:`~zensols.config.Configuration` instance depending
-        on if one or more configuration files are given.  Configurations are
-        created with using a :class:`~zensols.config.ConfigurationFactory` in
-        :meth:`_create_config`.  This method is called once to create all
-        configuration files for obj:`CONFIG_FILES` and again for each section
-        for :obj:`SECTIONS_SECTION`.
+        """Create one or more :class:`~zensols.config.Configuration` instance
+        depending on if one or more configuration files are given.
+        Configurations are created with using a
+        :class:`~zensols.config.ConfigurationFactory` in :meth:`_create_config`.
+        This method is called once to create all configuration files for
+        obj:`CONFIG_FILES` and again for each section for
+        :obj:`SECTIONS_SECTION`.
 
         :param section: the import ini section to load
 
@@ -375,8 +376,8 @@ class ImportIniConfig(IniConfig):
         return configs
 
     def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
-        """"Get children used for this config instance.  This is done by import each
-        import section and files by delayed loaded for each.
+        """"Get children used for this config instance.  This is done by import
+        each import section and files by delayed loaded for each.
 
         Order is important as each configuration can refer to previously loaded
         configurations.  For this reason, the :class:`_ConfigLoader` is needed

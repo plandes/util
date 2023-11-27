@@ -23,8 +23,8 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class Dictable(Writable):
-    """A class that that generates a dictionary recursively from data classes and
-    primitive data structures.
+    """A class that that generates a dictionary recursively from data classes
+    and primitive data structures.
 
     To override the default behavior of creating a dict from a
     :class:`dataclass`, override the :meth:`_from_dictable` method.
@@ -243,8 +243,8 @@ class Dictable(Writable):
 
     def _write_descendants(self, depth: int = 0,
                            writer: TextIOBase = sys.stdout):
-        """Write this instance by using the :meth:`write` method on children instead of
-        writing the generated dictionary.
+        """Write this instance by using the :meth:`write` method on children
+        instead of writing the generated dictionary.
 
         """
         for readable_name, name in self._get_dictable_attributes():
@@ -260,8 +260,8 @@ class Dictable(Writable):
                 self._write_key_value(readable_name, v, depth, writer)
 
     def _writable_dict(self) -> Dict[str, Any]:
-        """Return a :class:`dict` that contains what will be output when :meth:`write`
-        is called.
+        """Return a :class:`dict` that contains what will be output when
+        :meth:`write` is called.
 
         """
         dct = self._from_dictable(True, True)
@@ -271,12 +271,12 @@ class Dictable(Writable):
         return dct
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
-        """Write this instance as either a :class:`Writable` or as a :class:`Dictable`.
-        If class attribute ``_DICTABLE_WRITABLE_DESCENDANTS`` is set as
-        ``True``, then use the :meth:`write` method on children instead of
-        writing the generated dictionary.  Otherwise, write this instance by
-        first creating a ``dict`` recursively using :meth:`asdict`, then
-        formatting the output.
+        """Write this instance as either a :class:`Writable` or as a
+        :class:`Dictable`.  If class attribute
+        ``_DICTABLE_WRITABLE_DESCENDANTS`` is set as ``True``, then use the
+        :meth:`write` method on children instead of writing the generated
+        dictionary.  Otherwise, write this instance by first creating a ``dict``
+        recursively using :meth:`asdict`, then formatting the output.
 
         If the attribute ``_DICTABLE_WRITE_EXCLUDES`` is set, those attributes
         are removed from what is written in the :meth:`write` method.

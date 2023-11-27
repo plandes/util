@@ -57,8 +57,8 @@ class Writeback(FactoryStateObserver, Dictable):
 
     """
     def _notify_state(self, state: FactoryState):
-        """Called to update the object of a new state.  This is currently only called
-        by instances of :class:`.ConfigFactory`.
+        """Called to update the object of a new state.  This is currently only
+        called by instances of :class:`.ConfigFactory`.
 
         This is useful when overridding :meth:`is_settable` to disallow
         setting of the configuraiton while the object is being initialized (see
@@ -79,9 +79,9 @@ class Writeback(FactoryStateObserver, Dictable):
         return self.DEFAULT_SKIP_ATTRIBUTES
 
     def _get_keep_attribute(self) -> Set[str]:
-        """Return a list of attribute names to allow update.  This is an exclusive
-        list, so those not in this set are not updated.  If ``None``, always
-        update all.
+        """Return a list of attribute names to allow update.  This is an
+        exclusive list, so those not in this set are not updated.  If ``None``,
+        always update all.
 
         """
         return None
@@ -95,17 +95,17 @@ class Writeback(FactoryStateObserver, Dictable):
         return self.config_factory.config.serializer.is_allowed_type(value)
 
     def _allow_config_adds(self) -> bool:
-        """Whether or not to allow new entries to be made in the configuration if they
-        do not already exist.
+        """Whether or not to allow new entries to be made in the configuration
+        if they do not already exist.
 
         """
         return False
 
     def _is_settable(self, name: str, value: Any) -> bool:
-        """Return whether or not to allow setting attribute ``name`` with ``value`` on
-        the current instance.  This also checks to make sure this instance has
-        completed initialization by check for the existance of the :obj:`state`
-        attribute set in :meth:`_notify_state`.
+        """Return whether or not to allow setting attribute ``name`` with
+        ``value`` on the current instance.  This also checks to make sure this
+        instance has completed initialization by check for the existance of the
+        :obj:`state` attribute set in :meth:`_notify_state`.
 
         :param name: the name of the attribute
 
@@ -121,8 +121,8 @@ class Writeback(FactoryStateObserver, Dictable):
         return is_created and not is_skip and self._is_allowed_type(value)
 
     def _set_option(self, name: str, value: Any):
-        """Called by :meth:`__setattr__` to set the value on the backing ``config``.
-        The backing ``config`` handles the string serialization.
+        """Called by :meth:`__setattr__` to set the value on the backing
+        ``config``.  The backing ``config`` handles the string serialization.
 
         :param name: the name of the attribute
 
@@ -170,11 +170,11 @@ class Writeback(FactoryStateObserver, Dictable):
 
     def _from_dictable(self, recurse: bool, readable: bool,
                        class_name_param: str = None) -> Dict[str, Any]:
-        """This is overridden because this class operates on a per attribute basis very
-        close at the class/interpreter level.  Instead of using
-        :class:`dataclasses.dataclass` mechanisms to inform of how to create
-        the dictionary, it introspects the attributes and types of those
-        attributes of the object.
+        """This is overridden because this class operates on a per attribute
+        basis very close at the class/interpreter level.  Instead of using
+        :class:`dataclasses.dataclass` mechanisms to inform of how to create the
+        dictionary, it introspects the attributes and types of those attributes
+        of the object.
 
         """
         dct = OrderedDict()

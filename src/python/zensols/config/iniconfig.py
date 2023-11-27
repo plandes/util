@@ -280,8 +280,8 @@ class ExtendedInterpolationConfig(IniConfig):
 
 
 class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
-    """An :class:`.IniConfig` implementation that creates a section called ``env``
-    with environment variables passed.
+    """An :class:`.IniConfig` implementation that creates a section called
+    ``env`` with environment variables passed.
 
     """
 
@@ -317,8 +317,8 @@ class ExtendedInterpolationEnvConfig(ExtendedInterpolationConfig):
 
 
 class CommandLineConfig(IniConfig, metaclass=ABCMeta):
-    """A configuration object that allows creation by using command line arguments
-    as defaults when the configuration file is missing.
+    """A configuration object that allows creation by using command line
+    arguments as defaults when the configuration file is missing.
 
     Sub classes must implement the ``set_defaults`` method.  All defaults set
     in this method are then created in the default section of the configuration

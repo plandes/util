@@ -50,6 +50,14 @@ class Failure(object):
         raise self.exception
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
+        """Write the contents of this instance to ``writer`` using indention
+        ``depth``.
+
+        :param depth: the starting indentation depth
+
+        :param writer: the writer to dump the content of this writable
+
+        """
         sp = ' ' * (2 * depth)
         writer.write(f'{sp}{self.message}:\n')
         self.print_stack(writer)

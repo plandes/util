@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 class DictionaryConfig(TreeConfigurable, Dictable):
-    """This is a simple implementation of a dictionary backing configuration.  The
-    provided configuration is just a two level dictionary.  The top level keys
-    are the section and the values are a single depth dictionary with string
-    keys and values.
+    """This is a simple implementation of a dictionary backing configuration.
+    The provided configuration is just a two level dictionary.  The top level
+    keys are the section and the values are a single depth dictionary with
+    string keys and values.
 
     You can override :meth:`_get_config` to restructure the dictionary for
     application specific use cases.  One such example is

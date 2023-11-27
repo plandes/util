@@ -157,8 +157,8 @@ class Serializer(object):
             return re.split(r'\s*,\s*', v)
 
     def parse_object(self, v: str) -> Any:
-        """Parse as a string in to a Python object.  The following is done to parse the
-        string in order:
+        """Parse as a string in to a Python object.  The following is done to
+        parse the string in order:
 
           1. Primitive (i.e. ``1.23`` is a float, ``True`` is a boolean).
           2. A :class:`pathlib.Path` object when prefixed with ``path:``.
@@ -241,8 +241,8 @@ class Serializer(object):
     def populate_state(self, state: Dict[str, str],
                        obj: Union[dict, object] = None,
                        parse_types: bool = True) -> Union[dict, object]:
-        """Populate an object with a string dictionary.  The keys are used for the
-        output, and the values are parsed in to Python objects using
+        """Populate an object with a string dictionary.  The keys are used for
+        the output, and the values are parsed in to Python objects using
         :meth:`parse_object`.  The keys in the input are used as the same keys
         if ``obj`` is a ``dict``.  Otherwise, set data as attributes on the
         object with :py:func:`setattr`.
@@ -272,8 +272,8 @@ class Serializer(object):
         return json.loads(json_str, object_hook=as_python_object)
 
     def format_option(self, obj: Any) -> str:
-        """Format a Python object in to the string represetation per object syntax
-        rules.
+        """Format a Python object in to the string represetation per object
+        syntax rules.
 
         :see: :meth:`parse_object`
 
@@ -295,10 +295,10 @@ class Serializer(object):
 
     def resource_filename(self, resource_name: str, module_name: str = None) \
             -> Path:
-        """Return a resource based on a file name.  This uses the ``pkg_resources``
-        package first to find the resources.  If the resource module does not
-        exist, it defaults to the relateve file given in ``module_name``. If it
-        finds it, it returns a path on the file system.
+        """Return a resource based on a file name.  This uses the
+        ``pkg_resources`` package first to find the resources.  If the resource
+        module does not exist, it defaults to the relateve file given in
+        ``module_name``. If it finds it, it returns a path on the file system.
 
         Note that when a package is not installed, the ``resources`` directory
         must be in the module system path.  This happens automatically when

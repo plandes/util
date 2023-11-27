@@ -16,14 +16,15 @@ logger = logging.getLogger(__name__)
 
 
 class ClassExplorer(Writable):
-    """A utility class that recursively reports class metadata in an object graph.
+    """A utility class that recursively reports class metadata in an object
+    graph.
 
     """
     ATTR_META_NAME = 'ATTR_EXP_META'
-    """The attribute name set on classes to find to report their fields.  When the
-    value of this is set as a class attribute, each of that object instances'
-    members are pretty printed.  The value is a tuple of string attribute
-    names.
+    """The attribute name set on classes to find to report their fields.  When
+    the value of this is set as a class attribute, each of that object
+    instances' members are pretty printed.  The value is a tuple of string
+    attribute names.
 
     """
 

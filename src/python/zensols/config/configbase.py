@@ -110,7 +110,8 @@ class Configurable(Dictable, metaclass=ABCMeta):
         return self.serializer.parse_list(val)
 
     def get_option_boolean(self, name: str, section: str = None) -> bool:
-        """Just like :meth:`get_option` but parse as a boolean (any case `true`).
+        """Just like :meth:`get_option` but parse as a boolean (any case
+        `true`).
 
         :param section: section in the ini file to fetch the value; defaults to
                         constructor's ``default_section``

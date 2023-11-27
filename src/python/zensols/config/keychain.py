@@ -38,8 +38,8 @@ class Keychain(object):
 
     @property
     def password(self):
-        """Get the password for the account and service provided as member variables
-        (see class docs).
+        """Get the password for the account and service provided as member
+        variables (see class docs).
 
         """
         logger.debug(f'getting password for service={self.service}, ' +
@@ -48,9 +48,9 @@ class Keychain(object):
 
 
 class KeychainConfig(DictionaryConfig):
-    """A configuration that adds a user and password based on a macOS Keychain.app
-    entry.  The account (user name) and service (a grouping in Keychain.app) is
-    provided and the password is fetched.
+    """A configuration that adds a user and password based on a macOS
+    Keychain.app entry.  The account (user name) and service (a grouping in
+    Keychain.app) is provided and the password is fetched.
 
     Example::
 
@@ -61,6 +61,7 @@ class KeychainConfig(DictionaryConfig):
         type = keychain
         account = my-user-name
         default_section = login
+
     """
     def __init__(self, account: str, user: str = None,
                  service: str = 'python-passwords',

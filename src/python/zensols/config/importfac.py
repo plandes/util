@@ -154,7 +154,6 @@ class ImportConfigFactory(ConfigFactory, Deallocatable):
             cls._MODULES.append(mod)
 
     def _init_modules(self):
-        mod_type: Type[ImportConfigFactoryModule]
         modules: Tuple[ImportConfigFactoryModule] = tuple(
             map(lambda t: t(self), self._MODULES))
         mod_names: str = '|'.join(map(lambda m: m.name, modules))

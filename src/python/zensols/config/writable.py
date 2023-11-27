@@ -87,8 +87,8 @@ class Writable(ABC):
     def _write_line(self, line: str, depth: int, writer: TextIOBase,
                     max_len: Union[bool, int] = False,
                     repl_newlines: bool = False):
-        """Write a line of text ``line`` with the correct indentation per ``depth`` to
-        ``writer``.
+        """Write a line of text ``line`` with the correct indentation per
+        ``depth`` to ``writer``.
 
         :param max_line: truncate to the given length if an :class:`int` or
                          :obj:`WRITABLE_MAX_COL` if ``True``
@@ -213,8 +213,8 @@ class Writable(ABC):
             self._write_object(v, depth + (1 if include_index else 0), writer)
 
     def _is_container(self, v: Any) -> bool:
-        """Return whether or not ``v`` is a container object: ``dict``, ``list``,
-        ``tuple`` or a this class.
+        """Return whether or not ``v`` is a container object: ``dict``,
+        ``list``, ``tuple`` or a this class.
 
         """
         return isinstance(v, (dict, list, tuple, _WRITABLE_CLASS))
@@ -249,7 +249,8 @@ class Writable(ABC):
 
     @abstractmethod
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
-        """Write the contents of this instance to ``writer`` using indention ``depth``.
+        """Write the contents of this instance to ``writer`` using indention
+        ``depth``.
 
         :param depth: the starting indentation depth
 

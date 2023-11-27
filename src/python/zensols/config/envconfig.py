@@ -55,7 +55,8 @@ class EnvironmentConfig(Configurable):
 
     @persisted('_parsed_config')
     def _get_parsed_config(self) -> Dict[str, str]:
-        """Parse the configuration string given in the initializer (see class docs).
+        """Parse the configuration string given in the initializer (see class
+        docs).
 
         """
         conf = collections.defaultdict(lambda: {})
