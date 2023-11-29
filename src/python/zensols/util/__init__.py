@@ -4,11 +4,12 @@ and fork/exec operations.
 """
 __author__ = 'Paul Landes'
 
-from typing import Any
+from typing import Dict, Any
 from dataclasses import dataclass, field
 import sys
 import traceback
-from io import TextIOBase
+from collections import OrderedDict
+from io import StringIO, TextIOBase
 
 
 class APIError(Exception):
@@ -28,7 +29,7 @@ class Failure(object):
     """The exception that was generated."""
 
     thrower: Any = field(default=None)
-    """The insstance of the class that is throwing the exception."""
+    """The instance of the class that is throwing the exception."""
 
     traceback: traceback = field(default=None, repr=False)
     """The stack trace."""
@@ -44,6 +45,17 @@ class Failure(object):
     def print_stack(self, writer: TextIOBase = sys.stdout):
         """Print the stack trace of the exception that caused the failure."""
         traceback.print_exception(*self._exec_info, file=writer)
+
+    @property
+    def traceback_str(self) -> str:
+        """The stack trace as a string.
+
+        :see :meth:`print_stack`
+
+        """
+        sio = StringIO()
+        self.print_stack(writer=sio)
+        return sio.getvalue()
 
     def rethrow(self):
         """Raises :obj:`exception`."""
@@ -61,6 +73,21 @@ class Failure(object):
         sp = ' ' * (2 * depth)
         writer.write(f'{sp}{self.message}:\n')
         self.print_stack(writer)
+
+    def asdict(self) -> Dict[str, Any]:
+        """Return the content of the object as a dictionary."""
+        return OrderedDict(
+            [['message', self.message],
+             ['exception', self.exception],
+             ['trace', self.traceback_str]])
+
+    def __getstate__(self) -> Dict[str, Any]:
+        state = self.__dict__
+        del state['thrower']
+        return state
+
+    def __setstate__(self, state: Dict[str, Any]):
+        self.__dict__ = state
 
     def __str__(self) -> str:
         msg: str = str(self.exception) if self.message is None else self.message
