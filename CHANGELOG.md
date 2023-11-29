@@ -8,11 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.13.3] - 2023-11-29
+### Changed
+- `Failure` class is more flushed out.
+- Documentation, flake8 warnings, typehints.
+
+
 ## [1.13.2] - 2023-09-30
 ### Add
 - Functionality to force usage of the default action by argument reprocessing.
 
-### Changes
+### Changed
 - Default configuration searches UNIX style resource files for configuration
   (i.e. package `zensols.util` would point to `~/.zensols.util`).
 - Harness CLI uses better shell parsing to create applications and resources.
@@ -531,7 +537,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.13.2...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.13.3...HEAD
+[1.13.3]: https://github.com/plandes/util/compare/v1.13.2...v1.13.3
 [1.13.2]: https://github.com/plandes/util/compare/v1.13.1...v1.13.2
 [1.13.1]: https://github.com/plandes/util/compare/v1.13.0...v1.13.1
 [1.13.0]: https://github.com/plandes/util/compare/v1.12.7...v1.13.0
