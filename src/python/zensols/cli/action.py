@@ -33,10 +33,10 @@ class ActionCliManagerError(ActionCliError):
 
 @dataclass
 class ActionCliMethod(Dictable):
-    """A "married" action meta data / class method pair.  This is a pair of action
-    meta data that describes how to interpret it as a CLI action and the Python
-    class meta data method, which is used later to invoke the action (really
-    command).
+    """A "married" action meta data / class method pair.  This is a pair of
+    action meta data that describes how to interpret it as a CLI action and the
+    Python class meta data method, which is used later to invoke the action
+    (really command).
 
     """
     action_meta_data: ActionMetaData = field()
@@ -65,8 +65,8 @@ class ActionCli(PersistableContainer, Dictable):
 
     """
     options: Dict[str, OptionMetaData] = field(default=None)
-    """Options added by :class:`.ActionCliManager`, which are those options parsed
-    by the entire class metadata.
+    """Options added by :class:`.ActionCliManager`, which are those options
+    parsed by the entire class metadata.
 
     """
     mnemonic_includes: Set[str] = field(default=None)
@@ -76,8 +76,8 @@ class ActionCli(PersistableContainer, Dictable):
     """A list of mnemonicss to exclude, or none if ``None``."""
 
     mnemonic_overrides: Dict[str, str] = field(default=None)
-    """The name of the action given on the command line, which defaults to the name
-    of the action.
+    """The name of the action given on the command line, which defaults to the
+    name of the action.
 
     """
     option_includes: Set[str] = field(default=None)
@@ -87,16 +87,16 @@ class ActionCli(PersistableContainer, Dictable):
     """A list of options to exclude, or none if ``None``."""
 
     option_overrides: Dict[str, Dict[str, str]] = field(default=None)
-    """Overrides when creating new :class:`.OptionMetaData` where the keys are the
-    option names (field or method parameter) and the values are the dict that
-    clobbers respective keys.
+    """Overrides when creating new :class:`.OptionMetaData` where the keys are
+    the option names (field or method parameter) and the values are the dict
+    that clobbers respective keys.
 
     :see: :meth:`.ActionCliManager._create_op_meta_data`
 
     """
     first_pass: bool = field(default=False)
-    """Whether or not this is a first pass action (i.e. such as setting the level
-    in :class:`~zensols.cli.LogConfigurator`).
+    """Whether or not this is a first pass action (i.e. such as setting the
+    level in :class:`~zensols.cli.LogConfigurator`).
 
     """
     always_invoke: bool = field(default=False)
@@ -112,8 +112,8 @@ class ActionCli(PersistableContainer, Dictable):
     """Whether the action CLI is included in the usage help."""
 
     def _is_option_enabled(self, name: str) -> bool:
-        """Return ``True`` if the option is enabled and eligible to be added to the
-        command line.
+        """Return ``True`` if the option is enabled and eligible to be added to
+        the command line.
 
         """
         incs = self.option_includes
@@ -124,20 +124,22 @@ class ActionCli(PersistableContainer, Dictable):
         return enabled
 
     def _is_mnemonic_enabled(self, name: str) -> bool:
-        """Return ``True`` if the action for the mnemonic is enabled and eligible to be
-        added to the command line.
+        """Return ``True`` if the action for the mnemonic is enabled and
+        eligible to be added to the command line.
 
         """
         incs = self.mnemonic_includes
         excs = self.mnemonic_excludes
         enabled = ((incs is None) or (name in incs)) and (name not in excs)
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'mnemonic {self.section}:{name} is enabled: {enabled} for ' +
-                         f'{self.class_meta.name}: [inc={incs},exc={excs}]')
+            logger.debug(
+                f'mnemonic {self.section}:{name} is enabled: {enabled} for ' +
+                f'{self.class_meta.name}: [inc={incs},exc={excs}]')
         return enabled
 
     def _add_option(self, name: str, omds: Set[OptionMetaData]):
-        """Add an :class:`.OptionMetaData` from the previously collected options.
+        """Add an :class:`.OptionMetaData` from the previously collected
+        options.
 
         :param name: the name of the option
 
@@ -261,9 +263,9 @@ class ActionCli(PersistableContainer, Dictable):
 
 @dataclass
 class ActionCliManager(PersistableContainer, Dictable):
-    """Manages instances of :class:`.ActionCli`.  An :class:`.ActionCli` is created
-    from the configuration given by the section.  Optionally, another section
-    using :obj:`decorator_section_format` will be read to add additional
+    """Manages instances of :class:`.ActionCli`.  An :class:`.ActionCli` is
+    created from the configuration given by the section.  Optionally, another
+    section using :obj:`decorator_section_format` will be read to add additional
     metadata and configuration to instantiated object.  The decorated
     information is used to help bridge between the class given to be
     instantiated and the CLI.
@@ -414,8 +416,8 @@ class ActionCliManager(PersistableContainer, Dictable):
 
     def _create_op_meta_data(self, pmeta: ClassParam, meth: ClassMethod,
                              action_cli: ActionCli) -> OptionMetaData:
-        """Creates an option meta data used in the CLI from a method parsed from the
-        class's Python source code.
+        """Creates an option meta data used in the CLI from a method parsed from
+        the class's Python source code.
 
         """
         meta = None
@@ -450,7 +452,8 @@ class ActionCliManager(PersistableContainer, Dictable):
         return meta
 
     def _add_field(self, section: str, name: str, omd: OptionMetaData):
-        """Adds the field by name that will later be used in a :class:`.ActionCli`.
+        """Adds the field by name that will later be used in a
+        :class:`.ActionCli`.
 
         :raises ActionCliManagerError: if ``name`` has already been
                                        *registered*
@@ -470,8 +473,8 @@ class ActionCliManager(PersistableContainer, Dictable):
         self._fields[name] = omd
 
     def _add_action(self, action: ActionCli):
-        """Adds add an action for each method parsed from the action cli Python source
-        code.
+        """Adds add an action for each method parsed from the action cli Python
+        source code.
 
         """
         if action.section in self._actions:
@@ -514,9 +517,9 @@ class ActionCliManager(PersistableContainer, Dictable):
 
     def _create_action_from_section(self, conf_sec: str,
                                     params: Dict[str, Any]) -> ActionCli:
-        """Create an action from a section in the configuration.  If both the class
-        ``CLI_META`` and the decorator section exists, then this will replace
-        all options (properties) defined.
+        """Create an action from a section in the configuration.  If both the
+        class ``CLI_META`` and the decorator section exists, then this will
+        replace all options (properties) defined.
 
         :param conf_sec: the section name in the configuration that has the
                          action to create/overwrite the data
@@ -545,9 +548,9 @@ class ActionCliManager(PersistableContainer, Dictable):
         return action
 
     def _add_app(self, section: str):
-        """Add an :class:`.ActionCli` instanced from the configuration given by a
-        section.  The application is added to :obj:`._actions`.  The section is
-        parsed and use to instantiate an object using
+        """Add an :class:`.ActionCli` instanced from the configuration given by
+        a section.  The application is added to :obj:`._actions`.  The section
+        is parsed and use to instantiate an object using
         :class:`~zensols.config.factory.ImportConfigFactory`.
 
         Optionally, another section using :obj:`decorator_section_format` will
@@ -599,9 +602,9 @@ class ActionCliManager(PersistableContainer, Dictable):
     @property
     @persisted('_actions_pw')
     def actions(self) -> Dict[str, ActionCli]:
-        """Get a list of action CLIs that is used in :class:`.CommandLineParser` to
-        create instances of the application.  Each action CLI has a collection
-        of :class:`.ActionMetaData` instances.
+        """Get a list of action CLIs that is used in :class:`.CommandLineParser`
+        to create instances of the application.  Each action CLI has a
+        collection of :class:`.ActionMetaData` instances.
 
         :return: keys are the configuration sections with the action CLIs as
                  values
@@ -634,8 +637,8 @@ class ActionCliManager(PersistableContainer, Dictable):
     @property
     @persisted('_actions_by_meta_data_name_pw')
     def actions_by_meta_data_name(self) -> Dict[str, ActionCli]:
-        """Return a dict of :class:`.ActionMetaData` instances, each of which is each
-        mnemonic by name and the meta data by values.
+        """Return a dict of :class:`.ActionMetaData` instances, each of which is
+        each mnemonic by name and the meta data by values.
 
         """
         actions = {}
