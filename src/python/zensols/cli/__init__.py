@@ -4,8 +4,15 @@ driven applications.
 """
 __author__ = 'Paul Landes'
 
-from .simple import *
-from .peraction import *
+
+from zensols.util import APIError
+
+
+class ActionCliError(APIError):
+    """Thrown for all command line interface errors."""
+    pass
+
+
 from .util import *
 from .meta import *
 from .usage import *

@@ -1,16 +1,21 @@
 ## makefile automates the build and deployment for python projects
 
-# type of project
+
+## Build system
+#
 PROJ_TYPE=		python
 PROJ_MODULES=		git python-doc python-doc-deploy python-resources
 CLEAN_DEPS +=		pycleancache
 ADD_CLEAN +=		example/config/counter.dat
 
-#PY_SRC_TEST_PAT ?=	'test_app_config.py'
 
+## Includes
+#
 include ./zenbuild/main.mk
 
 
+## Targets
+#
 .PHONY:			check
 check:
 			mypy src/python/zensols/introspect/imp.py

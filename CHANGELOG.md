@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Removed
+- Old `actioncli` CLI modules `zensols.cli.{preaction,simple}`.
+
+
 ## [1.13.3] - 2023-11-29
 ### Changed
 - `Failure` class is more flushed out.
