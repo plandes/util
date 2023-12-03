@@ -24,8 +24,8 @@ class ClassImporterError(Exception):
 
 
 class ClassImporter(object):
-    """Utility class that reloads a module and instantiates a class from a string
-    class name.  This is handy for prototyping code in a Python REPL.
+    """Utility class that reloads a module and instantiates a class from a
+    string class name.  This is handy for prototyping code in a Python REPL.
 
     """
     _CLASS_REGEX: ClassVar[re.Pattern] = re.compile(
@@ -77,7 +77,9 @@ class ClassImporter(object):
         return mod
 
     def parse_module_class(self) -> Sequence[str]:
-        """Parse the module and class name part of the fully qualifed class name.
+        """Parse the module and class name part of the fully qualifed class
+        name.
+
         """
 
         cname: str = self.class_name
@@ -136,8 +138,8 @@ class ClassImporter(object):
             return cls
 
     def _bless(self, inst: Any) -> Any:
-        """A template method to modify a nascent instance just created.  The returned
-        instance is the instance used.
+        """A template method to modify a nascent instance just created.  The
+        returned instance is the instance used.
 
         This base class implementation just returns ``inst``.
 

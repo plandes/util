@@ -94,7 +94,8 @@ class TypeMapper(object):
 
 @dataclass(eq=True)
 class ClassDoc(object):
-    """A meta data for documentation at any level of the class code (methods etc).
+    """A meta data for documentation at any level of the class code (methods
+    etc).
 
     """
     PARAM_REGEX = re.compile(r'^\s*:param ([^:]+):\s*(.+)$')
@@ -284,9 +285,9 @@ class ClassInspector(object):
                     return node
 
     def _map_default(self, item: str, def_node: ast.AST):
-        """Map a default from what will be at times an :class:`ast.Name`.  This happens
-        when an enum is used as a type, but ``name.id`` only gives the enum
-        class name and not the enum value.
+        """Map a default from what will be at times an :class:`ast.Name`.  This
+        happens when an enum is used as a type, but ``name.id`` only gives the
+        enum class name and not the enum value.
 
         :param item: mapped target string used to create an error message
 
@@ -309,8 +310,8 @@ class ClassInspector(object):
                     msg = f'No default found for class: {cls}.{enum_name}'
                     if self.strict == 'y':
                         raise ClassError(msg)
-                    elif self.strict == 'w' and \
-                         logger.isEnabledFor(logging.WARN):
+                    elif self.strict == 'w' and logger.isEnabledFor(
+                            logging.WARN):
                         logger.warning(msg)
                     default = None
             # ast.Num and ast.Str added for Python 3.7 backward compat
@@ -396,8 +397,7 @@ class ClassInspector(object):
                isinstance(node.value, ast.Constant):
                 doc = ClassDoc(node.value.value)
             # ast.Str added for Python 3.7 backward compat
-            elif isinstance(node, ast.Expr) and \
-                 isinstance(node.value, ast.Str):
+            elif isinstance(node, ast.Expr) and isinstance(node.value, ast.Str):
                 doc = ClassDoc(node.value.s)
             else:
                 doc = None
@@ -424,11 +424,12 @@ class ClassInspector(object):
                 if param_name == 'self':
                     continue
                 positional = param.kind == Parameter.POSITIONAL_ONLY
+                pe = Parameter.empty
                 meth_args.append(ClassMethodArg(
                     name=param.name,
-                    dtype=None if param.annotation == Parameter.empty else param.annotation,
+                    dtype=None if param.annotation == pe else param.annotation,
                     doc=None,
-                    default=None if param.default == Parameter.empty else param.default,
+                    default=None if param.default == pe else param.default,
                     is_positional=positional))
             return ClassMethod(
                 name=mem_name,
@@ -491,7 +492,8 @@ class ClassInspector(object):
                     methods.append(meth)
             elif isinstance(node, ast.AnnAssign):
                 if self.strict == 'w' and logger.isEnabledFor(logging.WARNING):
-                    logger.warning(f'assign: {node.target.id}, {node.annotation}')
+                    logger.warning(
+                        f'assign: {node.target.id}, {node.annotation}')
             else:
                 msg = f'not processed node: {type(node)}: {node.value}'
                 if self.strict == 'w' and logger.isEnabledFor(logging.WARNING):
