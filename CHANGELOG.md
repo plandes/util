@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- `UnitTester`, which runs unit test cases from the REPL for the rapid
+  prototyping use case.
+
 ### Removed
 - Old `actioncli` CLI modules `zensols.cli.{preaction,simple}`.
 
