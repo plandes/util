@@ -8,12 +8,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.14.0] - 2023-12-05
+This release removes the deprecated CLI modules and is tested on Python 3.11.
+
 ### Added
 - `UnitTester`, which runs unit test cases from the REPL for the rapid
   prototyping use case.
+- Support for Python 3.11.
 
 ### Removed
 - Old `actioncli` CLI modules `zensols.cli.{preaction,simple}`.
+- Support for Python 3.9.
 
 
 ## [1.13.3] - 2023-11-29
@@ -545,7 +550,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.13.3...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.14.0...HEAD
+[1.14.0]: https://github.com/plandes/util/compare/v1.13.3...v1.14.0
 [1.13.3]: https://github.com/plandes/util/compare/v1.13.2...v1.13.3
 [1.13.2]: https://github.com/plandes/util/compare/v1.13.1...v1.13.2
 [1.13.1]: https://github.com/plandes/util/compare/v1.13.0...v1.13.1
