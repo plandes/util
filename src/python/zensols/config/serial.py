@@ -328,20 +328,20 @@ class Serializer(object):
                 res = pkg_resources.resource_filename(
                     module_name, resource_name)
                 if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f'resource exists: {res}')
+                    logger.debug(f"resource exists: '{res}'")
         except ModuleNotFoundError as e:
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'defaulting to module name: {resource_name}')
+                logger.debug(f"defaulting to module name: '{resource_name}'")
             if res is None:
                 raise ConfigurationError(f'Missing resource: {e}') from e
             if not res.exists():
                 raise ConfigurationError(
-                    f'Could not find path: {resource_name}') from e
+                    f"Could not find path: '{resource_name}'") from e
         except TypeError as e:
             # if the package is missing, a None is given to something raised
             # from the pkg_resources module
             raise ConfigurationError(
-                f'Could not find module and/or resource {module_name}: {e}') \
+                f"Could not find module and/or resource '{module_name}': {e}") \
                 from e
         if res is None:
             res = resource_name
