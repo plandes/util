@@ -54,6 +54,7 @@ class ConfigFormat(Enum):
     text = auto()
     ini = auto()
     json = auto()
+    yaml = auto()
 
 
 @dataclass
@@ -238,7 +239,7 @@ class ShowConfiguration(object):
 
     def _write_config(self, writer: TextIOBase, fmt: ConfigFormat,
                       sections: str):
-        conf = self.config_factory.config
+        conf: Configurable = self.config_factory.config
         if sections is not None:
             dconf = DictionaryConfig()
             conf.copy_sections(dconf, re.split(r'\s*,\s*', sections))
@@ -249,6 +250,8 @@ class ShowConfiguration(object):
             print(conf.get_raw_str().rstrip(), file=writer)
         elif fmt == ConfigFormat.json:
             print(conf.asjson(indent=4), file=writer)
+        elif fmt == ConfigFormat.yaml:
+            print(conf.asyaml(indent=4), file=writer)
 
     def show_config(self, sections: str = None) -> Configurable:
         """Print the configuration and exit.
