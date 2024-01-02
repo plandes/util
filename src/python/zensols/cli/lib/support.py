@@ -30,8 +30,8 @@ logger = logging.getLogger(__name__)
 
 
 class ExportFormat(Enum):
-    """The format for the environment export with the :class:`.ExportEnvironment`
-    first pass application.
+    """The format for the environment export with the
+    :class:`.ExportEnvironment` first pass application.
 
     """
     bash = auto()
@@ -66,8 +66,8 @@ class DryRunApplication(object):
 
 @dataclass
 class ExportEnvironment(object):
-    """The class dumps a list of bash shell export statements for sourcing in build
-    shell scripts.
+    """The class dumps a list of bash shell export statements for sourcing in
+    build shell scripts.
 
     """
     # we can't use "output_format" because ListActions would use the same
@@ -208,8 +208,8 @@ class ListActions(ApplicationObserver, Dictable):
 
 @dataclass
 class ShowConfiguration(object):
-    """The class dumps a list of bash shell export statements for sourcing in build
-    shell scripts.
+    """The class dumps a list of bash shell export statements for sourcing in
+    build shell scripts.
 
     """
     # we can't use "output_format" because ListActions would use the same
@@ -279,8 +279,8 @@ class ShowConfiguration(object):
 
 @dataclass
 class EditConfiguration(object):
-    """Edits the configuration file given on the command line.  This must be added
-    *after* the :class:`~zensols.cli.ConfigurationImporter` class.
+    """Edits the configuration file given on the command line.  This must be
+    added *after* the :class:`~zensols.cli.ConfigurationImporter` class.
 
     """
     CLI_META = {'option_includes': set(),
@@ -390,9 +390,9 @@ class ProgramNameConfigurator(object):
 
 @dataclass
 class Cleaner(DryRunApplication):
-    """Clean (removes) files and directories not needed by the project.  The first
-    tuple of paths will get deleted at any level, the next needs a level of 1
-    and so on.
+    """Clean (removes) files and directories not needed by the project.  The
+    first tuple of paths will get deleted at any level, the next needs a level
+    of 1 and so on.
 
     """
     CLASS_INSPECTOR = {}
