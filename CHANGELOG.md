@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.14.1] - 2024-01-04
+### Changes
+- Fix `Failure` picking bugs.
+- Move `Failure` and `APIError` to their own (`util.fail`) module.
+
+
 ## [1.14.0] - 2023-12-05
 This release removes the deprecated CLI modules and is tested on Python 3.11.
 
@@ -550,7 +556,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.14.0...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.14.1...HEAD
+[1.14.1]: https://github.com/plandes/util/compare/v1.14.0...v1.14.1
 [1.14.0]: https://github.com/plandes/util/compare/v1.13.3...v1.14.0
 [1.13.3]: https://github.com/plandes/util/compare/v1.13.2...v1.13.3
 [1.13.2]: https://github.com/plandes/util/compare/v1.13.1...v1.13.2
