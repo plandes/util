@@ -428,7 +428,7 @@ class CliHarness(object):
                         app_section: str = 'app') -> \
             Union[Application, ApplicationFailure]:
         """Get the application from the configuration factory.  For this to
-        work, the ``app_section`` section most not be in the cleanups.
+        work, the ``app_section`` section must not be in the cleanups.
         Otherwise the framework will remove the section before the call to the
         configuration factory to create it.
 
