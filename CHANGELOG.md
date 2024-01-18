@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- Short usage and help synopsis using the short help option (`-h`).
+
+
 ## [1.14.1] - 2024-01-04
 ### Changes
 - Fix `Failure` picking bugs.
