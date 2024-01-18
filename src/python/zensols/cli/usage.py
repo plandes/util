@@ -30,8 +30,8 @@ class UsageConfig(Dictable):
     """The max width to print help."""
 
     max_first_col: Union[float, int] = field(default=0.4)
-    """Maximum width of the first column.  If this is a float, then it is computed
-    as a percentage of the terminal width.
+    """Maximum width of the first column.  If this is a float, then it is
+    computed as a percentage of the terminal width.
 
     """
     max_metavar_len: Union[float, int] = field(default=0.15)
@@ -70,8 +70,8 @@ class UsageConfig(Dictable):
 
 
 class UsageActionOptionParser(OptionParser):
-    """Implements a human readable implementation of :meth:`print_help` for action
-    based command line handlers.
+    """Implements a human readable implementation of :meth:`print_help` for
+    action based command line handlers.
 
     **Implementation note**: we have to extend :class:`~optparser.OptionParser`
     since the ``-h`` option invokes the print help behavior and then exists
@@ -378,21 +378,22 @@ class _UsageFormatter(_Formatter):
 
     def _write_actions(self, depth: int, writer: TextIOBase,
                        action_metas: Sequence[ActionMetaData] = None):
+        def filter_action(f: _ActionFormatter) -> bool:
+            return f.action.is_usage_visible and \
+                (am_set is None or f.action.name in am_set)
+
         am_set: Set[str] = None
         if action_metas is not None:
             am_set = set(map(lambda a: a.name, action_metas))
         # get only visible actions
         fmts: Tuple[_ActionFormatter] = tuple(filter(
-            lambda f: f.action.is_usage_visible and \
-                (am_set is None or f.action.name in am_set),
-            self.action_formatters))
+            filter_action, self.action_formatters))
         n_fmt: int = len(fmts)
         if n_fmt > 0:
             self._write_line('Actions:', depth, writer)
         i: int
         fmt: _ActionFormatter
         for i, fmt in enumerate(fmts):
-            am: ActionMetaData = fmt.action
             self._write_object(fmt, depth, writer)
             if i < n_fmt - 1:
                 self._write_empty(writer)
@@ -419,7 +420,8 @@ class _UsageFormatter(_Formatter):
 
 @dataclass
 class _UsageWriter(_Formatter):
-    """Generates the usage and help messages for an :class:`optparse.OptionParser`.
+    """Generates the usage and help messages for an
+    :class:`optparse.OptionParser`.
 
     """
     parser: OptionParser = field()
