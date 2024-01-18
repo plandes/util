@@ -317,7 +317,7 @@ class EditConfiguration(object):
 class ProgramNameConfigurator(object):
     """Adds a section with the name of the program to use.  This is useful for
     adding the program name to the beginning of logging lines to confirm to
-    UNIX line output standards.
+    UNIX conventions.
 
     To add it to the logging output add it to the
     :class:`~zensols.cli.LogConfigurator` section's ``format`` property.
@@ -330,7 +330,7 @@ class ProgramNameConfigurator(object):
 
         [log_cli]
         class_name = zensols.cli.LogConfigurator
-        format = ${prog:name}: %%(message)s
+        format = ${program:name}: %%(message)s
 
     """
     CLI_META = {'first_pass': True,  # not a separate action
