@@ -1,9 +1,13 @@
 """Utility classes to write command line help.
 
+:see: :class:`.UsageActionOptionParser`
+
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import Tuple, Iterable, List, Union, Optional, Sequence, Set
+from typing import (
+    Tuple, Iterable, List, Union, Optional, Sequence, Set, ClassVar
+)
 from dataclasses import dataclass, field
 import logging
 import os
@@ -13,6 +17,7 @@ from itertools import chain
 from pathlib import Path
 from io import TextIOBase
 from optparse import OptionParser
+from zensols.util import APIError
 from zensols.introspect import IntegerSelection
 from zensols.config import Writable, Dictable
 from zensols.persist import persisted
@@ -73,6 +78,13 @@ class UsageActionOptionParser(OptionParser):
     """Implements a human readable implementation of :meth:`print_help` for
     action based command line handlers.
 
+    Each action is described with the full documentation with ``--help``.
+    However, the short option version (``-h``) creates a much (GNU style)
+    summarization of the command and actions.
+
+    If an action or several actions are given with either help flag, only that
+    action usage and documentation is printed.
+
     **Implementation note**: we have to extend :class:`~optparser.OptionParser`
     since the ``-h`` option invokes the print help behavior and then exists
     printing the second pass action options.  Instead, we look for the help
@@ -94,23 +106,32 @@ class UsageActionOptionParser(OptionParser):
             doc='show the program version and exit')
         options = [help_op, version_op] + list(options)
         self._usage_writer = _UsageWriter(
-            self, actions, options, doc, usage_config, default_action)
+            parser=self,
+            actions=actions,
+            global_options=options,
+            doc=doc,
+            usage_config=usage_config,
+            default_action=default_action)
         self.add_option(help_op.create_option())
 
     def print_help(self, file: TextIOBase = sys.stdout,
                    include_actions: bool = True,
-                   action_metas: Sequence[ActionMetaData] = None):
+                   action_metas: Sequence[ActionMetaData] = None,
+                   action_format: str = False):
         """Write the usage information and help text.
 
         :param include_actions: if ``True`` write each actions' usage as well
 
         :param actions: the list of actions to output, or ``None`` for all
 
+        :param action_format: the action format, either ``short`` or ``long``
+
         """
         self._usage_writer.write(
             writer=file,
             include_actions=include_actions,
-            action_metas=action_metas)
+            action_metas=action_metas,
+            action_format=action_format)
 
 
 @dataclass
@@ -125,8 +146,12 @@ class _Formatter(Writable):
         doc = re.sub(self._BACKTICKS_REGEX, r'"\1"', doc)
         return doc
 
-    def _write_three_col(self, a: str, b: str, c: str, depth: int = 0,
-                         writer: TextIOBase = sys.stdout):
+    def _write_one_col(self, text: str, depth: int, writer: TextIOBase):
+        text = self._trunc(text)
+        self._write_line(text, depth, writer)
+
+    def _write_three_col(self, a: str, b: str, c: str, depth: int,
+                         writer: TextIOBase):
         a = '' if a is None else a
         b = '' if b is None else b
         c = '' if c is None else c
@@ -241,39 +266,54 @@ class _ActionFormatter(_Formatter):
 
     def __post_init__(self):
         self.WRITABLE_MAX_COL = self.usage_config.width
-        action = self.action
-        is_def: bool = self.usage_formatter.default_action == action.name
-        if len(action.positional) == 0:
-            args = ''
-        else:
-            pargs = ', '.join(map(lambda p: p.name, action.positional))
-            args = f' <{pargs}>'
-        self.action_name = action.name + args
-        if is_def:
-            self.action_name = f'{self.action_name} (default)'
         self.opts = tuple(map(
             lambda of: _OptionFormatter(
                 self.usage_formatter, of, self.usage_config),
-            action.options))
+            self.action.options))
         self.pos = tuple(map(
             lambda pos: _PositionalFormatter(self.usage_formatter, pos),
-            action.positional))
+            self.action.positional))
         self.doc = self._format_doc(self.action.doc)
 
+    @property
+    @persisted('_position_args_str')
+    def position_args_str(self) -> Optional[str]:
+        if len(self.action.positional) > 0:
+            pargs = ' '.join(map(lambda p: p.name, self.action.positional))
+            return f'<{pargs}>'
+
+    @property
+    @persisted('_action_desc')
+    def action_desc(self) -> str:
+        is_def: bool = self.usage_formatter.default_action == self.action.name
+        action_name: str = self.action.name
+        pos_args: Optional[str] = self.position_args_str
+        if pos_args is not None:
+            action_name = f'{action_name} {pos_args}'
+        if is_def:
+            action_name = f'{action_name} (default)'
+        return action_name
+
     def add_first_col_width(self, widths: List[int]):
-        widths.append(len(self.action_name))
+        widths.append(len(self.action_desc))
         for of in self.opts:
             of.add_first_col_width(widths)
         for pos in self.pos:
             pos.add_first_col_width(widths)
 
-    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
-        self._write_three_col(
-            self.action_name, '', self.doc, depth, writer)
-        for pos in self.pos:
-            self._write_object(pos, depth, writer)
-        for opt in self.opts:
-            self._write_object(opt, depth, writer)
+    def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
+              format: str = 'long'):
+        if format == 'long':
+            self._write_three_col(
+                self.action_desc, '', self.doc, depth, writer)
+            for pos in self.pos:
+                self._write_object(pos, depth, writer)
+            for opt in self.opts:
+                self._write_object(opt, depth, writer)
+        elif format == 'short':
+            self._write_one_col(self.action_desc, depth, writer)
+        else:
+            raise APIError(f'No such action format: {format}')
 
 
 @dataclass
@@ -309,7 +349,7 @@ class _UsageFormatter(_Formatter):
         return len(self.visible_actions) == 1
 
     @property
-    def default_action(self):
+    def default_action(self) -> str:
         return self.writer.default_action
 
     @property
@@ -367,21 +407,26 @@ class _UsageFormatter(_Formatter):
             opts = ''
         return opts
 
+    @property
+    def has_opts(self) -> bool:
+        return len(self.glob_option_formatters) > 0
+
     def _write_options(self, depth: int, writer: TextIOBase) -> bool:
-        n_fmt = len(self.glob_option_formatters)
-        has_opts = n_fmt > 0
-        if has_opts:
+        has_opts: bool = self.has_opts
+        if self.has_opts:
             self._write_line('Options:', depth, writer)
             for i, of in enumerate(self.glob_option_formatters):
                 of.write(depth, writer)
         return has_opts
 
     def _write_actions(self, depth: int, writer: TextIOBase,
-                       action_metas: Sequence[ActionMetaData] = None):
+                       action_metas: Sequence[ActionMetaData],
+                       action_format: str):
         def filter_action(f: _ActionFormatter) -> bool:
             return f.action.is_usage_visible and \
                 (am_set is None or f.action.name in am_set)
 
+        is_short: bool = action_format == 'short'
         am_set: Set[str] = None
         if action_metas is not None:
             am_set = set(map(lambda a: a.name, action_metas))
@@ -389,33 +434,50 @@ class _UsageFormatter(_Formatter):
         fmts: Tuple[_ActionFormatter] = tuple(filter(
             filter_action, self.action_formatters))
         n_fmt: int = len(fmts)
-        if n_fmt > 0:
-            self._write_line('Actions:', depth, writer)
-        i: int
-        fmt: _ActionFormatter
-        for i, fmt in enumerate(fmts):
-            self._write_object(fmt, depth, writer)
-            if i < n_fmt - 1:
-                self._write_empty(writer)
+        lead_str: str = ''
+        if is_short:
+            fmt: _ActionFormatter
+            for fmt in fmts:
+                blocks: List[str] = [fmt.action.name]
+                pos_args: Optional[str] = fmt.position_args_str
+                if pos_args is not None:
+                    blocks.append(pos_args)
+                self.writer.write_short_usage(
+                    depth=depth,
+                    writer=writer,
+                    opts=tuple(map(lambda f: f.opt, fmt.opts)),
+                    usage=self._get_str_space(len(self.writer.USAGE_STR)),
+                    start_blocks=blocks)
+        else:
+            if n_fmt > 0 and (action_metas is None or len(action_metas) == 0):
+                self._write_line('Actions:', depth, writer)
+            i: int
+            fmt: _ActionFormatter
+            for i, fmt in enumerate(fmts):
+                writer.write(lead_str)
+                fmt.write(depth, writer, format=action_format)
+                if i < n_fmt - 1:
+                    self._write_empty(writer)
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
               include_singleton_positional: bool = True,
-              include_options: bool = True,
+              include_global_options: bool = True,
               include_actions: bool = True,
-              action_metas: Sequence[ActionMetaData] = None):
+              action_metas: Sequence[ActionMetaData] = None,
+              action_format: str = 'long'):
         if self.is_singleton_action and include_singleton_positional and \
            len(self.pos_formatters) > 0:
             self._write_line('Positional:', depth, writer)
             for po in self.pos_formatters:
                 self._write_object(po, depth, writer)
-            if include_options or include_actions:
+            if include_global_options or include_actions:
                 self._write_empty(writer)
-        if include_options:
+        if include_global_options:
             if self._write_options(depth, writer) and include_actions and \
                len(self.action_formatters) > 0:
                 self._write_empty(writer)
         if include_actions:
-            self._write_actions(depth, writer, action_metas)
+            self._write_actions(depth, writer, action_metas, action_format)
 
 
 @dataclass
@@ -424,6 +486,8 @@ class _UsageWriter(_Formatter):
     :class:`optparse.OptionParser`.
 
     """
+    USAGE_STR: ClassVar[str] = 'Usage: '
+
     parser: OptionParser = field()
     """Parses the command line in to primitive Python data structures."""
 
@@ -454,39 +518,136 @@ class _UsageWriter(_Formatter):
         self.usage_formatter = _UsageFormatter(
             self, actions, self.usage_config, self.global_options)
 
-    def get_prog_usage(self) -> str:
-        opt_usage: str = '[options]:'
+    @property
+    def program_name(self) -> str:
         prog: str = '<python>'
         if len(sys.argv) > 0:
             prog_path: Path = Path(sys.argv[0])
             prog = prog_path.name
+        return prog
+
+    def _get_short_option_str(self, opts: Tuple[OptionMetaData, ...]) -> str:
+        def filter_short(o: OptionMetaData) -> bool:
+            return o.dtype == bool and o.short_name is not None
+
+        def fmt_long(o: OptionMetaData) -> str:
+            if o.dtype == bool:
+                return f'[{o.shortest_option}]'
+            return f'[{o.shortest_option} {o.metavar}]'
+
+        shorts: str = '|'.join(map(lambda o: o.short_option,
+                                   filter(filter_short, opts)))
+        longs: str = ' '.join(map(fmt_long,
+                                  filter(lambda o: not filter_short(o), opts)))
+        if len(shorts) > 0:
+            shorts = f'[{shorts}]'
+        sp: str = ' ' if len(shorts) > 0 and len(longs) > 0 else ''
+        return shorts + sp + longs
+
+    def write_short_usage(self, depth: int, writer: TextIOBase,
+                          opts: Tuple[OptionMetaData, ...],
+                          usage: str = None,
+                          start_blocks: Sequence[str] = None,
+                          end_blocks: Sequence[str] = None):
+        def filter_short(o: OptionMetaData) -> bool:
+            return o.dtype == bool and o.short_name is not None
+
+        def fmt_long(o: OptionMetaData) -> str:
+            if o.dtype == bool:
+                return f'[{o.shortest_option}]'
+            return f'[{o.shortest_option} {o.metavar}]'
+
+        usage = self.USAGE_STR if usage is None else usage
+        usage_ind: int = len(usage)
+        sp: str = self._sp(depth)
+        option_sp: str = self._get_str_space(
+            usage_ind + len(self.program_name) + 1)
+        option_ind: int = len(option_sp)
+        shorts: str = '|'.join(map(
+            lambda o: o.short_option, filter(filter_short, opts)))
+        blocks: List[str] = [(usage + self.program_name)]
+        ind: int = 0
+        if start_blocks is not None:
+            blocks.extend(start_blocks)
+        if len(shorts) > 0:
+            blocks.append(f'[{shorts}]')
+        opt: OptionMetaData
+        for opt in filter(lambda o: not filter_short(o), opts):
+            blocks.append(fmt_long(opt))
+        if end_blocks is not None:
+            blocks.extend(end_blocks)
+        writer.write(sp)
+        block: str
+        for i, block in enumerate(blocks):
+            write_sp: bool = (i > 0)
+            if i > 0:
+                if i < len(blocks):
+                    next_width: int = ind + len(blocks[i]) + 1
+                    if next_width > self.WRITABLE_MAX_COL:
+                        writer.write('\n')
+                        writer.write(option_sp)
+                        ind = option_ind
+                        write_sp = False
+            if write_sp:
+                writer.write(' ')
+                ind += 1
+            writer.write(block)
+            ind += len(block)
+        writer.write('\n')
+
+    def _write_long_usage(self, depth: int, writer: TextIOBase):
+        prog: str = self.program_name
+        opt_usage: str = '[options]:'
         opts = self.usage_formatter.get_option_usage_names()
-        usage = f'{prog} {opts}{opt_usage}'
+        usage = f'{self.USAGE_STR}{prog} {opts}{opt_usage}'
         if len(usage) > (self.usage_config.width - len(opt_usage)):
             opts = self.usage_formatter.get_option_usage_names(expand=False)
             usage = f'{prog} {opts}{opt_usage}'
-        return usage
+        writer.write(usage)
+        self._write_empty(writer)
+        self._write_empty(writer)
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
               include_singleton_positional: bool = True,
-              include_options: bool = True,
+              include_global_options: bool = True,
               include_actions: bool = True,
-              action_metas: Sequence[ActionMetaData] = None):
-        prog = self.get_prog_usage()
+              action_metas: Sequence[ActionMetaData] = None,
+              action_format: str = 'long'):
+        is_short: bool = action_format == 'short'
         # if user specified help action(s) on the command line, only print the
         # action(s)
         if action_metas is None:
-            self._write_line(f'Usage: {prog}', depth, writer)
-            self._write_empty(writer)
-            if self.doc is not None:
+            if is_short:
+                self.write_short_usage(
+                    depth=depth,
+                    writer=writer,
+                    opts=(),
+                    start_blocks=('[-h|--help]', '[--version]'))
+                self.write_short_usage(
+                    depth=depth,
+                    writer=writer,
+                    opts=tuple(filter(
+                        lambda o: o.long_name not in {'help', 'version'},
+                        self.global_options)),
+                    usage=self._get_str_space(len(self.USAGE_STR)),
+                    start_blocks=(('<action>' if self.default_action is None
+                                   else '[action]'),),
+                    end_blocks=('[action options]',))
+            else:
+                self._write_long_usage(depth, writer)
+            if self.doc is not None and not is_short:
                 doc = self._format_doc(self.doc)
                 self._write_wrap(doc, depth, writer)
                 self._write_empty(writer)
         else:
-            include_options = False
+            include_global_options = False
+        if action_format == 'short':
+            include_singleton_positional = False
+            include_global_options = False
         self.usage_formatter.write(
             depth, writer,
             include_singleton_positional=include_singleton_positional,
-            include_options=include_options,
+            include_global_options=include_global_options,
             include_actions=include_actions,
-            action_metas=action_metas)
+            action_metas=action_metas,
+            action_format=action_format)

@@ -257,7 +257,8 @@ class CommandLineParser(Deallocatable, Dictable):
 
     def write_help(self, writer: TextIOBase = None,
                    include_actions: bool = True,
-                   action_metas: Sequence[ActionMetaData] = None):
+                   action_metas: Sequence[ActionMetaData] = None,
+                   action_format: str = 'long'):
         """Write the usage information and help text.
 
         :param writer: the data sync, or :obj:`sys.stdout` if ``None``
@@ -266,16 +267,18 @@ class CommandLineParser(Deallocatable, Dictable):
 
         :param actions: the list of actions to output, or ``None`` for all
 
+        :param action_format: the action format, either ``short`` or ``long``
+
         """
         writer = sys.stdout if writer is None else writer
-        parser = self._get_first_pass_parser(False)
-        parser.print_help(writer, include_actions, action_metas)
+        parser: UsageActionOptionParser = self._get_first_pass_parser(False)
+        parser.print_help(writer, include_actions, action_metas, action_format)
 
     def error(self, msg: str):
         """Print a usage with the error message and exit the program as fail.
 
         """
-        parser = self._get_first_pass_parser(False)
+        parser: UsageActionOptionParser = self._get_first_pass_parser(False)
         parser.error(msg)
 
     def _parse_type(self, s: str, t: type, name: str) -> Any:
@@ -338,6 +341,8 @@ class CommandLineParser(Deallocatable, Dictable):
         # make assoc array options in to a dict
         options = vars(options)
         if options['help'] is True:
+            goods: List[ActionMetaData]
+            bads: List[str]
             goods, bads = self._get_help_action(op_args)
             if len(bads) > 0:
                 raise CommandLineError(
@@ -346,7 +351,9 @@ class CommandLineParser(Deallocatable, Dictable):
             elif len(goods) > 0:
                 self.write_help(include_actions=True, action_metas=goods)
             else:
-                self.write_help(include_actions=True)
+                action_format: str = 'short' if '-h' in args else 'long'
+                self.write_help(include_actions=True,
+                                action_format=action_format)
             sys.exit(0)
         else:
             del options['help']
@@ -436,7 +443,7 @@ class CommandLineParser(Deallocatable, Dictable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'second pass opts: {options}:{op_args}')
             # sanity check to match parsed mnemonic and action name
-            assert(op_args[0] == action_meta.name)
+            assert (op_args[0] == action_meta.name)
             # remove the action name
             op_args = op_args[1:]
             options = vars(options)

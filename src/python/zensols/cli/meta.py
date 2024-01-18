@@ -201,6 +201,12 @@ class OptionMetaData(PersistableContainer, Dictable, _MetavarFormatter):
         """The short option string with dash."""
         return None if self.short_name is None else f'-{self.short_name}'
 
+    @property
+    def shortest_option(self) -> str:
+        """The shortest option (or long if no short option) with dash."""
+        opt: str = self.short_option
+        return self.long_option if opt is None else opt
+
     def create_option(self) -> optparse.Option:
         """Add the option to an option parser.
 

@@ -204,10 +204,10 @@ class TestMethodParse(LogTestCase):
         res: ActionResult = harness.execute('meth3 --inputfile b.txt')
         self.assertEqual(Path('b.txt'), res.result)
 
-    def test_help(self):
+    def test_long_help(self):
         sio = StringIO()
         with stdwrite(stdout=sio, stderr=sio):
-            self.harness.execute('-h')
+            self.harness.execute('--help')
         if False:
             print(f'should = <{sio.getvalue()}>')
             return
@@ -235,6 +235,24 @@ meth3                                     invoke a test method with a path
 meth4                                     invoke an int selection method. isel:
                                           the integer selection
   -e, --isel INT[,INT|:INT]  0
+exit: 0\n"""
+        self.assertEqual(should, sio.getvalue())
+
+    def test_short_help(self):
+        sio = StringIO()
+        with stdwrite(stdout=sio, stderr=sio):
+            self.harness.execute('-h')
+        if False:
+            print()
+            print(f'should = <{sio.getvalue()}>')
+            return
+        should = """\
+Usage: python -m unittest [-h|--help] [--version]
+       python -m unittest <action> [action options]
+       python -m unittest meth1
+       python -m unittest meth2 <fv> [-s INT]
+       python -m unittest meth3 [-i FILE]
+       python -m unittest meth4 [-e INT[,INT|:INT]]
 exit: 0\n"""
         self.assertEqual(should, sio.getvalue())
 

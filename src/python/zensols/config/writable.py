@@ -55,13 +55,11 @@ class Writable(ABC):
             s = s[:ml] + '...'
         return s
 
-    def _get_str_space(self, n_spaces: int) -> int:
+    def _get_str_space(self, n_spaces: int) -> str:
         return _get_str_space(n_spaces)
 
-    def _sp(self, depth: int):
-        """Utility method to create a space string.
-
-        """
+    def _sp(self, depth: int) -> str:
+        """Utility method to create a space string."""
         indent = getattr(self, '_indent', None)
         indent = self.WRITABLE_INDENT_SPACE if indent is None else indent
         return self._get_str_space(depth * indent)
