@@ -5,7 +5,7 @@ __author__ = 'Paul Landes'
 
 from typing import Iterable, List, Any, Tuple, Callable, Union, Type
 from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass, field, InitVar
+from dataclasses import dataclass, field
 import sys
 import os
 import logging
@@ -99,8 +99,8 @@ class MultiProcessor(object, metaclass=ABCMeta):
 
     @staticmethod
     def _process_work(processor: ChunkProcessor) -> int:
-        """Process a chunk of data in the child process that was created by the parent
-        process.
+        """Process a chunk of data in the child process that was created by the
+        parent process.
 
         """
         if logger.isEnabledFor(logging.DEBUG):
