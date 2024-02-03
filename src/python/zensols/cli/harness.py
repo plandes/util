@@ -99,8 +99,8 @@ class CliHarness(object):
     """More context given to the application context on app creation."""
 
     root_dir: Path = field(default=None)
-    """The entry point directory where to make all files relative.  If not given,
-    it is resolved from the parent of the entry point program path in the
+    """The entry point directory where to make all files relative.  If not
+    given, it is resolved from the parent of the entry point program path in the
     (i.e. :obj:`sys.argv`) arguments.
 
     """
@@ -109,10 +109,10 @@ class CliHarness(object):
     """The application factory used to create thye application."""
 
     relocate: bool = field(default=True)
-    """Whether or not to make :obj:`source_dir_name` and :obj:`app_config_resource`
-    relative to :obj:`root_dir` (when non-``None``).  This should be set to
-    ``False`` when used to create an application that is installed (i.e. with
-    pip).
+    """Whether or not to make :obj:`source_dir_name` and
+    :obj:`app_config_resource` relative to :obj:`root_dir` (when non-``None``).
+    This should be set to ``False`` when used to create an application that is
+    installed (i.e. with pip).
 
     """
     proto_args: Union[str, List[str]] = field(default_factory=list)
@@ -142,16 +142,16 @@ class CliHarness(object):
             self.add_sys_path(self.root_dir)
 
     @staticmethod
-    def add_sys_path(to_add: Path):
+    def add_sys_path(to_add: Union[str, Path]):
         """Add to the Python system path if not already.
 
         :param to_add: the path to test and add
 
         """
-        def canon(p: Path):
+        def canon(p: Path) -> Path:
             return p.expanduser().resolve().absolute()
 
-        spath: str
+        to_add = Path(to_add) if isinstance(to_add, str) else to_add
         to_add = canon(to_add)
         if not any(map(lambda p: canon(Path(p)) == to_add, sys.path)):
             sys.path.append(str(to_add))
@@ -179,8 +179,8 @@ class CliHarness(object):
         return meth
 
     def _handle_exit(self, se: SystemExit):
-        """Handle attempts to exit the Python interpreter.  This default implementation
-        simplly prints the error if :obj:`no_exit` is ``True``.
+        """Handle attempts to exit the Python interpreter.  This default
+        implementation simplly prints the error if :obj:`no_exit` is ``True``.
 
         :param se: the error caught
 
@@ -193,9 +193,9 @@ class CliHarness(object):
             raise se
 
     def configure_logging(self, *args, **kwargs):
-        """Convenience method to configure the logging package system for early stage
-        (bootstrap) debugging.  However, the "right" way to configure logging
-        is in the application configuration.
+        """Convenience method to configure the logging package system for early
+        stage (bootstrap) debugging.  However, the "right" way to configure
+        logging is in the application configuration.
 
         The arguments provided are given to the initializer of
         :class:`.LogConfigurator`, which is then used to configure the logging
@@ -630,17 +630,17 @@ class ConfigurationImporterCliHarness(CliHarness):
 
 @dataclass
 class NotebookHarness(CliHarness):
-    """A harness used in Jupyter notebooks.  This class has default configuration
-    useful to having a single directory with one or more notebooks off the
-    project root ditectory.
+    """A harness used in Jupyter notebooks.  This class has default
+    configuration useful to having a single directory with one or more notebooks
+    off the project root ditectory.
 
     For this reason :obj:`root_dir` is the parent directory, which is used to
     add :obj:`src_dir_name` to the Python path.
 
     """
     factory_kwargs: Dict[str, Any] = field(default_factory=dict)
-    """Arguments given to the factory when creating new application instances with
-    :meth:`__call__`.
+    """Arguments given to the factory when creating new application instances
+    with :meth:`__call__`.
 
     """
     def __post_init__(self):
