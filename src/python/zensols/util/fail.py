@@ -104,7 +104,7 @@ class Failure(object):
 
     def __str__(self) -> str:
         msg: str = str(self.exception) if self.message is None else self.message
-        return msg
+        return 'no information' if msg is None else msg
 
     def __repr__(self) -> str:
         msg: str = str(self)
