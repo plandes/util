@@ -8,7 +8,10 @@ import logging
 from pathlib import Path
 from io import TextIOBase, StringIO
 import yaml
-from zensols.config import ConfigurableFileNotFoundError, TreeConfigurable
+from yaml.parser import ParserError
+from zensols.config import (
+    ConfigurableError, ConfigurableFileNotFoundError, TreeConfigurable
+)
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +79,10 @@ class YamlConfig(TreeConfigurable):
         else:
             with open(cfile) as f:
                 content = f.read()
-        struct = yaml.load(content, yaml.FullLoader)
+        try:
+            struct = yaml.load(content, yaml.FullLoader)
+        except ParserError as e:
+            raise ConfigurableError(f"Could not parse '{cfile}': {e}") from e
         # struct is None is the file was empty
         if struct is None:
             struct = {}
