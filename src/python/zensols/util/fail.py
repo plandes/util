@@ -94,9 +94,9 @@ class Failure(object):
     def __getstate__(self) -> Dict[str, Any]:
         self.traceback_str
         state = self.__dict__
-        del state['thrower']
-        del state['traceback']
-        del state['_exc_info']
+        state['thrower'] = None
+        state['traceback'] = None
+        state['_exc_info'] = None
         return state
 
     def __setstate__(self, state: Dict[str, Any]):
