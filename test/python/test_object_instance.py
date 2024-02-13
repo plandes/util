@@ -37,7 +37,6 @@ class TestAlias(unittest.TestCase):
         self.fac = ImportConfigFactory(config)
 
     def test_defer(self):
-        print()
         basket = self.fac('basket_with_alias')
         self.assertEqual(Basket, basket.__class__)
         banana = basket.fruit
