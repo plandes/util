@@ -543,7 +543,6 @@ class _AliasImportConfigFactoryModule(ImportConfigFactoryModule):
     _SECTION_OPTION: ClassVar[re.Pattern] = re.compile(r'^([^:]+):(.+)$')
 
     def _instance(self, proto: ModulePrototype) -> Any:
-        print(proto.name, proto.config, proto.params)
         m: re.Match = self._SECTION_OPTION.match(proto.name)
         if m is None:
             raise FactoryError(
