@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Short usage and help synopsis using the short help option (`-h`).
+- Application configuration aliases (`alias:`) as a solution to tricky
+  configuration parser option interpolations.
 
 
 ## [1.14.1] - 2024-01-04

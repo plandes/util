@@ -231,6 +231,8 @@ in how it reads data, which uses the following rules:
 * A string starting with `instance:` as an object instance (see the
   [Configuration Factory] and [Instance Parameters](#instance-parameters)
   sections).
+* A string starting with `alias:` that indirectly points to an instance to
+  instantiate like `instance:` (see [Aliases](#aliases)).
 * A string starting with `object:` as an object specified by class name (see
   the [Configuration Factory] and [Instance Parameters](#instance-parameters)
   sections).
@@ -522,6 +524,40 @@ class_name = domain.Organization
 boss = instance({'share': 'deep'}): homer
 ```
 creates a new instance of `homer` that is not shared with `bobs_senior_center`.
+
+
+### Aliases
+
+There are occasions where defining which [instance](instance#parameters) to use
+can depend on previously defined configuration, which can be done with the
+typical configuration parser `${}` syntax.  However, this does not work when
+this configuration is not yet defined like in CLI application contexts where
+subordinate values are defined afterward.  To accommodate this, the following
+syntax can be used:
+
+```ini
+alias[(<parameters>)]: <section>:<option>
+```
+
+For example, the `instance:` syntax:
+```ini
+[fruit_default]
+name = fruit
+
+[fruit]
+class_name = app.Banana
+color = yellow
+
+[basket_instance]
+class_name = app.Basket
+fruit = instance: ${fruit_default:name}
+```
+is equivalent to:
+```ini
+[basket_instance]
+class_name = app.Basket
+fruit = alias: fruit_default:name
+```
 
 
 ### Dataclasses

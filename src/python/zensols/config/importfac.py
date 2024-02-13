@@ -17,7 +17,8 @@ from frozendict import frozendict
 from zensols.introspect import ClassResolver, ClassImporter
 from zensols.persist import persisted, PersistedWork, Deallocatable
 from . import (
-    Settings, Dictable, FactoryError, ImportClassResolver, ConfigFactory
+    Settings, Dictable, FactoryError, Configurable,
+    ImportClassResolver, ConfigFactory,
 )
 
 logger = logging.getLogger(__name__)
@@ -517,6 +518,46 @@ class _InstanceImportConfigFactoryModule(ImportConfigFactoryModule):
 
 
 ImportConfigFactory.register_module(_InstanceImportConfigFactoryModule)
+
+
+@dataclass
+class _AliasImportConfigFactoryModule(ImportConfigFactoryModule):
+    """Like :class:`._InstanceImportConfigFactoryModule` but use the an alias
+    for the instance section name.
+
+    The configuration string prototype has the form::
+
+        alias[(<parameters>)]: <section>:<option>
+
+    The ``option`` in ``section`` is then used for the instance to be created by
+    the factory.  The ``parameters`` are used to create the instance just like
+    with :class:`._InstanceImportConfigFactoryModule`.
+
+    This module is useful when using replaced values break the configuration
+    loading order, or for sections/options not yet defined.  This can happen in
+    CLI resource libraries application context definitions for default settings
+    not yet loaded.
+
+    """
+    _NAME: ClassVar[str] = 'alias'
+    _SECTION_OPTION: ClassVar[re.Pattern] = re.compile(r'^([^:]+):(.+)$')
+
+    def _instance(self, proto: ModulePrototype) -> Any:
+        print(proto.name, proto.config, proto.params)
+        m: re.Match = self._SECTION_OPTION.match(proto.name)
+        if m is None:
+            raise FactoryError(
+                f"Expected format '<section>:<option>' but got: '{proto.name}'")
+        sec: str = m.group(1)
+        option: str = m.group(2)
+        config: Configurable = self.factory.config
+        if sec not in config.sections:
+            raise FactoryError(f"No such alias section: '{sec}'")
+        alias: str = config.get_option(option, sec)
+        return self._create_instance(alias, proto.config, proto.params)
+
+
+ImportConfigFactory.register_module(_AliasImportConfigFactoryModule)
 
 
 @dataclass
