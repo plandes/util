@@ -542,13 +542,18 @@ class _AliasImportConfigFactoryModule(ImportConfigFactoryModule):
     _NAME: ClassVar[str] = 'alias'
     _SECTION_OPTION: ClassVar[re.Pattern] = re.compile(r'^([^:]+):(.+)$')
 
-    def _instance(self, proto: ModulePrototype) -> Any:
-        m: re.Match = self._SECTION_OPTION.match(proto.name)
+    @classmethod
+    def parse(cls: Type, s: str) -> Tuple[str, str]:
+        m: re.Match = cls._SECTION_OPTION.match(s)
         if m is None:
             raise FactoryError(
-                f"Expected format '<section>:<option>' but got: '{proto.name}'")
-        sec: str = m.group(1)
-        option: str = m.group(2)
+                f"Expected format '<section>:<option>' but got: '{s}'")
+        return m.groups()
+
+    def _instance(self, proto: ModulePrototype) -> Any:
+        sec: str
+        option: str
+        sec, option = self.parse(proto.name)
         config: Configurable = self.factory.config
         if sec not in config.sections:
             raise FactoryError(f"No such alias section: '{sec}'")

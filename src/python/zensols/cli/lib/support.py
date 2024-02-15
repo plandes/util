@@ -4,7 +4,7 @@ configuration functionality.
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Type, Any, Optional, Tuple, Union
+from typing import Dict, Type, Any, Optional, Tuple, List, Union
 from dataclasses import dataclass, field
 from enum import Enum, auto, EnumMeta
 import sys
@@ -21,10 +21,11 @@ from zensols.config import (
 )
 from zensols.introspect import ClassImporter
 from .. import (
-    Action, ActionCli, ActionCliMethod, ActionMetaData, ActionCliManager,
-    Application, ApplicationObserver,
+    Action, ActionCli, ActionCliError, ActionCliMethod, ActionMetaData,
+    ActionCliManager, Application, ApplicationObserver,
 )
 from .. import ConfigurationImporter
+from zensols.config.importfac import _AliasImportConfigFactoryModule
 
 logger = logging.getLogger(__name__)
 
@@ -406,7 +407,7 @@ class Cleaner(DryRunApplication):
          'option_overrides': {'clean_level': {'long_name': 'clevel',
                                               'short_name': None}}})
 
-    paths: Tuple[Tuple[Union[str, Path]]] = field(default=None)
+    paths: Tuple[Tuple[Union[str, Path], ...], ...] = field(default=None)
     """Paths to delete (files or directories) with each group corresponding to a
     level (see class docs).
 
@@ -450,3 +451,56 @@ class Cleaner(DryRunApplication):
 
     def __call__(self):
         self.clean()
+
+
+@dataclass
+class CacheClearer(DryRunApplication):
+    """Clear cached data by iterating through a list of application context
+    instances that have a ``clear`` method.
+
+    """
+    CLASS_INSPECTOR = {}
+    CLI_META = ActionCliManager.combine_meta(
+        DryRunApplication,
+        {'mnemonic_includes': {'clear'},
+         'option_excludes': {'config_factory', 'clearables'},
+         'option_overrides': {'clean_level': {'long_name': 'clevel',
+                                              'short_name': None}}})
+
+    config_factory: ConfigFactory = field(default=None)
+    """The parent application context factory, which is populated from the child
+    configuration (see class docs).
+
+    """
+    clearables: Tuple[str, ...] = field(default=None)
+    """A list of instance aliases (``<section>:<option>``), each with their own
+    list of instances to invoke ``clear`` to remove cached data.
+
+    """
+    def clear(self):
+        """Clear *all* cached data"""
+        config: Configurable = self.config_factory.config
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'clearing: {self.clearables}')
+        clearable: str
+        for clearable in self.clearables:
+            sec: str
+            option: str
+            sec, option = _AliasImportConfigFactoryModule.parse(clearable)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'clearing section: {sec}, option: {option}')
+            if sec not in config.sections:
+                raise ActionCliError(f'Missing section to clear: {sec}')
+            inst_names: List[str] = config.get_option_list(option, sec)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'clearing instances: {inst_names}')
+            inst_name: str
+            for inst_name in inst_names:
+                inst: Any = self.config_factory(inst_name)
+                if logger.isEnabledFor(logging.INFO):
+                    logger.info(f'clearing instance: {type(inst)}')
+                if not hasattr(inst, 'clear'):
+                    raise ActionCliError(
+                        f"No clear method on '{inst_name}' ({type(inst)})")
+                if not self.dry_run:
+                    inst.clear()

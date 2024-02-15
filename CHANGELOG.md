@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Short usage and help synopsis using the short help option (`-h`).
 - Application configuration aliases (`alias:`) as a solution to tricky
   configuration parser option interpolations.
+- An application to clear file caches given a list of application configuration
+  aliases.
 
 
 ## [1.14.1] - 2024-01-04
