@@ -1,0 +1,11 @@
+<map id="inheritance00c805b9ee" name="inheritance00c805b9ee">
+<area shape="rect" id="node1" href="#zensols.introspect.insp.Class" target="_top" title="Class(class_type: type, doc: zensols.introspect.insp.ClassDoc, fields: Dict[str, zensols.introspect.insp.ClassField], methods: Dict[str, zensols.introspect.insp.ClassMethod])" alt="" coords="5,5,71,33"/>
+<area shape="rect" id="node2" href="#zensols.introspect.insp.ClassDoc" target="_top" title="A meta data for documentation at any level of the class code (methods" alt="" coords="92,5,183,33"/>
+<area shape="rect" id="node3" href="#zensols.introspect.insp.ClassError" target="_top" title="Raised by :class:`.ClassInspector.` when a class can not be inspected or" alt="" coords="204,5,302,33"/>
+<area shape="rect" id="node4" href="#zensols.introspect.insp.ClassField" target="_top" title="Represents a :class:`dataclasses.dataclass` field." alt="" coords="259,77,357,105"/>
+<area shape="rect" id="node5" href="#zensols.introspect.insp.ClassParam" target="_top" title="Represents a :class:`dataclasses.dataclass` field." alt="" coords="324,5,435,33"/>
+<area shape="rect" id="node8" href="#zensols.introspect.insp.ClassMethodArg" target="_top" title="Meta data for an argument in a method." alt="" coords="379,77,521,105"/>
+<area shape="rect" id="node6" href="#zensols.introspect.insp.ClassInspector" target="_top" title="A utility class to return all :class:`dataclasses.dataclass` attribute" alt="" coords="458,5,587,33"/>
+<area shape="rect" id="node7" href="#zensols.introspect.insp.ClassMethod" target="_top" title="Meta data for a method in a dataclass." alt="" coords="608,5,725,33"/>
+<area shape="rect" id="node9" href="#zensols.introspect.insp.TypeMapper" target="_top" title="A utility class to map string types parsed from :class:`.ClassInspector`" alt="" coords="747,5,859,33"/>
+</map>

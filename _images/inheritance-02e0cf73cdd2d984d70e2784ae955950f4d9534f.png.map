@@ -1,0 +1,6 @@
+<map id="inheritance944960afcb" name="inheritance944960afcb">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="44,5,116,36"/>
+<area shape="rect" id="node3" href="#zensols.persist.domain.Stash" target="_top" title="A dictionary&#45;like pure virtual class for CRUDing data, most of which read" alt="" coords="44,84,116,115"/>
+<area shape="rect" id="node2" href="#zensols.persist.domain.ReadOnlyStash" target="_top" title="An abstract base class for subclasses that do not support write methods" alt="" coords="5,163,155,193"/>
+<area shape="rect" id="node4" href="#zensols.persist.zip.ZipStash" target="_top" title="Acesss a zip file by using the entry file names as keys and the content" alt="" coords="33,241,127,272"/>
+</map>

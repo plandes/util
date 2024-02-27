@@ -1,0 +1,12 @@
+<map id="inheritancec7f98f3b35" name="inheritancec7f98f3b35">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="5,5,77,36"/>
+<area shape="rect" id="node3" href="#zensols.persist.dealloc.Deallocatable" target="_top" title="All subclasses have the ability to deallocate any resources. &#160;This is" alt="" coords="5,84,136,115"/>
+<area shape="rect" id="node2" href="zensols.util.html#zensols.util.fail.APIError" target="_top" title="Base exception from which almost all library raised errors extend." alt="" coords="101,5,192,36"/>
+<area shape="rect" id="node7" href="#zensols.persist.annotation.PersistableError" target="_top" title="Thrown for any persistable API error" alt="" coords="161,84,311,115"/>
+<area shape="rect" id="node5" href="#zensols.persist.annotation.PersistableContainer" target="_top" title="Classes can extend this that want to persist :class:`.PersistedWork`" alt="" coords="5,163,195,193"/>
+<area shape="rect" id="node8" href="#zensols.persist.annotation.PersistedWork" target="_top" title="This class caches data in the instance of the contained class and/or" alt="" coords="219,163,357,193"/>
+<area shape="rect" id="node4" href="#zensols.persist.annotation.FileTextUtil" target="_top" title="Basic file naming utility methods." alt="" coords="217,5,327,36"/>
+<area shape="rect" id="node6" href="#zensols.persist.annotation.PersistableContainerMetadata" target="_top" title="Provides metadata about :class:`.PersistedWork` definitions in the class." alt="" coords="351,5,617,36"/>
+<area shape="rect" id="node9" href="#zensols.persist.annotation.persisted" target="_top" title="Class level annotation to further simplify usage with" alt="" coords="641,5,735,36"/>
+<area shape="rect" id="node10" href="#zensols.persist.annotation.resource" target="_top" title="This annotation uses a template pattern to (de)allocate resources. &#160;For" alt="" coords="759,5,851,36"/>
+</map>

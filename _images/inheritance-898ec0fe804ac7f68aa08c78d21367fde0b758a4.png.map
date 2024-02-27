@@ -1,0 +1,6 @@
+<map id="inheritanceacab3b04ff" name="inheritanceacab3b04ff">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="35,5,107,36"/>
+<area shape="rect" id="node2" href="#zensols.persist.dealloc.Deallocatable" target="_top" title="All subclasses have the ability to deallocate any resources. &#160;This is" alt="" coords="5,84,136,115"/>
+<area shape="rect" id="node3" href="#zensols.persist.dealloc.dealloc" target="_top" title="Object used with a ``with`` scope for deallocating any subclass of" alt="" coords="357,5,435,36"/>
+<area shape="rect" id="node4" href="#zensols.persist.dealloc.dealloc_recursive" target="_top" title="dealloc_recursive" alt="" coords="572,5,735,36"/>
+</map>

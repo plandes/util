@@ -1,0 +1,9 @@
+<map id="inheritance73238a48b1" name="inheritance73238a48b1">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="83,5,155,36"/>
+<area shape="rect" id="node5" href="#zensols.persist.domain.Stash" target="_top" title="A dictionary&#45;like pure virtual class for CRUDing data, most of which read" alt="" coords="83,84,155,115"/>
+<area shape="rect" id="node2" href="zensols.util.html#zensols.util.fail.APIError" target="_top" title="Base exception from which almost all library raised errors extend." alt="" coords="485,5,576,36"/>
+<area shape="rect" id="node7" href="#zensols.persist.annotation.PersistableError" target="_top" title="Thrown for any persistable API error" alt="" coords="455,84,606,115"/>
+<area shape="rect" id="node3" href="#zensols.persist.composite.DirectoryCompositeStash" target="_top" title="A stash distributes the data of each item out over several directories." alt="" coords="5,241,232,272"/>
+<area shape="rect" id="node4" href="#zensols.persist.stash.DirectoryStash" target="_top" title="Creates a pickled data file with a file name in a directory with a given" alt="" coords="49,163,189,193"/>
+<area shape="rect" id="node6" href="#zensols.persist.composite.MissingDataKeys" target="_top" title="MissingDataKeys" alt="" coords="449,163,612,193"/>
+</map>
