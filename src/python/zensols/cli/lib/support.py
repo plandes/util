@@ -56,6 +56,7 @@ class ConfigFormat(Enum):
     ini = auto()
     json = auto()
     yaml = auto()
+    shell = auto()
 
 
 @dataclass
@@ -78,9 +79,9 @@ class ExportEnvironment(object):
     OUTPUT_PATH = 'output_path'
     CLI_META = {'option_includes': {OUTPUT_FORMAT, OUTPUT_PATH},
                 'option_overrides':
-                {OUTPUT_FORMAT: {'long_name': 'expfmt',
+                {OUTPUT_FORMAT: {'long_name': 'eformat',
                                  'short_name': None},
-                 OUTPUT_PATH: {'long_name': 'expout',
+                 OUTPUT_PATH: {'long_name': 'eout',
                                'short_name': None}}}
 
     config: Configurable = field()
@@ -88,7 +89,6 @@ class ExportEnvironment(object):
     export commands.
 
     """
-
     section: str = field()
     """The section to dump as a series of export statements."""
 
@@ -219,15 +219,15 @@ class ShowConfiguration(object):
     OUTPUT_FORMAT = 'config_output_format'
     OUTPUT_PATH = 'config_output_path'
     SECTION_NAME = 'sections'
+    EVAL_NAME = 'evaluate'
     CLI_META = {'mnemonic_overrides': {'show_config': 'config'},
-                'option_includes': {OUTPUT_FORMAT, OUTPUT_PATH, SECTION_NAME},
+                'option_includes':
+                {OUTPUT_FORMAT, OUTPUT_PATH, SECTION_NAME, EVAL_NAME},
                 'option_overrides':
-                {OUTPUT_FORMAT: {'long_name': 'cnffmt',
-                                 'short_name': None},
-                 OUTPUT_PATH: {'long_name': 'cnfout',
-                               'short_name': None},
-                 SECTION_NAME: {'long_name': 'secs',
-                                'short_name': None}}}
+                {OUTPUT_FORMAT: {'long_name': 'cformat', 'short_name': None},
+                 OUTPUT_PATH: {'long_name': 'cout', 'short_name': None},
+                 SECTION_NAME: {'long_name': 'csec', 'short_name': None},
+                 EVAL_NAME: {'long_name': 'eval', 'short_name': None}}}
 
     config_factory: ConfigFactory = field()
     """The configuration factory which is returned from the app."""
@@ -238,21 +238,49 @@ class ShowConfiguration(object):
     config_output_format: ConfigFormat = field(default=ConfigFormat.text)
     """The output format."""
 
+    evaluate: bool = field(default=False)
+    """Whether to evaluate as the application sees it."""
+
+    def _eval_config(self, config: Configurable) -> Configurable:
+        secs: Dict[str, Dict[str, str]] = {}
+        sec_name: str
+        for sec_name in config.sections:
+            sec: Dict[str, str] = dict(map(
+                lambda t: (t[0], str(t[1])),
+                config.populate({}, sec_name).items()))
+            secs[sec_name] = sec
+        return DictionaryConfig(secs)
+
     def _write_config(self, writer: TextIOBase, fmt: ConfigFormat,
                       sections: str):
+        def pr(s: str):
+            writer.write(s)
+            writer.write('\n')
+
+        def prshell():
+            i: int
+            sec: str
+            for i, sec in enumerate(conf.sections):
+                if i > 0:
+                    writer.write('\n')
+                writer.write(f'# {sec}\n')
+                for k, v in conf.get_options(sec).items():
+                    writer.write(f'{k.upper()}="{v}"\n')
+
         conf: Configurable = self.config_factory.config
         if sections is not None:
             dconf = DictionaryConfig()
             conf.copy_sections(dconf, re.split(r'\s*,\s*', sections))
             conf = dconf
-        if fmt == ConfigFormat.text:
-            conf.write(writer=writer)
-        elif fmt == ConfigFormat.ini:
-            print(conf.get_raw_str().rstrip(), file=writer)
-        elif fmt == ConfigFormat.json:
-            print(conf.asjson(indent=4), file=writer)
-        elif fmt == ConfigFormat.yaml:
-            print(conf.asyaml(indent=4), file=writer)
+        if self.evaluate:
+            conf = self._eval_config(conf)
+        {
+            ConfigFormat.text: lambda: conf.write(writer=writer),
+            ConfigFormat.ini: lambda: pr(conf.get_raw_str().rstrip()),
+            ConfigFormat.json: lambda: pr(conf.asjson(indent=4)),
+            ConfigFormat.yaml: lambda: pr(conf.asyaml(indent=4)),
+            ConfigFormat.shell: prshell,
+        }[fmt]()
 
     def show_config(self, sections: str = None) -> Configurable:
         """Print the configuration and exit.

@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Add configuration evaluation and shell output to CLI show config (`config`)
+  action.
+
+
 ## [1.14.2] - 2024-02-27
 ### Added
 - Short usage and help synopsis using the short help option (`-h`).
