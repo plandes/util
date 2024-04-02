@@ -54,6 +54,9 @@ class UsageConfig(Dictable):
     sort_actions: bool = field(default=False)
     """If ``True`` sort mnemonic output."""
 
+    doc: str = field(default=None)
+    """Overrides the application help documentation."""
+
     def __post_init__(self):
         if self.width is None:
             try:
@@ -105,6 +108,8 @@ class UsageActionOptionParser(OptionParser):
             'version', None, dtype=bool,
             doc='show the program version and exit')
         options = [help_op, version_op] + list(options)
+        if usage_config.doc is not None:
+            doc = usage_config.doc
         self._usage_writer = _UsageWriter(
             parser=self,
             actions=actions,
