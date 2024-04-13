@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- A `TRACE` log level in `zensols.util.log`.
+
 ### Changed
 - Add configuration evaluation and shell output to CLI show config (`config`)
   action.
