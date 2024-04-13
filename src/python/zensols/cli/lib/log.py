@@ -10,8 +10,10 @@ import logging
 from logging import Logger
 from pathlib import Path
 from .. import ActionCliError, ApplicationError
+from zensols.util.log import add_trace_level
 
 logger = logging.getLogger(__name__)
+add_trace_level()
 
 
 class LogLevel(Enum):
@@ -20,6 +22,7 @@ class LogLevel(Enum):
 
     """
     notset = logging.NOTSET
+    trace = logging.TRACE
     debug = logging.DEBUG
     info = logging.INFO
     warn = logging.WARNING
