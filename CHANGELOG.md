@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.14.3] - 2024-04-14
 ### Added
 - A `TRACE` log level in `zensols.util.log`.
 
@@ -573,7 +574,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.14.2...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.14.3...HEAD
+[1.14.3]: https://github.com/plandes/util/compare/v1.14.2...v1.14.3
 [1.14.2]: https://github.com/plandes/util/compare/v1.14.1...v1.14.2
 [1.14.1]: https://github.com/plandes/util/compare/v1.14.0...v1.14.1
 [1.14.0]: https://github.com/plandes/util/compare/v1.13.3...v1.14.0
