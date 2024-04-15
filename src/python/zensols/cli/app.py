@@ -172,7 +172,7 @@ class ApplicationResult(Dictable):
         """
         sec_pass = tuple(filter(lambda r: not r.action.meta_data.first_pass,
                                 self.action_results))
-        assert(len(sec_pass) == 1)
+        assert (len(sec_pass) == 1)
         return sec_pass[0]
 
     def __call__(self) -> ActionResult:
