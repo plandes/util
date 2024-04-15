@@ -526,7 +526,8 @@ class CacheClearer(DryRunApplication):
             for inst_name in inst_names:
                 inst: Any = self.config_factory(inst_name)
                 if logger.isEnabledFor(logging.INFO):
-                    logger.info(f'clearing instance: {type(inst)}')
+                    nm = inst.name if hasattr(inst, 'name') else str(type(inst))
+                    logger.info(f'clearing instance: {nm}')
                 if not hasattr(inst, 'clear'):
                     raise ActionCliError(
                         f"No clear method on '{inst_name}' ({type(inst)})")
