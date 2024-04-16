@@ -5,7 +5,7 @@ application context.
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Any, Set, List, Tuple, Optional, Type, Union
+from typing import Dict, Any, Set, List, Tuple, Iterable, Optional, Type, Union
 from dataclasses import dataclass, field
 import os
 import logging
@@ -13,6 +13,7 @@ from string import Template
 import parse as par
 import re
 from pathlib import Path
+import pickle
 from zensols.util import PackageResource
 from zensols.persist import persisted
 from zensols.config import (
@@ -133,6 +134,47 @@ class ConfigurationOverrider(object):
 
     def __call__(self) -> Configurable:
         return self.merge()
+
+
+@dataclass
+class _CacheConfigManager(object):
+    path: Path = field()
+    config: ImportIniConfig = field()
+    watch_files: Dict[Path, int] = field(default_factory=dict)
+
+    def _get_newer_files(self, files: Dict[Path, int]) -> Iterable[Path]:
+        path: Path
+        prev_mtime: int
+        for path, prev_mtime in files.items():
+            cur_mtime = path.stat().st_mtime
+            if cur_mtime > prev_mtime:
+                yield path
+
+    def load(self) -> ImportIniConfig:
+        prev_config: ImportIniConfig = None
+        if self.path.is_file():
+            with open(self.path, 'rb') as f:
+                prev_mng: _CacheConfigManager = pickle.load(f)
+            newer_files: Tuple[Path, ...] = tuple(
+                self._get_newer_files(prev_mng.watch_files))
+            if len(newer_files) == 0:
+                if logger.isEnabledFor(logging.INFO):
+                    logger.info(f'reusing cached config: {self.path}')
+                prev_config = prev_mng.config
+            else:
+                if logger.isEnabledFor(logging.INFO):
+                    logger.info(f'reloading since files changed: {newer_files}')
+        if prev_config is None:
+            self.config.start_file_capture()
+        return prev_config
+
+    def save(self):
+        visited: Set[Path] = set(self.config.stop_file_capture())
+        self.watch_files.update(dict(map(
+            lambda p: (p, p.stat().st_mtime), visited)))
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.path, 'wb') as f:
+            pickle.dump(self, f)
 
 
 @dataclass
@@ -261,6 +303,18 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
     debug: bool = field(default=False)
     """Printn the configuration after the merge operation."""
 
+    cache_path: Path = field(default=None)
+    """A path to a binary file of the cached configuration.  This is useful for
+    large application contexts that have a lot of imports that take a long time
+    to load.
+
+    When this file is set, the imported configuration files and their modify
+    timestamps are written along with the loaded configuration to this specified
+    file.  On subsequent runs, previous configuration is used if none of the
+    configuration files have changed.  Otherwise, they are reloaded and cached
+    again.
+
+    """
     # name of this field must match
     # :obj:`ConfigurationImporter.CONFIG_PATH_FIELD`
     config_path: Path = field(default=None)
@@ -512,7 +566,32 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
         """Load the configuration and update the application context.
 
         """
-        modified_config = self._load_configuration()
+        modified_config: Configurable = None
+        cmng: _CacheConfigManager = None
+        loaded: bool = False
+        if self.cache_path is not None:
+            if isinstance(self.config, ImportIniConfig):
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'caching: to {self.cache_path}')
+                cmng = _CacheConfigManager(self.cache_path, config=self.config)
+                if self.config_path is not None:
+                    # TODO: add entry point app.conf to watch files
+                    cmng.watch_files[self.config_path] = \
+                        self.config_path.stat().st_mtime
+                modified_config = cmng.load()
+                if modified_config is not None:
+                    with rawconfig(modified_config):
+                        modified_config.copy_sections(self.config)
+                        modified_config = self.config
+                    loaded = True
+            else:
+                logger.warning('configured to cache config at' +
+                               f'{self.cache_path} but configuration ' +
+                               f'is not ImportIniConfig: {type(self.config)}')
+        if modified_config is None:
+            modified_config = self._load_configuration()
+        if cmng is not None and not loaded:
+            cmng.save()
         if self.config_path_option_name is not None:
             val: str
             if self.config_path is None:
@@ -521,6 +600,7 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
                 val = f'path: {str(self.config_path)}'
             self.config.set_option(self.config_path_option_name,
                                    val, section=self.name)
+        modified_config.write()
         return modified_config
 
     def _reset(self):

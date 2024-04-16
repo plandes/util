@@ -198,6 +198,7 @@ class ImportIniConfig(IniConfig):
     TYPE_NAME = ConfigurableFactory.TYPE_NAME
     _IMPORT_SECTION_FIELDS = {SECTIONS_SECTION, SINGLE_CONFIG_FILE,
                               CONFIG_FILES, REFS_NAME, CLEANUPS_NAME}
+    _VISITED_FILES = None
 
     def __init__(self, *args,
                  config_section: str = IMPORT_SECTION,
@@ -364,6 +365,8 @@ class ImportIniConfig(IniConfig):
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'adding bootstrap {bs_config.children} + ' +
                                  f'self {self.children} to {config}')
+                if self._VISITED_FILES is not None:
+                    self._VISITED_FILES.append(config.config_file)
                 # add children bootstrap config that aren't add duplicates
                 # children created with this instance
                 ids: Set[int] = set(map(lambda c: id(c), bs_config.children))
@@ -487,3 +490,11 @@ class ImportIniConfig(IniConfig):
             del self._config_sections
         del self.children
         return parser
+
+    def start_file_capture(self):
+        self.__class__._VISITED_FILES = []
+
+    def stop_file_capture(self) -> List[Path]:
+        files: List[Path] = self.__class__._VISITED_FILES
+        self.__class__._VISITED_FILES = None
+        return files

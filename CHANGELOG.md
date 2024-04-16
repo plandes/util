@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- Cached configurations using `ImportIniConfig`.
+
+
 ## [1.14.3] - 2024-04-14
 ### Added
 - A `TRACE` log level in `zensols.util.log`.
