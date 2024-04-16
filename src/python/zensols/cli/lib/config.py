@@ -600,7 +600,6 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
                 val = f'path: {str(self.config_path)}'
             self.config.set_option(self.config_path_option_name,
                                    val, section=self.name)
-        modified_config.write()
         return modified_config
 
     def _reset(self):
