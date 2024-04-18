@@ -13,6 +13,18 @@ from . import PersistableError
 logger = logging.getLogger(__name__)
 
 
+class NotPickleable(object):
+    """A class marker that raises an error on attempts to :mod:`pickle` the
+    instance.
+
+    """
+    def __getstate__(self):
+        """
+        :raises PersistableError: is raised by the :mod:`pickle` package
+        """
+        raise PersistableError('Instances are not pickleable')
+
+
 class chunks(object):
     """An iterable that chunks any other iterable in to chunks.  Each element
     returned is a list of elemnets of the given size or smaller.  That element
