@@ -163,7 +163,8 @@ class _CacheConfigManager(object):
                 prev_config = prev_mng.config
             else:
                 if logger.isEnabledFor(logging.INFO):
-                    logger.info(f'reloading since files changed: {newer_files}')
+                    fnames: str = ', '.join(map(str, newer_files))
+                    logger.info(f'reloading since files changed: {fnames}')
         if prev_config is None:
             self.config.start_file_capture()
         return prev_config
