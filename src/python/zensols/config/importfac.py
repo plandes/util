@@ -678,12 +678,18 @@ class _CallImportConfigFactoryModule(ImportConfigFactoryModule):
     def _instance(self, proto: ModulePrototype) -> Any:
         cble: Any = self.factory.instance(proto.name)
         params: Dict[str, Any] = proto.params
-        method: Optional[str] = params.pop('method', None)
-        if method is None:
-            return cble(**params)
+        method_name: Optional[str] = params.pop('method', None)
+        val: Any
+        if method_name is None:
+            attr_name: Optional[str] = params.pop('attribute', None)
+            if attr_name is not None:
+                val = getattr(cble, attr_name)
+            else:
+                val = cble(**params)
         else:
-            meth = getattr(cble, method)
-            return meth(**params)
+            method: Any = getattr(cble, method_name)
+            val = method(**params)
+        return val
 
 
 ImportConfigFactory.register_module(_CallImportConfigFactoryModule)

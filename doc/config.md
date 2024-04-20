@@ -608,7 +608,8 @@ pointing to large trained ML models.
 ### Calls
 
 *Callables* and methods on Python object instances created in the application
-context can be used to set values.  The parameters and the instance are given, such as:
+context can be used to set values.  The parameters and the instance are given,
+such as:
 ```ini
 [tracker]
 class_name = payroll.Tracker
@@ -617,8 +618,13 @@ class_name = payroll.Tracker
 db = call({'param': {'method': 'print_employees', 'format': 'short'}}): tracker
 ```
 This sets the `db` parameter on the `employees` instance to the return value of
-the tracker's `print_employees` method.  The `method` parameter may be omitted
-if the referenced instance is *Callable*.
+the tracker's `print_employees` method.  The remaining parameters are passed to
+the method, which is `format = short` in this example.
+
+The `method` parameter may be omitted if the referenced instance is *Callable*,
+but the curly braces are needed in the parenthesis (i.e. `call({})`).  Instead
+of calling a method, an attribute or property is accessed by replacing `method`
+with `attribute`.
 
 
 ### Tree

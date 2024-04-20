@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Cached configurations using `ImportIniConfig`.
+- Attribute access using the call directive (`call`).
 
 
 ## [1.14.3] - 2024-04-14
