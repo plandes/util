@@ -681,12 +681,16 @@ class _CallImportConfigFactoryModule(ImportConfigFactoryModule):
         method_name: Optional[str] = params.pop('method', None)
         val: Any
         if method_name is None:
+            # either the object is callable or an attribute
             attr_name: Optional[str] = params.pop('attribute', None)
             if attr_name is not None:
+                # return the attribute if specified
                 val = getattr(cble, attr_name)
             else:
+                # otherwise assume it's callable and let it raise if not
                 val = cble(**params)
         else:
+            # call the specified method with parameters
             method: Any = getattr(cble, method_name)
             val = method(**params)
         return val
