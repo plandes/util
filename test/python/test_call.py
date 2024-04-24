@@ -47,9 +47,8 @@ class Car(object):
     make: str = field()
 
 
-class TestArgumentParse(LogTestCase):
+class TestConfigCall(LogTestCase):
     def test_call(self):
-        print()
         fac = ImportConfigFactory(IniConfig(StringIO(CONFIG)))
         car = fac('car')
         self.assertEqual(Car, type(car))

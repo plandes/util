@@ -4,9 +4,10 @@
 __author__ = 'Paul Landes'
 
 import logging
-from typing import Callable, Any, Iterable, Tuple
+from typing import Tuple, Dict, Iterable, Optional, Any, Callable
 from dataclasses import dataclass, field, InitVar
 from abc import ABCMeta
+from collections import OrderedDict
 from itertools import chain
 import parse
 import pickle
@@ -116,11 +117,12 @@ class DictionaryStash(Stash):
     in the initializer a new ``dict`` is created.
 
     """
-    _data: dict = field(default_factory=dict)
+    _data: Dict[str, Any] = field(default_factory=dict)
     """The backing dictionary for the stash data."""
 
     @property
     def data(self):
+        """The dictionary that contains the stash data."""
         return self._data
 
     def load(self, name: str) -> Any:
@@ -149,12 +151,40 @@ class DictionaryStash(Stash):
         return self.data[key]
 
 
+@dataclass(init=False)
+class LRUCacheStash(DictionaryStash):
+    """A stash that removes elements on :meth:`dump` after :obj:`size` elements
+    are kept.
+
+    """
+    maxsize: InitVar[int] = field()
+    """The highest number of items stored in the stash before deletions."""
+
+    def __init__(self, maxsize: int):
+        super().__init__(_data=OrderedDict())
+        self._maxsize = maxsize
+
+    def load(self, name: str) -> Any:
+        data: Dict[str, Any] = self.data
+        item: Optional[Any] = data.get(name)
+        if item is not None:
+            data.move_to_end(name)
+        return item
+
+    def dump(self, name: str, inst):
+        data: Dict[str, Any] = self.data
+        data[name] = inst
+        data.move_to_end(name)
+        while len(data) > self._maxsize:
+            data.popitem(last=False)
+
+
 @dataclass
 class CacheStash(DelegateStash):
     """Provide a dictionary based caching based stash.
 
     """
-    cache_stash: Stash = field(default_factory=lambda: DictionaryStash())
+    cache_stash: Stash = field(default_factory=DictionaryStash)
     """A stash used for caching (defaults to :class:`.DictionaryStash`)."""
 
     def load(self, name: str):
