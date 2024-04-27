@@ -3,11 +3,12 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Any, Iterable, Tuple, Set
+from typing import Any, Iterable, Tuple, Union, Set
 from dataclasses import dataclass, field, InitVar
 from abc import abstractmethod, ABC, ABCMeta
 import logging
 import itertools as it
+from pathlib import Path
 from . import PersistableError
 
 logger = logging.getLogger(__name__)
@@ -458,17 +459,27 @@ class KeySubsetStash(ReadOnlyDelegateStash):
     :obj:`delegate`.
 
     """
-    key_subset: InitVar[Set[str]] = field()
-    """A subset of the keys availble."""
+    key_subset: InitVar[Union[Path, Set[str]]] = field()
+    """A subset of the keys availble.  If this is set to a
+    :class:`~pathlib.Path`, then the keys are read from a newline delimited
+    file.
 
+    """
     dynamic_subset: InitVar[bool] = field()
     """Whether the delegate keys are dynamic, which forces inefficient key
     checks on the delegate.
 
     """
-    def __post_init__(self, key_subset: Set[str], dynamic_subset: bool):
+    def __post_init__(self, key_subset: Union[Path, Set[str]],
+                      dynamic_subset: bool):
         super().__post_init__()
-        self._key_subset = frozenset(key_subset)
+        if isinstance(key_subset, Path):
+            with open(key_subset) as f:
+                self._key_subset = filter(
+                    lambda ln: len(ln) > 0,
+                    map(str.strip, f.readlines()))
+        else:
+            self._key_subset = frozenset(key_subset)
         self._dynamic_subset = dynamic_subset
 
     def load(self, name: str) -> Any:
