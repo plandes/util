@@ -48,7 +48,7 @@ class DirectoryCompositeStash(DirectoryStash):
     INSTANCE_DIRECTORY_NAME = 'inst'
     COMPOSITE_DIRECTORY_NAME = 'comp'
 
-    def __init__(self, path: Path, groups: Tuple[Set[str]],
+    def __init__(self, path: Path, groups: Tuple[Set[str], ...],
                  attribute_name: str, load_keys: Set[str] = None):
         """Initialize using the parent class's default pattern.
 
@@ -83,7 +83,7 @@ class DirectoryCompositeStash(DirectoryStash):
         self.groups = groups
 
     @property
-    def groups(self) -> Tuple[Set[str]]:
+    def groups(self) -> Tuple[Set[str], ...]:
         """The groups of the ``dict`` composite attribute, which are sets of
         keys, each of which are persisted to their respective directory.
 
@@ -91,7 +91,7 @@ class DirectoryCompositeStash(DirectoryStash):
         return self._groups
 
     @groups.setter
-    def groups(self, groups: Tuple[Set[str]]):
+    def groups(self, groups: Tuple[Set[str], ...]):
         """The groups of the ``dict`` composite attribute, which are sets of
         keys, each of which are persisted to their respective directory.
 
@@ -103,7 +103,8 @@ class DirectoryCompositeStash(DirectoryStash):
             return frozenset(group)
 
         if len(groups) == 0:
-            raise PersistableError('Must have at least one group set')
+            raise PersistableError(
+                f'Must have at least one group set, but got: {groups}')
         groups = tuple(map(map_group, groups))
         stashes = {}
         comp_path: Path = self._top_level_dir / self.COMPOSITE_DIRECTORY_NAME
@@ -126,7 +127,8 @@ class DirectoryCompositeStash(DirectoryStash):
             logger.info(f'creating composit hash with groups: {groups}')
         self._groups = groups
 
-    def _to_composite(self, data: dict) -> Tuple[str, Any, Tuple[str, Any]]:
+    def _to_composite(self, data: dict) -> \
+            Tuple[str, Any, Tuple[str, Any], ...]:
         """Create the composite data used to by the composite stashes to
         persist.
 
