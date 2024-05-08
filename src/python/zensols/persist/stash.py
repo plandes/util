@@ -307,6 +307,9 @@ class DirectoryStash(Stash):
         path = self.key_to_path(name)
         if path.exists():
             path.unlink()
+        else:
+            if logger.isEnabledFor(logging.WARNING):
+                logger.warning(f'does not exist: {name}')
 
     def close(self):
         pass
