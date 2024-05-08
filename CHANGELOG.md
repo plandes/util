@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - An LRU cache `Stash` class.
 - A stash that filters `Failure`.
 
+### Changed
+- Confirm the naming of the `KeyLimitStash` class's attribute `n_limit` to
+  `limit`.
+
 
 ## [1.14.3] - 2024-04-14
 ### Added

@@ -6,6 +6,7 @@ __author__ = 'Paul Landes'
 from typing import Any, Iterable, Tuple, Union, Set
 from dataclasses import dataclass, field, InitVar
 from abc import abstractmethod, ABC, ABCMeta
+import sys
 import logging
 import itertools as it
 from pathlib import Path
@@ -23,7 +24,7 @@ class NotPickleable(object):
         """
         :raises PersistableError: is raised by the :mod:`pickle` package
         """
-        raise PersistableError('Instances are not pickleable')
+        raise PersistableError(f'Instances are not pickleable: {type(self)}')
 
 
 class chunks(object):
@@ -440,14 +441,14 @@ class KeyLimitStash(DelegateStash):
     on key mapping.
 
     """
-    ATTR_EXP_META = ('n_limit',)
+    ATTR_EXP_META = ('limit',)
 
-    n_limit: int = field()
+    limit: int = field(default=sys.maxsize)
     """The max number of keys provided as a slice of the delegate's keys."""
 
     def keys(self) -> Iterable[str]:
         ks = super().keys()
-        return it.islice(ks, self.n_limit)
+        return it.islice(ks, self.limit)
 
     def exists(self, name: str) -> bool:
         return name in self.keys()
