@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.14.4] - 2024-05-11
 ### Added
 - Cached configurations using `ImportIniConfig`.
 - Attribute access using the call directive (`call`).
@@ -585,7 +586,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.14.3...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.14.4...HEAD
+[1.14.4]: https://github.com/plandes/util/compare/v1.14.3...v1.14.4
 [1.14.3]: https://github.com/plandes/util/compare/v1.14.2...v1.14.3
 [1.14.2]: https://github.com/plandes/util/compare/v1.14.1...v1.14.2
 [1.14.1]: https://github.com/plandes/util/compare/v1.14.0...v1.14.1
