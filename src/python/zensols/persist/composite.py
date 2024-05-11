@@ -127,8 +127,7 @@ class DirectoryCompositeStash(DirectoryStash):
             logger.info(f'creating composit hash with groups: {groups}')
         self._groups = groups
 
-    def _to_composite(self, data: dict) -> \
-            Tuple[str, Any, Tuple[str, Any], ...]:
+    def _to_composite(self, data: dict) -> Tuple[str, Any, Tuple[str, Any]]:
         """Create the composite data used to by the composite stashes to
         persist.
 
