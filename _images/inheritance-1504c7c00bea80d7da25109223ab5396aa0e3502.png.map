@@ -1,0 +1,16 @@
+<map id="inheritance3e7ca24b5c" name="inheritance3e7ca24b5c">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="219,5,291,36"/>
+<area shape="rect" id="node10" href="zensols.persist.html#zensols.persist.dealloc.Deallocatable" target="_top" title="All subclasses have the ability to deallocate any resources. &#160;This is" alt="" coords="117,84,247,115"/>
+<area shape="rect" id="node11" href="zensols.config.html#zensols.config.writable.Writable" target="_top" title="An interface for classes that have multi&#45;line debuging capability." alt="" coords="279,84,367,115"/>
+<area shape="rect" id="node2" href="zensols.util.html#zensols.util.fail.APIError" target="_top" title="Base exception from which almost all library raised errors extend." alt="" coords="597,5,687,36"/>
+<area shape="rect" id="node3" href="#zensols.cli.ActionCliError" target="_top" title="Thrown for all command line interface errors." alt="" coords="587,84,721,115"/>
+<area shape="rect" id="node7" href="#zensols.cli.meta.ApplicationError" target="_top" title="Thrown for any application error that should result in a user error" alt="" coords="584,163,735,193"/>
+<area shape="rect" id="node4" href="#zensols.cli.meta.ActionMetaData" target="_top" title="An action represents a link between a command line mnemonic *action* and" alt="" coords="5,241,156,272"/>
+<area shape="rect" id="node5" href="zensols.persist.html#zensols.persist.annotation.PersistableContainer" target="_top" title="Classes can extend this that want to persist :class:`.PersistedWork`" alt="" coords="81,163,270,193"/>
+<area shape="rect" id="node13" href="#zensols.cli.meta.OptionMetaData" target="_top" title="A command line option." alt="" coords="181,241,335,272"/>
+<area shape="rect" id="node6" href="zensols.config.html#zensols.config.dictable.Dictable" target="_top" title="A class that that generates a dictionary recursively from data classes" alt="" coords="295,163,381,193"/>
+<area shape="rect" id="node8" href="#zensols.cli.meta.ApplicationFailure" target="_top" title="Contains information for application invocation failures used by" alt="" coords="562,241,727,272"/>
+<area shape="rect" id="node14" href="#zensols.cli.meta.PositionalMetaData" target="_top" title="A command line required argument that has no option switches." alt="" coords="359,241,538,272"/>
+<area shape="rect" id="node9" href="zensols.util.html#zensols.util.fail.Failure" target="_top" title="Contains information for failures as caught exceptions used by" alt="" coords="482,163,559,193"/>
+<area shape="rect" id="node12" href="#zensols.cli.meta.OptionFactory" target="_top" title="Creates commonly used options." alt="" coords="711,5,847,36"/>
+</map>

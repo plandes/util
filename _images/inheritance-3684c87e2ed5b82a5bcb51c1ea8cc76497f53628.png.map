@@ -1,0 +1,7 @@
+<map id="inheritance4cb50a735a" name="inheritance4cb50a735a">
+<area shape="rect" id="node1" href="zensols.util.html#zensols.util.fail.APIError" target="_top" title="Base exception from which almost all library raised errors extend." alt="" coords="56,5,147,36"/>
+<area shape="rect" id="node4" href="#zensols.introspect.intsel.IntegerSelectionError" target="_top" title="Raised for errors parsing or working with :class:`.IntegerSelection`." alt="" coords="5,84,197,115"/>
+<area shape="rect" id="node2" title="Create a collection of name/value pairs." alt="" coords="268,5,340,36"/>
+<area shape="rect" id="node5" href="#zensols.introspect.intsel.Kind" target="_top" title="The kind of integer selection provided by :class:`.IntegerSelection`." alt="" coords="268,84,340,115"/>
+<area shape="rect" id="node3" href="#zensols.introspect.intsel.IntegerSelection" target="_top" title="Parses an string that selects integers. &#160;These (:obj:`kind`) include:" alt="" coords="553,5,705,36"/>
+</map>

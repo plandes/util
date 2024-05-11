@@ -1,0 +1,8 @@
+<map id="inheritance09bc37371a" name="inheritance09bc37371a">
+<area shape="rect" id="node1" href="#zensols.util.log.LogConfigurer" target="_top" title="Configure logging to go to a file or Graylog." alt="" coords="5,5,141,36"/>
+<area shape="rect" id="node2" href="#zensols.util.log.LogLevelSetFilter" target="_top" title="LogLevelSetFilter" alt="" coords="203,5,365,36"/>
+<area shape="rect" id="node3" href="#zensols.util.log.LoggerStream" target="_top" title="Each line of standard out/error becomes a logged line" alt="" coords="409,5,546,36"/>
+<area shape="rect" id="node4" href="#zensols.util.log.StreamLogDumper" target="_top" title="Redirect stream output to a logger in a running thread." alt="" coords="531,84,707,115"/>
+<area shape="rect" id="node5" title="A class that represents a thread of control." alt="" coords="579,5,658,36"/>
+<area shape="rect" id="node6" href="#zensols.util.log.loglevel" target="_top" title="Object used with a ``with`` scope that sets the logging level temporarily" alt="" coords="687,5,769,36"/>
+</map>

@@ -1,0 +1,53 @@
+zensols.introspect package
+==========================
+
+Submodules
+----------
+
+zensols.introspect.imp
+----------------------
+.. inheritance-diagram:: zensols.introspect.imp
+   :parts: 1
+
+.. automodule:: zensols.introspect.imp
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.introspect.insp
+-----------------------
+.. inheritance-diagram:: zensols.introspect.insp
+   :parts: 1
+
+.. automodule:: zensols.introspect.insp
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.introspect.intsel
+-------------------------
+.. inheritance-diagram:: zensols.introspect.intsel
+   :parts: 1
+
+.. automodule:: zensols.introspect.intsel
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.introspect.tester
+-------------------------
+.. inheritance-diagram:: zensols.introspect.tester
+   :parts: 1
+
+.. automodule:: zensols.introspect.tester
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: zensols.introspect
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,5 @@
+<map id="inheritancec0960b35aa" name="inheritancec0960b35aa">
+<area shape="rect" id="node1" href="#zensols.util.time.TimeoutError" target="_top" title="Raised when a time out even occurs in :func:`.timeout` or" alt="" coords="5,5,133,36"/>
+<area shape="rect" id="node2" href="#zensols.util.time.time" target="_top" title="Used in a ``with`` scope that executes the body and logs the elapsed time." alt="" coords="277,5,349,36"/>
+<area shape="rect" id="node3" href="#zensols.util.time.timeprotect" target="_top" title="Invokes a block and bails if not completed in a specified number of seconds." alt="" coords="433,5,545,36"/>
+</map>

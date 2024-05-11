@@ -1,0 +1,13 @@
+<map id="inheritancef568d47041" name="inheritancef568d47041">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="144,5,216,36"/>
+<area shape="rect" id="node10" href="zensols.persist.html#zensols.persist.dealloc.Deallocatable" target="_top" title="All subclasses have the ability to deallocate any resources. &#160;This is" alt="" coords="41,84,172,115"/>
+<area shape="rect" id="node11" href="zensols.config.html#zensols.config.writable.Writable" target="_top" title="An interface for classes that have multi&#45;line debuging capability." alt="" coords="204,84,292,115"/>
+<area shape="rect" id="node2" href="zensols.util.html#zensols.util.fail.APIError" target="_top" title="Base exception from which almost all library raised errors extend." alt="" coords="465,5,556,36"/>
+<area shape="rect" id="node6" href="#zensols.cli.ActionCliError" target="_top" title="Thrown for all command line interface errors." alt="" coords="444,84,577,115"/>
+<area shape="rect" id="node3" href="#zensols.cli.action.ActionCli" target="_top" title="A set of commands that is invokeable on the command line, one for each" alt="" coords="207,241,300,272"/>
+<area shape="rect" id="node4" href="zensols.persist.html#zensols.persist.annotation.PersistableContainer" target="_top" title="Classes can extend this that want to persist :class:`.PersistedWork`" alt="" coords="5,163,195,193"/>
+<area shape="rect" id="node7" href="#zensols.cli.action.ActionCliManager" target="_top" title="Manages instances of :class:`.ActionCli`. &#160;An :class:`.ActionCli` is" alt="" coords="17,241,183,272"/>
+<area shape="rect" id="node5" href="zensols.config.html#zensols.config.dictable.Dictable" target="_top" title="A class that that generates a dictionary recursively from data classes" alt="" coords="219,163,306,193"/>
+<area shape="rect" id="node9" href="#zensols.cli.action.ActionCliMethod" target="_top" title="A &quot;married&quot; action meta data / class method pair. &#160;This is a pair of" alt="" coords="324,241,479,272"/>
+<area shape="rect" id="node8" href="#zensols.cli.action.ActionCliManagerError" target="_top" title="Raised by :class:`.ActionCliManager` for any problems creating" alt="" coords="408,163,613,193"/>
+</map>

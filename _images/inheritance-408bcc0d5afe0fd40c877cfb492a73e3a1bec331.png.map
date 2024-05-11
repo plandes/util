@@ -1,0 +1,5 @@
+<map id="inheritanceb431fc0663" name="inheritanceb431fc0663">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="65,5,137,36"/>
+<area shape="rect" id="node2" href="zensols.cli.html#zensols.cli.app.ApplicationObserver" target="_top" title="Extended by application targets to get call backs and information from" alt="" coords="8,84,193,115"/>
+<area shape="rect" id="node3" href="#zensols.cli.lib.package.PackageInfoImporter" target="_top" title="Adds a section to the configuration with the application package" alt="" coords="5,163,196,193"/>
+</map>

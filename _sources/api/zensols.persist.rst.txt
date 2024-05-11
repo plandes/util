@@ -1,0 +1,93 @@
+zensols.persist package
+=======================
+
+Submodules
+----------
+
+zensols.persist.annotation
+--------------------------
+.. inheritance-diagram:: zensols.persist.annotation
+   :parts: 1
+
+.. automodule:: zensols.persist.annotation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.persist.composite
+-------------------------
+.. inheritance-diagram:: zensols.persist.composite
+   :parts: 1
+
+.. automodule:: zensols.persist.composite
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.persist.dealloc
+-----------------------
+.. inheritance-diagram:: zensols.persist.dealloc
+   :parts: 1
+
+.. automodule:: zensols.persist.dealloc
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.persist.domain
+----------------------
+.. inheritance-diagram:: zensols.persist.domain
+   :parts: 1
+
+.. automodule:: zensols.persist.domain
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.persist.shelve
+----------------------
+.. inheritance-diagram:: zensols.persist.shelve
+   :parts: 1
+
+.. automodule:: zensols.persist.shelve
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.persist.stash
+---------------------
+.. inheritance-diagram:: zensols.persist.stash
+   :parts: 1
+
+.. automodule:: zensols.persist.stash
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.persist.util
+--------------------
+.. inheritance-diagram:: zensols.persist.util
+   :parts: 1
+
+.. automodule:: zensols.persist.util
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.persist.zip
+-------------------
+.. inheritance-diagram:: zensols.persist.zip
+   :parts: 1
+
+.. automodule:: zensols.persist.zip
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: zensols.persist
+   :members:
+   :undoc-members:
+   :show-inheritance:

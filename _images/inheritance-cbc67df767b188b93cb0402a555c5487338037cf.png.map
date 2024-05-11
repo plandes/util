@@ -1,0 +1,9 @@
+<map id="inheritanceb1a9254692" name="inheritanceb1a9254692">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="161,5,233,36"/>
+<area shape="rect" id="node3" href="#zensols.persist.domain.Stash" target="_top" title="A dictionary&#45;like pure virtual class for CRUDing data, most of which read" alt="" coords="105,84,177,115"/>
+<area shape="rect" id="node7" href="#zensols.persist.domain.Primeable" target="_top" title="Any subclass that has the ability (and need) to do preprocessing. &#160;For" alt="" coords="201,84,305,115"/>
+<area shape="rect" id="node2" href="#zensols.persist.domain.CloseableStash" target="_top" title="Any stash that has a resource that needs to be closed." alt="" coords="5,163,153,193"/>
+<area shape="rect" id="node4" href="#zensols.persist.domain.DelegateStash" target="_top" title="Delegate pattern. &#160;It can also be used as a no&#45;op if no delegate is" alt="" coords="25,241,165,272"/>
+<area shape="rect" id="node6" href="#zensols.persist.domain.PrimeableStash" target="_top" title="Any subclass that has the ability to do processing before any CRUD method" alt="" coords="177,163,328,193"/>
+<area shape="rect" id="node5" href="#zensols.persist.util.FailureFilterStash" target="_top" title="Filter&#39;s instances of :class:`~.zensols.util.fail.Failure`. &#160;It does this" alt="" coords="70,320,233,351"/>
+</map>

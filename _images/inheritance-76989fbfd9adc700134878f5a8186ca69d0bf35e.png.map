@@ -1,0 +1,21 @@
+<map id="inheritancec2555e85e4" name="inheritancec2555e85e4">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="76,5,148,36"/>
+<area shape="rect" id="node5" href="#zensols.persist.domain.Stash" target="_top" title="A dictionary&#45;like pure virtual class for CRUDing data, most of which read" alt="" coords="217,84,289,115"/>
+<area shape="rect" id="node16" href="#zensols.persist.domain.Primeable" target="_top" title="Any subclass that has the ability (and need) to do preprocessing. &#160;For" alt="" coords="51,84,155,115"/>
+<area shape="rect" id="node2" href="#zensols.persist.domain.CacheFactoryStash" target="_top" title="Like :class:`.FactoryStash` but suitable for :class:`.ReadOnlyStash`" alt="" coords="235,477,415,508"/>
+<area shape="rect" id="node3" href="#zensols.persist.domain.FactoryStash" target="_top" title="A stash that defers to creation of new items to another :obj:`factory`" alt="" coords="261,399,389,429"/>
+<area shape="rect" id="node4" href="#zensols.persist.domain.CloseableStash" target="_top" title="Any stash that has a resource that needs to be closed." alt="" coords="333,163,481,193"/>
+<area shape="rect" id="node7" href="#zensols.persist.domain.DelegateStash" target="_top" title="Delegate pattern. &#160;It can also be used as a no&#45;op if no delegate is" alt="" coords="337,241,477,272"/>
+<area shape="rect" id="node12" href="#zensols.persist.domain.NoopStash" target="_top" title="A stash that does nothing." alt="" coords="198,163,309,193"/>
+<area shape="rect" id="node15" href="#zensols.persist.domain.PrimeableStash" target="_top" title="Any subclass that has the ability to do processing before any CRUD method" alt="" coords="23,163,174,193"/>
+<area shape="rect" id="node18" href="#zensols.persist.domain.ReadOnlyStash" target="_top" title="An abstract base class for subclasses that do not support write methods" alt="" coords="581,241,731,272"/>
+<area shape="rect" id="node6" href="#zensols.persist.domain.DelegateDefaults" target="_top" title="Defaults set in :class:`.DelegateStash`." alt="" coords="315,5,475,36"/>
+<area shape="rect" id="node8" href="#zensols.persist.domain.PreemptiveStash" target="_top" title="Provide support for preemptively creating data in a stash. &#160;It provides" alt="" coords="107,320,267,351"/>
+<area shape="rect" id="node9" href="#zensols.persist.domain.KeyLimitStash" target="_top" title="A stash that limits the number of generated keys useful for debugging." alt="" coords="291,320,429,351"/>
+<area shape="rect" id="node11" href="#zensols.persist.domain.ReadOnlyDelegateStash" target="_top" title="Makes any stash read only." alt="" coords="627,320,848,351"/>
+<area shape="rect" id="node17" href="#zensols.persist.domain.ProtectiveStash" target="_top" title="A stash that guards :meth:`dump` so that when :class:`Exception` is" alt="" coords="454,320,602,351"/>
+<area shape="rect" id="node14" href="#zensols.persist.domain.PrimablePreemptiveStash" target="_top" title="A stash that&#39;s primable and preemptive." alt="" coords="5,399,237,429"/>
+<area shape="rect" id="node10" href="#zensols.persist.domain.KeySubsetStash" target="_top" title="A stash that exposes a subset of the keys available in the" alt="" coords="660,399,815,429"/>
+<area shape="rect" id="node13" href="#zensols.persist.domain.NotPickleable" target="_top" title="A class marker that raises an error on attempts to :mod:`pickle` the" alt="" coords="571,5,703,36"/>
+<area shape="rect" id="node19" href="#zensols.persist.domain.chunks" target="_top" title="An iterable that chunks any other iterable in to chunks. &#160;Each element" alt="" coords="763,5,842,36"/>
+</map>

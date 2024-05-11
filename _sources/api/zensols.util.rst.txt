@@ -1,0 +1,103 @@
+zensols.util package
+====================
+
+Submodules
+----------
+
+zensols.util.executor
+---------------------
+.. inheritance-diagram:: zensols.util.executor
+   :parts: 1
+
+.. automodule:: zensols.util.executor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.util.fail
+-----------------
+.. inheritance-diagram:: zensols.util.fail
+   :parts: 1
+
+.. automodule:: zensols.util.fail
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.util.hasher
+-------------------
+.. inheritance-diagram:: zensols.util.hasher
+   :parts: 1
+
+.. automodule:: zensols.util.hasher
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.util.log
+----------------
+.. inheritance-diagram:: zensols.util.log
+   :parts: 1
+
+.. automodule:: zensols.util.log
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.util.pkgres
+-------------------
+.. inheritance-diagram:: zensols.util.pkgres
+   :parts: 1
+
+.. automodule:: zensols.util.pkgres
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.util.sci
+----------------
+.. inheritance-diagram:: zensols.util.sci
+   :parts: 1
+
+.. automodule:: zensols.util.sci
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.util.std
+----------------
+.. inheritance-diagram:: zensols.util.std
+   :parts: 1
+
+.. automodule:: zensols.util.std
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.util.tempfile
+---------------------
+.. inheritance-diagram:: zensols.util.tempfile
+   :parts: 1
+
+.. automodule:: zensols.util.tempfile
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.util.time
+-----------------
+.. inheritance-diagram:: zensols.util.time
+   :parts: 1
+
+.. automodule:: zensols.util.time
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: zensols.util
+   :members:
+   :undoc-members:
+   :show-inheritance:

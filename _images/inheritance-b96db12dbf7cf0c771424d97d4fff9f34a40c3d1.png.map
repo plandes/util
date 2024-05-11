@@ -1,0 +1,7 @@
+<map id="inheritance3a8f112129" name="inheritance3a8f112129">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="43,5,115,36"/>
+<area shape="rect" id="node3" href="#zensols.persist.domain.Stash" target="_top" title="A dictionary&#45;like pure virtual class for CRUDing data, most of which read" alt="" coords="43,84,115,115"/>
+<area shape="rect" id="node2" href="#zensols.persist.domain.CloseableStash" target="_top" title="Any stash that has a resource that needs to be closed." alt="" coords="5,163,153,193"/>
+<area shape="rect" id="node4" href="#zensols.persist.shelve.ShelveStash" target="_top" title="Stash that uses Python&#39;s shelve library to store key/value pairs in DBM" alt="" coords="18,241,141,272"/>
+<area shape="rect" id="node5" href="#zensols.persist.shelve.shelve" target="_top" title="Object used with a ``with`` scope that creates the closes a shelve" alt="" coords="455,5,530,36"/>
+</map>

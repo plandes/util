@@ -1,0 +1,4 @@
+<map id="inheritanceebaa71af51" name="inheritanceebaa71af51">
+<area shape="rect" id="node1" href="#zensols.util.fail.APIError" target="_top" title="Base exception from which almost all library raised errors extend." alt="" coords="5,5,96,36"/>
+<area shape="rect" id="node2" href="#zensols.util.fail.Failure" target="_top" title="Contains information for failures as caught exceptions used by" alt="" coords="283,5,360,36"/>
+</map>

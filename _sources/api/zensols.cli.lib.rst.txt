@@ -1,0 +1,45 @@
+zensols.cli.lib namespace
+=========================
+
+Submodules
+----------
+
+zensols.cli.lib.config
+----------------------
+.. inheritance-diagram:: zensols.cli.lib.config
+   :parts: 1
+
+.. automodule:: zensols.cli.lib.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.lib.log
+-------------------
+.. inheritance-diagram:: zensols.cli.lib.log
+   :parts: 1
+
+.. automodule:: zensols.cli.lib.log
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.lib.package
+-----------------------
+.. inheritance-diagram:: zensols.cli.lib.package
+   :parts: 1
+
+.. automodule:: zensols.cli.lib.package
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.lib.support
+-----------------------
+.. inheritance-diagram:: zensols.cli.lib.support
+   :parts: 1
+
+.. automodule:: zensols.cli.lib.support
+   :members:
+   :undoc-members:
+   :show-inheritance:

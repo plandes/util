@@ -1,0 +1,6 @@
+<map id="inheritancec1923cffdf" name="inheritancec1923cffdf">
+<area shape="rect" id="node1" title="Helper class that provides a standard way to create an ABC using" alt="" coords="41,5,113,36"/>
+<area shape="rect" id="node4" href="#zensols.config.writable.Writable" target="_top" title="An interface for classes that have multi&#45;line debuging capability." alt="" coords="33,84,121,115"/>
+<area shape="rect" id="node2" href="#zensols.config.dictable.DefaultDictable" target="_top" title="A convenience utility class that provides access to methods such as" alt="" coords="5,241,149,272"/>
+<area shape="rect" id="node3" href="#zensols.config.dictable.Dictable" target="_top" title="A class that that generates a dictionary recursively from data classes" alt="" coords="34,163,121,193"/>
+</map>
