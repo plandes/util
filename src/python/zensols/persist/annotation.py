@@ -30,7 +30,7 @@ class FileTextUtil(object):
 
     """
     _NORMALIZE_REGEX: ClassVar[re.Pattern] = re.compile(
-        r"""[ \\\[\]()\/()<>{}:;_`'"!@#$%^&*,+=.-]+""")
+        r"""[ \\\[\]()\/()<>{}:;_`'"|!@#$%^&*,+=.-]+""")
     """The default regular expression for :meth:`normalize_text`."""
 
     @classmethod
