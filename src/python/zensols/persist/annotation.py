@@ -9,6 +9,7 @@ import sys
 import re
 from copy import copy
 import pickle
+import string
 import time as tm
 from datetime import datetime
 import os
@@ -35,7 +36,8 @@ class FileTextUtil(object):
 
     @classmethod
     def normalize_text(cls: Type, name: str, replace_char: str = '-',
-                       lower: bool = True, regex: re.Pattern = None) -> str:
+                       lower: bool = True, regex: re.Pattern = None,
+                       remove_non_printable: bool = False) -> str:
         """Normalize the name in to a string that is more file system friendly.
         This removes special characters and replaces them with ``replace_char``.
 
@@ -46,6 +48,8 @@ class FileTextUtil(object):
         :param lower: whether to lowercase the text
 
         :param regex: the regular expression that matches on text to remove
+
+        :param remove_non_printable: whether to keep only ASCII characters
 
         :return: the normalized name
 
@@ -61,6 +65,9 @@ class FileTextUtil(object):
                 name = name[1:]
             if nlen > 2 and name[-1] == replace_char:
                 name = name[:-1]
+        if remove_non_printable:
+            printable = set(string.printable)
+            name = ''.join(filter(lambda x: x in printable, name))
         return name
 
     @staticmethod
