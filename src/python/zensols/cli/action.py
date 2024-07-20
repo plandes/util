@@ -162,10 +162,11 @@ class ActionCli(PersistableContainer, Dictable):
         """
         meths: Dict[str, ActionCliMethod] = {}
         field_params: Set[OptionMetaData] = set()
-        f: ClassField
-        # add the dataclass fields that will populate the CLI as options
-        for f in self.class_meta.fields.values():
-            self._add_option(f.name, field_params)
+        if self.is_usage_visible:
+            # add the dataclass fields that will populate the CLI as options
+            f: ClassField
+            for f in self.class_meta.fields.values():
+                self._add_option(f.name, field_params)
         # create an action from each method
         for name in sorted(self.class_meta.methods.keys()):
             if logger.isEnabledFor(logging.DEBUG):
