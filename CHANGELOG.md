@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- Added access to the clipboard on macOS operating systems.
+- Added support for file name normalization (`FileTextUtil`) for non-ASCII
+  characters.
+
+
 ## [1.14.4] - 2024-05-11
 ### Added
 - Cached configurations using `ImportIniConfig`.
