@@ -9,9 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ### Added
-- Added access to the clipboard on macOS operating systems.
-- Added support for file name normalization (`FileTextUtil`) for non-ASCII
-  characters.
+- Access to the clipboard on macOS operating systems.
+- Support for file name normalization (`FileTextUtil`) for non-ASCII
+  and other special characters.
+- A utility to find an executable in the `PATH` environment variable.
 
 
 ## [1.14.4] - 2024-05-11

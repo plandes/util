@@ -3,8 +3,9 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Union, Iterable, Optional
+from typing import Tuple, Iterable, Union, Optional
 from dataclasses import dataclass, field
+import os
 import logging
 from logging import Logger
 from pathlib import Path
@@ -98,3 +99,53 @@ class Executor(object):
         if ex_val is not None and ret != ex_val:
             raise OSError(f'command returned with {ret}, expecting {ex_val}')
         return ret
+
+
+@dataclass
+class ExecutableFinder(object):
+    """Searches for an executable binary in the search path.  The default search
+    path (:obj:`path_var`) is set to the operating system's ``PATH`` environment
+    variable.
+
+    """
+    path_var: Path = os.environ.get('PATH', '')
+    """The string path variable ``PATH`` variable separated by the path
+    separator (i.e. ``:`` in UNIX/Linux).
+
+    """
+    raise_on_missing: bool = field(default=True)
+    """Whether to raise errors when executables are not found."""
+
+    @property
+    def search_path(self) -> Tuple[Path, ...]:
+        """The search path dervied from :obj:`path_var`."""
+        return tuple(map(Path, self.path_var.split(os.pathsep)))
+
+    def find_all(self, name: str) -> Iterable[Path]:
+        """Return matches of executable binary ``name``, if any."""
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'looking for executable: {name}')
+        for path in self.search_path:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'searching directory: {path}')
+            if not path.is_dir():
+                if logger.isEnabledFor(logging.INFO):
+                    logger.info(f'not a directory: {path}--skipping')
+            else:
+                cand: Path = path / name
+                if cand.is_file():
+                    if logger.isEnabledFor(logging.INFO):
+                        logger.info(f'found matching executable: {path}')
+                    yield cand
+
+    def find(self, name: str) -> Path:
+        """Like :meth:`find_all`, but returns only the first found executable.
+
+        :raises OSError: if executable ``name`` is not found
+
+        """
+        execs: Tuple[Path, ...] = tuple(self.find_all(name))
+        if len(execs) < 1:
+            if self.raise_on_missing:
+                raise OSError(f'Executable name found: {name}')
+        return execs[0] if len(execs) > 0 else None
