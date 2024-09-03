@@ -194,7 +194,7 @@ class ListActions(ApplicationObserver, Dictable):
         def list_json():
             try:
                 self._command_line = True
-                print(self.asjson(indent=4, cls=ActionEncoder))
+                print(self.asjson(flatten=False, indent=4, cls=ActionEncoder))
             finally:
                 self._command_line = False
 

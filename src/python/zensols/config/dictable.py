@@ -202,13 +202,16 @@ class Dictable(Writable):
         io.seek(0)
         return json.load(io)
 
-    def asjson(self, writer: TextIOBase = None,
-               recurse: bool = True, readable: bool = True, **kwargs) -> str:
+    def asjson(self, writer: TextIOBase = None, recurse: bool = True,
+               readable: bool = True, flatten: bool = True, **kwargs) -> str:
         """Return a JSON string representing the data in this instance.
 
         """
-        dct: Dict[str, Any] = self.asflatdict(
-            recurse=recurse, readable=readable)
+        dct: Dict[str, Any]
+        if flatten:
+            dct = self.asflatdict(recurse=recurse, readable=readable)
+        else:
+            dct = self.asdict(recurse=recurse, readable=readable)
         if writer is None:
             return json.dumps(dct, **kwargs)
         else:
