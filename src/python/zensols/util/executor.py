@@ -108,13 +108,18 @@ class ExecutableFinder(object):
     variable.
 
     """
-    path_var: Path = os.environ.get('PATH', '')
-    """The string path variable ``PATH`` variable separated by the path
+    path_var: str = field(default=None)
+    """The string that gives a delimited list of directories to search for an
+    executable.  This defaults to the ``PATH`` variable separated by the path
     separator (i.e. ``:`` in UNIX/Linux).
 
     """
     raise_on_missing: bool = field(default=True)
     """Whether to raise errors when executables are not found."""
+
+    def __post_init__(self):
+        if self.path_var is None:
+            self.path_var = os.environ.get('PATH', '')
 
     @property
     def search_path(self) -> Tuple[Path, ...]:
