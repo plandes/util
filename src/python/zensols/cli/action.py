@@ -8,6 +8,7 @@ from dataclasses import dataclass, field, InitVar
 import dataclasses
 import logging
 import copy as cp
+from collections import OrderedDict
 from itertools import chain
 from zensols.persist import persisted, PersistableContainer
 from zensols.introspect import (
@@ -111,6 +112,9 @@ class ActionCli(PersistableContainer, Dictable):
     is_usage_visible: bool = field(default=True)
     """Whether the action CLI is included in the usage help."""
 
+    sort_methods: bool = field(default=False)
+    """Whether to sort methods, which has an effect on action usage."""
+
     def _is_option_enabled(self, name: str) -> bool:
         """Return ``True`` if the option is enabled and eligible to be added to
         the command line.
@@ -160,15 +164,18 @@ class ActionCli(PersistableContainer, Dictable):
         """Return the methods for this action CLI with method name keys.
 
         """
-        meths: Dict[str, ActionCliMethod] = {}
+        meths: Dict[str, ActionCliMethod] = OrderedDict()
         field_params: Set[OptionMetaData] = set()
+        meth_keys = self.class_meta.methods.keys()
         if self.is_usage_visible:
             # add the dataclass fields that will populate the CLI as options
             f: ClassField
             for f in self.class_meta.fields.values():
                 self._add_option(f.name, field_params)
+        if self.sort_methods:
+            meth_keys = sorted(meth_keys)
         # create an action from each method
-        for name in sorted(self.class_meta.methods.keys()):
+        for name in meth_keys:
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'creating method {name}')
             meth: ClassMethod = self.class_meta.methods[name]
