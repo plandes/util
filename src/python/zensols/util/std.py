@@ -65,9 +65,6 @@ class stdout(object):
     STANDARD_OUT_PATH: ClassVar[str] = '-'
     """The string used to indicate to write to standard out."""
 
-    FILE_RECOMMEND_NAME: ClassVar[str] = '+'
-    """The string used to indicate to use the recommended file name."""
-
     def __init__(self, path: Union[str, Path] = None, extension: str = None,
                  recommend_name: str = 'unnamed', capture: bool = False,
                  logger: logging.Logger = logger, open_args: str = 'w'):
@@ -97,11 +94,11 @@ class stdout(object):
 
         """
         path = Path(path) if isinstance(path, str) else path
-        if path is None or self.is_stdout(path):
+        if path is not None and self.is_stdout(path):
             path = None
-        elif (path is not None and
-              path.name == self.FILE_RECOMMEND_NAME and
-              recommend_name is not None):
+        elif (path is None and recommend_name is not None):
+            if extension is not None:
+                recommend_name = f'{recommend_name}.{extension}'
             path = Path(recommend_name)
         if path is None:
             self._path = None
@@ -119,11 +116,6 @@ class stdout(object):
     def is_stdout(self, path: Path) -> bool:
         """Return whether the path indicates to use to standard out."""
         return path.name == self.STANDARD_OUT_PATH
-
-    @classmethod
-    def is_file_recommend(self, path: Path) -> bool:
-        """Return whether the path indicates to recommmend a file."""
-        return path.name == self.FILE_RECOMMEND_NAME
 
     def __enter__(self):
         if self._path is None:
