@@ -14,6 +14,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   and other special characters.
 - A utility to find an executable in the `PATH` environment variable.
 
+### Changed
+- Command line usage gives the order of actions as they appear in the
+  application case rather than alphabetically (now by default).  This can be
+  configured to keep the alphabetic sort order.
+- File or standard output `zensols.util.stdout` uses `None` instead of `+` to
+  indicate to use a recommended file name for output rather than explicitly
+  having to add as a file name.
+
 
 ## [1.14.4] - 2024-05-11
 ### Added
