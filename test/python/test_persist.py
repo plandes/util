@@ -485,3 +485,21 @@ class TestFileText(unittest.TestCase):
         self.assertEqual('test-of-file-text-util-last', norm)
         norm = FileTextUtil.normalize_text('!--Test middle!@#$%^&*(){} Last!%')
         self.assertEqual('test-middle-last', norm)
+
+    def test_norm_path(self):
+        path = FileTextUtil.normalize_path(Path('/usr/local/bin/script.txt'))
+        self.assertTrue(isinstance(path, Path))
+        self.assertEqual('/usr/local/bin/script-txt', str(path))
+        self.assertEqual(('/', 'usr', 'local', 'bin', 'script-txt'), path.parts)
+
+        path = FileTextUtil.normalize_path(Path('bin/script.txt'))
+        self.assertEqual(('bin', 'script-txt'), path.parts)
+        self.assertEqual('bin/script-txt', str(path))
+
+        path = FileTextUtil.normalize_path(Path('local.bin/script.txt'))
+        self.assertEqual(('local-bin', 'script-txt'), path.parts)
+        self.assertEqual('local-bin/script-txt', str(path))
+
+        path = FileTextUtil.normalize_path(Path('~/src/file.c'))
+        self.assertEqual(('~', 'src', 'file-c'), path.parts)
+        self.assertEqual('~/src/file-c', str(path))

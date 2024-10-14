@@ -70,6 +70,25 @@ class FileTextUtil(object):
             name = ''.join(filter(lambda x: x in printable, name))
         return name
 
+    @classmethod
+    def normalize_path(cls: Type, path: Path, replace_char: str = '-',
+                       lower: bool = True, regex: re.Pattern = None,
+                       remove_non_printable: bool = False) -> Path:
+        """Applies :meth:`normalize_text` for each component of the path and
+        return it.  Directory separators and tilde (``~``) are not normalized.
+
+        :see: :meth:`normalize_text`
+
+        """
+        def map_part(s: str) -> str:
+            norm: str = s
+            if s != os.sep and s != '~':
+                norm = cls.normalize_text(
+                    s, replace_char, lower, regex, remove_non_printable)
+            return norm
+
+        return Path(*tuple(map(map_part, path.parts)))
+
     @staticmethod
     def byte_format(num: int, suffix: str = 'B') -> str:
         """Return a human readable string of the number of bytes ``num``.
