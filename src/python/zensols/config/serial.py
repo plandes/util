@@ -179,15 +179,15 @@ class Serializer(object):
         else:
             parsed = None
             m = self.STRING_REGEXP.match(v)
-            if m:
+            if m is not None:
                 parsed = m.group(1)
             if parsed is None:
                 m = self.PATH_REGEXP.match(v)
-                if m:
+                if m is not None:
                     parsed = Path(m.group(1)).expanduser()
             if parsed is None:
                 m = self.LIST_REGEXP.match(v)
-                if m:
+                if m is not None:
                     ctype, pconfig, lst = m.groups()
                     parsed = self.parse_list(lst)
                     if pconfig is not None:
@@ -208,7 +208,7 @@ class Serializer(object):
                             f'Unknown sequence type: {ctype}')
             if parsed is None:
                 m = self.RESOURCE_REGEXP.match(v)
-                if m:
+                if m is not None:
                     mod, pathstr = m.groups()
                     if mod is None:
                         if self.DEFAULT_RESOURCE_MODULE is None:
@@ -222,17 +222,17 @@ class Serializer(object):
                         parsed = Path(parsed)
             if parsed is None:
                 m = self.EVAL_REGEXP.match(v)
-                if m:
+                if m is not None:
                     pconfig, evalstr = m.groups()
                     parsed = self._parse_eval(pconfig, evalstr)
             if parsed is None:
                 m = self.CLASS_REGEXP.match(v)
-                if m:
+                if m is not None:
                     class_name = m.group(1)
                     parsed = ClassImporter(class_name, False).get_class()
             if parsed is None:
                 m = self.JSON_REGEXP.match(v)
-                if m:
+                if m is not None:
                     parsed = self._json_load(m.group(1))
             if parsed is not None:
                 v = parsed
