@@ -4,7 +4,7 @@ parsed from files.
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Set
+from typing import Dict, Set, Union
 import logging
 import re
 import collections
@@ -28,13 +28,15 @@ class StringConfig(Configurable):
     """
     KEY_VAL_REGEX = re.compile(r'^(?:([^.]+?)\.)?([^=]+?)=(.+)$')
 
-    def __init__(self, config_str: str, option_sep: str = ',',
+    def __init__(self, config_str: str,
+                 option_sep_regex: Union[re.Pattern, str] = r'\s*,\s*',
                  default_section: str = None):
         """Initialize with a string given as described in the class docs.
 
         :param config_str: the configuration
 
-        :param option_sep: the string used to delimit the each key/value pair
+        :param option_sep_regex: the regular expression used to delimit the each
+                                 key/value pair
 
         :param default_section: used as the default section when non given on
                                 the get methds such as :meth:`get_option`
@@ -42,7 +44,10 @@ class StringConfig(Configurable):
         """
         super().__init__(default_section)
         self.config_str = config_str
-        self.option_sep = option_sep
+        if isinstance(option_sep_regex, str):
+            self.option_sep_regex = re.compile(option_sep_regex)
+        else:
+            self.option_sep_regex = option_sep_regex
 
     @persisted('_parsed_config')
     def _get_parsed_config(self) -> Dict[str, str]:
@@ -51,10 +56,11 @@ class StringConfig(Configurable):
 
         """
         conf = collections.defaultdict(lambda: {})
-        for kv in self.config_str.split(self.option_sep):
+        for kv in re.split(self.option_sep_regex, self.config_str):
             m = self.KEY_VAL_REGEX.match(kv)
             if m is None:
-                raise ConfigurableError(f'unexpected format: {kv}')
+                raise ConfigurableError(
+                    f"unexpected format: '{kv}' in '{self.config_str}'")
             sec, name, value = m.groups()
             sec = self.default_section if sec is None else sec
             if logger.isEnabledFor(logging.DEBUG):

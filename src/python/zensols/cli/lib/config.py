@@ -101,7 +101,7 @@ class ConfigurationOverrider(object):
     overrides configuration.
 
     """
-    option_sep: str = field(default=',')
+    option_sep_regex: str = field(default=r'\s*,\s*')
     """The string used to delimit the each key/value pair."""
 
     disable: bool = field(default=False)
@@ -118,7 +118,7 @@ class ConfigurationOverrider(object):
             else:
                 overrides = StringConfig(
                     self.override,
-                    option_sep=self.option_sep
+                    option_sep_regex=self.option_sep_regex
                 )
             return overrides
 

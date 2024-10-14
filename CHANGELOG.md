@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - File or standard output `zensols.util.stdout` uses `None` instead of `+` to
   indicate to use a recommended file name for output rather than explicitly
   having to add as a file name.
+- `StringConfig` takes a format that allows white space between commas as a
+  regular expression.
 
 
 ## [1.14.4] - 2024-05-11
