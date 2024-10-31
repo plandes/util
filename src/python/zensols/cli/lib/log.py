@@ -160,9 +160,10 @@ class LogConfigurator(object):
     @staticmethod
     def reset():
         """Reset the logging system.  All configuration is removed."""
-        from importlib import reload
         logging.shutdown()
-        reload(logging)
+        root = logging.getLogger()
+        list(map(root.removeHandler, root.handlers))
+        list(map(root.removeFilter, root.filters))
 
     def __call__(self):
         return self.config()
