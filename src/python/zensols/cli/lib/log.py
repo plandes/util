@@ -116,7 +116,8 @@ class LogConfigurator(object):
                                   disable_existing_loggers=False)
 
     def _config_basic(self):
-        self._debug(f'configuring root logger to {self.default_level}')
+        if logger.isEnabledFor(logging.DEBUG):
+            self._debug(f'configuring root logger to {self.default_level}')
         level: int = self._to_level('default', self.default_level)
         params = {'level': level}
         if self.format is not None:
