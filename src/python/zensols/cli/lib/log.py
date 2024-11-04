@@ -73,6 +73,12 @@ class LogConfigurator(object):
     loggers: Dict[str, Union[str, LogLevel]] = field(default=None)
     """Additional loggers to configure."""
 
+    skip_config: bool = field(default=False)
+    """Whether to configure the logging system.  Set this to ``False`` to allow
+    the application to configure the logging system while still leveraging this
+    class.
+
+    """
     debug: bool = field(default=False)
     """Print some logging to standard out to debug this class."""
 
@@ -123,6 +129,9 @@ class LogConfigurator(object):
         """Configure the log system.
 
         """
+        self._debug(f'{self.__class__}: skip_config={self.skip_config}')
+        if self.skip_config:
+            return
         modified_logger: Logger = None
         if self.config_file is not None:
             self._config_file()
@@ -153,7 +162,7 @@ class LogConfigurator(object):
         """
         root = logging.getLogger()
         hdlr: logging.StreamHandler = root.handlers[0]
-        assert type(hdlr) == logging.StreamHandler
+        assert isinstance(hdlr, logging.StreamHandler)
         fmt = logging.Formatter(format)
         hdlr.setFormatter(fmt)
 

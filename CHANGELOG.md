@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Add an option to `LogConfigurator` to allow the application to configure the
+  logging system while still leveraging this class.
+
+
 ## [1.14.5] - 2024-10-14
 ### Added
 - Access to the clipboard on macOS operating systems.
