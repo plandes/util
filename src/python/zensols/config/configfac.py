@@ -10,7 +10,9 @@ import logging
 from pathlib import Path
 from zensols.introspect import ClassImporter
 from zensols.persist import persisted
-from . import ConfigurableError, Configurable, IniConfig, DictionaryConfig
+from . import (
+    ConfigurableError, Configurable, IniConfig, DictionaryConfig, Serializer
+)
 
 logger = logging.getLogger(__name__)
 
@@ -175,8 +177,16 @@ class ConfigurableFactory(object):
                     tpe = f'import{etype}'
             config = self.from_type(tpe)
         elif config_file is not None:
+            config_path: Path = None
             del params[self.SINGLE_CONFIG_FILE]
-            config = self.from_path(Path(config_file))
+            serializer = Serializer()
+            if isinstance(config_file, str):
+                config_path = serializer.parse_object(config_file)
+                if not isinstance(config_path, Path):
+                    config_path = None
+            if config_path is None:
+                config_path = Path(config_file)
+            config = self.from_path(config_path)
         else:
             raise ConfigurableError(
                 f"No loader information for '{section}': {params}")
