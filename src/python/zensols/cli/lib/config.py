@@ -415,7 +415,7 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
                 conf = co.get_configurable()
                 break
         if conf is None:
-            conf = DictionaryConfig()
+            conf = DictionaryConfig(parent=self.config)
         return conf
 
     def _validate(self):
@@ -459,7 +459,7 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
                             pls = filter(lambda x: x is not None, pls)
                             preload_keys.update(pls)
                         repl_sec[k] = vr
-        return DictionaryConfig(secs), preload_keys
+        return DictionaryConfig(secs, parent=self.config), preload_keys
 
     def _load_configuration(self) -> Configurable:
         """Once we have the path and the class used to load the configuration,
@@ -487,7 +487,7 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
             cf = ConfigurableFactory(kwargs=args)
             if self.config_path is None:
                 # this happens when expect=False and no configuration is given
-                cl_config = DictionaryConfig()
+                cl_config = DictionaryConfig(parent=self.config)
             else:
                 cl_config = cf.from_path(self.config_path)
                 logger.info(f'config loaded {self.config_path} as ' +
@@ -497,7 +497,7 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
             args: dict = {} if self.arguments is None else self.arguments
             children: Tuple[Configurable, ...] = \
                 self._app.factory.children_configs
-            ini: IniConfig = IniConfig(self.config)
+            ini: IniConfig = IniConfig(self.config, parent=self.config)
             dconf: Configurable
             preload_keys: Set[str]
             dconf, preload_keys = self._populate_import_sections(ini)
@@ -514,6 +514,7 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
                     preloads=preloads,
                     config_file=ini,
                     children=children,
+                    parent=self.config,
                     **args)
             with rawconfig(cl_config):
                 cl_config.copy_sections(self.config)

@@ -30,7 +30,7 @@ class StringConfig(Configurable):
 
     def __init__(self, config_str: str,
                  option_sep_regex: Union[re.Pattern, str] = r'\s*,\s*',
-                 default_section: str = None):
+                 default_section: str = None, parent: Configurable = None):
         """Initialize with a string given as described in the class docs.
 
         :param config_str: the configuration
@@ -42,7 +42,7 @@ class StringConfig(Configurable):
                                 the get methds such as :meth:`get_option`
 
         """
-        super().__init__(default_section)
+        super().__init__(default_section, parent=parent)
         self.config_str = config_str
         if isinstance(option_sep_regex, str):
             self.option_sep_regex = re.compile(option_sep_regex)

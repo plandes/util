@@ -10,7 +10,8 @@ from io import TextIOBase, StringIO
 import yaml
 from yaml.parser import ParserError
 from zensols.config import (
-    ConfigurableError, ConfigurableFileNotFoundError, TreeConfigurable
+    ConfigurableError, ConfigurableFileNotFoundError,
+    Configurable, TreeConfigurable
 )
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,8 @@ class YamlConfig(TreeConfigurable):
     def __init__(self, config_file: Union[str, Path, TextIOBase] = None,
                  default_section: str = None,
                  default_vars: Dict[str, Any] = None, delimiter: str = '$',
-                 sections_name: str = 'sections', sections: Set[str] = None):
+                 sections_name: str = 'sections', sections: Set[str] = None,
+                 parent: Configurable = None):
         """Initialize this instance.  When sections are not set, and the
         sections are not given in configuration file at location
         :obj:`sections_name` the root is made a singleton section.
@@ -63,6 +65,7 @@ class YamlConfig(TreeConfigurable):
         self.delimiter = delimiter
         self._config = None
         super().__init__(default_section=default_section,
+                         parent=parent,
                          default_vars=default_vars,
                          sections_name=sections_name,
                          sections=sections)

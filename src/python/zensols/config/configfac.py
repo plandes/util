@@ -7,6 +7,7 @@ from typing import Dict, Any, Type, Union, ClassVar
 from dataclasses import dataclass, field
 import sys
 import logging
+import inspect
 from pathlib import Path
 from zensols.introspect import ClassImporter
 from zensols.persist import persisted
@@ -15,6 +16,12 @@ from . import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class _ConfigMeta(object):
+    ci: ClassImporter = field()
+    takes_parent: bool = field()
 
 
 @dataclass
@@ -37,6 +44,8 @@ class ConfigurableFactory(object):
     :see: `.ImportIniConfig`
 
     """
+    _CONFIG_META: ClassVar[Dict[str, _ConfigMeta]] = {}
+
     EXTENSION_TO_TYPE: ClassVar[Dict[str, str]] = {
         'conf': 'ini',
         'ini': 'ini',
@@ -69,6 +78,8 @@ class ConfigurableFactory(object):
     :see: :obj:`EXTENSION_TO_TYPE`
 
     """
+    parent: Configurable = field(default=None)
+
     def _mod_name(self) -> str:
         """Return the ``config`` (parent) module name."""
         mname = sys.modules[__name__].__name__
@@ -94,7 +105,15 @@ class ConfigurableFactory(object):
                  and created with :obj:`kwargs`
 
         """
-        return ClassImporter(class_name, False).instance(**self.kwargs)
+        config_meta: _ConfigMeta = self._CONFIG_META.get(class_name)
+        if config_meta is None:
+            ci = ClassImporter(class_name, False)
+            args = inspect.signature(ci.get_class().__init__)
+            config_meta = _ConfigMeta(ci, 'parent' in args.parameters)
+        if config_meta.takes_parent:
+            return config_meta.ci.instance(**self.kwargs, parent=self.parent)
+        else:
+            return config_meta.ci.instance(**self.kwargs)
 
     def from_type(self, config_type: str) -> Configurable:
         """Create a configurable from the configuration type.
@@ -150,12 +169,12 @@ class ConfigurableFactory(object):
 
     @classmethod
     def from_section(cls: Type[ConfigurableFactory], kwargs: Dict[str, Any],
-                     section: str) -> Configurable:
+                     section: str, parent: Configurable = None) -> Configurable:
         params = dict(kwargs)
         class_name: str = params.get(cls.CLASS_NAME)
         type_map: Dict[str, str] = params.pop('type_map', {})
         self: ConfigurableFactory = cls(
-            **{'type_map': type_map, 'kwargs': params})
+            **{'type_map': type_map, 'kwargs': params, 'parent': parent})
         tpe: str = params.get(self.TYPE_NAME)
         config_file: Union[str, Dict[str, str]] = params.get(
             self.SINGLE_CONFIG_FILE)

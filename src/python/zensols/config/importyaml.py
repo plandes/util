@@ -31,7 +31,8 @@ class ImportYamlConfig(YamlConfig):
                  default_section: str = None, sections_name: str = 'sections',
                  sections: Set[str] = None, import_name: str = 'import',
                  parse_values: bool = False,
-                 children: Tuple[Configurable, ...] = ()):
+                 children: Tuple[Configurable, ...] = (),
+                 parent: Configurable = None):
         """Initialize with importation configuration.  The usage of
         ``default_vars`` in the super class is disabled since this
         implementation uses a mix of dot and colon (configparser) variable
@@ -61,9 +62,9 @@ class ImportYamlConfig(YamlConfig):
                              merging
 
         """
-        super().__init__(config_file, default_section, default_vars=None,
-                         delimiter=None, sections_name=sections_name,
-                         sections=sections)
+        super().__init__(config_file, default_section, parent=parent,
+                         default_vars=None, delimiter=None,
+                         sections_name=sections_name, sections=sections)
         self.import_name = import_name
         self.serializer = Serializer()
         self._parse_values = parse_values
@@ -98,7 +99,8 @@ class ImportYamlConfig(YamlConfig):
             for sec_name, params in import_def.items():
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'import sec: {sec_name}')
-                config = ConfigurableFactory.from_section(params, sec_name)
+                config = ConfigurableFactory.from_section(
+                    params, sec_name, parent=self)
                 for sec in config.sections:
                     cnf[sec] = config.get_options(section=sec)
 
@@ -108,7 +110,7 @@ class ImportYamlConfig(YamlConfig):
         self._flatten(context, '', self._config, ':')
 
         if len(self.children) > 0:
-            dconf = DictionaryConfig()
+            dconf = DictionaryConfig(parent=self)
             for child in self.children:
                 child.copy_sections(dconf)
             tpl_context.update(dconf.as_one_tier_dict())

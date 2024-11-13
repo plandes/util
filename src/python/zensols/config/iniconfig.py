@@ -23,8 +23,14 @@ class IniConfig(Configurable, Primeable):
     returns sets or subsets of options.
 
     """
-    def __init__(self, config_file: Union[Path, TextIOBase] = None,
-                 default_section: str = None, use_interpolation: bool = False):
+    __slots__ = ('config_file', 'default_section', 'use_interpolation',
+                 'nascent', '_cached_sections', '_raw', '_conf')
+
+    def __init__(self,
+                 config_file: Union[Path, TextIOBase, Configurable] = None,
+                 default_section: str = None,
+                 use_interpolation: bool = False,
+                 parent: Configurable = None):
         """Create with a configuration file path.
 
         :param config_file: the configuration file path to read from; if the
@@ -40,7 +46,7 @@ class IniConfig(Configurable, Primeable):
                        configuration file is missing
 
         """
-        super().__init__(default_section)
+        super().__init__(default_section, parent=parent)
         if isinstance(config_file, str):
             self.config_file = Path(config_file).expanduser()
         else:

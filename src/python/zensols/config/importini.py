@@ -114,7 +114,10 @@ class _BootstrapConfig(IniConfig):
     includes nested configruation imports when we *descend* recursively.
 
     """
-    def __init__(self, parent: IniConfig, children: Tuple[Configurable, ...]):
+    __slots__ = ('children',)
+
+    def __init__(self, bootstrap_parent: IniConfig,
+                 children: Tuple[Configurable, ...]):
         """Initialize.
 
         :param parent: the initial config having only the import, load and
@@ -126,8 +129,9 @@ class _BootstrapConfig(IniConfig):
                          loaded
 
         """
-        super().__init__(parent, parent.default_section)
-        self.children = [parent] + list(children)
+        super().__init__(bootstrap_parent, bootstrap_parent.default_section,
+                         parent=bootstrap_parent)
+        self.children = [bootstrap_parent] + list(children)
 
     def append_child(self, child: Configurable):
         self.children.append(child)
@@ -189,6 +193,8 @@ class ImportIniConfig(IniConfig):
     for more information.
 
     """
+    __slots__ = ('config_section', 'exclude_config_sections', 'children')
+
     IMPORT_SECTION = 'import'
     SECTIONS_SECTION = 'sections'
     SINGLE_CONFIG_FILE = ConfigurableFactory.SINGLE_CONFIG_FILE
@@ -201,6 +207,7 @@ class ImportIniConfig(IniConfig):
     _VISITED_FILES = None
 
     def __init__(self, *args,
+                 parent: Configurable = None,
                  config_section: str = IMPORT_SECTION,
                  exclude_config_sections: bool = True,
                  children: Tuple[Configurable, ...] = (),
@@ -229,7 +236,8 @@ class ImportIniConfig(IniConfig):
                                   :class:`~configparser.ExtendedInterpolation`
 
         """
-        super().__init__(*args, use_interpolation=use_interpolation, **kwargs)
+        super().__init__(*args, parent=parent,
+                         use_interpolation=use_interpolation, **kwargs)
         self.config_section = config_section
         self.exclude_config_sections = exclude_config_sections
         if children is None:
@@ -239,6 +247,7 @@ class ImportIniConfig(IniConfig):
            (self.default_section == self.config_section):
             self._raise('You must set exclude_config_sections to False ' +
                         'when the import and config section are the same')
+        self.remove_sections: List[str] = []
 
     def _get_bootstrap_config(self) -> _BootstrapConfig:
         """Create the config that is used to read only the sections needed to
@@ -254,7 +263,7 @@ class ImportIniConfig(IniConfig):
         if logger.isEnabledFor(logging.TRACE):
             logger.trace('creating bootstrap parser')
         conf_sec = self.config_section
-        bs_config = IniConfig(self.config_file)
+        bs_config = IniConfig(self.config_file, parent=self)
         cparser = bs_config.parser
         has_secs = bs_config.has_option(self.SECTIONS_SECTION, conf_sec)
         has_refs = bs_config.has_option(self.REFS_NAME, conf_sec)
@@ -307,7 +316,7 @@ class ImportIniConfig(IniConfig):
     def _create_config(self, section: str,
                        params: Dict[str, Any]) -> Configurable:
         """Create a config from a section."""
-        return ConfigurableFactory.from_section(params, section)
+        return ConfigurableFactory.from_section(params, section, parent=self)
 
     def _create_configs(self, section: str, params: Dict[str, Any],
                         bs_config: _BootstrapConfig) -> List[Configurable]:
@@ -488,6 +497,8 @@ class ImportIniConfig(IniConfig):
             for sec in self._config_sections:
                 parser.remove_section(sec)
             del self._config_sections
+        for sec in self.remove_sections:
+            parser.remove_section(sec)
         del self.children
         return parser
 

@@ -11,7 +11,8 @@ from io import TextIOBase
 import json
 from zensols.persist import persisted, PersistedWork
 from . import (
-    ConfigurableError, ConfigurableFileNotFoundError, DictionaryConfig
+    ConfigurableError, ConfigurableFileNotFoundError, Configurable,
+    DictionaryConfig
 )
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,8 @@ class JsonConfig(DictionaryConfig):
 
     """
     def __init__(self, config_file: Union[Path, TextIOBase],
-                 default_section: str = None, deep: bool = False):
+                 default_section: str = None, deep: bool = False,
+                 parent: Configurable = None):
         """Initialize.
 
         :param config_file: the configuration file path to read from; if the
@@ -47,9 +49,8 @@ class JsonConfig(DictionaryConfig):
         else:
             self.config_file = config_file
         self._parsed_config = PersistedWork('_parsed_config', self)
-        super().__init__(config=None,
-                         default_section=default_section,
-                         deep=deep)
+        super().__init__(config=None, parent=parent,
+                         default_section=default_section, deep=deep)
 
     def _narrow_root(self, conf: Dict[str, Any]) -> Dict[str, str]:
         if not isinstance(conf, dict):

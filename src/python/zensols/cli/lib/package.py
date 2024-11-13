@@ -74,7 +74,7 @@ class PackageInfoImporter(ApplicationObserver):
                   'version': pkg_res.version}
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'adding package section: {self.section}={params}')
-        d_conf = DictionaryConfig({self.section: params})
+        d_conf = DictionaryConfig({self.section: params}, parent=self.config)
         d_conf.copy_sections(self.config)
         return d_conf
 

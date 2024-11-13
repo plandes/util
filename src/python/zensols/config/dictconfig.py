@@ -21,12 +21,16 @@ class DictionaryConfig(TreeConfigurable, Dictable):
     application specific use cases.  One such example is
     :meth:`.JsonConfig._get_config`.
 
+    This configuration also allows Python code to be executed which allows
+    sections and values to be created programatically.
+
     .. document private functions
     .. automethod:: _get_config
 
     """
     def __init__(self, config: Dict[str, Dict[str, Any]] = None,
-                 default_section: str = None, deep: bool = False):
+                 default_section: str = None, deep: bool = False,
+                 code: str = None, parent: Configurable = None):
         """Initialize.
 
         :param config: configures this instance (see class docs)
@@ -34,13 +38,18 @@ class DictionaryConfig(TreeConfigurable, Dictable):
         :param default_section: used as the default section when non given on
                                 the get methds such as :meth:`get_option`
 
+        :param deep: whether or not to use the super class configuration methods
+
+        :param code: code executed with :func:`exec` with variable ``config``
+                     available to programatically create sections and values
+
         """
-        super().__init__(default_section=default_section)
-        if config is None:
-            self._dict_config = {}
-        else:
-            self._dict_config = config
+        super().__init__(default_section=default_section, parent=parent)
+        config = {} if config is None else config
+        self._dict_config = config
         self._deep = deep
+        if code is not None:
+            exec(code)
         self.invalidate()
 
     @classmethod

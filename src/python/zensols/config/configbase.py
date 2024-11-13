@@ -43,7 +43,10 @@ class Configurable(Dictable, metaclass=ABCMeta):
     However, they are reimplemented here for consistency among parser.
 
     """
-    def __init__(self, default_section: str = None):
+    __slots__ = ('default_section', '_parent', 'serializer')
+
+    def __init__(self, default_section: str = None, *,
+                 parent: Configurable = None):
         """Initialize.
 
         :param default_section: used as the default section when non given on
@@ -56,9 +59,15 @@ class Configurable(Dictable, metaclass=ABCMeta):
         else:
             self.default_section = default_section
         self.serializer = self._create_serializer()
+        self._parent = parent
 
     def _create_serializer(self) -> Serializer:
         return Serializer()
+
+    @property
+    def parent(self) -> Optional[Configurable]:
+        """The configurable that creates this instance."""
+        return self._parent
 
     @abstractmethod
     def get_options(self, section: str = None) -> Dict[str, str]:
@@ -187,6 +196,11 @@ class Configurable(Dictable, metaclass=ABCMeta):
 
     def __getitem__(self, section: str = None) -> Settings:
         return self.populate(section=section)
+
+    def __getstate__(self) -> Dict[str, Any]:
+        # null out parent
+        return tuple(map(lambda x: None if isinstance(x, Configurable) else x,
+                         super().__getstate__()))
 
     @property
     def sections(self) -> Set[str]:
@@ -389,7 +403,8 @@ class TreeConfigurable(Configurable, metaclass=ABCMeta):
     def __init__(self, default_section: str = None,
                  default_vars: Dict[str, Any] = None,
                  sections_name: str = 'sections',
-                 sections: Set[str] = None):
+                 sections: Set[str] = None,
+                 parent: Configurable = None):
         """Initialize.
 
         :param default_section: used as the default section when non given on
@@ -406,7 +421,7 @@ class TreeConfigurable(Configurable, metaclass=ABCMeta):
         :param sections: used as the set of sections for this instance
 
         """
-        super().__init__(default_section=default_section)
+        super().__init__(default_section=default_section, parent=parent)
         self.sections_name = sections_name
         self.default_vars = default_vars if default_vars else {}
         self._sections = sections

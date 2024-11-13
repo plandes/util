@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 import logging
 import re
 from zensols.persist import persisted
-from . import ImportYamlConfig, Serializer
+from . import Configurable, ImportYamlConfig, Serializer
 
 logger = logging.getLogger(__name__)
 
@@ -67,8 +67,8 @@ class ConditionalYamlConfig(ImportYamlConfig):
     _THEN_NODE = 'then'
     _ELSE_NODE = 'else'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, *args, parent: Configurable = None, **kwargs):
+        super().__init__(*args, parent=parent, **kwargs)
         self._evals: Dict[str, Dict[str, Any]] = {}
 
     def _find_node(self, n: Union[Dict, Any], path: str, name: str):
