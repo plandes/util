@@ -3,7 +3,9 @@
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import Dict, Set, Iterable, List, Any, Union, Optional, Type, Tuple
+from typing import (
+    Tuple, Sequence, Dict, Set, Iterable, List, Any, Union, Optional, Type
+)
 from abc import ABCMeta, abstractmethod
 import sys
 import logging
@@ -264,6 +266,33 @@ class Configurable(Dictable, metaclass=ABCMeta):
                     to_populate.remove_section(sec)
                     last_ex = e
         return last_ex
+
+    def _copy_import_section(self, sections: Sequence[str],
+                             target: Configurable = None):
+        """Copy import section definitions defined in this instance to
+        ``target``.
+
+        :param sections: the name of the sections that have import definitions
+                         (per :meth:`.Configurable.from_section`)
+
+        :param target: the configurable to populate, which defaults to this
+                       instance
+
+        """
+        from . import ConfigurableFactory
+        target = self if target is None else target
+        secs: Dict[str, Dict[str, Any]] = \
+            dict(map(lambda s: (s, self.get_options(s)), sections))
+        sec_name: str
+        params: Dict[str, Any]
+        for sec_name, params in secs.items():
+            if params is None:
+                raise ConfigurableError(f"No section '{sec_name}' in {target}")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'import sec: {sec_name}')
+            src: Configurable = ConfigurableFactory.from_section(
+                params, sec_name, parent=self)
+            src.copy_sections(target)
 
     def remove_section(self, section: str):
         """Remove a seciton with the given name."""

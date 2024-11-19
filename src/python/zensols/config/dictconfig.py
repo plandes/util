@@ -21,7 +21,7 @@ class DictionaryConfig(TreeConfigurable, Dictable):
     application specific use cases.  One such example is
     :meth:`.JsonConfig._get_config`.
 
-    This configuration also allows Python code to be executed which allows
+    This configuration also allows Python source to be executed which allows
     sections and values to be created programatically.
 
     .. document private functions
@@ -30,7 +30,7 @@ class DictionaryConfig(TreeConfigurable, Dictable):
     """
     def __init__(self, config: Dict[str, Dict[str, Any]] = None,
                  default_section: str = None, deep: bool = False,
-                 code: str = None, parent: Configurable = None):
+                 source: str = None, parent: Configurable = None):
         """Initialize.
 
         :param config: configures this instance (see class docs)
@@ -40,16 +40,16 @@ class DictionaryConfig(TreeConfigurable, Dictable):
 
         :param deep: whether or not to use the super class configuration methods
 
-        :param code: code executed with :func:`exec` with variable ``config``
-                     available to programatically create sections and values
+        :param source: source executed with :func:`exec` with variable
+                       ``config`` available to programatically create sections
+                       and values
 
         """
         super().__init__(default_section=default_section, parent=parent)
         config = {} if config is None else config
         self._dict_config = config
         self._deep = deep
-        if code is not None:
-            exec(code)
+        self._source = source
         self.invalidate()
 
     @classmethod
@@ -82,6 +82,10 @@ class DictionaryConfig(TreeConfigurable, Dictable):
         return self._get_config()
 
     def _get_config(self) -> Dict[str, Any]:
+        if self._source is not None:
+            source: str = self._source
+            self._source = None
+            exec(source, {'config': self._dict_config, 'self': self})
         return self._dict_config
 
     def _set_config(self, source: Dict[str, Any]):

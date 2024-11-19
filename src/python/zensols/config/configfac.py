@@ -167,6 +167,18 @@ class ConfigurableFactory(object):
                 self.kwargs = old_kwargs
         return inst
 
+    def _get_path(self, config_file: Union[str, Path],
+                  parent: Configurable) -> Path:
+        config_path: Path = None
+        if isinstance(config_file, str):
+            sr = parent.serializer if parent is not None else Serializer()
+            config_path = sr.parse_object(config_file)
+            if not isinstance(config_path, Path):
+                config_path = None
+        if config_path is None:
+            config_path = Path(config_file)
+        return config_path
+
     @classmethod
     def from_section(cls: Type[ConfigurableFactory], kwargs: Dict[str, Any],
                      section: str, parent: Configurable = None) -> Configurable:
@@ -176,8 +188,11 @@ class ConfigurableFactory(object):
         self: ConfigurableFactory = cls(
             **{'type_map': type_map, 'kwargs': params, 'parent': parent})
         tpe: str = params.get(self.TYPE_NAME)
-        config_file: Union[str, Dict[str, str]] = params.get(
+        config_file: Union[str, Dict[str, str], Path] = params.get(
             self.SINGLE_CONFIG_FILE)
+        if isinstance(config_file, str):
+            config_file = self._get_path(config_file, parent)
+            params[self.SINGLE_CONFIG_FILE] = config_file
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'class: {class_name}, type: {tpe}, ' +
                          f'config: {config_file}, params: {params}')
@@ -189,23 +204,14 @@ class ConfigurableFactory(object):
             config = DictionaryConfig(config_file)
         elif tpe is not None:
             del params[self.TYPE_NAME]
-            if tpe == 'import' and config_file is not None:
-                ext = Path(config_file).suffix[1:]
-                etype = self.extension_to_type.get(ext)
+            if tpe == 'import' and isinstance(config_file, Path):
+                ext: str = config_file.suffix[1:]
+                etype: str = self.extension_to_type.get(ext)
                 if etype is not None:
                     tpe = f'import{etype}'
             config = self.from_type(tpe)
         elif config_file is not None:
-            config_path: Path = None
-            del params[self.SINGLE_CONFIG_FILE]
-            serializer = Serializer()
-            if isinstance(config_file, str):
-                config_path = serializer.parse_object(config_file)
-                if not isinstance(config_path, Path):
-                    config_path = None
-            if config_path is None:
-                config_path = Path(config_file)
-            config = self.from_path(config_path)
+            config = self.from_path(config_file)
         else:
             raise ConfigurableError(
                 f"No loader information for '{section}': {params}")
