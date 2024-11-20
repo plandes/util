@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Add an option to `LogConfigurator` to allow the application to configure the
   logging system while still leveraging this class.
 
+### Added
+- YAML configuration files now have the same importation capabilities as
+  `ImportIniConfig`.
+- `DictionaryConfig` provide a way to execute Python code with the `source`
+  attribute.
+
 
 ## [1.14.5] - 2024-10-14
 ### Added

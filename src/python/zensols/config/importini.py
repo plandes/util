@@ -202,6 +202,7 @@ class ImportIniConfig(IniConfig):
     REFS_NAME = 'references'
     CLEANUPS_NAME = 'cleanups'
     TYPE_NAME = ConfigurableFactory.TYPE_NAME
+    TYPE_MAP = ConfigurableFactory.TYPE_MAP
     _IMPORT_SECTION_FIELDS = {SECTIONS_SECTION, SINGLE_CONFIG_FILE,
                               CONFIG_FILES, REFS_NAME, CLEANUPS_NAME}
     _VISITED_FILES = None
@@ -316,7 +317,10 @@ class ImportIniConfig(IniConfig):
     def _create_config(self, section: str,
                        params: Dict[str, Any]) -> Configurable:
         """Create a config from a section."""
-        return ConfigurableFactory.from_section(params, section, parent=self)
+        return ConfigurableFactory.from_section(
+            kwargs=params,
+            section=section,
+            parent=self)
 
     def _create_configs(self, section: str, params: Dict[str, Any],
                         bs_config: _BootstrapConfig) -> List[Configurable]:

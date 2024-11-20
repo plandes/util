@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 import sys
 import logging
 import inspect
+from inspect import Signature
 from pathlib import Path
 from zensols.introspect import ClassImporter
 from zensols.persist import persisted
@@ -20,8 +21,25 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class _ConfigMeta(object):
-    ci: ClassImporter = field()
-    takes_parent: bool = field()
+    class_name: str = field()
+
+    @property
+    @persisted('_class_importer')
+    def class_importer(self) -> ClassImporter:
+        return ClassImporter(self.class_name, reload=False)
+
+    @property
+    @persisted('_signature')
+    def signature(self) -> Signature:
+        return inspect.signature(self.class_importer.get_class().__init__)
+
+    @property
+    def takes_parent(self) -> bool:
+        return 'parent' in self.signature.parameters
+
+    @property
+    def takes_name(self) -> bool:
+        return 'parent_section_name' in self.signature.parameters
 
 
 @dataclass
@@ -57,11 +75,15 @@ class ConfigurableFactory(object):
         'import': 'ImportIni',
         'importini': 'ImportIni',
         'importyaml': 'ImportYaml',
+        'importtree': 'ImportTree',
         'condyaml': 'ConditionalYaml'}
     """Mapping from :obj:`TYPE_NAME` option to class prefix."""
 
     TYPE_NAME: ClassVar[str] = 'type'
     """The section entry for the configurable type (eg ``ini`` vs ``yaml``)."""
+
+    TYPE_MAP: ClassVar[str] = 'type_map'
+    """The section entry for type map (see :obj:`type_map`)."""
 
     SINGLE_CONFIG_FILE: ClassVar[str] = 'config_file'
     """The section entry for the configuration file."""
@@ -79,6 +101,10 @@ class ConfigurableFactory(object):
 
     """
     parent: Configurable = field(default=None)
+    """The client configuration using this instance to create a child."""
+
+    parent_section_name: str = field(default=None)
+    """The name of the section that has the definition creating a child."""
 
     def _mod_name(self) -> str:
         """Return the ``config`` (parent) module name."""
@@ -107,13 +133,13 @@ class ConfigurableFactory(object):
         """
         config_meta: _ConfigMeta = self._CONFIG_META.get(class_name)
         if config_meta is None:
-            ci = ClassImporter(class_name, False)
-            args = inspect.signature(ci.get_class().__init__)
-            config_meta = _ConfigMeta(ci, 'parent' in args.parameters)
+            config_meta = _ConfigMeta(class_name)
+        params = dict(self.kwargs)
         if config_meta.takes_parent:
-            return config_meta.ci.instance(**self.kwargs, parent=self.parent)
-        else:
-            return config_meta.ci.instance(**self.kwargs)
+            params['parent'] = self.parent
+        if config_meta.takes_name:
+            params['parent_section_name'] = self.parent_section_name
+        return config_meta.class_importer.instance(**params)
 
     def from_type(self, config_type: str) -> Configurable:
         """Create a configurable from the configuration type.
@@ -184,9 +210,12 @@ class ConfigurableFactory(object):
                      section: str, parent: Configurable = None) -> Configurable:
         params = dict(kwargs)
         class_name: str = params.get(cls.CLASS_NAME)
-        type_map: Dict[str, str] = params.pop('type_map', {})
+        type_map: Dict[str, str] = params.pop(cls.TYPE_MAP, {})
         self: ConfigurableFactory = cls(
-            **{'type_map': type_map, 'kwargs': params, 'parent': parent})
+            **{'type_map': type_map,
+               'kwargs': params,
+               'parent': parent,
+               'parent_section_name': section})
         tpe: str = params.get(self.TYPE_NAME)
         config_file: Union[str, Dict[str, str], Path] = params.get(
             self.SINGLE_CONFIG_FILE)

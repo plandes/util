@@ -33,5 +33,6 @@ from .condyaml import *
 from .importini import *
 from .envconfig import *
 from .treeimpmod import *
+from .treeconfig import *
 from .keychain import *
 from .meta import *

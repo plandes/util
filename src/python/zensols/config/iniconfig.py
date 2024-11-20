@@ -230,7 +230,7 @@ class IniConfig(Configurable, Primeable):
 
     def _get_container_desc(self, include_type: bool = True,
                             max_path_len: int = 3) -> str:
-        mod = ''
+        mod: str = ''
         if isinstance(self.config_file, (str, Path)):
             parts = self.config_file.parts
             path = Path(*parts[max(0, len(parts) - max_path_len):])
@@ -241,18 +241,14 @@ class IniConfig(Configurable, Primeable):
             mod = f'{tpe}[{self.config_file}]'
         return mod
 
-    def _get_section_short_str(self) -> str:
-        if self._conf is None:
+    def _get_short_str(self) -> str:
+        sec: str = ''
+        if self._conf is not None:
             # getting sections invokes parsing, which causes issues if used in
             # a debugging statement when we're not yet ready to parse
-            return ''
-        secs = tuple(self.parser.sections())
-        if len(secs) > 0:
-            return secs[0]
-        return ''
-
-    def _get_short_str(self) -> str:
-        sec: str = self._get_section_short_str()
+            secs = tuple(self.parser.sections())
+            if len(secs) > 0:
+                sec = secs[0]
         cname: str = self.__class__.__name__
         return f'{cname}({self._get_container_desc()}){{{sec}}}'
 

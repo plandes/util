@@ -387,15 +387,8 @@ class Configurable(Dictable, metaclass=ABCMeta):
                 flat[f'{sec}:{k}'] = v
         return flat
 
-    def _get_section_short_str(self):
-        try:
-            return next(iter(self.sections))
-        except StopIteration:
-            return ''
-
     def _get_short_str(self) -> str:
-        sec = self._get_section_short_str()
-        return f'{self.__class__.__name__}{{{sec}}}'
+        return self.__class__.__name__
 
     def _get_container_desc(self, include_type: bool = True,
                             max_path_len: int = 3) -> str:
