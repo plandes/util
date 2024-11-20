@@ -1,0 +1,5 @@
+app_pkg_imp:
+  import:
+    pkg_imp:
+      type: importtree
+      cleanups: [app_pkg_imp]

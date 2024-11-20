@@ -50,6 +50,7 @@ class DictionaryConfig(TreeConfigurable, Dictable):
         self._dict_config = config
         self._deep = deep
         self._source = source
+        self._initialized = False
         self.invalidate()
 
     @classmethod
@@ -86,11 +87,16 @@ class DictionaryConfig(TreeConfigurable, Dictable):
             source: str = self._source
             self._source = None
             exec(source, {'config': self._dict_config, 'self': self})
+        self._initialized = True
         return self._dict_config
 
     def _set_config(self, source: Dict[str, Any]):
         self._dict_config = source
+        self._initialized = True
         self.invalidate()
+
+    def _is_initialized(self) -> bool:
+        return self._initialized
 
     @property
     def options(self) -> Dict[str, Any]:

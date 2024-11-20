@@ -3,8 +3,11 @@
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import Iterable, Tuple, List, Dict, Any, Set, Sequence, Union
+from typing import (
+    Iterable, Tuple, List, Dict, Any, Set, Sequence, Union, ClassVar
+)
 import logging
+import re
 from itertools import chain
 from collections import ChainMap
 from pathlib import Path
@@ -13,8 +16,9 @@ from configparser import (
 )
 from zensols.introspect import ClassImporterError
 from . import (
-    ConfigurableError, ConfigurableFileNotFoundError,
-    Configurable, ConfigurableFactory, IniConfig, ImportYamlConfig, rawconfig,
+    ConfigurableError, ConfigurableFileNotFoundError, Configurable,
+    ConfigurableFactory, DictionaryConfig, IniConfig, ImportYamlConfig,
+    rawconfig
 )
 
 logger = logging.getLogger(__name__)
@@ -195,16 +199,20 @@ class ImportIniConfig(IniConfig):
     """
     __slots__ = ('config_section', 'exclude_config_sections', 'children')
 
-    IMPORT_SECTION = 'import'
-    SECTIONS_SECTION = 'sections'
-    SINGLE_CONFIG_FILE = ConfigurableFactory.SINGLE_CONFIG_FILE
-    CONFIG_FILES = 'config_files'
-    REFS_NAME = 'references'
-    CLEANUPS_NAME = 'cleanups'
-    TYPE_NAME = ConfigurableFactory.TYPE_NAME
-    TYPE_MAP = ConfigurableFactory.TYPE_MAP
-    _IMPORT_SECTION_FIELDS = {SECTIONS_SECTION, SINGLE_CONFIG_FILE,
-                              CONFIG_FILES, REFS_NAME, CLEANUPS_NAME}
+    IMPORT_SECTION: ClassVar[str] = 'import'
+    SECTIONS_SECTION: ClassVar[str] = 'sections'
+    SINGLE_CONFIG_FILE: ClassVar[str] = ConfigurableFactory.SINGLE_CONFIG_FILE
+    CONFIG_FILES: ClassVar[str] = 'config_files'
+    REFS_NAME: ClassVar[str] = 'references'
+    CLEANUPS_NAME: ClassVar[str] = 'cleanups'
+    ENABLED_NAME: ClassVar[str] = 'enabled'
+    TYPE_NAME: ClassVar[str] = ConfigurableFactory.TYPE_NAME
+    TYPE_MAP: ClassVar[str] = ConfigurableFactory.TYPE_MAP
+    IMPORT_SECTION_FIELDS: ClassVar[Set[str]] = frozenset(
+        {SECTIONS_SECTION, SINGLE_CONFIG_FILE,
+         CONFIG_FILES, REFS_NAME, CLEANUPS_NAME, ENABLED_NAME})
+    _ENABLED_LOOKUP_REGEX: ClassVar[re.Pattern] = re.compile(
+        r'^([a-zA-Z_-]+):([a-zA-Z_-]+)$')
     _VISITED_FILES = None
 
     def __init__(self, *args,
@@ -298,7 +306,7 @@ class ImportIniConfig(IniConfig):
             import_props: Set[str] = set(import_sec.keys())
             refs: List[str] = import_sec.get(self.REFS_NAME)
             file_props: Set[str] = {self.SINGLE_CONFIG_FILE, self.CONFIG_FILES}
-            aliens = import_props - self._IMPORT_SECTION_FIELDS
+            aliens = import_props - self.IMPORT_SECTION_FIELDS
             if len(aliens) > 0:
                 props = ', '.join(map(lambda p: f"'{p}'", aliens))
                 self._raise(f"Invalid options in section '{conf_sec}'" +
@@ -314,13 +322,47 @@ class ImportIniConfig(IniConfig):
                             f"Reference '{ref}' in section '{conf_sec}' not " +
                             f"found, got: {set(config.sections)}")
 
+    def _get_child_option(self, name: str, section: str) -> bool:
+        for c in self._get_children(name, section):
+            if c.has_option(name, section):
+                return c.get_option_object(name, section)
+        self._raise(f"No option '{name}' in section '{section}' found")
+
+    def _is_enabled(self, params: Dict[str, Any]) -> bool:
+        """Determine if the section is enabled based on a half-baked
+        (half-initialized) configuration.  This often doesn't work because
+        IniConfig instances don't have ConfigParser instances initialized
+        because they're loading (this) child.
+
+        TODO: find a better way to conditionally import configuration as this is
+        way to kludgy and complex.
+
+        """
+        enabled: Union[bool, str] = params.get(self.ENABLED_NAME, True)
+        if not isinstance(enabled, bool):
+            if not isinstance(enabled, str):
+                self._raise('Expecting either a <section>:<option> ' +
+                            f'string or a boolean but got: {enabled}')
+            match: re.Match = self._ENABLED_LOOKUP_REGEX.match(enabled)
+            if match is None:
+                self._raise('Expecting lookup format <section>:<option> ' +
+                            f'but got: {enabled}')
+            section, option = match.groups()
+            enabled = self._get_child_option(option, section)
+        return enabled
+
     def _create_config(self, section: str,
                        params: Dict[str, Any]) -> Configurable:
         """Create a config from a section."""
-        return ConfigurableFactory.from_section(
-            kwargs=params,
-            section=section,
-            parent=self)
+        if self._is_enabled(params):
+            params = dict(params)
+            params.pop(self.ENABLED_NAME, None)
+            return ConfigurableFactory.from_section(
+                kwargs=params,
+                section=section,
+                parent=self)
+        else:
+            return DictionaryConfig()
 
     def _create_configs(self, section: str, params: Dict[str, Any],
                         bs_config: _BootstrapConfig) -> List[Configurable]:
@@ -391,7 +433,7 @@ class ImportIniConfig(IniConfig):
             bs_config.append_child(config)
         return configs
 
-    def _get_children(self) -> Tuple[List[str], Iterable[Configurable]]:
+    def _get_import_children(self) -> Tuple[List[str], Iterable[Configurable]]:
         """"Get children used for this config instance.  This is done by import
         each import section and files by delayed loaded for each.
 
@@ -452,7 +494,7 @@ class ImportIniConfig(IniConfig):
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'importing {self._get_container_desc()}, ' +
                          f'children={self.children}')
-        csecs, children = self._get_children()
+        csecs, children = self._get_import_children()
         overwrites: Set = set()
         # copy each configuration added to the bootstrap loader in the order we
         # added them.

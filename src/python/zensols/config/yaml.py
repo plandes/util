@@ -125,7 +125,10 @@ class """ + class_name + """(Template):
                 prev = content
                 # TODO: raise here for missing keys embedded in the file rather
                 # than KeyError
-                content = cls(content).substitute(context)
+                try:
+                    content = cls(content).substitute(context)
+                except Exception as e:
+                    self._raise('Can not substitute YAML template', e)
         conf: Dict[str, Any] = yaml.load(content, yaml.FullLoader)
         if conf is None:
             conf = {}
@@ -141,3 +144,10 @@ class """ + class_name + """(Template):
         super().invalidate()
         self.config_file = None
         self._get_config()
+
+    def _is_initialized(self) -> bool:
+        return self._config is not None
+
+    def remove_section(self, section: str):
+        self._get_config().pop(section, None)
+        super().invalidate()

@@ -1,0 +1,65 @@
+app_pkg_imp:
+  import:
+    pkg_imp_0:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_1:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_2:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_3:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_4:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_5:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_6:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_7:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_8:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_9:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_10:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_11:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_12:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_13:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_14:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_15:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_16:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_17:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_18:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_19:
+      type: importtree
+      config_files: test-resources/config-test.conf
+    pkg_imp_20:
+      type: importtree
+      config_files: test-resources/config-test.conf

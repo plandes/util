@@ -14,9 +14,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - YAML configuration files now have the same importation capabilities as
-  `ImportIniConfig`.
+  `ImportIniConfig`, but are experimental.
 - `DictionaryConfig` provide a way to execute Python code with the `source`
   attribute.
+- Feature to enable `ImportIniConfig` import sections predicated on a
+  configured boolean.
 
 
 ## [1.14.5] - 2024-10-14

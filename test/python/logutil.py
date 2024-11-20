@@ -19,6 +19,7 @@ class LogTestCase(unittest.TestCase):
         LogUtil.reset()
 
     def config_logging(self, *names: Sequence[str]):
+        print(f'\nlogging: {", ".join(names)}')
         logging.basicConfig(level=logging.ERROR)
         for lv in names:
             logging.getLogger(lv).setLevel(logging.DEBUG)

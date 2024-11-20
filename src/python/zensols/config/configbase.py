@@ -71,6 +71,31 @@ class Configurable(Dictable, metaclass=ABCMeta):
         """The configurable that creates this instance."""
         return self._parent
 
+    def _get_children(self, name: str = None, section: str = None) -> \
+            List[Configurable]:
+        def collect(parent: Configurable, coll: List[Configurable]):
+            coll.append(parent)
+            if hasattr(parent, 'children'):
+                for c in parent.children:
+                    collect(c, coll)
+            if parent.parent is not None:
+                collect(parent.parent, coll)
+
+        children: List[Configurable] = []
+        collect(self, children)
+        if section is not None:
+            keep: List[Configurable] = []
+            for c in children:
+                if c._is_initialized():
+                    # otherwise infinite recursive loop
+                    if name is None:
+                        if section in c.sections:
+                            keep.append(c)
+                    elif c.has_option(name, section):
+                        keep.append(c)
+            children = keep
+        return children
+
     @abstractmethod
     def get_options(self, section: str = None) -> Dict[str, str]:
         """Get all options for a section.  If ``opt_keys`` is given return only
@@ -457,6 +482,11 @@ class TreeConfigurable(Configurable, metaclass=ABCMeta):
     def _set_config(self, source: Dict[str, Any]):
         pass
 
+    @abstractmethod
+    def _is_initialized(self) -> bool:
+        """Return whether the configuration is initialized with data."""
+        pass
+
     @property
     def config(self) -> Dict[str, Any]:
         """The configuration as a nested set of :class:`~builtins.dict`.
@@ -591,7 +621,7 @@ class TreeConfigurable(Configurable, metaclass=ABCMeta):
             if name in ops:
                 return ops[name]
             else:
-                self._raise(f'No such option: {name}')
+                self._raise(f"No such option: '{name}'")
 
     def get_options(self, name: str = None) -> Dict[str, Any]:
         name = self.default_section if name is None else name

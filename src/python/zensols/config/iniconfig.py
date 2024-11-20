@@ -108,7 +108,10 @@ class IniConfig(Configurable, Primeable):
             try:
                 for sec in src.sections:
                     parser.add_section(sec)
-                    for k, v in src.get_options(sec).items():
+                    opts = src.get_options(sec)
+                    if opts is None:
+                        raise ConfigurableError(f'No section: {sec} in {self}')
+                    for k, v in opts.items():
                         parser.set(sec, k, v)
             finally:
                 if is_ini:
@@ -129,6 +132,9 @@ class IniConfig(Configurable, Primeable):
             self._create_and_load_parser(parser)
             self._conf = parser
         return self._conf
+
+    def _is_initialized(self) -> bool:
+        return self._conf is not None
 
     def reload(self):
         self._conf = None

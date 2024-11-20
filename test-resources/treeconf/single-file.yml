@@ -1,0 +1,5 @@
+app_pkg_imp:
+  import:
+    pkg_imp:
+      type: importtree
+      config_file: test-resources/config-test.conf

@@ -1,0 +1,9 @@
+app_pkg_imp:
+  import:
+    pkg_imp:
+      type: importtree
+      enabled: app_default:is_foo_enabled
+      cleanups: [app_pkg_imp]
+      config_files: |
+        test-resources/config-test.conf
+        test-resources/config-test-nodef.conf

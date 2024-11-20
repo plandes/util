@@ -1,0 +1,7 @@
+app_pkg_imp:
+  import:
+    pkg_imp:
+      type: importtree
+      config_files: |
+        test-resources/config-test.conf
+        test-resources/config-test-nodef.conf
