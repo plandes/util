@@ -14,7 +14,7 @@ from . import PersistableError, DirectoryStash
 logger = logging.getLogger(__name__)
 
 
-class MissingDataKeys(PersistableError):
+class MissingDataKeysError(PersistableError):
     def __init__(self, keys: Set[str]):
         super().__init__(f'Missing data keys: {keys}')
         self.keys = keys
@@ -148,7 +148,7 @@ class DirectoryCompositeStash(DirectoryStash):
             logger.debug(f'keys: {data.keys()}, groups: {self._all_keys}')
         missing_keys: Set[str] = self._all_keys - set(data.keys())
         if len(missing_keys) > 0:
-            raise MissingDataKeys(missing_keys)
+            raise MissingDataKeysError(missing_keys)
         for k, v in data.items():
             if k not in self._stash_by_attribute:
                 raise PersistableError(
