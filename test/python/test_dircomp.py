@@ -7,7 +7,7 @@ import unittest
 from zensols.persist import (
     DelegateDefaults,
     DirectoryCompositeStash,
-    MissingDataKeys,
+    MissingDataKeysError,
     PersistableError,
 )
 
@@ -145,5 +145,5 @@ class TestDirectoryCompStash(unittest.TestCase):
         try:
             stash.dump('1', di)
             self.assertTrue(False, 'should have thrown exception')
-        except MissingDataKeys as e:
+        except MissingDataKeysError as e:
             self.assertEqual({'dog'}, e.keys)
