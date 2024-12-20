@@ -207,10 +207,19 @@ class Configurable(Dictable, metaclass=ABCMeta):
         """
         return self.get_options()
 
-    def populate(self, obj: Any = None, section: str = None,
-                 parse_types: bool = True) -> Union[dict, Settings]:
+    def populate(self, obj: Union[Dict[str, str], Any] = None,
+                 section: str = None, parse_types: bool = True) -> \
+            Union[Dict[str, Any], Settings]:
         """Set attributes in ``obj`` with ``setattr`` from the all values in
         ``section``.
+
+        :param obj: the object to populate
+
+        :param section: the section with the source data used to populate
+
+        :param parse_types: whether to parse string values into Python types
+
+        :return: ``obj`` if given as non-``None``, otherwise a new :class:`dict`
 
         """
         section = self.default_section if section is None else section

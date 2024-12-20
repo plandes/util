@@ -239,21 +239,26 @@ class Serializer(object):
         return v
 
     def populate_state(self, state: Dict[str, str],
-                       obj: Union[dict, object] = None,
-                       parse_types: bool = True) -> Union[dict, object]:
+                       obj: Union[Dict[str, str], Any] = None,
+                       parse_types: bool = True) -> \
+            Union[Dict[str, Any], Settings]:
         """Populate an object with a string dictionary.  The keys are used for
         the output, and the values are parsed in to Python objects using
         :meth:`parse_object`.  The keys in the input are used as the same keys
-        if ``obj`` is a ``dict``.  Otherwise, set data as attributes on the
+        if ``obj`` is a :class:`dict`.  Otherwise, set data as attributes on the
         object with :py:func:`setattr`.
 
         :param state: the data to parse
 
         :param obj: the object to populate
 
+        :param parse_types: whether to parse string values into Python types
+
+        :return: ``obj`` if given as non-``None``, otherwise a new :class:`dict`
+
         """
         obj = Settings() if obj is None else obj
-        is_dict = isinstance(obj, dict)
+        is_dict = isinstance(obj, Dict)
         for k, v in state.items():
             if parse_types and isinstance(v, str):
                 v = self.parse_object(v)
