@@ -86,8 +86,10 @@ class TestDirectoryCompStash(unittest.TestCase):
         fd.close()
         with openread(Path(self.FILE_PATH)) as f:
             self.assertEqual(should, f.read())
-        with openread(self.FILE_PATH) as f:
+        with openread(self.FILE_PATH, interpret_str=False) as f:
             self.assertEqual(should, f.read())
+        with openread(self.FILE_PATH) as f:
+            self.assertEqual(self.FILE_PATH, f.read())
         self.assertEqual(set(), open_files, 'file(s) were not closed')
 
     def test_stdin_read(self):
@@ -106,7 +108,7 @@ class TestDirectoryCompStash(unittest.TestCase):
     def test_no_close(self):
         # let the unittest warn on unclosed files
         try:
-            with openread(self.FILE_PATH, no_close=True):
+            with openread(self.FILE_PATH, interpret_str=False, no_close=True):
                 pass
             self.assertEqual(1, len(open_files))
         finally:
@@ -116,7 +118,7 @@ class TestDirectoryCompStash(unittest.TestCase):
 
     def test_non_file(self):
         with self.assertRaisesRegex(OSError, '^Not openable: nada'):
-            with openread('nada') as f:
+            with openread('nada', interpret_str=False) as f:
                 print(f)
-        with openread('nada', raise_error=False) as f:
+        with openread('nada', interpret_str=False, raise_error=False) as f:
             self.assertEqual(None, f)

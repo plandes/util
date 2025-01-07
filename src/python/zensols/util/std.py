@@ -7,7 +7,7 @@ from typing import Any, Type, ClassVar, Union
 from enum import Enum, auto
 import logging
 from pathlib import Path
-from io import IOBase, TextIOBase
+from io import IOBase, TextIOBase, StringIO
 import sys
 
 logger = logging.getLogger(__name__)
@@ -209,7 +209,16 @@ class stdout(object):
 
 class openread(object):
     """Open an file object for reading if possible, and close it only if
-    necessary.  Input types are described by :class:`.FileLikeType`.
+    necessary.  Input types are described by :class:`.FileLikeType`.  If the
+    source is
+
+        * :class:`~pathlib.Path`: read a a file
+
+        * :class:`builtins.str`: read as a file if ``interpret_str`` is
+          ``False`` and it points to a file; otherwise, the string is read
+
+        * *file-like object* such as any :class:`~io.IOBase` (sub)class, it is
+           read a file
 
     Example::
 
@@ -220,32 +229,44 @@ class openread(object):
             line = it.islice(f.readlines(), 1)
 
     """
-    def __init__(self, source: Any, no_close: bool = False,
-                 raise_error: bool = True):
+    def __init__(self, source: Any, interpret_str: bool = True,
+                 raise_error: bool = True, no_close: bool = False,
+                 **open_kwargs):
         """Initialize.
 
         :param source: the data source
 
-        :param no_close: do not close the file object (if opened in the first
-                         place), even if it should be
+        :param interpret_str: whether to read the string or use it as a file
+                              name
 
         :param raise_error: if ``True`` raise :class:`~builtins.OSError` if
                             ``source`` is an object that can not be opened or
                             read
+        :param no_close: do not close the file object (if opened in the first
+                         place), even if it should be
+
+        :param open_kwargs: keyword argument passed to :func:`open`
 
         """
         self._source = source
         self.file_like_type = FileLikeType.from_instance(source)
-        self._no_close = no_close
+        self._interpret_str = interpret_str
         self._raise_error = raise_error
+        self._no_close = no_close
+        self._open_kwargs = open_kwargs
         self._fd = None
 
     def __enter__(self):
-        if FileLikeType.is_standard_in(self._source):
+        if self._interpret_str and \
+           isinstance(self._source, str) and \
+           not FileLikeType.is_standard_in(self._source):
+            self._fd = StringIO(self._source)
+            return self._fd
+        elif FileLikeType.is_standard_in(self._source):
             self._source = sys.stdin
             return self._source
         elif self.file_like_type.is_openable:
-            self._fd = open(self._source)
+            self._fd = open(self._source, **self._open_kwargs)
             return self._fd
         elif self.file_like_type == self.file_like_type.none:
             if self._raise_error:
