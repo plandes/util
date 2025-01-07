@@ -52,6 +52,8 @@ class TestDirectoryCompStash(unittest.TestCase):
         self.assertEqual(FileLikeType.none, from_inst(None))
         self.assertEqual(FileLikeType.none, from_inst('nada'))
         self.assertEqual(FileLikeType.stdin, from_inst(sys.stdin))
+        self.assertEqual(FileLikeType.stdin, from_inst('-'))
+        self.assertEqual(FileLikeType.stdin, from_inst(Path('-')))
 
     def test_type_readable(self):
         self.assertTrue(FileLikeType.filelike.is_readable)
@@ -87,6 +89,14 @@ class TestDirectoryCompStash(unittest.TestCase):
         with openread(self.FILE_PATH) as f:
             self.assertEqual(should, f.read())
         self.assertEqual(set(), open_files, 'file(s) were not closed')
+
+    def test_stdin_read(self):
+        with openread(sys.stdin) as f:
+            self.assertEqual(id(sys.stdin), id(f))
+        with openread('-') as f:
+            self.assertEqual(id(sys.stdin), id(f))
+        with openread(Path('-')) as f:
+            self.assertEqual(id(sys.stdin), id(f))
 
     def test_no_close_stdin(self):
         with openread(sys.stdin):

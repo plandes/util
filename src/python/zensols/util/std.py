@@ -13,6 +13,65 @@ import sys
 logger = logging.getLogger(__name__)
 
 
+_STANDARD_IN_OUT_SYMBOL = '-'
+"""The string used to indicate to write to standard in."""
+
+
+class FileLikeType(Enum):
+    """Indicates readability aspects of a Python object.  Enumeration values and
+    helper methods specify how an object might be readable and in what way.
+    This class describes types can be files-like, :class:`pathlib.Path`, strings
+    that point to files, and :obj:`sys.stdin`.
+
+    """
+    filelike = auto()
+    path = auto()
+    string_path = auto()
+    stdin = auto()
+    none = auto()
+
+    @classmethod
+    def from_instance(cls: Type, instance: Any) -> FileLikeType:
+        """Return an instance of this enumeration based on the type of
+        ``instance``.
+
+        """
+        fl_type: FileLikeType = cls.none
+        is_path: bool = isinstance(instance, Path)
+        if is_path and instance.name == _STANDARD_IN_OUT_SYMBOL:
+            instance = _STANDARD_IN_OUT_SYMBOL
+        if id(instance) == id(sys.stdin) or instance == _STANDARD_IN_OUT_SYMBOL:
+            fl_type = cls.stdin
+        elif is_path:
+            fl_type = cls.path
+        elif isinstance(instance, str) and Path(instance).exists():
+            fl_type = cls.string_path
+        elif isinstance(instance, IOBase):
+            fl_type = cls.filelike
+        return fl_type
+
+    @staticmethod
+    def is_standard_in(instance: Any) -> bool:
+        """Whether ``instance`` is not :obj:`sys.stdin` but represents it."""
+        if id(instance) == id(sys.stdout) or \
+           instance == _STANDARD_IN_OUT_SYMBOL:
+            return True
+        else:
+            is_path: bool = isinstance(instance, Path)
+            return is_path and instance.name == _STANDARD_IN_OUT_SYMBOL
+
+    @property
+    def is_readable(self) -> bool:
+        """Whether the enumeration value can be read."""
+        return self.value != self.none.value
+
+    @property
+    def is_openable(self) -> bool:
+        """Whether an object can be opened with :function:`open`."""
+        return self.value == self.path.value or \
+            self.value == self.string_path.value
+
+
 class stdwrite(object):
     """Capture standard out/error.
 
@@ -63,7 +122,7 @@ class stdout(object):
                 print('write data')
 
     '''
-    STANDARD_OUT_PATH: ClassVar[str] = '-'
+    STANDARD_OUT_PATH: ClassVar[str] = _STANDARD_IN_OUT_SYMBOL
     """The string used to indicate to write to standard out."""
 
     def __init__(self, path: Union[str, Path] = None, extension: str = None,
@@ -147,48 +206,6 @@ class stdout(object):
             self._logger.info(f'wrote: {self._path}')
 
 
-class FileLikeType(Enum):
-    """Indicates readability aspects of a Python object.  Enumeration values and
-    helper methods specify how an object might be readable and in what way.
-    This class describes types can be files-like, :class:`pathlib.Path`, strings
-    that point to files, and :obj:`sys.stdin`.
-
-    """
-    filelike = auto()
-    path = auto()
-    string_path = auto()
-    stdin = auto()
-    none = auto()
-
-    @classmethod
-    def from_instance(cls: Type, instance: Any) -> FileLikeType:
-        """Return an instance of this enumeration based on the type of
-        ``instance``.
-
-        """
-        fl_type: FileLikeType = cls.none
-        if id(instance) == id(sys.stdin):
-            fl_type = cls.stdin
-        elif isinstance(instance, str) and Path(instance).exists():
-            fl_type = cls.string_path
-        elif isinstance(instance, Path):
-            fl_type = cls.path
-        elif isinstance(instance, IOBase):
-            fl_type = cls.filelike
-        return fl_type
-
-    @property
-    def is_readable(self) -> bool:
-        """Whether the enumeration value can be read."""
-        return self.value != self.none.value
-
-    @property
-    def is_openable(self) -> bool:
-        """Whether an object can be opened with :function:`open`."""
-        return self.value == self.path.value or \
-            self.value == self.string_path.value
-
-
 class openread(object):
     """Open an file object for reading if possible, and close it only if
     necessary.  Input types are described by :class:`.FileLikeType`.
@@ -223,7 +240,10 @@ class openread(object):
         self._fd = None
 
     def __enter__(self):
-        if self.file_like_type.is_openable:
+        if FileLikeType.is_standard_in(self._source):
+            self._source = sys.stdin
+            return self._source
+        elif self.file_like_type.is_openable:
             self._fd = open(self._source)
             return self._fd
         elif self.file_like_type == self.file_like_type.none:
