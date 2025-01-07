@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   attribute.
 - Feature to enable `ImportIniConfig` import sections predicated on a
   configured boolean.
+- A monitor like the `open` function, but only closes the file-like object when
+  necessary.
 
 
 ## [1.14.5] - 2024-10-14

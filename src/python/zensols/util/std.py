@@ -1,12 +1,13 @@
 """Utility classes for system based functionality.
 
 """
+from __future__ import annotations
 __author__ = 'Paul Landes'
-
-from typing import ClassVar, Union
+from typing import Any, Type, ClassVar, Union
+from enum import Enum, auto
 import logging
 from pathlib import Path
-from io import TextIOBase
+from io import IOBase, TextIOBase
 import sys
 
 logger = logging.getLogger(__name__)
@@ -144,3 +145,95 @@ class stdout(object):
                 logger.error(f'Can not close stream: {e}', e)
         if should_log:
             self._logger.info(f'wrote: {self._path}')
+
+
+class FileLikeType(Enum):
+    """Indicates readability aspects of a Python object.  Enumeration values and
+    helper methods specify how an object might be readable and in what way.
+    This class describes types can be files-like, :class:`pathlib.Path`, strings
+    that point to files, and :obj:`sys.stdin`.
+
+    """
+    filelike = auto()
+    path = auto()
+    string_path = auto()
+    stdin = auto()
+    none = auto()
+
+    @classmethod
+    def from_instance(cls: Type, instance: Any) -> FileLikeType:
+        """Return an instance of this enumeration based on the type of
+        ``instance``.
+
+        """
+        fl_type: FileLikeType = cls.none
+        if id(instance) == id(sys.stdin):
+            fl_type = cls.stdin
+        elif isinstance(instance, str) and Path(instance).exists():
+            fl_type = cls.string_path
+        elif isinstance(instance, Path):
+            fl_type = cls.path
+        elif isinstance(instance, IOBase):
+            fl_type = cls.filelike
+        return fl_type
+
+    @property
+    def is_readable(self) -> bool:
+        """Whether the enumeration value can be read."""
+        return self.value != self.none.value
+
+    @property
+    def is_openable(self) -> bool:
+        """Whether an object can be opened with :function:`open`."""
+        return self.value == self.path.value or \
+            self.value == self.string_path.value
+
+
+class openread(object):
+    """Open an file object for reading if possible, and close it only if
+    necessary.  Input types are described by :class:`.FileLikeType`.
+
+    Example::
+
+        import sys
+        import itertools as it
+
+        with openread(sys.stdin) as f:
+            line = it.islice(f.readlines(), 1)
+
+    """
+    def __init__(self, source: Any, no_close: bool = False,
+                 raise_error: bool = True):
+        """Initialize.
+
+        :param source: the data source
+
+        :param no_close: do not close the file object (if opened in the first
+                         place), even if it should be
+
+        :param raise_error: if ``True`` raise :class:`~builtins.OSError` if
+                            ``source`` is an object that can not be opened or
+                            read
+
+        """
+        self._source = source
+        self.file_like_type = FileLikeType.from_instance(source)
+        self._no_close = no_close
+        self._raise_error = raise_error
+        self._fd = None
+
+    def __enter__(self):
+        if self.file_like_type.is_openable:
+            self._fd = open(self._source)
+            return self._fd
+        elif self.file_like_type == self.file_like_type.none:
+            if self._raise_error:
+                raise OSError(
+                    f'Not openable: {self._source} ({type(self._source)})')
+            return None
+        else:
+            return self._source
+
+    def __exit__(self, type, value, traceback):
+        if self._fd is not None and not self._no_close:
+            self._fd.close()
