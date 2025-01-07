@@ -21,7 +21,8 @@ class FileLikeType(Enum):
     """Indicates readability aspects of a Python object.  Enumeration values and
     helper methods specify how an object might be readable and in what way.
     This class describes types can be files-like, :class:`pathlib.Path`, strings
-    that point to files, and :obj:`sys.stdin`.
+    that point to files, and :obj:`sys.stdin`.  The string or path
+    :class:`~.stdout.STANDARD_OUT_PATH` is treated as standard in.
 
     """
     filelike = auto()
