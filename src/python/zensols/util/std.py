@@ -215,7 +215,7 @@ class openread(object):
         * :class:`~pathlib.Path`: read a a file
 
         * :class:`builtins.str`: read as a file if ``interpret_str`` is
-          ``False`` and it points to a file; otherwise, the string is read
+          ``True`` and it points to a file; otherwise, the string is read
 
         * *file-like object* such as any :class:`~io.IOBase` (sub)class, it is
            read a file
@@ -229,9 +229,9 @@ class openread(object):
             line = it.islice(f.readlines(), 1)
 
     """
-    def __init__(self, source: Any, interpret_str: bool = True,
+    def __init__(self, source: Any, interpret_str: bool = False,
                  raise_error: bool = True, no_close: bool = False,
-                 **open_kwargs):
+                 *open_args, **open_kwargs):
         """Initialize.
 
         :param source: the data source
