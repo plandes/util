@@ -8,7 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
-## [1.14.6] - 2025-01-11
+## [1.15.0] - 2025-01-11
+### Removed
+- Drop support for Python 3.10.
+
 ### Changed
 - Add an option to `LogConfigurator` to allow the application to configure the
   logging system while still leveraging this class.
@@ -620,8 +623,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.14.6...HEAD
-[1.14.6]: https://github.com/plandes/util/compare/v1.14.5...v1.14.6
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.0...HEAD
+[1.15.0]: https://github.com/plandes/util/compare/v1.14.5...v1.15.0
 [1.14.5]: https://github.com/plandes/util/compare/v1.14.4...v1.14.5
 [1.14.4]: https://github.com/plandes/util/compare/v1.14.3...v1.14.4
 [1.14.3]: https://github.com/plandes/util/compare/v1.14.2...v1.14.3
