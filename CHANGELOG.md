@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [1.15.0] - 2025-01-11
+Additional feature additions to configuration. One of these feature additions
+precludes support of Python 3.10.  Support for Python 3.12 will be added in a
+later version.
+
 ### Removed
 - Drop support for Python 3.10.
 
