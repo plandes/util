@@ -636,8 +636,6 @@ class FactoryStash(PreemptiveStash):
     item is dumped back to the delegate when the delegate does not have it.
 
     """
-    ATTR_EXP_META = ('enable_preemptive',)
-
     factory: Stash = field()
     """The stash used to create using ``load`` and ``keys``."""
 
@@ -647,6 +645,13 @@ class FactoryStash(PreemptiveStash):
     dump_factory_nones: bool = field(default=True)
     """Whether to pass on ``None`` values to the delegate when the factory
     creates them.
+
+    """
+    force_clear_factory: bool = field(default=False)
+    """When :meth:`clear` is called the :obj:`factory` stash is only cleared if
+    this is set to ``True`` or the factory is not an instance of
+    :class:`.ReadOnlyStash`.  Setting this to ``True`` calls
+    :meth:`.Stash.clear` regardless.
 
     """
     def _calculate_has_data(self) -> bool:
@@ -685,7 +690,8 @@ class FactoryStash(PreemptiveStash):
 
     def clear(self):
         super().clear()
-        if not isinstance(self.factory, ReadOnlyStash):
+        if self.force_clear_factory or \
+           not isinstance(self.factory, ReadOnlyStash):
             self.factory.clear()
 
 
