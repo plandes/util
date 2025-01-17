@@ -27,7 +27,6 @@ class ClassExplorer(Writable):
     attribute names.
 
     """
-
     def __init__(self, include_classes: Set[Type],
                  exclude_classes: Set[Type] = None,
                  indent: int = 4, attr_truncate_len: int = 80,
