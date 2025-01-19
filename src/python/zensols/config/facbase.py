@@ -4,7 +4,7 @@ objects and files.
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import Any, Type, Optional, Tuple, Dict
+from typing import Any, Type, Optional, Tuple, Sequence, Dict
 from abc import ABC, abstractmethod
 from enum import Enum
 import logging
@@ -23,20 +23,44 @@ logger = logging.getLogger(__name__)
 
 
 class FactoryError(APIError):
-    """Raised when an object can not be instantianted by a
-    :class:`.ConfigFactory`.
+    """Raised when processing data in a :class:`.ConfigFactory`.
 
     """
-    def __init__(self, msg: str, factory: ConfigFactory = None):
+    def __init__(self, reason: str, factory: ConfigFactory = None):
+        cf: Path = None
+        self.reason = reason
         if factory is not None:
             config = factory.config
             if config is not None and hasattr(config, 'config_file') and \
                isinstance(config.config_file, (str, Path)):
                 cf = config.config_file
                 if isinstance(cf, Path):
-                    cf = cf.absolute()
-                msg += f', in file: {cf}'
-        super().__init__(msg)
+                    cf = cf.absolute().resolve()
+                reason += f', in file: {cf}'
+        self.config_file = cf
+        super().__init__(reason)
+
+
+class InstanteFactoryError(FactoryError):
+    """Raised when an object can not be instantianted by a
+    :class:`.ConfigFactory`.
+
+    """
+    def __init__(self, cls: Type, args: Sequence[Any], kwargs: Dict[str, Any],
+                 class_description: str, cause: Exception,
+                 factory: ConfigFactory = None):
+        llen: int = 200
+        kwstr: str = str(kwargs)
+        if len(kwstr) > llen:
+            kwstr = 'keys: ' + (', '.join(kwargs.keys()))
+        kwstr = textwrap.shorten(kwstr, llen)
+        invoke: str = f'{cls}({args})({kwstr})'
+        reason: str = (f'Can not create \'{class_description}\' for class ' +
+                       f'{invoke}: {cause}')
+        super().__init__(reason, factory)
+        self.kwargs = {k: str(v) for k, v in kwargs.items()}
+        self.class_description = class_description
+        self.invoke = invoke
 
 
 class FactoryState(Enum):
@@ -225,13 +249,8 @@ class ConfigFactory(object):
             if isinstance(inst, FactoryStateObserver):
                 inst._notify_state(FactoryState.CREATED)
         except Exception as e:
-            llen = 200
-            kwstr = str(kwargs)
-            if len(kwstr) > llen:
-                kwstr = 'keys: ' + (', '.join(kwargs.keys()))
-            kwstr = textwrap.shorten(kwstr, llen)
-            raise FactoryError(f'Can not create \'{cls_desc}\' for class ' +
-                               f'{cls}({args})({kwstr}): {e}', self) from e
+            raise InstanteFactoryError(
+                cls, args, kwargs, cls_desc, e, self) from e
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'inst: {inst.__class__}')
         return inst
