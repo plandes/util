@@ -324,5 +324,5 @@ class WritableContext(object):
             if method is None:
                 c._write_object(obj, d, w)
             else:
-                meth: Callable = getattr(c, method)
-                meth(obj, self.depth, w)
+                meth: Callable = getattr(c, f'_write_{method}')
+                meth(obj, d, w)
