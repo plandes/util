@@ -13,8 +13,6 @@ class ConfigurationError(APIError):
     """
     pass
 
-
-from .writable import *
 from .dictable import *
 from .serial import *
 from .configbase import *

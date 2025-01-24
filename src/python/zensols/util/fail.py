@@ -10,6 +10,7 @@ import sys
 import traceback
 from collections import OrderedDict
 from io import StringIO, TextIOBase
+from . import Writable
 
 
 class APIError(Exception):
@@ -20,7 +21,7 @@ class APIError(Exception):
 
 
 @dataclass
-class Failure(object):
+class Failure(Writable):
     """Contains information for failures as caught exceptions used by
     programatic methods.
 
@@ -80,9 +81,13 @@ class Failure(object):
         :param writer: the writer to dump the content of this writable
 
         """
-        sp = ' ' * (2 * depth)
-        writer.write(f'{sp}{self.message}:\n')
-        self.print_stack(writer)
+        message: str = self.message
+        if message is None or len(self.message) == 0:
+            message = str(self.exception)
+            if len(message) == 0:
+                message = f'Exception: {type(self.exception)}'
+        self._write_line(f'{message}:', depth, writer)
+        self._write_block(self.traceback_str, depth + 1, writer)
 
     def asdict(self) -> Dict[str, Any]:
         """Return the content of the object as a dictionary."""

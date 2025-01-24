@@ -15,8 +15,9 @@ import inspect
 import json
 import yaml
 from io import TextIOBase, StringIO
-from zensols.introspect import ClassResolver
-from . import ConfigurationError, Writable
+from ..introspect import ClassResolver
+from ..util import Writable
+from . import ConfigurationError
 
 logger = logging.getLogger(__name__)
 

@@ -5,7 +5,7 @@ with a hierarchical structure.
 __author__ = 'Paul Landes'
 
 from typing import Union, Any, Iterable, ClassVar, Dict
-from abc import ABC, abstractmethod
+from abc import ABCMeta, abstractmethod
 import sys
 import logging
 from logging import Logger
@@ -14,7 +14,6 @@ from collections import OrderedDict
 import itertools as it
 from io import TextIOBase, StringIO
 from functools import lru_cache
-from . import ConfigurationError
 
 
 @lru_cache(maxsize=50)
@@ -22,7 +21,7 @@ def _get_str_space(n_spaces: int) -> str:
     return ' ' * n_spaces
 
 
-class Writable(ABC):
+class Writable(object, metaclass=ABCMeta):
     """An interface for classes that have multi-line debuging capability.
 
     .. document private functions
@@ -104,7 +103,7 @@ class Writable(ABC):
         elif isinstance(max_len, int):
             s = self._trunc(s, max_len)
         else:
-            raise ConfigurationError(
+            raise ValueError(
                 "Parameter 'max_len' must either be a boolean or integer")
         writer.write(s)
         self._write_empty(writer)
