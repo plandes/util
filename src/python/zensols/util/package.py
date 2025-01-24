@@ -8,12 +8,42 @@ from dataclasses import dataclass, field
 import logging
 from pathlib import Path
 import pkg_resources as pkg
+from .writable import Writable, WritableContext
 
 logger = logging.getLogger(__name__)
 
 
 @dataclass
-class PackageResource(object):
+class PackageRequirement(Writable):
+    """A Python requirement specification.
+    """
+    name: str = field()
+    """The name of the module (i.e. zensols.someappname)."""
+
+    version: str = field()
+    """The version if the package exists."""
+
+    version_constraint: str = field(default='==')
+    """The constraint on the version as an (in)equality.  The following
+    (limited) operators are ``==``, ``~=``, ``>`` etc.  However, multiple
+    operators to specify intervals are not supported.
+
+    """
+    def _write(self, c: WritableContext):
+        c(self.name, 'name')
+        c(self.version, 'version')
+
+    @property
+    def spec(self) -> str:
+        """The specification such as ``plac==1.4.3``."""
+        return self.name + self.version_constraint + self.version
+
+    def __repr__(self) -> str:
+        return self.spec
+
+
+@dataclass
+class PackageResource(Writable):
     """Contains resources of installed Python packages.  It makes the
     :obj:`distribution` available and provides access to to resource files with
     :meth:`get_path` and as an index.
@@ -23,13 +53,12 @@ class PackageResource(object):
     """The name of the module (i.e. zensols.someappname)."""
 
     file_system_defer: bool = field(default=True)
-    """Whether or not to return resource paths that point to the file system when
-    this package distribution does not exist.
+    """Whether or not to return resource paths that point to the file system
+    when this package distribution does not exist.
 
     :see: :meth:`get_path`
 
     """
-
     @property
     def distribution(self) -> Optional[pkg.DistInfoDistribution]:
         """The package distribution.
@@ -47,18 +76,19 @@ class PackageResource(object):
 
     @property
     def exists(self) -> bool:
-        """Return if the package exists and installed.
-
-        """
+        """Whether the package exists and installed."""
         return self.distribution is not None
 
     @property
     def version(self) -> Optional[str]:
-        """Return the version if the package exists.
-
-        """
+        """The version if the package exists."""
         if self.exists:
             return self.distribution.version
+
+    def get_package_requirement(self) -> Optional[PackageRequirement]:
+        """The requirement represented by this instance."""
+        if self.exists:
+            return PackageRequirement(self.name, self.version)
 
     def get_path(self, resource: str) -> Optional[Path]:
         """Return a resource file name by name.  Optionally return resource as a
@@ -80,6 +110,12 @@ class PackageResource(object):
         else:
             path = Path(res_name)
         return path
+
+    def _write(self, c: WritableContext):
+        c(self.name, 'name')
+        c(self.version, 'version')
+        c(self.exists, 'exists')
+        c(self.distribution, 'distribution')
 
     def __getitem__(self, resource: str) -> Path:
         if not self.exists:
