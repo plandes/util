@@ -2,9 +2,10 @@
 with a hierarchical structure.
 
 """
+from __future__ import annotations
 __author__ = 'Paul Landes'
-
-from typing import Union, Any, Iterable, ClassVar, Dict
+from typing import Dict, Any, Iterable, Union, Callable, ClassVar
+from dataclasses import dataclass, field
 from abc import ABCMeta, abstractmethod
 import sys
 import logging
@@ -21,7 +22,7 @@ def _get_str_space(n_spaces: int) -> str:
     return ' ' * n_spaces
 
 
-class Writable(object, metaclass=ABCMeta):
+class Writable(object):
     """An interface for classes that have multi-line debuging capability.
 
     .. document private functions
@@ -244,7 +245,6 @@ class Writable(object, metaclass=ABCMeta):
                 else:
                     self._write_key_value(k, v, depth, writer)
 
-    @abstractmethod
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout):
         """Write the contents of this instance to ``writer`` using indention
         ``depth``.
@@ -254,6 +254,9 @@ class Writable(object, metaclass=ABCMeta):
         :param writer: the writer to dump the content of this writable
 
         """
+        self._write(WritableContext(self, depth, writer))
+
+    def _write(self, c: WritableContext):
         pass
 
     def write_to_log(self, logger: Logger, level: int = logging.INFO,
@@ -281,3 +284,45 @@ class Writable(object, metaclass=ABCMeta):
 
 
 _WRITABLE_CLASS = Writable
+
+
+@dataclass
+class WritableContext(object):
+    """A text data sync given to a :class:`.Writable` as a convenience object.
+
+    """
+    target: Writable = field()
+    """The client of this class."""
+
+    depth: int = field()
+    """The text indentation."""
+
+    writer: TextIOBase = field()
+    """The data sync to which text gets written."""
+
+    def __call__(self, obj: Any, desc: str = None, method: str = None,
+                 depth: int = 0):
+        """Write data.
+
+        :param obj: the data source
+
+        :param desc: a descriptor that is added
+
+        :param depth: additional depth to add to :obj:`depth`
+
+        """
+        c: Writable = self.target
+        d: int = self.depth + depth
+        w: TextIOBase = self.writer
+        if desc is not None and method is None and \
+           (obj is None or isinstance(obj, (float, int, bool, str))):
+            c._write_line(f'{desc}: {obj}', d, w)
+        else:
+            if desc is not None:
+                c._write_line(f'{desc}:', d, w)
+                d += 1
+            if method is None:
+                c._write_object(obj, d, w)
+            else:
+                meth: Callable = getattr(c, method)
+                meth(obj, self.depth, w)
