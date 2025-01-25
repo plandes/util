@@ -1,13 +1,15 @@
 """A convenience class around the :mod:`pkg_resources` module.
 
 """
+from __future__ import annotations
 __author__ = 'Paul Landes'
-
-from typing import Optional
+from typing import Tuple, Sequence, Iterable, Optional, Type, Union, ClassVar
 from dataclasses import dataclass, field
 import logging
+import re
 from pathlib import Path
 import pkg_resources as pkg
+from .import APIError
 from .writable import Writable, WritableContext
 
 logger = logging.getLogger(__name__)
@@ -16,7 +18,12 @@ logger = logging.getLogger(__name__)
 @dataclass
 class PackageRequirement(Writable):
     """A Python requirement specification.
+
     """
+    _COMMENT_REGEX: ClassVar[re.Pattern] = re.compile(r'^\s*#.*')
+    _VER_REGEX: ClassVar[re.Pattern] = re.compile(r'^([^<>=]+)([<>=]+)(.+)$')
+    _URL_REGEX: ClassVar[re.Pattern] = re.compile(r'^([^@]+) @ (.+)$')
+
     name: str = field()
     """The name of the module (i.e. zensols.someappname)."""
 
@@ -29,6 +36,9 @@ class PackageRequirement(Writable):
     operators to specify intervals are not supported.
 
     """
+    url: str = field(default=None)
+    """The URL of the requirement."""
+
     def _write(self, c: WritableContext):
         c(self.name, 'name')
         c(self.version, 'version')
@@ -36,7 +46,32 @@ class PackageRequirement(Writable):
     @property
     def spec(self) -> str:
         """The specification such as ``plac==1.4.3``."""
-        return self.name + self.version_constraint + self.version
+        if self.url is not None:
+            return f'{self.name} @ {self.url}'
+        else:
+            return self.name + self.version_constraint + self.version
+
+    @classmethod
+    def from_spec(cls: Type[PackageRequirement], spec: str) -> \
+            Optional[PackageRequirement]:
+        pr: PackageRequirement = None
+        if cls._COMMENT_REGEX.match(spec) is None:
+            ver: re.Match = cls._VER_REGEX.match(spec)
+            if ver is not None:
+                pr = PackageRequirement(
+                    name=ver.group(1),
+                    version_constraint=ver.group(2),
+                    version=ver.group(3))
+            else:
+                url: re.Match = cls._URL_REGEX.match(spec)
+                if url is not None:
+                    pr = PackageRequirement(
+                        name=url.group(1),
+                        version=None,
+                        url=url.group(2))
+            if pr is None:
+                raise APIError(f"Unknown requirement specification: '{spec}'")
+        return pr
 
     def __repr__(self) -> str:
         return self.spec
