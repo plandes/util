@@ -87,15 +87,8 @@ class PackageResource(Writable):
     name: str = field()
     """The name of the module (i.e. zensols.someappname)."""
 
-    file_system_defer: bool = field(default=True)
-    """Whether or not to return resource paths that point to the file system
-    when this package distribution does not exist.
-
-    :see: :meth:`get_path`
-
-    """
     @property
-    def distribution(self) -> Optional[pkg.DistInfoDistribution]:
+    def _distribution(self) -> Optional[pkg.DistInfoDistribution]:
         """The package distribution.
 
         :return: the distribution or ``None`` if it is not installed
@@ -112,13 +105,13 @@ class PackageResource(Writable):
     @property
     def exists(self) -> bool:
         """Whether the package exists and installed."""
-        return self.distribution is not None
+        return self._distribution is not None
 
     @property
     def version(self) -> Optional[str]:
         """The version if the package exists."""
         if self.exists:
-            return self.distribution.version
+            return self._distribution.version
 
     def get_package_requirement(self) -> Optional[PackageRequirement]:
         """The requirement represented by this instance."""
@@ -133,8 +126,7 @@ class PackageResource(Writable):
                         (i.e. ``resources/app.conf``) of the resource name
 
         :return: a path to that resource on the file system or ``None`` if the
-                 package doesn't exist, the resource doesn't exist and
-                 :obj:`file_system_defer` is ``False``
+                 package doesn't exist, the resource doesn't exist
 
         """
         res_name = str(Path(*resource.split('/')))
@@ -150,7 +142,7 @@ class PackageResource(Writable):
         c(self.name, 'name')
         c(self.version, 'version')
         c(self.exists, 'exists')
-        c(self.distribution, 'distribution')
+        c(self._distribution, 'distribution')
 
     def __getitem__(self, resource: str) -> Path:
         if not self.exists:
@@ -162,6 +154,6 @@ class PackageResource(Writable):
 
     def __str__(self) -> str:
         if self.exists:
-            return str(self.distribution)
+            return str(self._distribution)
         else:
             return self.name

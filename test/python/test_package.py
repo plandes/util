@@ -1,13 +1,14 @@
 import unittest
+from pathlib import Path
 from zensols.util import PackageRequirement, PackageResource
 
 
 class TestPackage(unittest.TestCase):
     def test_requirement_version_spec(self):
-        should_obj = PackageRequirement('plac', '1.4.3')
-        should_str: str = 'plac==1.4.3'
+        should_obj = PackageRequirement('frozendict', '1.4.3')
+        should_str: str = 'frozendict==1.4.3'
         req = PackageRequirement.from_spec(should_str)
-        self.assertEqual('plac', req.name)
+        self.assertEqual('frozendict', req.name)
         self.assertEqual('1.4.3', req.version)
         self.assertEqual(should_str, str(req))
         self.assertEqual(should_str, str(should_obj))
@@ -24,14 +25,17 @@ class TestPackage(unittest.TestCase):
         self.assertEqual(should_str, str(req))
 
     def test_resource(self):
-        pr = PackageResource('plac')
-        self.assertEqual('plac', pr.name)
+        pr = PackageResource('frozendict')
+        self.assertEqual('frozendict', pr.name)
         self.assertTrue(pr.exists)
         self.assertEqual(str, type(pr.version))
         self.assertTrue(len(pr.version) > 3)
+        pyfile: str = pr.get_path('core.py')
+        self.assertTrue(isinstance(pyfile, Path))
+        self.assertTrue('frozendict', pyfile.parent.name)
 
         req = pr.get_package_requirement()
-        self.assertEqual('plac', req.name)
+        self.assertEqual('frozendict', req.name)
         self.assertEqual(pr.version, req.version)
         self.assertEqual(req.spec, str(req))
-        self.assertRegex(req.spec, r'^plac==[0-9.]+$')
+        self.assertRegex(req.spec, r'^frozendict==[0-9.]+$')
