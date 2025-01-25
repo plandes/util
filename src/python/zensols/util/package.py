@@ -3,12 +3,15 @@
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import Tuple, Sequence, Iterable, Optional, Type, Union, ClassVar
+from typing import Optional, Type, ClassVar
 from dataclasses import dataclass, field
+import importlib.metadata
+import importlib.resources
+import importlib.util
+from importlib.machinery import ModuleSpec
 import logging
 import re
 from pathlib import Path
-import pkg_resources as pkg
 from .import APIError
 from .writable import Writable, WritableContext
 
@@ -88,34 +91,36 @@ class PackageResource(Writable):
     """The name of the module (i.e. zensols.someappname)."""
 
     @property
-    def _distribution(self) -> Optional[pkg.DistInfoDistribution]:
-        """The package distribution.
-
-        :return: the distribution or ``None`` if it is not installed
-
-        """
-        if not hasattr(self, '_dist'):
-            try:
-                self._dist = pkg.get_distribution(self.name)
-            except pkg.DistributionNotFound:
-                logger.info(f'no distribution found: {self.name}')
-                self._dist = None
-        return self._dist
-
-    @property
-    def exists(self) -> bool:
-        """Whether the package exists and installed."""
-        return self._distribution is not None
+    def _module_spec(self) -> Optional[ModuleSpec]:
+        if not hasattr(self, '_module_spec_val'):
+            self._module_spec_val = importlib.util.find_spec(self.name)
+        return self._module_spec_val
 
     @property
     def version(self) -> Optional[str]:
-        """The version if the package exists."""
-        if self.exists:
-            return self._distribution.version
+        """The version if the package is installed."""
+        if not hasattr(self, '_version'):
+            self._version = None
+            if self._module_spec is not None:
+                try:
+                    self._version = importlib.metadata.version(self.name)
+                except importlib.metadata.PackageNotFoundError:
+                    pass
+        return self._version
+
+    @property
+    def installed(self) -> bool:
+        """Whether the package is installed."""
+        return self.version is not None
+
+    @property
+    def available(self) -> bool:
+        """Whether the package exists but not installed."""
+        return self._module_spec is not None
 
     def get_package_requirement(self) -> Optional[PackageRequirement]:
         """The requirement represented by this instance."""
-        if self.exists:
+        if self.available:
             return PackageRequirement(self.name, self.version)
 
     def get_path(self, resource: str) -> Optional[Path]:
@@ -129,31 +134,32 @@ class PackageResource(Writable):
                  package doesn't exist, the resource doesn't exist
 
         """
-        res_name = str(Path(*resource.split('/')))
-        path = None
-        if self.exists and pkg.resource_exists(self.name, res_name):
-            path = pkg.resource_filename(self.name, res_name)
-            path = Path(path)
+        path: Path = None
+        rel_path: Path = Path(*resource.split('/'))
+        if self.available:
+            install_path: Path = importlib.resources.files(self.name)
+            abs_path: Path = install_path / rel_path
+            path = abs_path if abs_path.exists() else rel_path
         else:
-            path = Path(res_name)
+            path = rel_path
         return path
 
     def _write(self, c: WritableContext):
         c(self.name, 'name')
         c(self.version, 'version')
-        c(self.exists, 'exists')
-        c(self._distribution, 'distribution')
+        c(self.available, 'available')
+        c(self.installed, 'installed')
 
     def __getitem__(self, resource: str) -> Path:
-        if not self.exists:
-            raise KeyError(f'package does not exist: {self.name}')
+        if not self.available:
+            raise KeyError(f'Package does not exist: {self.name}')
         res = self.get_path(resource)
         if res is None:
-            raise KeyError(f'no such resource file: {resource}')
+            raise KeyError(f'No such resource file: {resource}')
         return res
 
-    def __str__(self) -> str:
-        if self.exists:
-            return str(self._distribution)
+    def __repr__(self) -> str:
+        if self.available:
+            return f'{self.name}=={self.version}'
         else:
             return self.name

@@ -24,10 +24,12 @@ class TestPackage(unittest.TestCase):
         self.assertEqual(url, req.url)
         self.assertEqual(should_str, str(req))
 
-    def test_resource(self):
+    def test_resource_available(self):
         pr = PackageResource('frozendict')
         self.assertEqual('frozendict', pr.name)
-        self.assertTrue(pr.exists)
+        self.assertTrue(pr.available)
+        self.assertTrue(pr.installed)
+        self.assertTrue(str(pr).startswith('frozendict=='))
         self.assertEqual(str, type(pr.version))
         self.assertTrue(len(pr.version) > 3)
         pyfile: str = pr.get_path('core.py')
@@ -39,3 +41,20 @@ class TestPackage(unittest.TestCase):
         self.assertEqual(pr.version, req.version)
         self.assertEqual(req.spec, str(req))
         self.assertRegex(req.spec, r'^frozendict==[0-9.]+$')
+
+    def test_resource_not_installed(self):
+        bad_name: str = 'nopkgnada'
+        pr = PackageResource(bad_name)
+        self.assertEqual(bad_name, pr.name)
+        self.assertFalse(pr.available)
+        self.assertFalse(pr.installed)
+        self.assertEqual(bad_name, str(pr))
+
+    def test_resource_availabe_not_installed(self):
+        name: str = 'zensols.util'
+        pr = PackageResource(name)
+        self.assertEqual(name, pr.name)
+        self.assertTrue(pr.available)
+        self.assertFalse(pr.installed)
+        rpathstr = 'resources/default.conf'
+        self.assertEqual(Path(rpathstr), pr[rpathstr])
