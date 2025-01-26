@@ -320,7 +320,6 @@ class PackageManager(object):
         if req is None:
             pr = PackageResource(package)
             req = pr.to_package_requirement()
-            print('HERE', req)
         return req
 
     def install(self, requirement: PackageRequirement, no_deps: bool = False):
@@ -348,7 +347,7 @@ class PackageManager(object):
 
         :param requirement: the requirement to uninstall
 
-        :param no_deps: if ``True``
+        :param no_deps: if ``True`` do not install the package's dependencies
 
         :return: the output from the pip command invocation
 
