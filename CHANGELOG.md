@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Replace deprecated setuptools `pkg_resources` (removed in Python 3.12) with
+  `importlib.{metadata,resources}`.
+
+
 ## [1.15.1] - 2025-01-23
 ### Changed
 - Move `zensols.config.Writable` to `zensols.util`.  The class is still

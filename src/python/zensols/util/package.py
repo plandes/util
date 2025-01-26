@@ -3,8 +3,11 @@
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import Optional, Type, ClassVar
+from typing import Dict, List, Tuple, Iterable, Union, Optional, Type, ClassVar
 from dataclasses import dataclass, field
+import sys
+import subprocess
+from itertools import chain
 import importlib.metadata
 import importlib.resources
 import importlib.util
@@ -12,20 +15,28 @@ from importlib.machinery import ModuleSpec
 import logging
 import re
 from pathlib import Path
-from .import APIError
 from .writable import Writable, WritableContext
+from .import APIError
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass
+class PackageError(APIError):
+    """Raised for errors related to packages from this module."""
+    pass
+
+
+@dataclass(order=True, frozen=True)
 class PackageRequirement(Writable):
     """A Python requirement specification.
 
     """
     _COMMENT_REGEX: ClassVar[re.Pattern] = re.compile(r'^\s*#.*')
-    _VER_REGEX: ClassVar[re.Pattern] = re.compile(r'^([^<>=]+)([<>=]+)(.+)$')
     _URL_REGEX: ClassVar[re.Pattern] = re.compile(r'^([^@]+) @ (.+)$')
+    _VER_REGEX: ClassVar[re.Pattern] = re.compile(
+        r'^(^[a-z0-9]+(?:[_-][a-z0-9]+)*)([<>~=]+)(.+)$')
+    _NON_VER_REGEX: ClassVar[re.Pattern] = re.compile(
+        r'^(^[a-z0-9]+(?:[_-][a-z0-9]+)*)$')
 
     name: str = field()
     """The name of the module (i.e. zensols.someappname)."""
@@ -42,39 +53,61 @@ class PackageRequirement(Writable):
     url: str = field(default=None)
     """The URL of the requirement."""
 
-    def _write(self, c: WritableContext):
-        c(self.name, 'name')
-        c(self.version, 'version')
+    source: Path = field(default=None)
+    """The file in which the requirement was parsed."""
+
+    meta: Dict[str, str] = field(default=None)
 
     @property
     def spec(self) -> str:
         """The specification such as ``plac==1.4.3``."""
+        spec: str
         if self.url is not None:
-            return f'{self.name} @ {self.url}'
+            spec = f'{self.name} @ {self.url}'
         else:
-            return self.name + self.version_constraint + self.version
+            spec: str
+            if self.version is None:
+                spec = self.name
+            else:
+                spec = self.name + self.version_constraint + self.version
+        return spec
 
     @classmethod
-    def from_spec(cls: Type[PackageRequirement], spec: str) -> \
+    def from_spec(cls: Type[PackageRequirement], spec: str, **kwargs) -> \
             Optional[PackageRequirement]:
         pr: PackageRequirement = None
         if cls._COMMENT_REGEX.match(spec) is None:
-            ver: re.Match = cls._VER_REGEX.match(spec)
-            if ver is not None:
-                pr = PackageRequirement(
-                    name=ver.group(1),
-                    version_constraint=ver.group(2),
-                    version=ver.group(3))
-            else:
-                url: re.Match = cls._URL_REGEX.match(spec)
-                if url is not None:
+            if pr is None:
+                m: re.Match = cls._URL_REGEX.match(spec)
+                if m is not None:
                     pr = PackageRequirement(
-                        name=url.group(1),
+                        name=m.group(1),
                         version=None,
-                        url=url.group(2))
+                        version_constraint=None,
+                        url=m.group(2),
+                        **kwargs)
+            if pr is None:
+                m: re.Match = cls._VER_REGEX.match(spec)
+                if m is not None:
+                    pr = PackageRequirement(
+                        name=m.group(1),
+                        version_constraint=m.group(2),
+                        version=m.group(3),
+                        **kwargs)
+            if pr is None:
+                m: re.Match = cls._NON_VER_REGEX.match(spec)
+                if m is not None:
+                    pr = PackageRequirement(m.group(1), None, **kwargs)
             if pr is None:
                 raise APIError(f"Unknown requirement specification: '{spec}'")
         return pr
+
+    def _write(self, c: WritableContext):
+        c(self.name, 'name')
+        c(self.version, 'version')
+        c(self.url, 'url')
+        c(self.source, 'source')
+        c(self.meta, 'meta')
 
     def __repr__(self) -> str:
         return self.spec
@@ -88,7 +121,7 @@ class PackageResource(Writable):
 
     """
     name: str = field()
-    """The name of the module (i.e. zensols.someappname)."""
+    """The name of the module (i.e. ``zensols.someappname``)."""
 
     @property
     def _module_spec(self) -> Optional[ModuleSpec]:
@@ -118,10 +151,16 @@ class PackageResource(Writable):
         """Whether the package exists but not installed."""
         return self._module_spec is not None
 
-    def get_package_requirement(self) -> Optional[PackageRequirement]:
+    def to_package_requirement(self) -> Optional[PackageRequirement]:
         """The requirement represented by this instance."""
+        from importlib.metadata import PackageMetadata
         if self.available:
-            return PackageRequirement(self.name, self.version)
+            pm: PackageMetadata = importlib.metadata.metadata(self.name)
+            meta: Dict[str, str] = {k.lower(): v for k, v in pm.items()}
+            return PackageRequirement(
+                name=meta.pop('name'),
+                version=meta.pop('version'),
+                meta=meta)
 
     def get_path(self, resource: str) -> Optional[Path]:
         """Return a resource file name by name.  Optionally return resource as a
@@ -163,3 +202,134 @@ class PackageResource(Writable):
             return f'{self.name}=={self.version}'
         else:
             return self.name
+
+
+@dataclass
+class PackageManager(object):
+    """Gather and parse requirements and optionally install them.
+
+    """
+    _FIELD_REGEX: ClassVar[re.Pattern] = re.compile(
+        r'^([A-Z][a-z-]+):(?: (.+))?$')
+
+    pip_install_args: Tuple[str, ...] = field(
+        default=('--use-deprecated=legacy-resolver',))
+
+    def _get_requirements_from_file(self, source: Path) -> \
+            Iterable[PackageRequirement]:
+        try:
+            with open(source) as f:
+                spec: str
+                for spec in map(str.strip, f.readlines()):
+                    req: PackageRequirement = PackageRequirement.from_spec(
+                        spec=spec,
+                        source=source)
+                    if req is not None:
+                        yield req
+        except Exception as e:
+            raise PackageError(
+                f"Can not parse requirements from '{source}': {e}") from e
+
+    def _get_requirements(self, source: Union[str, Path, PackageRequirement]) \
+            -> Iterable[PackageRequirement]:
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f"resolving requirements from '{source}'")
+        if isinstance(source, PackageRequirement):
+            yield source
+        elif isinstance(source, str):
+            req: PackageRequirement = PackageRequirement.from_spec(source)
+            if req is not None:
+                yield req
+        elif isinstance(source, Path):
+            if source.is_file():
+                req: PackageRequirement
+                for req in self._get_requirements_from_file(source):
+                    yield req
+            elif source.is_dir():
+                path: Path
+                for path in source.iterdir():
+                    req: PackageRequirement
+                    for req in self._get_requirements_from_file(path):
+                        yield req
+            else:
+                raise PackageError(f'Not a file or directory: {path}')
+        else:
+            raise PackageError('Expecting a string, path or requirement ' +
+                               f'but got: {type(source)}')
+
+    def find_requirements(self, sources:
+                          Tuple[Union[str, Path, PackageRequirement], ...]) -> \
+            Tuple[PackageRequirement, ...]:
+        """The requirements contained in this manager.  .
+
+        :param sources: the :obj:PackageRequirement.spec`, requirements file, or
+                        directory with requirements files
+
+        """
+        return tuple(sorted(chain.from_iterable(
+            map(self._get_requirements, sources))))
+
+    def _invoke_pip(self, args: List[str],
+                    raise_exception: bool = True) -> str:
+        cmd: List[str] = [sys.executable, "-m", "pip"] + args
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'pip command: {cmd}')
+        res: subprocess.CompletedProcess = subprocess.run(
+            cmd, capture_output=True, text=True)
+        if raise_exception and res.returncode != 0:
+            raise PackageError(f'Unable to run pip: {res.stderr}')
+        output: str = res.stdout.strip()
+        return output
+
+    def get_installed_requirement(self, package: str) -> PackageRequirement:
+        output: str = self._invoke_pip(['show', package], raise_exception=False)
+        meta: Dict[str, str] = {}
+        if len(output) > 0:
+            line: str
+            for line in map(str.strip, output.split('\n')):
+                m: re.Match = self._FIELD_REGEX.match(line)
+                if m is None:
+                    raise PackageError(f"Bad pip show format: <{line}>")
+                meta[m.group(1).lower()] = m.group(2)
+            return PackageRequirement(
+                name=meta.pop('name'),
+                version=meta.pop('version'),
+                meta=meta)
+
+    def install(self, requirement: PackageRequirement, no_deps: bool = False):
+        """Install a package in this Python enviornment with pip.
+
+        :param requirement: the requirement to install
+
+        :param no_deps: if ``True``
+
+        :return: the output from the pip command invocation
+
+        """
+        args: List[str] = ['install']
+        args.extend(self.pip_install_args)
+        if no_deps:
+            args.append('--no-deps')
+        args.append(requirement.spec)
+        output: str = self._invoke_pip(args)
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'pip: {output}')
+        return output
+
+    def uninstall(self, requirement: PackageRequirement) -> str:
+        """Uninstall a package in this Python enviornment with pip.
+
+        :param requirement: the requirement to uninstall
+
+        :param no_deps: if ``True``
+
+        :return: the output from the pip command invocation
+
+        """
+        args: List[str] = ['uninstall', '-y']
+        args.extend(self.pip_install_args)
+        args.append(requirement.spec)
+        output: str = self._invoke_pip(args)
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(f'pip: {output}')
+        return output
