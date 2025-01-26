@@ -1,6 +1,6 @@
 import unittest
 from pathlib import Path
-from zensols.config import IniConfig
+from zensols.config import IniConfig, Settings
 
 
 class TestConfigPopulate(unittest.TestCase):
@@ -20,6 +20,7 @@ class TestConfigPopulate(unittest.TestCase):
 
     def test_type(self):
         s = self.conf.populate(section='type_test')
+        self.assertTrue(isinstance(s, Settings))
         self.assertEqual(s.str1, 'some string')
         self.assertEqual(s.lst_str, ['1', '2'])
         self.assertEqual(s.lst_int, [1, 2])
@@ -34,6 +35,7 @@ class TestConfigPopulate(unittest.TestCase):
 
     def test_sci_notation(self):
         s = self.conf.populate(section='sci_test')
+        self.assertTrue(isinstance(s, Settings))
         self.assertTrue(isinstance(s.v1, float))
         self.assertEqual(2e-3, s.v1)
         self.assertEqual(-2e-3, s.v2)
@@ -52,6 +54,7 @@ class TestConfigPopulate(unittest.TestCase):
 
     def test_eval_populate(self):
         s = self.conf.populate()
+        self.assertTrue(isinstance(s, Settings))
         self.assertEqual(dict, type(s.param9))
         self.assertEqual(s.param9, {'scott': 2, 'paul': 1})
         self.assertEqual(list, type(s.param10))
@@ -59,11 +62,13 @@ class TestConfigPopulate(unittest.TestCase):
 
     def test_path(self):
         s = self.conf.populate()
+        self.assertTrue(isinstance(s, Settings))
         self.assertTrue(isinstance(s.param11, Path))
         self.assertEqual('/tmp/some/file.txt', str(s.param11.absolute()))
 
     def test_by_section(self):
         s = self.conf.populate({}, section='single_section')
+        self.assertTrue(isinstance(s, dict))
         self.assertEqual({'car': 'bmw', 'animal': 'dog'}, s)
 
     def test_eval_import(self):
@@ -72,6 +77,7 @@ class TestConfigPopulate(unittest.TestCase):
         self.assertEqual(counts, s)
         should = {'car': 'bmw', 'animal': 'dog', 'counts': counts}
         s = self.conf.populate({}, section='eval_test')
+        self.assertTrue(isinstance(s, dict))
         self.assertEqual(should, s)
 
     def test_json(self):
@@ -81,3 +87,17 @@ class TestConfigPopulate(unittest.TestCase):
         self.assertEqual({"animal": "dog", "car": "bmw"}, dat[0])
         self.assertEqual({"somefloat": 1.23, "someint": 5}, dat[1])
         self.assertEqual([5.5, 6.7, True, False], dat[2])
+
+
+class TestConfigResource(unittest.TestCase):
+    def setUp(self):
+        self.conf = IniConfig('test-resources/resource-test.conf')
+
+    def test_resource(self):
+        sec: Settings = self.conf.populate(section='sec1')
+        self.assertTrue(isinstance(sec, Settings))
+        self.assertEqual(1, len(sec))
+        self.assertTrue(hasattr(sec, 'pathvar'))
+        path: Path = sec.pathvar
+        self.assertTrue(isinstance(path, Path))
+        self.assertEqual('resources/default.conf', str(path))

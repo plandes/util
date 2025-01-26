@@ -155,12 +155,15 @@ class PackageResource(Writable):
         """The requirement represented by this instance."""
         from importlib.metadata import PackageMetadata
         if self.available:
-            pm: PackageMetadata = importlib.metadata.metadata(self.name)
-            meta: Dict[str, str] = {k.lower(): v for k, v in pm.items()}
-            return PackageRequirement(
-                name=meta.pop('name'),
-                version=meta.pop('version'),
-                meta=meta)
+            try:
+                pm: PackageMetadata = importlib.metadata.metadata(self.name)
+                meta: Dict[str, str] = {k.lower(): v for k, v in pm.items()}
+                return PackageRequirement(
+                    name=meta.pop('name'),
+                    version=meta.pop('version'),
+                    meta=meta)
+            except importlib.metadata.PackageNotFoundError:
+                pass
 
     def get_path(self, resource: str) -> Optional[Path]:
         """Return a resource file name by name.  Optionally return resource as a
@@ -217,6 +220,7 @@ class PackageManager(object):
 
     pip_install_args: Tuple[str, ...] = field(
         default=('--use-deprecated=legacy-resolver',))
+    """Additional argument used for installing packages with ``pip``."""
 
     def _get_requirements_from_file(self, source: Path) -> \
             Iterable[PackageRequirement]:
@@ -284,7 +288,13 @@ class PackageManager(object):
         output: str = res.stdout.strip()
         return output
 
-    def get_installed_requirement(self, package: str) -> PackageRequirement:
+    def get_installed_requirement(self, package: str) -> \
+            Optional[PackageRequirement]:
+        """Get an already installed requirement by name.
+
+        :param package: the package name (i.e. ``zensols.util``)
+
+        """
         output: str = self._invoke_pip(['show', package], raise_exception=False)
         meta: Dict[str, str] = {}
         if len(output) > 0:
@@ -298,6 +308,20 @@ class PackageManager(object):
                 name=meta.pop('name'),
                 version=meta.pop('version'),
                 meta=meta)
+
+    def get_requirement(self, package: str) -> Optional[PackageRequirement]:
+        """First try to get an installed (:meth:`get_installed_requirement), and
+        if not found, back off to finding one with :class:`.PackageResource`.
+
+        :param package: the package name (i.e. ``zensols.util``)
+
+        """
+        req: PackageRequirement = self.get_installed_requirement(package)
+        if req is None:
+            pr = PackageResource(package)
+            req = pr.to_package_requirement()
+            print('HERE', req)
+        return req
 
     def install(self, requirement: PackageRequirement, no_deps: bool = False):
         """Install a package in this Python enviornment with pip.

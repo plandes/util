@@ -355,9 +355,9 @@ class Configurable(Dictable, metaclass=ABCMeta):
                     return mod
 
     def resource_filename(self, resource_name: str, module_name: str = None):
-        """Return a resource based on a file name.  This uses the
-        ``pkg_resources`` package first to find the resources.  If it doesn't
-        find it, it returns a path on the file system.
+        """Return a resource based on a file name.  This uses
+        :meth:`.Serializer.resource_filename` to find the resources.  If it
+        doesn't find it, it returns a path on the file system.
 
         :param: resource_name the file name of the resource to obtain (or name
                 if obtained from an installed module)

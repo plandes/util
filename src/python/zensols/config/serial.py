@@ -10,9 +10,9 @@ import json
 from json import JSONEncoder
 from itertools import chain
 import re
-import pkg_resources
 from pathlib import Path
-from zensols.introspect import ClassImporter
+from ..introspect import ClassImporter
+from ..util import PackageResource
 from . import ConfigurationError, Dictable
 
 logger = logging.getLogger(__name__)
@@ -300,10 +300,11 @@ class Serializer(object):
 
     def resource_filename(self, resource_name: str, module_name: str = None) \
             -> Path:
-        """Return a resource based on a file name.  This uses the
-        ``pkg_resources`` package first to find the resources.  If the resource
-        module does not exist, it defaults to the relateve file given in
-        ``module_name``. If it finds it, it returns a path on the file system.
+        """Return a resource based on a file name.  This uses
+        :class:`~zensols.util.package.PackageResource` to find the resources.
+        If the resource module does not exist, it defaults to the relateve file
+        given in ``module_name``. If it finds it, it returns a path on the file
+        system.
 
         Note that when a package is not installed, the ``resources`` directory
         must be in the module system path.  This happens automatically when
@@ -326,12 +327,11 @@ class Serializer(object):
             logger.debug(
                 f'looking resource mod={module_name}{type(module_name)}, ' +
                 f'resource={resource_name}{type(resource_name)}')
-        res = None
+        res: Path = None
         try:
-            if module_name is not None and \
-               pkg_resources.resource_exists(module_name, resource_name):
-                res = pkg_resources.resource_filename(
-                    module_name, resource_name)
+            pr = PackageResource(module_name)
+            if pr.available:
+                res = pr.get_path(resource_name)
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f"resource exists: '{res}'")
         except ModuleNotFoundError as e:
