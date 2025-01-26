@@ -41,7 +41,7 @@ class PackageRequirement(Writable):
     name: str = field()
     """The name of the module (i.e. zensols.someappname)."""
 
-    version: str = field()
+    version: str = field(default=None)
     """The version if the package exists."""
 
     version_constraint: str = field(default='==')
@@ -97,7 +97,7 @@ class PackageRequirement(Writable):
             if pr is None:
                 m: re.Match = cls._NON_VER_REGEX.match(spec)
                 if m is not None:
-                    pr = PackageRequirement(m.group(1), None, **kwargs)
+                    pr = PackageRequirement(m.group(1), **kwargs)
             if pr is None:
                 raise APIError(f"Unknown requirement specification: '{spec}'")
         return pr
