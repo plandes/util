@@ -8,8 +8,6 @@ PROJ_MODULES=		git python-doc python-doc-deploy python-resources
 CLEAN_DEPS +=		pycleancache
 ADD_CLEAN +=		example/config/counter.dat
 
-#PY_SRC_TEST_PAT ?=	'test_package.py'
-
 
 ## Includes
 #
