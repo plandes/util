@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.15.2] - 2025-01-25
+### Added
+- Support for Python 3.12.
+
 ### Changed
 - Replace deprecated setuptools `pkg_resources` (removed in Python 3.12) with
   `importlib.{metadata,resources}`.
@@ -640,7 +644,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.15.1...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.2...HEAD
+[1.15.2]: https://github.com/plandes/util/compare/v1.15.1...v1.15.2
 [1.15.1]: https://github.com/plandes/util/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/plandes/util/compare/v1.14.5...v1.15.0
 [1.14.5]: https://github.com/plandes/util/compare/v1.14.4...v1.14.5
