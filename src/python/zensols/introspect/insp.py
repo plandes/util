@@ -314,11 +314,8 @@ class ClassInspector(object):
                             logging.WARN):
                         logger.warning(msg)
                     default = None
-            # ast.Num and ast.Str added for Python 3.7 backward compat
-            elif isinstance(def_node, ast.Num):
-                default = def_node.n
-            elif isinstance(def_node, ast.Str):
-                default = def_node.s
+            elif isinstance(def_node, ast.Constant):
+                default = def_node.value
             elif isinstance(def_node, ast.Call):
                 func = def_node.func.id
                 args = map(map_arg, def_node.args)
@@ -473,9 +470,7 @@ class ClassInspector(object):
                 last_field: ClassField = fields[-1]
                 if last_field.doc is None:
                     last_field.doc = doc
-            # ast.Str added for Python 3.7 backward compat
             elif (isinstance(node, ast.Expr) and
-                  isinstance(node.value, ast.Str) and
                   len(fields) > 0):
                 doc = ClassDoc(node.value.s)
                 last_field: ClassField = fields[-1]

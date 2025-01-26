@@ -176,9 +176,12 @@ class PackageResource(Writable):
         path: Path = None
         rel_path: Path = Path(*resource.split('/'))
         if self.available:
-            install_path: Path = importlib.resources.files(self.name)
-            abs_path: Path = install_path / rel_path
-            path = abs_path if abs_path.exists() else rel_path
+            try:
+                install_path: Path = importlib.resources.files(self.name)
+                abs_path: Path = install_path / rel_path
+                path = abs_path if abs_path.exists() else rel_path
+            except TypeError:
+                path = rel_path
         else:
             path = rel_path
         return path
