@@ -328,7 +328,7 @@ class PackageManager(object):
 
         :param requirement: the requirement to install
 
-        :param no_deps: if ``True``
+        :param no_deps: if ``True`` do not install the package's dependencies
 
         :return: the output from the pip command invocation
 
