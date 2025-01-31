@@ -12,6 +12,11 @@ from . import APIError
 
 @dataclass
 class Hasher(object):
+    """A utility class that creates hexadecimal hash values for text.
+
+    :see: :mod:`hashlib`
+
+    """
     short: bool = field(default=True)
     """Whether or not to generate a 32-bit or 64-bit key."""
 

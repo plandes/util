@@ -57,8 +57,8 @@ class ImportYamlConfig(YamlConfig):
                             ``import``
 
         :param parse_values: whether to invoke the :class:`.Serializer` to
-                             create in memory Python data, which defaults to
-                             false to keep data as string for configuraiton
+                             create in memory Python data values, which defaults
+                             to false to keep data as strings for configuration
                              merging
 
         """
