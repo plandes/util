@@ -6,7 +6,6 @@ from __future__ import annotations
 __author__ = 'Paul Landes'
 from typing import Dict, Any, Iterable, Union, Callable, ClassVar
 from dataclasses import dataclass, field
-from abc import ABCMeta, abstractmethod
 import sys
 import logging
 from logging import Logger
@@ -26,6 +25,7 @@ class Writable(object):
     """An interface for classes that have multi-line debuging capability.
 
     .. document private functions
+    .. automethod:: _write
     .. automethod:: _trunc
     .. automethod:: _sp
     .. automethod:: _set_indent
@@ -257,6 +257,7 @@ class Writable(object):
         self._write(WritableContext(self, depth, writer))
 
     def _write(self, c: WritableContext):
+        """Use :class:`.WritableContext` as a data sink."""
         pass
 
     def write_to_log(self, logger: Logger, level: int = logging.INFO,
@@ -299,6 +300,22 @@ class WritableContext(object):
 
     writer: TextIOBase = field()
     """The data sync to which text gets written."""
+
+    def __getattr__(self, attr: str, default: Any = None) -> Any:
+        if attr.startswith('write_'):
+            def make_proxy(meth: Callable):
+                def proxy(*args, **kwargs):
+                    if 'depth' not in kwargs:
+                        kwargs['depth'] = self.depth
+                    else:
+                        kwargs['depth'] += self.depth
+                    return meth(*args, writer=self.writer, **kwargs)
+                return proxy
+
+            meth_name: str = '_' + attr
+            meth = getattr(self.target, meth_name)
+            return make_proxy(meth)
+        return super().__getattribute__(attr)
 
     def __call__(self, obj: Any, desc: str = None, method: str = None,
                  depth: int = 0):
