@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- A "shortcut" directive to get a section as a `dict` rather than
+  `config.Settings`.
+
+
 ## [1.15.2] - 2025-01-25
 ### Added
 - Support for Python 3.12.

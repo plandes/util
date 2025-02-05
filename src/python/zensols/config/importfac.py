@@ -521,6 +521,29 @@ ImportConfigFactory.register_module(_InstanceImportConfigFactoryModule)
 
 
 @dataclass
+class _AsDictImportConfigFactoryModule(ImportConfigFactoryModule):
+    """A module that uses the :obj:`factory` to create the instance from a
+    section as a :class:`builtins.dict` instead of :class:`.Settings`.
+
+    The configuration string prototype has the form::
+
+        asdict: <section name>
+
+    """
+    _NAME: ClassVar[str] = 'asdict'
+
+    def _instance(self, proto: ModulePrototype) -> Any:
+        obj = self._create_instance(proto.name, proto.config, proto.params)
+        if not isinstance(obj, Settings):
+            raise FactoryError(
+                f'Expecting non-class (Settings) but got {type(obj)}')
+        return obj.asdict()
+
+
+ImportConfigFactory.register_module(_AsDictImportConfigFactoryModule)
+
+
+@dataclass
 class _AliasImportConfigFactoryModule(ImportConfigFactoryModule):
     """Like :class:`._InstanceImportConfigFactoryModule` but use the an alias
     for the instance section name.

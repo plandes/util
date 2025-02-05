@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 import unittest
-from zensols.config import IniConfig, ImportConfigFactory
+from zensols.config import (
+    IniConfig, ImportConfigFactory, Settings, FactoryError
+)
 
 
 @dataclass
@@ -42,3 +44,31 @@ class TestAlias(unittest.TestCase):
         banana = basket.fruit
         self.assertEqual(Banana, banana.__class__)
         self.assertEqual('brown', banana.color)
+
+
+class TestConfigComposite(unittest.TestCase):
+    def setUp(self):
+        config = IniConfig('test-resources/object-factory.conf')
+        self.fac = ImportConfigFactory(config)
+
+    def test_instance(self):
+        bs = self.fac('basket_settings')
+        self.assertTrue(isinstance(bs, Settings))
+        self.assertTrue(isinstance(bs.fruit, Settings))
+        self.assertEqual(bs.fruit.name, 'old_fruit')
+
+    def test_call(self):
+        bs = self.fac('basket_call_dict')
+        self.assertTrue(isinstance(bs, Settings))
+        self.assertTrue(isinstance(bs.fruit, dict))
+        self.assertEqual(bs.fruit['name'], 'old_fruit')
+
+    def test_asdict_call(self):
+        bs = self.fac('basket_as_dict')
+        self.assertTrue(isinstance(bs, Settings))
+        self.assertTrue(isinstance(bs.fruit, dict))
+        self.assertEqual(bs.fruit['name'], 'old_fruit')
+
+    def test_asdict_fail(self):
+        with self.assertRaisesRegex(FactoryError, r'^Expecting non-class'):
+            self.fac('basket_as_dict_fail')
