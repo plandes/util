@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.15.3] - 2025-02-05
 ### Added
 - A "shortcut" directive to get a section as a `dict` rather than
   `config.Settings`.
@@ -649,7 +650,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.15.2...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.3...HEAD
+[1.15.3]: https://github.com/plandes/util/compare/v1.15.2...v1.15.3
 [1.15.2]: https://github.com/plandes/util/compare/v1.15.1...v1.15.2
 [1.15.1]: https://github.com/plandes/util/compare/v1.15.0...v1.15.1
 [1.15.0]: https://github.com/plandes/util/compare/v1.14.5...v1.15.0
