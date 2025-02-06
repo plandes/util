@@ -1,0 +1,85 @@
+zensols.cli package
+===================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   zensols.cli.lib
+
+Submodules
+----------
+
+zensols.cli.action module
+-------------------------
+
+.. automodule:: zensols.cli.action
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.app module
+----------------------
+
+.. automodule:: zensols.cli.app
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.command module
+--------------------------
+
+.. automodule:: zensols.cli.command
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.harness module
+--------------------------
+
+.. automodule:: zensols.cli.harness
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.meta module
+-----------------------
+
+.. automodule:: zensols.cli.meta
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.notebook module
+---------------------------
+
+.. automodule:: zensols.cli.notebook
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.usage module
+------------------------
+
+.. automodule:: zensols.cli.usage
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.util module
+-----------------------
+
+.. automodule:: zensols.cli.util
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: zensols.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:

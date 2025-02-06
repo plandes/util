@@ -1,0 +1,21 @@
+zensols.multi package
+=====================
+
+Submodules
+----------
+
+zensols.multi.stash module
+--------------------------
+
+.. automodule:: zensols.multi.stash
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: zensols.multi
+   :members:
+   :undoc-members:
+   :show-inheritance:
