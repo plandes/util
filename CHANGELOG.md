@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Fix bug with missing `_initialized` attribute in Configurable subclasses.
+
+
 ## [1.15.3] - 2025-02-05
 ### Added
 - A "shortcut" directive to get a section as a `dict` rather than

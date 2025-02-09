@@ -48,6 +48,7 @@ class StringConfig(Configurable):
             self.option_sep_regex = re.compile(option_sep_regex)
         else:
             self.option_sep_regex = option_sep_regex
+        self._initialized = False
 
     @persisted('_parsed_config')
     def _get_parsed_config(self) -> Dict[str, str]:
@@ -66,6 +67,7 @@ class StringConfig(Configurable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'section={sec}, name={name}, value={value}')
             conf[sec][name] = value
+        self._initialized = True
         return conf
 
     @property
@@ -83,6 +85,9 @@ class StringConfig(Configurable):
         if opts is None:
             raise ConfigurableError(f'no section: {section}')
         return opts
+
+    def _is_initialized(self) -> bool:
+        return self._initialized
 
     def __str__(self) -> str:
         return self.__class__.__name__ + ': config=' + self.config_str

@@ -52,6 +52,7 @@ class EnvironmentConfig(Configurable):
         self.map_delimiter = map_delimiter
         self.skip_delimiter = skip_delimiter
         self.includes = includes
+        self._initialized = False
 
     @persisted('_parsed_config')
     def _get_parsed_config(self) -> Dict[str, str]:
@@ -69,6 +70,7 @@ class EnvironmentConfig(Configurable):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'section={sec}, name={name}, value={value}')
             conf[sec][name] = value
+        self._initialized = True
         return conf
 
     @persisted('_keys')
@@ -83,6 +85,9 @@ class EnvironmentConfig(Configurable):
     def has_option(self, name: str, section: str = None) -> bool:
         keys = self._get_keys()
         return self.default_section == section and name in keys
+
+    def _is_initialized(self) -> bool:
+        return self._initialized
 
     @persisted('_env_section')
     def _get_env_section(self) -> Dict[str, str]:

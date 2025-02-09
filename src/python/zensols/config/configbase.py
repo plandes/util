@@ -111,6 +111,11 @@ class Configurable(Dictable, metaclass=ABCMeta):
     def has_option(self, name: str, section: str = None) -> bool:
         pass
 
+    @abstractmethod
+    def _is_initialized(self) -> bool:
+        """Return whether the configuration is initialized with data."""
+        pass
+
     def get_option(self, name: str, section: str = None) -> str:
         """Return an option from ``section`` with ``name``.
 
@@ -489,11 +494,6 @@ class TreeConfigurable(Configurable, metaclass=ABCMeta):
 
     @abstractmethod
     def _set_config(self, source: Dict[str, Any]):
-        pass
-
-    @abstractmethod
-    def _is_initialized(self) -> bool:
-        """Return whether the configuration is initialized with data."""
         pass
 
     @property
