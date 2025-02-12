@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.15.4] - 2025-02-12
 ### Changed
 - Fix bug with missing `_initialized` attribute in Configurable subclasses.
 
@@ -654,7 +655,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.15.3...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.4...HEAD
+[1.15.4]: https://github.com/plandes/util/compare/v1.15.3...v1.15.4
 [1.15.3]: https://github.com/plandes/util/compare/v1.15.2...v1.15.3
 [1.15.2]: https://github.com/plandes/util/compare/v1.15.1...v1.15.2
 [1.15.1]: https://github.com/plandes/util/compare/v1.15.0...v1.15.1
