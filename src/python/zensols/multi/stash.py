@@ -381,7 +381,7 @@ class MultiProcessFactoryStash(MultiProcessDefaultStash):
     :obj:`delegate`, which persists the data.
 
     """
-    enable_preemptive: bool = field()
+    enable_preemptive: Union[str, bool] = field()
     """If ``False``, do not invoke the :obj:`factory` instance's data
     calculation.  If the value is ``always``, then always assume the data is not
     calcuated, which forces the factory prime.  Otherwise, if ``None``, then
