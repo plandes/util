@@ -189,7 +189,7 @@ class MultiProcessRobustStash(MultiProcessFactoryStash):
                 item = super()._load_from_factory(k)
             except Exception as e:
                 msg = (f'Could not load from stash {type(self.factory)} ' +
-                       f'in {type(self)} (section={self.name})')
+                       f'in {type(self)} (section={self.name}): {e}')
                 item = Failure(e, self, message=msg)
         else:
             item = super()._load_from_factory(k)
