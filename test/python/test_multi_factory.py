@@ -67,7 +67,7 @@ class TestMultiProcessRobustStash(unittest.TestCase):
         stash: Stash = self.fac('robust')
         self.assertEqual(MultiProcessRobustStash, type(stash))
 
-    def test_multi_create_missing_invalidate(self):
+    def test_multi_missing_invalidate(self):
         keys: List[str] = ' 3 5 6'.split()
         stash: Stash = self.fac('robust')
         init_len: int = stash.factory.n
@@ -88,8 +88,7 @@ class TestMultiProcessRobustStash(unittest.TestCase):
         nstash.invalidate()
         self.assertEqual(init_len, len(nstash))
 
-    def _test_multi_create_missing(self, fn, should_missing,
-                                   stash_sec='robust'):
+    def _test_multi_missing(self, fn, should_missing, stash_sec='robust'):
         keys: List[str] = ' 3 5 6'.split()
         stash: Stash = self.fac(stash_sec)
         init_len: int = stash.factory.n
@@ -117,15 +116,15 @@ class TestMultiProcessRobustStash(unittest.TestCase):
         self.assertEqual(should_size, len(nstash))
         self.assertEqual(should_size, len(tuple(ds_path.iterdir())))
 
-    def test_multicreate_missing_len(self):
+    def test_multi_missing_len(self):
         def test_fn(stash):
             len(stash)
-        self._test_multi_create_missing(test_fn, False)
+        self._test_multi_missing(test_fn, False)
 
-    def test_multicreate_missing_load(self):
+    def test_multi_missing_load(self):
         def test_fn(stash):
             self.assertEqual('5', stash.load('5')['name'])
-        self._test_multi_create_missing(test_fn, False)
+        self._test_multi_missing(test_fn, False)
 
     def _test_fail(self, stash: Stash):
         self.assertTrue(isinstance(stash.factory.fails, Set))
