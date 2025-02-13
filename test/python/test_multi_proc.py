@@ -19,7 +19,7 @@ class RangeStash(ReadOnlyStash):
         return name
 
     def keys(self):
-        return range(self.n)
+        return map(str, range(self.n))
 
 
 @dataclass
