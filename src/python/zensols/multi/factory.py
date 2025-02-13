@@ -118,6 +118,10 @@ class MultiProcessFactoryStash(MultiProcessDefaultStash):
     def _load_from_factory(self, k: str) -> Any:
         return self.factory.load(k)
 
+    def clear(self):
+        super().clear()
+        self.factory.clear()
+
 
 @dataclass(init=False)
 class MultiProcessRobustStash(MultiProcessFactoryStash):
