@@ -4,3 +4,4 @@
 __author__ = 'Paul Landes'
 
 from .stash import *
+from .factory import *
