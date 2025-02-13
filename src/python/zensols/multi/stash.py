@@ -156,11 +156,11 @@ class SingleMultiProcessor(PoolMultiProcessor):
 @dataclass
 class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     """A stash that forks processes to process data in a distributed fashion.
-    The stash is typically created by a :class:`.ImportConfigFactory` in the
-    child process.  Work is chunked (grouped) and then sent to child processes.
-    In each, a new instance of this same stash is created using
-    :class:`.ImportConfigFactory` and then an abstract method is called to dump
-    the data.
+    The stash is typically created by a
+    :class:`~zensols.config.importfac.ImportConfigFactory` in the child process.
+    Work is chunked (grouped) and then sent to child processes.  In each, a new
+    instance of this same stash is created using ``ImportConfigFactory`` and
+    then an abstract method is called to dump the data.
 
     Implementation details:
 
@@ -182,8 +182,6 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
     .. automethod:: _process
     .. automethod:: _create_chunk_processor
 
-    :see: :class:`zensols.config.factory.ImportConfigFactory`
-
     """
     ATTR_EXP_META = ('chunk_size', 'workers')
 
@@ -193,9 +191,10 @@ class MultiProcessStash(PrimablePreemptiveStash, metaclass=ABCMeta):
 
     """
     config: Configurable = field()
-    """The application configuration meant to be populated by
-    :class:`zensols.config.factory.ImportClassFactory`."""
+    """The application configuration meant to be used by a
+    :class:`~zensols.config.importfac.ImportConfigFactory`.
 
+    """
     name: str = field()
     """The name of the instance in the configuration."""
 
@@ -370,9 +369,9 @@ class MultiProcessDefaultStash(MultiProcessStash):
 
 @dataclass(init=False)
 class MultiProcessFactoryStash(MultiProcessDefaultStash):
-    """Like :class:`~zensols.persist.FactoryStash`, but uses a subordinate
-    factory stash to generate the data in a subprocess(es) in the same manner as
-    the super class :class:`.MultiProcessStash`.
+    """Like :class:`~zensols.persist.domain.FactoryStash`, but uses a
+    subordinate factory stash to generate the data in a subprocess(es) in the
+    same manner as the super class :class:`.MultiProcessStash`.
 
     Attributes :obj:`chunk_size` and :obj:`workers` both default to ``0``.
 
@@ -395,8 +394,8 @@ class MultiProcessFactoryStash(MultiProcessDefaultStash):
         """Initialize with attributes :obj:`chunk_size` and :obj:`workers` both
         defaulting to ``0``.
 
-        :param config: the application configuration meant to be populated by
-                       :class:`zensols.config.factory.ImportClassFactory`
+        :param config: the application configuration meant to be use by a
+                       :class:`~zensols.config.importfac.ImportConfigFactory`
 
         :param name: the name of the parent stash used to create the chunk, and
                      subsequently process this chunk
