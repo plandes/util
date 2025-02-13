@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.15.5] - 2025-02-13
+### Added
+- A tolerant easy to use multiprocessing factory stash
+  (`MultiProcessRobustStash`) that retries to create missing or failed items.
+
+
 ## [1.15.4] - 2025-02-12
 ### Changed
 - Fix bug with missing `_initialized` attribute in Configurable subclasses.
@@ -655,7 +661,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.15.4...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.5...HEAD
+[1.15.5]: https://github.com/plandes/util/compare/v1.15.4...v1.15.5
 [1.15.4]: https://github.com/plandes/util/compare/v1.15.3...v1.15.4
 [1.15.3]: https://github.com/plandes/util/compare/v1.15.2...v1.15.3
 [1.15.2]: https://github.com/plandes/util/compare/v1.15.1...v1.15.2
