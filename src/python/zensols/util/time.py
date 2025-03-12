@@ -1,13 +1,14 @@
 """Peformance measure convenience utils.
 
 """
+from __future__ import annotations
 __author__ = 'Paul Landes'
-
-from typing import Union
+from typing import Tuple, Union, Callable
 import logging
 from logging import Logger
 import inspect
 import time as tm
+from datetime import timedelta
 import traceback as trc
 from functools import wraps
 from io import TextIOBase
@@ -15,6 +16,7 @@ import math
 import errno
 import os
 import signal
+from .fail import APIError
 
 _time_logger: Logger = logging.getLogger(__name__)
 TIMEOUT_DEFAULT: int = 10
@@ -204,3 +206,62 @@ class timeprotect(object):
     def __exit__(self, cls, value, traceback):
         signal.alarm(0)
         return True
+
+
+class DurationFormatter(object):
+    """Utility class to format time as duration.
+
+    """
+    def __init__(self, duration: Union[float, int, timedelta]):
+        """Initialize with the duration to format as seconds or a
+        :class:`~datetime.timedelta`.
+
+        """
+        if isinstance(duration, (float, int)):
+            duration = timedelta(seconds=duration)
+        self.duration = duration
+
+    @property
+    def days_hours_minutes_seconds(self) -> Tuple[int, int, int, int]:
+        """The days, hours, minutes and seconds of :obj:`duration`."""
+        s: int = round(self.duration.total_seconds())
+        return self.duration.days, s // 3600, (s // 60) % 60, s % 60
+
+    def format(self, format: str) -> str:
+        """Format the duration with using ``format``, which is one of:
+
+          * ``hour_min_sec``: ``HH:MM:SS``
+          * ``non_zero``: ``Hh:Mm:Ss`` with each field given if non_zero
+
+        """
+        s: str = None
+        meth_name: str = f'_{format}'
+        if hasattr(self, meth_name):
+            meth: Callable = getattr(self, meth_name)
+            s = meth()
+        if s is None:
+            raise APIError(f"No such format '{format}' in {self.__class__}")
+        return s
+
+    def __call__(self, format: str) -> str:
+        """See :meth:`format`."""
+        return self.format(format)
+
+    def _hour_min_sec(self) -> str:
+        _, h, m, s = self.days_hours_minutes_seconds
+        return f'{h:.0f}:{m:02d}:{s:02d}'
+
+    def _non_zero(self) -> str:
+        _, h, m, s = self.days_hours_minutes_seconds
+        d: str = ''
+        if h > 0:
+            d = f'{h:.0f}h'
+        if m > 0:
+            if len(d) > 0:
+                d += ', '
+            d += f'{m}m'
+        if s > 0:
+            if len(d) > 0:
+                d += ', '
+            d += f'{s}s'
+        return d

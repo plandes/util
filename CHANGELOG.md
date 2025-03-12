@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Added
+- A time duration formatting utility (`DurationFormatter`).
+
+
 ## [1.15.5] - 2025-02-13
 ### Added
 - A tolerant easy to use multiprocessing factory stash
