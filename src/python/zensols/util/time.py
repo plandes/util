@@ -11,12 +11,13 @@ import time as tm
 import traceback as trc
 from functools import wraps
 from io import TextIOBase
+import math
 import errno
 import os
 import signal
 
-_time_logger = logging.getLogger(__name__)
-TIMEOUT_DEFAULT = 10
+_time_logger: Logger = logging.getLogger(__name__)
+TIMEOUT_DEFAULT: int = 10
 
 
 class TimeoutError(Exception):
@@ -28,7 +29,8 @@ class TimeoutError(Exception):
 
 
 class time(object):
-    """Used in a ``with`` scope that executes the body and logs the elapsed time.
+    """Used in a ``with`` scope that executes the body and logs the elapsed
+    time.
 
     Format f-strings are supported as the locals are taken from the calling
     frame on exit.  This means you can do things like:
@@ -137,8 +139,9 @@ def timeout(seconds=TIMEOUT_DEFAULT, error_message=os.strerror(errno.ETIME)):
         def long_running_function1():
             pass
 
-    This was derived from the `David Narayan's <https://stackoverflow.com/questions/2281850/timeout-function-if-it-takes-too-long-to-finish>`_
-    StackOverflow thread.
+    This was derived from the David Narayan's `StackOverflow`_  thread.
+
+    .. StackOverflow: https://stackoverflow.com/questions/2281850/timeout-function-if-it-takes-too-long-to-finish
 
     """
     def decorator(func):
@@ -160,7 +163,8 @@ def timeout(seconds=TIMEOUT_DEFAULT, error_message=os.strerror(errno.ETIME)):
 
 
 class timeprotect(object):
-    """Invokes a block and bails if not completed in a specified number of seconds.
+    """Invokes a block and bails if not completed in a specified number of
+    seconds.
 
     :param seconds: the number of seconds to wait
 
