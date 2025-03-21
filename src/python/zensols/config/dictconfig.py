@@ -128,7 +128,7 @@ class DictionaryConfig(TreeConfigurable, Dictable):
             conf = self._get_config()
             sec = conf.get(section)
             if sec is not None:
-                return sec.contains(name)
+                return name in sec
             return False
 
     @property

@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - A time duration formatting utility (`DurationFormatter`).
 
+### Changed
+- Bug fix to `DictionaryConfig` option fetch.
+
 
 ## [1.15.5] - 2025-02-13
 ### Added
