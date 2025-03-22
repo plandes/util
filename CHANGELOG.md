@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.15.6] - 2025-03-22
 ### Added
 - A time duration formatting utility (`DurationFormatter`).
 
@@ -668,7 +669,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.15.5...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.6...HEAD
+[1.15.6]: https://github.com/plandes/util/compare/v1.15.5...v1.15.6
 [1.15.5]: https://github.com/plandes/util/compare/v1.15.4...v1.15.5
 [1.15.4]: https://github.com/plandes/util/compare/v1.15.3...v1.15.4
 [1.15.3]: https://github.com/plandes/util/compare/v1.15.2...v1.15.3
