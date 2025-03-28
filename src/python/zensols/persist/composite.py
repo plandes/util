@@ -218,7 +218,10 @@ class DirectoryCompositeStash(DirectoryStash):
         return comp_data
 
     def load(self, name: str) -> Any:
-        inst, context = super().load(name)
+        item = super().load(name)
+        if item is None:
+            raise PersistableError(f'No key for composite: {name}')
+        inst, context = item
         attr_val = self._from_composite(name, context)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'loaded {name}({self.attribute_name})')
