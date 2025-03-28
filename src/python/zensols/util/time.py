@@ -35,7 +35,7 @@ class time(object):
     time.
 
     Format f-strings are supported as the locals are taken from the calling
-    frame on exit.  This means you can do things like:
+    frame on exit.  This means you can do things like::
 
         with time('processed {cnt} items'):
             cnt = 5
