@@ -18,10 +18,10 @@ logger = logging.getLogger(__name__)
 
 
 class YamlConfig(TreeConfigurable):
-    """Just like :class:`.IniConfig` but parse configuration from YAML files.
-    Variable substitution works just like ini files, but you can set what
-    delimiter to use and keys are the paths of the data in the hierarchy
-    separated by dots.
+    """Just like :class:`.IniConfig` but parse configuration from YAML files
+    using the :mod:`yaml` module.  Variable substitution works just like ini
+    files, but you can set what delimiter to use and keys are the paths of the
+    data in the hierarchy separated by dots.
 
     See the test cases for examples.
 
