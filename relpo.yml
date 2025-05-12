@@ -12,8 +12,8 @@ github:
 project:
   domain: zensols
   name: util
-  short_description: Command line, configuration and persistence utilites generally used for any more than basic application.
-  long_description: TODO
+  short_description: Zensols Utilities
+  long_description: Command line, configuration and persistence utilites generally used for any more than basic application.
   keywords:
     - tooling
   python:
