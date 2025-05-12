@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
-## [1.16.0] - 2025-05-11
+## [1.15.7] - 2025-05-11
 Switch from setuptools to [Pixi].
 
 ## Changed
@@ -677,8 +677,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.16.0...HEAD
-[1.16.0]: https://github.com/plandes/util/compare/v1.15.6...v1.16.0
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.7...HEAD
+[1.15.7]: https://github.com/plandes/util/compare/v1.15.6...v1.15.7
 [1.15.6]: https://github.com/plandes/util/compare/v1.15.5...v1.15.6
 [1.15.5]: https://github.com/plandes/util/compare/v1.15.4...v1.15.5
 [1.15.4]: https://github.com/plandes/util/compare/v1.15.3...v1.15.4
