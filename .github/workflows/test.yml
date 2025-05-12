@@ -18,12 +18,15 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Build information
+        run: 'make info'
+
+      - name: Create the project file needed by setup-pixi
+        run: 'make pyproject.toml'
+
       - uses: prefix-dev/setup-pixi@v0.8.8
         with:
           pixi-version: v0.45.0
-
-      - name: Build information
-        run: 'make info'
 
       - name: Run tests
         run: 'make test'
