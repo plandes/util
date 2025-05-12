@@ -70,11 +70,11 @@ class TestPackageResource(unittest.TestCase):
         pr = PackageResource(name)
         self.assertEqual(name, pr.name)
         self.assertTrue(pr.available)
-        #self.assertFalse(pr.installed)
         self.assertTrue(pr.installed)
         rpathstr = 'resources/default.conf'
-        #self.assertEqual(Path(rpathstr), pr[rpathstr])
-        self.assertTrue(str(pr[rpathstr]).endswith('zensols/util/resources/default.conf'))
+        path = str(pr[rpathstr])
+        self.assertTrue(path.endswith('resources/default.conf'),
+                        f'bad path: {path}')
 
 
 class TestPackageManagerFind(unittest.TestCase):

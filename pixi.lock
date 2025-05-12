@@ -1444,8 +1444,8 @@ packages:
   timestamp: 1743195092905
 - pypi: .
   name: zensols-util
-  version: 1.15.6
-  sha256: 5a0def05bc0b010bf3ff01faf01b4fe3174916d04466b03abf585e108707aa9b
+  version: 1.16.0
+  sha256: b784843e7c2b7ef024ca55f1f28d4590a79dbd9ed28bbcd370287e42fb614458
   requires_dist:
   - frozendict
   - pip

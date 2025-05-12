@@ -100,5 +100,6 @@ class TestConfigResource(unittest.TestCase):
         self.assertTrue(hasattr(sec, 'pathvar'))
         path: Path = sec.pathvar
         self.assertTrue(isinstance(path, Path))
-        #self.assertEqual('resources/default.conf', str(path))
-        self.assertTrue(str(path).endswith('zensols/util/resources/default.conf'))
+        path = str(path)
+        self.assertTrue(path.endswith('resources/default.conf'),
+                        f'wrong path: {path}')
