@@ -4,8 +4,7 @@
 ## Build system
 #
 PROJ_TYPE=		python
-PROJ_MODULES=		git python-doc python-doc-deploy python-resources
-CLEAN_DEPS +=		pycleancache
+PROJ_MODULES=		python/doc
 ADD_CLEAN +=		example/config/counter.dat
 
 
@@ -29,3 +28,6 @@ runexamples:
 
 .PHONY:			testall
 testall:		test runexamples
+
+tmp:
+			$(PY_PX_BIN) run testcur
