@@ -15,8 +15,8 @@ include ./zenbuild/main.mk
 
 ## Targets
 #
-.PHONY:			check
-check:
+.PHONY:			mypy
+mypy:
 			mypy src/python/zensols/introspect/imp.py
 
 .PHONY:			runexamples
