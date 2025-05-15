@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changes
 - Look for configuration files in a shared directory using the `ZENSOLSRC`
   environment variable.  See [ConfigurationImporter.get_environ_path].
+- Fix `PackageResource` absolute path resources truncated leading slash removed
+  bug.
 
 
 ## [1.15.7] - 2025-05-11
