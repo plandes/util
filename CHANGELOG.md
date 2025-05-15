@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.15.8] - 2025-05-15
+### Changes
+- Look for configuration files in a shared directory using the `ZENSOLSRC`
+  environment variable.  See [ConfigurationImporter.get_environ_path].
+
+
 ## [1.15.7] - 2025-05-11
 Switch from setuptools to [Pixi].
 
@@ -677,7 +683,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.15.7...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.8...HEAD
+[1.15.8]: https://github.com/plandes/util/compare/v1.15.7...v1.15.8
 [1.15.7]: https://github.com/plandes/util/compare/v1.15.6...v1.15.7
 [1.15.6]: https://github.com/plandes/util/compare/v1.15.5...v1.15.6
 [1.15.5]: https://github.com/plandes/util/compare/v1.15.4...v1.15.5
@@ -738,3 +745,4 @@ Major release.
 
 [zensols.install]: https://github.com/plandes/install
 [Pixi]: https://pixi.sh
+[ConfigurationImporter.get_environ_path]: https://plandes.github.io/util/api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationImporter.get_environ_path

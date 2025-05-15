@@ -240,6 +240,11 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
     identifying an :class:`.ImportIniConfig` import section.
 
     """
+    ENVIRON_SHARED_NAME = 'ZENSOLSRC'
+    """Environment variable name that points to a directory for shared config
+    files (see :meth:`get_environ_path`).
+
+    """
     ENVIRON_VAR_REGEX = re.compile(r'^.+\.([a-z]+?)$')
     """A regular expression to parse the name from the package name for the
     environment variable that might hold the configuration
@@ -354,34 +359,50 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
         return name
 
     def get_environ_path(self) -> Optional[Path]:
-        """Return the path to the resource configuration file.  This first uses
-        :meth:`get_environ_var_from_app` to attempt to find an environment
-        variable with a reference to file, then looks for it using the UNIX
-        style file naming conventions (i.e. package ``zensols.util`` would point
-        to ``~/.utilrc``).
+        """Return the path to the resource configuration file.  The following
+        files are searched in order:
+
+          1. This first uses :meth:`get_environ_var_from_app` to attempt to find
+             an environment variable with a reference to file,
+
+          2. A file pointed by the environment variable
+             ``ENVIRON_SHARED_NAME/<application prefix>`` *without* the trailing
+             ``rc`` (i.e. package ``zensols.util`` would point to
+             ``~/etc/util.{conf,yml}``),
+
+          3. UNIX style file naming conventionsin the home directory
+             (i.e. package ``zensols.util`` would point to ``~/.utilrc``).
 
         """
+        rc_files: List[Path] = []
         env_var: str = self.get_environ_var_from_app()
         env_var_path: str = os.environ.get(env_var)
-        rc_path: Path = None
+        prefix: str = self._get_rc_prefix()
+        home_rc_path: Path = Path(f'~/.{prefix}rc').expanduser()
+        shared_rc_var: str = os.environ.get(self.ENVIRON_SHARED_NAME)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug('loading config from environment ' +
                          f"varaibles '{env_var}' = {env_var_path}")
-        if env_var_path is None:
-            prefix: str = self._get_rc_prefix()
-            path = Path(f'~/.{prefix}rc').expanduser()
+        if env_var_path is not None:
+            rc_files.append(Path(env_var_path))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(
+                'loading config from environment referred shared directory ' +
+                f"'{self.ENVIRON_SHARED_NAME}' = '{shared_rc_var}'")
+        if shared_rc_var is not None:
+            sdir: Path = Path(shared_rc_var)
+            rc_files.append((sdir / f'{prefix}.conf').expanduser())
+            rc_files.append((sdir / f'{prefix}.yml').expanduser())
+        if home_rc_path.is_file():
+            rc_files.append(home_rc_path)
+        path: Path
+        for path in rc_files:
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'trying UNIX style resource file: {path}')
+                logger.debug(f'checking for RC file: {path}')
             if path.is_file():
-                rc_path = path
-        else:
-            path = Path(env_var_path)
-            if path.exists():
-                rc_path = path
-            else:
-                logger.warning(f'Environment variable {env_var} set to ' +
-                               f'non-existant path: {env_var_path}')
-        return rc_path
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f'found RC file: {path}')
+                return path
 
     def _get_config_option(self) -> str:
         """Return the long option name (with dashes) as given on the command
