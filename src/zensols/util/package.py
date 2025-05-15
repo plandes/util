@@ -177,7 +177,11 @@ class PackageResource(Writable):
 
         """
         path: Path = None
-        rel_path: Path = Path(*resource.split('/'))
+        rel_path: Path = Path(resource)
+        if not rel_path.is_file():
+            rel_path = Path(*resource.split('/'))
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'relative path: {resource} -> {rel_path}')
         if self.available:
             try:
                 install_path: Path = importlib.resources.files(self.name)
@@ -187,6 +191,8 @@ class PackageResource(Writable):
                 path = rel_path
         else:
             path = rel_path
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'package path: {path}')
         return path
 
     def _write(self, c: WritableContext):
