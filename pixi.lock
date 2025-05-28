@@ -1445,7 +1445,7 @@ packages:
 - pypi: .
   name: zensols-util
   version: 1.15.8
-  sha256: 02303bc59b7594f1ae84bcf08a0e2d4d631d8c66fcc87c4553dddf84f96cc5c6
+  sha256: 36fcb85c43f3bda97c79bfa120bca033ae731ae89f9a4126e616908fc5450c44
   requires_dist:
   - frozendict
   - pip

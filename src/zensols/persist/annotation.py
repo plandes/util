@@ -157,9 +157,9 @@ class PersistedWork(Deallocatable):
                  recover_empty: bool = False):
         """Create an instance of the class.
 
-        :param path: if type of ``pathlib.Path`` then use disk storage to cache
-                     of the pickeled data, otherwise a string used to store in
-                     the owner
+        :param path: if type of :class:`pathlib.Path` then use disk storage to
+                     cache of the pickeled data, otherwise a string used to
+                     store in the owner
 
         :param owner: an owning class to get and retrieve as an attribute
 
@@ -172,12 +172,12 @@ class PersistedWork(Deallocatable):
         :param initial_value: if provided, the method is never called and this
                               value returned for all invocations
 
-        :param mkdir: if ``path`` is a :class`.Path` object, then recursively
-                      create all directories needed to be able to persist the
-                      file without missing directory IO errors
+        :param mkdir: if ``path`` is a :class`pathlib.Path` object, then
+                      recursively create all directories needed to be able to
+                      persist the file without missing directory IO errors
 
         :deallocate_recursive: the ``recursive`` parameter passed to
-                               :meth:`.Deallocate._try_deallocate` to try to
+                               :meth:`.Deallocatable._try_deallocate` to try to
                                deallocate the object graph recursively
 
         :param recover_empty: if ``True`` and a ``path`` points to a zero size
@@ -210,8 +210,8 @@ class PersistedWork(Deallocatable):
         self.recover_empty = recover_empty
 
     def _info(self, msg, *args):
-        if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(self.varname + ': ' + msg, *args)
+        if logger.isEnabledFor(logging.INFO):
+            logger.info(self.varname + ': ' + msg, *args)
 
     def clear_global(self):
         """Clear only any cached global data.
@@ -269,17 +269,21 @@ class PersistedWork(Deallocatable):
         If the file does not exist, calling ``__do_work__`` and save it.
         """
         load_file: bool = self.path.is_file()
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'{self.varname}: load_file: {load_file}')
         if load_file and self.recover_empty and self.path.stat().st_size == 0:
             load_file = False
         if load_file:
-            self._info('loading work from {}'.format(self.path))
+            if logger.isEnabledFor(logging.INFO):
+                self._info(f'loading work from {self.path}')
             with open(self.path, 'rb') as f:
                 try:
                     obj = pickle.load(f)
                 except EOFError as e:
                     raise PersistableError(f'Can not read: {self.path}') from e
         else:
-            self._info('saving work to {}'.format(self.path))
+            if logger.isEnabledFor(logging.INFO):
+                self._info(f'saving work to {self.path}')
             if self.mkdir:
                 self.path.parent.mkdir(parents=True, exist_ok=True)
             if not self.path.parent.is_dir():
@@ -288,6 +292,8 @@ class PersistedWork(Deallocatable):
             with open(self.path, 'wb') as f:
                 obj = self._do_work(*argv, **kwargs)
                 pickle.dump(obj, f)
+            if logger.isEnabledFor(logging.INFO):
+                self._info(f'wrote: {self.path}')
         return obj
 
     def set(self, obj):
@@ -338,7 +344,7 @@ class PersistedWork(Deallocatable):
         vname = self.varname
         obj = None
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug('call with vname: {}'.format(vname))
+            logger.debug(f'{vname}: call')
         if self.owner is not None and hasattr(self.owner, vname):
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug('found in instance')
@@ -362,7 +368,12 @@ class PersistedWork(Deallocatable):
         will invoke the worker to do the work.
 
         """
-        return self.worker(*argv, **kwargs)
+        if logger.isEnabledFor(logging.INFO):
+            self._info(f'do work: {self.worker}')
+        res = self.worker(*argv, **kwargs)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'{self.varname}: work result: {type(res)}')
+        return res
 
     def write(self, indent=0, include_content=False, writer=sys.stdout):
         sp = ' ' * indent
