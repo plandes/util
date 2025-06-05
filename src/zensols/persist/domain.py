@@ -37,7 +37,11 @@ class chunks(object):
         """Initialize the chunker.
 
         :param iterable: any iterable object
+
         :param size: the size of each chunk
+
+        :param enum: whether to tuples of ``(<count int>, <value>)`` produced by
+                     :function:`enumerate`
 
         """
         self.iterable = iterable
