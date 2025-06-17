@@ -16,7 +16,7 @@ import json
 import yaml
 from io import TextIOBase, StringIO
 from ..introspect import ClassResolver
-from ..util import Writable
+from ..util import Writable, WritableContext
 from . import ConfigurationError
 
 logger = logging.getLogger(__name__)
@@ -294,11 +294,14 @@ class Dictable(Writable):
         :param writer: the writer to dump the content of this writable
 
         """
+        super().write(depth, writer)
+
+    def _write(self, c: WritableContext):
         name = '_DICTABLE_WRITABLE_DESCENDANTS'
         if hasattr(self, name) and (getattr(self, name) is True):
-            self._write_descendants(depth, writer)
+            self._write_descendants(c.depth, c.writer)
         else:
-            self._write_dict(self._writable_dict(), depth, writer)
+            self._write_dict(self._writable_dict(), c.depth, c.writer)
 
     def _write_key_value(self, k: Any, v: Any, depth: int, writer: TextIOBase):
         sp = self._sp(depth)

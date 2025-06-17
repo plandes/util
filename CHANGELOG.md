@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Change
+- Fix `Dictable` overriding `_write` method.
+
+
 ## [1.15.8] - 2025-05-15
 ### Changes
 - Look for configuration files in a shared directory using the `ZENSOLSRC`
