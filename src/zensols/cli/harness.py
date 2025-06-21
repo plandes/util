@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import List, Dict, Any, Union, Type, Optional, Tuple, ClassVar
+from typing import List, Dict, Set, Any, Union, Type, Optional, Tuple, ClassVar
 from dataclasses import dataclass, field
 import sys
 import os
@@ -134,27 +134,49 @@ class CliHarness(object):
     """If ``True`` do not exist the program when :class:`SystemExit` is raised.
 
     """
+    sys_path: str = field(default=None)
+    """Paths separated by :obj:`os.pathsep` (such as ``:``) to add to the
+    :obj:`sys.path` (``PYTHONPATH``).  These paths are added to the *beginning*
+    of the system path.
+
+    """
     def __post_init__(self):
         if self.root_dir is not None:
             if not self.root_dir.is_dir():
                 raise ApplicationError(
                     f'No such root directory: {self.root_dir}')
             self.add_sys_path(self.root_dir)
+        if self.sys_path is not None:
+            self.add_sys_path(self.sys_path, 0)
 
     @staticmethod
-    def add_sys_path(to_add: Union[str, Path]):
+    def add_sys_path(to_add: Union[str, Path], insert_index: int = None):
         """Add to the Python system path if not already.
 
-        :param to_add: the path to test and add
+        :param to_add: the path or string path list separated by
+                       :obj:`os.pathsep` (such as ``:``) and may have user home
+                       names (``~``)
+
+        :param insert_index: where in the path to add or ``None`` to add to the
+                             end
 
         """
-        def canon(p: Path) -> Path:
-            return p.expanduser().resolve().absolute()
+        def canon_path(p: Path) -> str:
+            return str(p.expanduser().resolve().absolute())
 
-        to_add = Path(to_add) if isinstance(to_add, str) else to_add
-        to_add = canon(to_add)
-        if not any(map(lambda p: canon(Path(p)) == to_add, sys.path)):
-            sys.path.append(str(to_add))
+        pre_paths: Set[str] = set(sys.path)
+        paths: List[Path] = []
+        if isinstance(to_add, str):
+            paths.extend(map(Path, to_add.split(os.pathsep)))
+        elif isinstance(to_add, Path):
+            paths.append(to_add)
+        path: str
+        for path in map(canon_path, paths):
+            if path not in pre_paths:
+                if insert_index is None:
+                    sys.path.append(path)
+                else:
+                    sys.path.insert(insert_index, path)
 
     @property
     def invoke_method(self) -> str:

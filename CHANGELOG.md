@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.15.10] - 2025-06-21
+### Changed
+- `CliHarness` system path index parameter.
+- `Settings` uses parameter naming compatible with dictionaries.
+
+
 ## [1.15.9] - 2025-06-20
 ### Change
 - Fix `Dictable` overriding `_write` method.
@@ -692,7 +698,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.15.9...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.10...HEAD
+[1.15.10]: https://github.com/plandes/util/compare/v1.15.9...v1.15.10
 [1.15.9]: https://github.com/plandes/util/compare/v1.15.8...v1.15.9
 [1.15.8]: https://github.com/plandes/util/compare/v1.15.7...v1.15.8
 [1.15.7]: https://github.com/plandes/util/compare/v1.15.6...v1.15.7

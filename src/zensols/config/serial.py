@@ -49,8 +49,8 @@ class Settings(Dictable):
     def keys(self) -> Iterable[Any]:
         return self.__dict__.keys()
 
-    def get(self, name: str, default: Any = None) -> Any:
-        return self.__dict__.get(name, default)
+    def get(self, key: str, default: Any = None) -> Any:
+        return self.__dict__.get(key, default)
 
     def items(self) -> Tuple[Tuple[Any, Any], ...]:
         return self.__dict__.items()
@@ -59,11 +59,11 @@ class Settings(Dictable):
                        class_name_param: str = None) -> Dict[str, Any]:
         return self.__dict__
 
-    def __contains__(self, name: str) -> bool:
-        return name in self.__dict__
+    def __contains__(self, key: str) -> bool:
+        return key in self.__dict__
 
-    def __getitem__(self, name: str) -> str:
-        return self.__dict__[name]
+    def __getitem__(self, key: str) -> str:
+        return self.__dict__[key]
 
     def __len__(self) -> int:
         return len(self.__dict__)
