@@ -8,8 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.15.9] - 2025-06-20
 ### Change
 - Fix `Dictable` overriding `_write` method.
+- Environment variable `ZENSOLSRC` can now be a path separated (`:` on UNIX) of
+  directories to configuration files.
 
 
 ## [1.15.8] - 2025-05-15
@@ -689,7 +692,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.15.8...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.9...HEAD
+[1.15.9]: https://github.com/plandes/util/compare/v1.15.8...v1.15.9
 [1.15.8]: https://github.com/plandes/util/compare/v1.15.7...v1.15.8
 [1.15.7]: https://github.com/plandes/util/compare/v1.15.6...v1.15.7
 [1.15.6]: https://github.com/plandes/util/compare/v1.15.5...v1.15.6

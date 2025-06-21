@@ -390,9 +390,11 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
                 'loading config from environment referred shared directory ' +
                 f"'{self.ENVIRON_SHARED_NAME}' = '{shared_rc_var}'")
         if shared_rc_var is not None:
-            sdir: Path = Path(shared_rc_var)
-            rc_files.append((sdir / f'{prefix}.conf').expanduser())
-            rc_files.append((sdir / f'{prefix}.yml').expanduser())
+            spath: str
+            for spath in shared_rc_var.split(os.pathsep):
+                sdir: Path = Path(spath)
+                rc_files.append((sdir / f'{prefix}.conf').expanduser())
+                rc_files.append((sdir / f'{prefix}.yml').expanduser())
         if home_rc_path.is_file():
             rc_files.append(home_rc_path)
         path: Path

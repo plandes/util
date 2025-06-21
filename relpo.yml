@@ -16,6 +16,7 @@ project:
   long_description: Command line, configuration and persistence utilites generally used for any more than basic application.
   keywords:
     - tooling
+    - utility
   python:
     # Python interpreter versions
     version:
