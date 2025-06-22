@@ -3,6 +3,8 @@ from dataclasses import FrozenInstanceError
 import unittest
 import sys
 from pathlib import Path
+from packaging.specifiers import SpecifierSet
+from packaging.requirements import Requirement
 from zensols.util import (
     PackageError, PackageRequirement, PackageResource, PackageManager
 )
@@ -10,7 +12,7 @@ from zensols.util import (
 
 class TestPackageResource(unittest.TestCase):
     def setUp(self):
-        self.req = PackageRequirement('frozendict', '1.4.3')
+        self.req = PackageRequirement(Requirement('frozendict==1.4.3'))
         self.maxDiff = sys.maxsize
 
     def test_req_frozen(self):
@@ -22,10 +24,21 @@ class TestPackageResource(unittest.TestCase):
         should_str: str = 'frozendict==1.4.3'
         req = PackageRequirement.from_spec(should_str)
         self.assertEqual('frozendict', req.name)
-        self.assertEqual('1.4.3', req.version)
+        self.assertEqual('1.4.3', str(req.first_version))
         self.assertEqual(should_str, str(req))
         self.assertEqual(should_str, str(should_obj))
         self.assertEqual(should_obj, req)
+
+    def test_req_strict(self):
+        not_stricts = (
+            'frozendict>1.4.3', 'frozendict~=1.4.3', 'frozendict',
+            'frozendict>1.4.3,<1.5.0.dev')
+        self.assertTrue(self.req.is_strict)
+        for not_strict in not_stricts:
+            req = PackageRequirement.from_spec(not_strict)
+            self.assertFalse(
+                req.is_strict,
+                f'requirement should be strict but is not: {req}')
 
     def test_req_url_spec(self):
         url = 'https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.5.3/en_core_sci_sm-0.5.3.tar.gz'
@@ -33,7 +46,7 @@ class TestPackageResource(unittest.TestCase):
         should_str: str = f'{name} @ {url}'
         req = PackageRequirement.from_spec(should_str)
         self.assertEqual(name, req.name)
-        self.assertEqual(None, req.version)
+        self.assertEqual(None, req.first_version)
         self.assertEqual(url, req.url)
         self.assertEqual(should_str, str(req))
 
@@ -51,11 +64,11 @@ class TestPackageResource(unittest.TestCase):
 
     def test_resource_to_requirement(self):
         pr = PackageResource('frozendict')
-        req = pr.to_package_requirement()
+        req = pr.to_requirement()
         self.assertEqual('frozendict', req.name)
-        self.assertEqual(pr.version, req.version)
-        self.assertEqual(req.spec, str(req))
-        self.assertRegex(req.spec, r'^frozendict==[0-9.]+$')
+        self.assertEqual(pr.version, str(req.first_version))
+        self.assertEqual(str(req), str(req))
+        self.assertRegex(str(req), r'^frozendict==[0-9.]+$')
 
     def test_resource_not_installed(self):
         bad_name: str = 'nopkgnada'
@@ -84,15 +97,15 @@ class TestPackageManagerFind(unittest.TestCase):
     def _test_fd_req(self, req: PackageRequirement):
         self.assertEqual(self.spec, str(req))
         self.assertEqual(req.name, 'frozendict')
-        self.assertEqual(req.version, '1.2.3')
-        self.assertEqual(req.version_constraint, '==')
+        self.assertEqual(str(req.first_version), '1.2.3')
+        self.assertEqual(req.specifier, SpecifierSet('==1.2.3'))
         self.assertEqual(req.url, None)
 
     def _test_sci_req(self, req: PackageRequirement):
         self.assertEqual('scispacy~=0.5.3', str(req))
         self.assertEqual(req.name, 'scispacy')
-        self.assertEqual(req.version, '0.5.3')
-        self.assertEqual(req.version_constraint, '~=')
+        self.assertEqual(str(req.first_version), '0.5.3')
+        self.assertEqual(req.specifier, '~=0.5.3')
         self.assertEqual(req.url, None)
 
     def _test_model_req(self, req: PackageRequirement, url: str, name: str,
@@ -100,8 +113,8 @@ class TestPackageManagerFind(unittest.TestCase):
         spec = f'{name} @ {url}'
         self.assertEqual(spec, str(req))
         self.assertEqual(req.name, name)
-        self.assertEqual(req.version, None)
-        self.assertEqual(req.version_constraint, None)
+        self.assertEqual(req.first_version, None)
+        self.assertEqual(req.specifier, None)
         self.assertEqual(req.url, url)
         self.assertEqual('test-resources/req', str(req.source.parent))
         self.assertEqual(file_name, req.source.name)
@@ -139,7 +152,7 @@ class TestPackageManagerFind(unittest.TestCase):
         self._test_model_md_req(reqs[0], 'scispacy.txt')
         self._test_fd_req(reqs[1])
         self.assertEqual(nada_name, reqs[2].name)
-        self.assertEqual(None, reqs[2].version)
+        self.assertEqual(None, reqs[2].first_version)
         self.assertEqual(None, reqs[2].url)
         self._test_sci_req(reqs[3])
 
@@ -164,19 +177,34 @@ class TestPackageManagerFind(unittest.TestCase):
 
 
 class TestPackageManagerResolve(unittest.TestCase):
-    def test_get_intalled(self):
+    def test_is_installed(self):
         mng = PackageManager()
         req: PackageRequirement = mng.get_installed_requirement('frozendict')
         self.assertTrue(isinstance(req, PackageRequirement))
         self.assertEqual('frozendict', req.name)
-        self.assertTrue(len(req.version) > 3)
+        self.assertTrue(req.first_version is not None)
+        self.assertTrue(len(str(req.first_version)) > 3)
         self.assertTrue(req.meta is not None)
         self.assertTrue(len(req.meta) > 5)
 
-    def test_get_not_intalled(self):
+    def test_is_not_installed(self):
         mng = PackageManager()
         res = mng.get_installed_requirement('nada')
         self.assertEqual(None, res)
+
+    def test_is_not_installed_diff_version(self):
+        import frozendict
+        cur_ver: str = frozendict.__version__
+        installs = (
+            (f'frozendict=={cur_ver}', True),
+            ('frozendict==0.0.0', False),
+            ('frozendict>0.0.1', True),
+        )
+        mng = PackageManager()
+        for spec, should in installs:
+            req = PackageRequirement.from_spec(spec)
+            msg = f'spec should {"" if should else "not"} be installed: {req}'
+            self.assertEqual(should, mng.is_installed(req), msg)
 
 
 class TestPackageManagerInstall(unittest.TestCase):
@@ -186,16 +214,20 @@ class TestPackageManagerInstall(unittest.TestCase):
         mng = PackageManager()
         try:
             req: PackageRequirement = mng.get_installed_requirement(pname)
+            self.assertFalse(mng.is_installed(install_req))
             self.assertEqual(None, req)
             mng.install(install_req)
             req = mng.get_installed_requirement(pname)
             self.assertTrue(req is not None)
             self.assertEqual('pip-install-test', req.name)
-            self.assertTrue(len(req.version) > 0, 'version set')
+            self.assertTrue(req.first_version is not None)
+            self.assertTrue(len(str(req.first_version)) > 0, 'version set')
         finally:
+            output: str = None
             try:
-                mng.uninstall(install_req)
-            except Exception:
-                pass
+                output = mng.uninstall(install_req)
+            except Exception as e:
+                print(f'can not uninstall {install_req} <<{e}>>: {output}')
         req = mng.get_installed_requirement(pname)
         self.assertEqual(None, req)
+        self.assertFalse(mng.is_installed(install_req))

@@ -30,14 +30,15 @@ project:
       package_host: '3.11.6'
     # pypi dependencies added to 'project'
     dependencies:
-      - frozendict
+      - 'frozendict~=2.4.6'
       # needed by zensols.util.package
-      - pip
+      - 'pip'
+      - 'packaging~=25.0'
       # configuration classes
-      - configparser~=5.2.0
-      - PyYAML~=6.0.1
+      - 'configparser~=5.2.0'
+      - 'PyYAML~=6.0.1'
       # used by dictionary stash
-      - parse>=1.20.0
+      - 'parse>=1.20.0'
 doc:
   api_config:
     intersphinx_mapping:

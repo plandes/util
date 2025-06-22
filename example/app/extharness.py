@@ -7,6 +7,9 @@ not installed since it's application configuration sources another resource
 (``obj.conf``).  However, the application instead defines it relative to the
 application root specifically for this example.
 
+Note the package needs to be installed for this example to work so it can find
+this package's resource libraries.
+
 """
 
 from pathlib import Path
@@ -19,8 +22,7 @@ def invoke_cli():
         package_resource='mycom.payroll',
         proto_factory_kwargs={'reload_pattern': r'^mycom\.payroll'},
     )
-    res = harness.run()
-    return res
+    return harness.run()
 
 
 if (__name__ == '__main__'):

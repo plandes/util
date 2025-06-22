@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.15.11] - 2025-06-21
+### Changed
+- Switch to the `packaging` module for requirements parsing.
+- Fixed "integration" tests.
+
+
 ## [1.15.10] - 2025-06-21
 ### Changed
 - `CliHarness` system path index parameter.
@@ -698,7 +704,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.15.10...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.11...HEAD
+[1.15.11]: https://github.com/plandes/util/compare/v1.15.10...v1.15.11
 [1.15.10]: https://github.com/plandes/util/compare/v1.15.9...v1.15.10
 [1.15.9]: https://github.com/plandes/util/compare/v1.15.8...v1.15.9
 [1.15.8]: https://github.com/plandes/util/compare/v1.15.7...v1.15.8

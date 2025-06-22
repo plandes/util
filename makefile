@@ -5,6 +5,7 @@
 #
 PROJ_TYPE=		python
 PROJ_MODULES=		python/doc python/deploy
+PY_TEST_ALL_TARGETS +=	testexamples
 ADD_CLEAN +=		example/config/counter.dat
 
 
@@ -15,19 +16,41 @@ include ./zenbuild/main.mk
 
 ## Targets
 #
-.PHONY:			mypy
-mypy:
-			mypy src/python/zensols/introspect/imp.py
+# show the output of the example
+.PHONY:			showexample
+showexample:		
+			$(eval pybin := $(shell $(PY_PX_BIN) info --json | jq -r \
+				'.environments_info|.[]|select(.name=="testcur").prefix' ))
+			@export PYTHONPATH=$(abspath .)/src ; \
+			 export PATH="$(pybin)/bin:$(PATH)" ; $(ARG)
 
-.PHONY:			runexamples
-runexamples:
-			( cd example/app ; ./fsinfo.py ls --format long > /dev/null 2>&1 )
-			( cd example/app ; ./extharness.py > /dev/null 2>&1 )
-			( cd example/config ; ./run.sh > /dev/null )
-			( cd example/cli ; ./run.sh > /dev/null 2>&1 )
+# compare line output counts of examples as a poor man's integration test
+.PHONY:			testexample
+testexample:		
+			@echo "running example: <<$(ARG)>>..."
+			$(eval line_count := $(shell $(MAKE) $(PY_MAKE_ARGS) \
+				ARG="$(ARG)" showexample | wc -l ) )
+			@if [ $(line_count) -ne $(LINES) ] ; then \
+				echo "Expecting $(LINES) but got $(line_count)" ; \
+				exit 1 ; \
+			fi
+			@echo "running example: <<$(ARG)>>...ok"
 
-.PHONY:			testall
-testall:		test runexamples
+# run all example
+.PHONY:			testexamples
+testexamples:
+#			$(eval action := showexample)
+			$(eval action := testexample)
+			@$(MAKE) $(action) $(PY_MAKE_ARGS) LINES=4 \
+				ARG="( cd example/app ; ./fsinfo.py ls --format long 2>&1 )"
+			@$(MAKE) $(action) $(PY_MAKE_ARGS) LINES=35 \
+				ARG="( cd example/config ; ./run.sh )"
+			@$(MAKE) $(action) $(PY_MAKE_ARGS) LINES=47 \
+				ARG="( cd example/cli ; ./run.sh 2>&1 )"
 
-tmp:
-			$(PY_PX_BIN) run testcur
+# this only works after the library is installed as it needs access to the
+# package's resource library, which aren't relocatable
+.PHONY:			extharnesstest
+extharnesstest:
+			@$(MAKE) $(action) $(PY_MAKE_ARGS) LINES=? \
+				ARG="( cd example/app ; ./extharness.py )"

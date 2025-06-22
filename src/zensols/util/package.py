@@ -7,7 +7,11 @@ from typing import Dict, List, Tuple, Iterable, Union, Optional, Type, ClassVar
 from dataclasses import dataclass, field
 import sys
 import subprocess
+from functools import total_ordering
 from itertools import chain
+from packaging.version import Version
+from packaging.specifiers import SpecifierSet, Specifier
+from packaging.requirements import Requirement
 import importlib.metadata
 import importlib.resources
 import importlib.util
@@ -26,91 +30,113 @@ class PackageError(APIError):
     pass
 
 
-@dataclass(order=True, frozen=True)
+@total_ordering
+@dataclass(frozen=True)
 class PackageRequirement(Writable):
     """A Python requirement specification.
 
     """
     _COMMENT_REGEX: ClassVar[re.Pattern] = re.compile(r'^\s*#.*')
-    _URL_REGEX: ClassVar[re.Pattern] = re.compile(r'^([^@]+) @ (.+)$')
-    _VER_REGEX: ClassVar[re.Pattern] = re.compile(
-        r'^(^[a-z0-9]+(?:[_-][a-z0-9]+)*)([<>~=]+)(.+)$')
-    _NON_VER_REGEX: ClassVar[re.Pattern] = re.compile(
-        r'^(^[a-z0-9]+(?:[_-][a-z0-9]+)*)$')
+    """A regular expression of pip ``requirements.txt`` comments"""
 
-    name: str = field()
-    """The name of the module (i.e. zensols.someappname)."""
-
-    version: str = field(default=None)
-    """The version if the package exists."""
-
-    version_constraint: str = field(default='==')
-    """The constraint on the version as an (in)equality.  The following
-    (limited) operators are ``==``, ``~=``, ``>`` etc.  However, multiple
-    operators to specify intervals are not supported.
-
-    """
-    url: str = field(default=None)
-    """The URL of the requirement."""
+    requirement: Requirement = field()
+    """The requirement of the package."""
 
     source: Path = field(default=None)
     """The file in which the requirement was parsed."""
 
     meta: Dict[str, str] = field(default=None)
+    """The metadata of the package.  This is populated by
+    :meth:`.PackageManager.get_installed_requirement`."""
 
     @property
-    def spec(self) -> str:
-        """The specification such as ``plac==1.4.3``."""
-        spec: str
-        if self.url is not None:
-            spec = f'{self.name} @ {self.url}'
-        else:
-            spec: str
-            if self.version is None:
-                spec = self.name
-            else:
-                spec = self.name + self.version_constraint + self.version
-        return spec
+    def name(self) -> str:
+        """The name of the module (i.e. zensols.someappname)."""
+        return self.requirement.name
+
+    @property
+    def specifier(self) -> SpecifierSet:
+        spec: SpecifierSet = self.requirement.specifier
+        if len(spec) > 0:
+            return spec
+
+    @property
+    def first_version(self) -> Optional[Version]:
+        """The first specifier's version if any specifiers exist."""
+        spec_set: SpecifierSet = self.specifier
+        if spec_set is not None:
+            spec: Specifier = None
+            try:
+                spec = next(iter(spec_set))
+            except StopIteration:
+                pass
+            if spec is not None:
+                return Version(spec.version)
+
+    @property
+    def url(self) -> Optional[str]:
+        """The URL of the requirement."""
+        return self.requirement.url
+
+    @property
+    def is_strict(self) -> bool:
+        """Whether the requirement is strict around one and only one version."""
+        spec: SpecifierSet = self.specifier
+        if spec is not None:
+            specs: Tuple[Specifier, ...] = tuple(self.specifier)
+            return len(specs) == 1 and specs[0].operator == '=='
+        return False
+
+    @property
+    def version(self) -> Version:
+        """The singleton version of the requirement.
+
+        :return: the version of the specifier or ``None`` if :obj:`is_strict` is
+                 ``False``
+
+        """
+        if self.is_strict:
+            return self.first_version
 
     @classmethod
     def from_spec(cls: Type[PackageRequirement], spec: str, **kwargs) -> \
             Optional[PackageRequirement]:
         pr: PackageRequirement = None
         if cls._COMMENT_REGEX.match(spec) is None:
-            if pr is None:
-                m: re.Match = cls._URL_REGEX.match(spec)
-                if m is not None:
-                    pr = PackageRequirement(
-                        name=m.group(1),
-                        version=None,
-                        version_constraint=None,
-                        url=m.group(2),
-                        **kwargs)
-            if pr is None:
-                m: re.Match = cls._VER_REGEX.match(spec)
-                if m is not None:
-                    pr = PackageRequirement(
-                        name=m.group(1),
-                        version_constraint=m.group(2),
-                        version=m.group(3),
-                        **kwargs)
-            if pr is None:
-                m: re.Match = cls._NON_VER_REGEX.match(spec)
-                if m is not None:
-                    pr = PackageRequirement(m.group(1), **kwargs)
-            if pr is None:
-                raise APIError(f"Unknown requirement specification: '{spec}'")
+            req = Requirement(spec)
+            pr = PackageRequirement(req, **kwargs)
         return pr
+
+    def to_resource(self) -> PackageRequirement:
+        """Create a package resource from this requirement."""
+        return PackageResource(self.name)
 
     def _write(self, c: WritableContext):
         c(self.name, 'name')
-        c(self.version, 'version')
+        c(self.specifier, 'specifier')
         c(self.url, 'url')
         c(self.source, 'source')
         c(self.meta, 'meta')
 
+    def __eq__(self, other: PackageRequirement) -> bool:
+        if other is None:
+            return NotImplemented
+        return (self.name, self.specifier) == (other.name, other.specifier)
+
+    def __lt__(self, other: PackageRequirement) -> bool:
+        if other is None:
+            return NotImplemented
+        return (self.name, self.specifier) < (other.name, other.specifier)
+
+    def __hash__(self) -> int:
+        return hash(self.requirement)
+
+    def __str__(self) -> str:
+        # normalize requirement specs with URLs
+        return str(self.requirement).replace('@', ' @')
+
     def __repr__(self) -> str:
-        return self.spec
+        return repr(self.requirement)
 
 
 @dataclass
@@ -151,17 +177,16 @@ class PackageResource(Writable):
         """Whether the package exists but not installed."""
         return self._module_spec is not None
 
-    def to_package_requirement(self) -> Optional[PackageRequirement]:
+    def to_requirement(self) -> Optional[PackageRequirement]:
         """The requirement represented by this instance."""
         from importlib.metadata import PackageMetadata
         if self.available:
             try:
                 pm: PackageMetadata = importlib.metadata.metadata(self.name)
                 meta: Dict[str, str] = {k.lower(): v for k, v in pm.items()}
-                return PackageRequirement(
-                    name=meta.pop('name'),
-                    version=meta.pop('version'),
-                    meta=meta)
+                name: str = meta.pop('name')
+                ver: str = meta.pop('version')
+                return PackageRequirement.from_spec(f'{name}=={ver}', meta=meta)
             except importlib.metadata.PackageNotFoundError:
                 pass
 
@@ -228,6 +253,15 @@ class PackageManager(object):
         default=('--use-deprecated=legacy-resolver',))
     """Additional argument used for installing packages with ``pip``."""
 
+    no_deps: bool = field(default=False)
+    """If ``True`` do not install the package's dependencies."""
+
+    force: bool = field(default=False)
+    """Whether to force installs and uninstalls regardless of whether a
+    dependency is already (un)installed.  This has no effect on the pip install
+    command (``--force``).
+
+    """
     def _get_requirements_from_file(self, source: Path) -> \
             Iterable[PackageRequirement]:
         try:
@@ -310,10 +344,9 @@ class PackageManager(object):
                 if m is None:
                     raise PackageError(f"Bad pip show format: <{line}>")
                 meta[m.group(1).lower()] = m.group(2)
-            return PackageRequirement(
-                name=meta.pop('name'),
-                version=meta.pop('version'),
-                meta=meta)
+            name: str = meta.pop('name')
+            ver: str = meta.pop('version')
+            return PackageRequirement.from_spec(f'{name}=={ver}', meta=meta)
 
     def get_requirement(self, package: str) -> Optional[PackageRequirement]:
         """First try to get an installed (:meth:`get_installed_requirement), and
@@ -325,10 +358,21 @@ class PackageManager(object):
         req: PackageRequirement = self.get_installed_requirement(package)
         if req is None:
             pr = PackageResource(package)
-            req = pr.to_package_requirement()
+            req = pr.to_requirement()
         return req
 
-    def install(self, requirement: PackageRequirement, no_deps: bool = False):
+    def is_installed(self, requirement: PackageRequirement) -> bool:
+        """Return whether a requirement is installed."""
+        req_name: str = requirement.name
+        installed: Optional[PackageRequirement] = self.get_requirement(req_name)
+        if installed is not None:
+            assert installed.is_strict
+            assert requirement is not None
+            if requirement.specifier is None:
+                return True
+            return installed.version in requirement.specifier
+
+    def install(self, requirement: PackageRequirement) -> Optional[str]:
         """Install a package in this Python enviornment with pip.
 
         :param requirement: the requirement to install
@@ -338,15 +382,18 @@ class PackageManager(object):
         :return: the output from the pip command invocation
 
         """
-        args: List[str] = ['install']
-        args.extend(self.pip_install_args)
-        if no_deps:
-            args.append('--no-deps')
-        args.append(requirement.spec)
-        output: str = self._invoke_pip(args)
-        if logger.isEnabledFor(logging.INFO):
-            logger.info(f'pip: {output}')
-        return output
+        if not self.force and self.is_installed(requirement):
+            logging.info(f'already installed: {requirement}--skipping')
+        else:
+            args: List[str] = ['install']
+            args.extend(self.pip_install_args)
+            if self.no_deps:
+                args.append('--no-deps')
+            args.append(str(requirement))
+            output: str = self._invoke_pip(args)
+            if logger.isEnabledFor(logging.INFO):
+                logger.info(f'pip: {output}')
+            return output
 
     def uninstall(self, requirement: PackageRequirement) -> str:
         """Uninstall a package in this Python enviornment with pip.
@@ -358,10 +405,13 @@ class PackageManager(object):
         :return: the output from the pip command invocation
 
         """
-        args: List[str] = ['uninstall', '-y']
-        args.extend(self.pip_install_args)
-        args.append(requirement.spec)
-        output: str = self._invoke_pip(args)
-        if logger.isEnabledFor(logging.INFO):
-            logger.info(f'pip: {output}')
-        return output
+        if not self.force and not self.is_installed(requirement):
+            logging.info(f'not installed installed: {requirement}--skipping')
+        else:
+            args: List[str] = ['uninstall', '-y']
+            args.extend(self.pip_install_args)
+            args.append(str(requirement))
+            output: str = self._invoke_pip(args)
+            if logger.isEnabledFor(logging.INFO):
+                logger.info(f'pip: {output}')
+            return output
