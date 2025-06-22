@@ -1,0 +1,1654 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" />
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2024.08.06 -->
+        <title>Change Log - Zensols Utilities 1.15.11 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="top.html"><div class="brand">Zensols Utilities 1.15.11 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="top.html">
+  
+  
+  <span class="sidebar-brand-text">Zensols Utilities 1.15.11 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc/config.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc/persist.html">Persistence</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of API Reference</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/zensols.cli.html">zensols.cli package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of zensols.cli package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.config.html">zensols.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.introspect.html">zensols.introspect package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.multi.html">zensols.multi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.persist.html">zensols.persist package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.util.html">zensols.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/CHANGELOG.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="change-log">
+<h1>Change Log<a class="headerlink" href="#change-log" title="Link to this heading">¶</a></h1>
+<p>All notable changes to this project will be documented in this file.</p>
+<p>The format is based on <a class="reference external" href="http://keepachangelog.com/">Keep a Changelog</a>
+and this project adheres to <a class="reference external" href="http://semver.org/">Semantic Versioning</a>.</p>
+<section id="unreleased">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.15.11...HEAD">Unreleased</a><a class="headerlink" href="#unreleased" title="Link to this heading">¶</a></h2>
+</section>
+<section id="id1">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.15.10...v1.15.11">1.15.11</a> - 2025-06-21<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Switch to the <code class="docutils literal notranslate"><span class="pre">packaging</span></code> module for requirements parsing.</p></li>
+<li><p>Fixed “integration” tests.</p></li>
+</ul>
+</section>
+</section>
+<section id="id2">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.15.9...v1.15.10">1.15.10</a> - 2025-06-21<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<section id="id3">
+<h3>Changed<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CliHarness</span></code> system path index parameter.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Settings</span></code> uses parameter naming compatible with dictionaries.</p></li>
+</ul>
+</section>
+</section>
+<section id="id4">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.15.8...v1.15.9">1.15.9</a> - 2025-06-20<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<section id="change">
+<h3>Change<a class="headerlink" href="#change" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fix <code class="docutils literal notranslate"><span class="pre">Dictable</span></code> overriding <code class="docutils literal notranslate"><span class="pre">_write</span></code> method.</p></li>
+<li><p>Environment variable <code class="docutils literal notranslate"><span class="pre">ZENSOLSRC</span></code> can now be a path separated (<code class="docutils literal notranslate"><span class="pre">:</span></code> on UNIX) of
+directories to configuration files.</p></li>
+</ul>
+</section>
+</section>
+<section id="id5">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.15.7...v1.15.8">1.15.8</a> - 2025-05-15<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<section id="changes">
+<h3>Changes<a class="headerlink" href="#changes" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Look for configuration files in a shared directory using the <code class="docutils literal notranslate"><span class="pre">ZENSOLSRC</span></code>
+environment variable.  See <a class="reference external" href="https://plandes.github.io/util/api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationImporter.get_environ_path">ConfigurationImporter.get_environ_path</a>.</p></li>
+<li><p>Fix <code class="docutils literal notranslate"><span class="pre">PackageResource</span></code> absolute path resources truncated leading slash removed
+bug.</p></li>
+</ul>
+</section>
+</section>
+<section id="id6">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.15.6...v1.15.7">1.15.7</a> - 2025-05-11<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h2>
+<p>Switch from setuptools to <a class="reference external" href="https://pixi.sh">Pixi</a>.</p>
+</section>
+<section id="id7">
+<h2>Changed<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Move to <a class="reference external" href="https://pixi.sh">Pixi</a>.</p></li>
+<li><p>Directory structure to match <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> conventions.</p></li>
+</ul>
+</section>
+<section id="id8">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.15.5...v1.15.6">1.15.6</a> - 2025-03-22<a class="headerlink" href="#id8" title="Link to this heading">¶</a></h2>
+<section id="added">
+<h3>Added<a class="headerlink" href="#added" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>A time duration formatting utility (<code class="docutils literal notranslate"><span class="pre">DurationFormatter</span></code>).</p></li>
+</ul>
+</section>
+<section id="id9">
+<h3>Changed<a class="headerlink" href="#id9" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Bug fix to <code class="docutils literal notranslate"><span class="pre">DictionaryConfig</span></code> option fetch.</p></li>
+</ul>
+</section>
+</section>
+<section id="id10">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.15.4...v1.15.5">1.15.5</a> - 2025-02-13<a class="headerlink" href="#id10" title="Link to this heading">¶</a></h2>
+<section id="id11">
+<h3>Added<a class="headerlink" href="#id11" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>A tolerant easy to use multiprocessing factory stash
+(<code class="docutils literal notranslate"><span class="pre">MultiProcessRobustStash</span></code>) that retries to create missing or failed items.</p></li>
+</ul>
+</section>
+</section>
+<section id="id12">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.15.3...v1.15.4">1.15.4</a> - 2025-02-12<a class="headerlink" href="#id12" title="Link to this heading">¶</a></h2>
+<section id="id13">
+<h3>Changed<a class="headerlink" href="#id13" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fix bug with missing <code class="docutils literal notranslate"><span class="pre">_initialized</span></code> attribute in Configurable subclasses.</p></li>
+</ul>
+</section>
+</section>
+<section id="id14">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.15.2...v1.15.3">1.15.3</a> - 2025-02-05<a class="headerlink" href="#id14" title="Link to this heading">¶</a></h2>
+<section id="id15">
+<h3>Added<a class="headerlink" href="#id15" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>A “shortcut” directive to get a section as a <code class="docutils literal notranslate"><span class="pre">dict</span></code> rather than
+<code class="docutils literal notranslate"><span class="pre">config.Settings</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id16">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.15.1...v1.15.2">1.15.2</a> - 2025-01-25<a class="headerlink" href="#id16" title="Link to this heading">¶</a></h2>
+<section id="id17">
+<h3>Added<a class="headerlink" href="#id17" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Support for Python 3.12.</p></li>
+</ul>
+</section>
+<section id="id18">
+<h3>Changed<a class="headerlink" href="#id18" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Replace deprecated setuptools <code class="docutils literal notranslate"><span class="pre">pkg_resources</span></code> (removed in Python 3.12) with
+<code class="docutils literal notranslate"><span class="pre">importlib.{metadata,resources}</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id19">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.15.0...v1.15.1">1.15.1</a> - 2025-01-23<a class="headerlink" href="#id19" title="Link to this heading">¶</a></h2>
+<section id="id20">
+<h3>Changed<a class="headerlink" href="#id20" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Move <code class="docutils literal notranslate"><span class="pre">zensols.config.Writable</span></code> to <code class="docutils literal notranslate"><span class="pre">zensols.util</span></code>.  The class is still
+imported to the <code class="docutils literal notranslate"><span class="pre">zensols.config</span></code> module so import statements need not change.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">zensols.util.Failure</span></code> extends from <code class="docutils literal notranslate"><span class="pre">zensols.util.Writable</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id21">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.14.5...v1.15.0">1.15.0</a> - 2025-01-11<a class="headerlink" href="#id21" title="Link to this heading">¶</a></h2>
+<p>Additional feature additions to configuration. One of these feature additions
+precludes support of Python 3.10.  All dependent packages can continue to use
+1.14 as long as they do not serialize and instance of <code class="docutils literal notranslate"><span class="pre">Configurable</span></code>.  Support
+for Python 3.12 will be added in a later version.</p>
+<section id="removed">
+<h3>Removed<a class="headerlink" href="#removed" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Drop support for Python 3.10.</p></li>
+</ul>
+</section>
+<section id="id22">
+<h3>Changed<a class="headerlink" href="#id22" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Add an option to <code class="docutils literal notranslate"><span class="pre">LogConfigurator</span></code> to allow the application to configure the
+logging system while still leveraging this class.</p></li>
+</ul>
+</section>
+<section id="id23">
+<h3>Added<a class="headerlink" href="#id23" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>YAML configuration files now have the same importation capabilities as
+<code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code>, but are experimental.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DictionaryConfig</span></code> provide a way to execute Python code with the <code class="docutils literal notranslate"><span class="pre">source</span></code>
+attribute.</p></li>
+<li><p>Feature to enable <code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code> import sections predicated on a
+configured boolean.</p></li>
+<li><p>A monitor like the <code class="docutils literal notranslate"><span class="pre">open</span></code> function, but only closes the file-like object when
+necessary.</p></li>
+</ul>
+</section>
+</section>
+<section id="id24">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.14.4...v1.14.5">1.14.5</a> - 2024-10-14<a class="headerlink" href="#id24" title="Link to this heading">¶</a></h2>
+<section id="id25">
+<h3>Added<a class="headerlink" href="#id25" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Access to the clipboard on macOS operating systems.</p></li>
+<li><p>Support for file name normalization (<code class="docutils literal notranslate"><span class="pre">FileTextUtil</span></code>) for non-ASCII
+and other special characters.</p></li>
+<li><p>A utility to find an executable in the <code class="docutils literal notranslate"><span class="pre">PATH</span></code> environment variable.</p></li>
+</ul>
+</section>
+<section id="id26">
+<h3>Changed<a class="headerlink" href="#id26" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Command line usage gives the order of actions as they appear in the
+application case rather than alphabetically (now by default).  This can be
+configured to keep the alphabetic sort order.</p></li>
+<li><p>File or standard output <code class="docutils literal notranslate"><span class="pre">zensols.util.stdout</span></code> uses <code class="docutils literal notranslate"><span class="pre">None</span></code> instead of <code class="docutils literal notranslate"><span class="pre">+</span></code> to
+indicate to use a recommended file name for output rather than explicitly
+having to add as a file name.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">StringConfig</span></code> takes a format that allows white space between commas as a
+regular expression.</p></li>
+</ul>
+</section>
+</section>
+<section id="id27">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.14.3...v1.14.4">1.14.4</a> - 2024-05-11<a class="headerlink" href="#id27" title="Link to this heading">¶</a></h2>
+<section id="id28">
+<h3>Added<a class="headerlink" href="#id28" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Cached configurations using <code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code>.</p></li>
+<li><p>Attribute access using the call directive (<code class="docutils literal notranslate"><span class="pre">call</span></code>).</p></li>
+<li><p>An LRU cache <code class="docutils literal notranslate"><span class="pre">Stash</span></code> class.</p></li>
+<li><p>A stash that filters <code class="docutils literal notranslate"><span class="pre">Failure</span></code>.</p></li>
+</ul>
+</section>
+<section id="id29">
+<h3>Changed<a class="headerlink" href="#id29" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Confirm the naming of the <code class="docutils literal notranslate"><span class="pre">KeyLimitStash</span></code> class’s attribute <code class="docutils literal notranslate"><span class="pre">n_limit</span></code> to
+<code class="docutils literal notranslate"><span class="pre">limit</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id30">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.14.2...v1.14.3">1.14.3</a> - 2024-04-14<a class="headerlink" href="#id30" title="Link to this heading">¶</a></h2>
+<section id="id31">
+<h3>Added<a class="headerlink" href="#id31" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>A <code class="docutils literal notranslate"><span class="pre">TRACE</span></code> log level in <code class="docutils literal notranslate"><span class="pre">zensols.util.log</span></code>.</p></li>
+</ul>
+</section>
+<section id="id32">
+<h3>Changed<a class="headerlink" href="#id32" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Add configuration evaluation and shell output to CLI show config (<code class="docutils literal notranslate"><span class="pre">config</span></code>)
+action.</p></li>
+</ul>
+</section>
+</section>
+<section id="id33">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.14.1...v1.14.2">1.14.2</a> - 2024-02-27<a class="headerlink" href="#id33" title="Link to this heading">¶</a></h2>
+<section id="id34">
+<h3>Added<a class="headerlink" href="#id34" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Short usage and help synopsis using the short help option (<code class="docutils literal notranslate"><span class="pre">-h</span></code>).</p></li>
+<li><p>Application configuration aliases (<code class="docutils literal notranslate"><span class="pre">alias:</span></code>) as a solution to tricky
+configuration parser option interpolations.</p></li>
+<li><p>An application to clear file caches given a list of application configuration
+aliases.</p></li>
+</ul>
+</section>
+</section>
+<section id="id35">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.14.0...v1.14.1">1.14.1</a> - 2024-01-04<a class="headerlink" href="#id35" title="Link to this heading">¶</a></h2>
+<section id="id36">
+<h3>Changes<a class="headerlink" href="#id36" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fix <code class="docutils literal notranslate"><span class="pre">Failure</span></code> picking bugs.</p></li>
+<li><p>Move <code class="docutils literal notranslate"><span class="pre">Failure</span></code> and <code class="docutils literal notranslate"><span class="pre">APIError</span></code> to their own (<code class="docutils literal notranslate"><span class="pre">util.fail</span></code>) module.</p></li>
+</ul>
+</section>
+</section>
+<section id="id37">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.13.3...v1.14.0">1.14.0</a> - 2023-12-05<a class="headerlink" href="#id37" title="Link to this heading">¶</a></h2>
+<p>This release removes the deprecated CLI modules and is tested on Python 3.11.</p>
+<section id="id38">
+<h3>Added<a class="headerlink" href="#id38" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">UnitTester</span></code>, which runs unit test cases from the REPL for the rapid
+prototyping use case.</p></li>
+<li><p>Support for Python 3.11.</p></li>
+</ul>
+</section>
+<section id="id39">
+<h3>Removed<a class="headerlink" href="#id39" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Old <code class="docutils literal notranslate"><span class="pre">actioncli</span></code> CLI modules <code class="docutils literal notranslate"><span class="pre">zensols.cli.{preaction,simple}</span></code>.</p></li>
+<li><p>Support for Python 3.9.</p></li>
+</ul>
+</section>
+</section>
+<section id="id40">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.13.2...v1.13.3">1.13.3</a> - 2023-11-29<a class="headerlink" href="#id40" title="Link to this heading">¶</a></h2>
+<section id="id41">
+<h3>Changed<a class="headerlink" href="#id41" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Failure</span></code> class is more flushed out.</p></li>
+<li><p>Documentation, flake8 warnings, typehints.</p></li>
+</ul>
+</section>
+</section>
+<section id="id42">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.13.1...v1.13.2">1.13.2</a> - 2023-09-30<a class="headerlink" href="#id42" title="Link to this heading">¶</a></h2>
+<section id="add">
+<h3>Add<a class="headerlink" href="#add" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Functionality to force usage of the default action by argument reprocessing.</p></li>
+</ul>
+</section>
+<section id="id43">
+<h3>Changed<a class="headerlink" href="#id43" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Default configuration searches UNIX style resource files for configuration
+(i.e. package <code class="docutils literal notranslate"><span class="pre">zensols.util</span></code> would point to <code class="docutils literal notranslate"><span class="pre">~/.zensols.util</span></code>).</p></li>
+<li><p>Harness CLI uses better shell parsing to create applications and resources.</p></li>
+</ul>
+</section>
+</section>
+<section id="id44">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.13.0...v1.13.1">1.13.1</a> - 2023-08-25<a class="headerlink" href="#id44" title="Link to this heading">¶</a></h2>
+<section id="id45">
+<h3>Added<a class="headerlink" href="#id45" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Multiprocessing strategy (<code class="docutils literal notranslate"><span class="pre">Multiprocessor</span></code>) split from owning stash
+(<code class="docutils literal notranslate"><span class="pre">MultiProcessStash</span></code>).</p></li>
+</ul>
+</section>
+</section>
+<section id="id46">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.12.7...v1.13.0">1.13.0</a> - 2023-08-16<a class="headerlink" href="#id46" title="Link to this heading">¶</a></h2>
+<p>Moderate risk update release that changes tree structured application
+configuration.</p>
+<section id="id47">
+<h3>Added<a class="headerlink" href="#id47" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Key subset stash class.</p></li>
+<li><p>A no-operation <code class="docutils literal notranslate"><span class="pre">Stash</span></code>.</p></li>
+</ul>
+</section>
+<section id="id48">
+<h3>Changed<a class="headerlink" href="#id48" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Introduce a tree based <code class="docutils literal notranslate"><span class="pre">Configurable</span></code> for YAML and JSON type configurations.</p></li>
+<li><p>Fix YAML bug for empty configuration files.</p></li>
+<li><p>CLI <code class="docutils literal notranslate"><span class="pre">stdout</span></code> context manager is more CLI friendly.  Initial parameter is the
+same, but open arguments are now a list.</p></li>
+<li><p>Fix multi-processing stash by adding a call to <code class="docutils literal notranslate"><span class="pre">MultiProcessStash.prime</span></code>.</p></li>
+<li><p>Raise <code class="docutils literal notranslate"><span class="pre">ApplicationError</span></code>s from <code class="docutils literal notranslate"><span class="pre">ApplicationFailure</span></code>s.</p></li>
+</ul>
+</section>
+<section id="id49">
+<h3>Added<a class="headerlink" href="#id49" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>A new tree-like <code class="docutils literal notranslate"><span class="pre">Configurable</span></code> that allows for nested dictionary access
+previously only available in the <code class="docutils literal notranslate"><span class="pre">YamlConfig</span></code>.  This is now available in
+<code class="docutils literal notranslate"><span class="pre">DictionaryConfig</span></code> and <code class="docutils literal notranslate"><span class="pre">JsonConfig</span></code>.</p></li>
+<li><p>A new instance directive (<code class="docutils literal notranslate"><span class="pre">tree</span></code>) to create new instances from deep nested
+dictionary configuration.</p></li>
+<li><p>A decorator to catch an exception type and re-throw as an <code class="docutils literal notranslate"><span class="pre">ApplicationError</span></code>
+as a command line application convenience.</p></li>
+<li><p>Bug fix parsing empty YAML files.</p></li>
+</ul>
+</section>
+</section>
+<section id="id50">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.12.5...v1.12.6">1.12.6</a> - 2023-07-02<a class="headerlink" href="#id50" title="Link to this heading">¶</a></h2>
+<section id="id51">
+<h3>Changed<a class="headerlink" href="#id51" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fix the CLI app returned first pass action showing up in action list.</p></li>
+</ul>
+</section>
+</section>
+<section id="id52">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.12.4...v1.12.5">1.12.5</a> - 2023-06-11<a class="headerlink" href="#id52" title="Link to this heading">¶</a></h2>
+<section id="id53">
+<h3>Added<a class="headerlink" href="#id53" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Integer selection parsing and CLI interaction.</p></li>
+</ul>
+</section>
+</section>
+<section id="id54">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.12.3...v1.12.4">1.12.4</a> - 2023-06-09<a class="headerlink" href="#id54" title="Link to this heading">¶</a></h2>
+<section id="id55">
+<h3>Changed<a class="headerlink" href="#id55" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>CLI bug fixes.</p></li>
+</ul>
+</section>
+</section>
+<section id="id56">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.12.2...v1.12.3">1.12.3</a> - 2023-06-07<a class="headerlink" href="#id56" title="Link to this heading">¶</a></h2>
+<section id="id57">
+<h3>Added<a class="headerlink" href="#id57" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Jupyter notebook utility class <code class="docutils literal notranslate"><span class="pre">NotebookManager</span></code>.  This class integrates with
+access Zensols applications via Jupyter.</p></li>
+<li><p>Flexible module agnostic class resolution methods.</p></li>
+</ul>
+</section>
+<section id="id58">
+<h3>Changed<a class="headerlink" href="#id58" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>More comprehensive parsing of Python source files in <code class="docutils literal notranslate"><span class="pre">ClassInspector</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id59">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.12.1...v1.12.2">1.12.2</a> - 2023-04-05<a class="headerlink" href="#id59" title="Link to this heading">¶</a></h2>
+<section id="id60">
+<h3>Added<a class="headerlink" href="#id60" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Override all optional positional metadata.</p></li>
+<li><p>Configuration operand <code class="docutils literal notranslate"><span class="pre">application</span></code> to create instances of the context from a
+an external application.</p></li>
+<li><p>Create YAML from <code class="docutils literal notranslate"><span class="pre">Dictable</span></code> instances.</p></li>
+<li><p>A <code class="docutils literal notranslate"><span class="pre">Dictable</span></code> flat nested dictionary structure suitable for writing to JSON or
+YAML.</p></li>
+<li><p>A context manager that multiplexes between standard out or the file system.</p></li>
+<li><p>A byte formatting utility in <code class="docutils literal notranslate"><span class="pre">FileTextUtil</span></code>.</p></li>
+</ul>
+</section>
+<section id="id61">
+<h3>Changed<a class="headerlink" href="#id61" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Refactor to uncouple configuration factory operands (i.e. <code class="docutils literal notranslate"><span class="pre">instance</span></code>,
+<code class="docutils literal notranslate"><span class="pre">object</span></code>) in <code class="docutils literal notranslate"><span class="pre">ImportConfigFactory</span></code> as separate classes.</p></li>
+<li><p>Allow overriding of positional metadata for the CLI package.</p></li>
+<li><p>Fix Sphinx API generated documentation and human readable documentation.</p></li>
+</ul>
+</section>
+</section>
+<section id="id62">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.12.0...v1.12.1">1.12.1</a> - 2023-02-02<a class="headerlink" href="#id62" title="Link to this heading">¶</a></h2>
+<section id="id63">
+<h3>Added<a class="headerlink" href="#id63" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CliHarness</span></code> application get method.</p></li>
+</ul>
+</section>
+</section>
+<section id="id64">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.11.1...v1.12.0">1.12.0</a> - 2023-01-22<a class="headerlink" href="#id64" title="Link to this heading">¶</a></h2>
+<section id="id65">
+<h3>Added<a class="headerlink" href="#id65" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>A programmatic method to get the config factory and application context using
+the CLI application invocation API from the <code class="docutils literal notranslate"><span class="pre">CliHarness</span></code>.  This uses an
+“invisible” application that returns the configuration factory enabling the
+application access without “short cutting” the API to get instances.</p></li>
+<li><p>An <code class="docutils literal notranslate"><span class="pre">instance:</span></code> parameter in application context configurations that allow
+new/deep instances.</p></li>
+<li><p>A convenience utility class <code class="docutils literal notranslate"><span class="pre">DefaultDictable</span></code> that provides access to methods
+such as <code class="docutils literal notranslate"><span class="pre">write</span></code> and <code class="docutils literal notranslate"><span class="pre">asjson</span></code> without needing inheritance.</p></li>
+<li><p>Command line help available on specified action only.</p></li>
+</ul>
+</section>
+<section id="id66">
+<h3>Changed<a class="headerlink" href="#id66" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Upgraded the <code class="docutils literal notranslate"><span class="pre">configparser</span></code> package from 5.2 to 5.3.</p></li>
+<li><p>Fix bug with config factories throwing the wrong exception when using
+<code class="docutils literal notranslate"><span class="pre">type=import</span></code> in application configuration when using bad configuration files
+with <code class="docutils literal notranslate"><span class="pre">-c</span></code> on the command line.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">persisted</span></code> decorator and <code class="docutils literal notranslate"><span class="pre">PersistedWork</span></code> skip file system checks when
+configured as in memory rather with file system paths.</p></li>
+<li><p>The CLI <code class="docutils literal notranslate"><span class="pre">Cleaner</span></code> app now expands the user home directory when the syntax is
+provided with <code class="docutils literal notranslate"><span class="pre">pathlib.Path.expanduser</span></code>.</p></li>
+<li><p>Better command line help and usage formatting.</p></li>
+</ul>
+</section>
+</section>
+<section id="id67">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.11.0...v1.11.1">1.11.1</a> - 2022-09-30<a class="headerlink" href="#id67" title="Link to this heading">¶</a></h2>
+<p>A few functional <code class="docutils literal notranslate"><span class="pre">Stash</span></code> changes, but mostly a bug release.</p>
+<section id="id68">
+<h3>Added<a class="headerlink" href="#id68" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>More options for file system name normalization.</p></li>
+</ul>
+</section>
+<section id="id69">
+<h3>Changed<a class="headerlink" href="#id69" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Propagate clear method message in <code class="docutils literal notranslate"><span class="pre">FactoryStash</span></code>.</p></li>
+<li><p>Skip clear for read only stashes from <code class="docutils literal notranslate"><span class="pre">FactoryStash</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id70">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.10.1...v1.11.0">1.11.0</a> - 2022-08-06<a class="headerlink" href="#id70" title="Link to this heading">¶</a></h2>
+<section id="id71">
+<h3>Added<a class="headerlink" href="#id71" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Add a read-only zip file based stash.</p></li>
+<li><p>File system and hashing utilities.</p></li>
+<li><p>State clearing in <code class="docutils literal notranslate"><span class="pre">PersistableWork</span></code>.</p></li>
+</ul>
+</section>
+<section id="id72">
+<h3>Changed<a class="headerlink" href="#id72" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Resource configuration (<code class="docutils literal notranslate"><span class="pre">conf_sec</span></code> for regular expressions).</p></li>
+<li><p>Better error messages from <code class="docutils literal notranslate"><span class="pre">DirectoryStash</span></code>.</p></li>
+<li><p>Robustly allow null YAML config values.</p></li>
+</ul>
+</section>
+<section id="id73">
+<h3>Removed<a class="headerlink" href="#id73" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">time</span></code> context manager removed the <code class="docutils literal notranslate"><span class="pre">logger</span></code> keyword parameter.</p></li>
+</ul>
+</section>
+</section>
+<section id="id74">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.10.0...v1.10.1">1.10.1</a> - 2022-06-15<a class="headerlink" href="#id74" title="Link to this heading">¶</a></h2>
+<section id="id75">
+<h3>Changed<a class="headerlink" href="#id75" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Command line configuration metadata with configuration decorators bug fix.</p></li>
+</ul>
+</section>
+</section>
+<section id="id76">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.9.0...v1.10.0">1.10.0</a> - 2022-06-13<a class="headerlink" href="#id76" title="Link to this heading">¶</a></h2>
+<section id="id77">
+<h3>Added<a class="headerlink" href="#id77" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Command line first pass applications and <code class="docutils literal notranslate"><span class="pre">--config</span></code> option added as resource
+libraries.</p></li>
+<li><p>If/then/else logic during configuration creation with
+<code class="docutils literal notranslate"><span class="pre">ConditionalYamlConfig</span></code>.</p></li>
+<li><p>Nest and invoke <code class="docutils literal notranslate"><span class="pre">--override</span></code> anywhere in the configuration importation
+list.</p></li>
+<li><p>Inline <code class="docutils literal notranslate"><span class="pre">&#64;dataclasses</span></code> in YAML files at the section level.</p></li>
+<li><p>Scientific notation formatted configuration option values.</p></li>
+</ul>
+</section>
+<section id="id78">
+<h3>Changed<a class="headerlink" href="#id78" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated documentation to be more current, added newer API.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DirectoryCompositeStash</span></code> now robustly handle group sequences.</p></li>
+<li><p>Better collapsing of long option and defaults usage help columns.</p></li>
+<li><p>Bug fixes and supporter for merging <code class="docutils literal notranslate"><span class="pre">CLI_META</span></code> for CLI applications.</p></li>
+</ul>
+</section>
+<section id="id79">
+<h3>Removed<a class="headerlink" href="#id79" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Support for Python 3.8 is removed.</p></li>
+</ul>
+</section>
+</section>
+<section id="id80">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.8.0...v1.9.0">1.9.0</a> - 2022-05-14<a class="headerlink" href="#id80" title="Link to this heading">¶</a></h2>
+<section id="id81">
+<h3>Removed<a class="headerlink" href="#id81" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Support for Python 3.7 is removed as <code class="docutils literal notranslate"><span class="pre">typing.get_origin</span></code> is needed by this
+version.</p></li>
+</ul>
+</section>
+<section id="id82">
+<h3>Added<a class="headerlink" href="#id82" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Instances of <code class="docutils literal notranslate"><span class="pre">&#64;dataclass</span></code> configurable in YAML configurables/files.</p></li>
+</ul>
+</section>
+<section id="id83">
+<h3>Changed<a class="headerlink" href="#id83" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Make <code class="docutils literal notranslate"><span class="pre">DirectoryCompositeStash.groups</span></code> a property that re-configures the
+instance.</p></li>
+<li><p>By default YAML configurables use the root as the singleton section.</p></li>
+</ul>
+</section>
+</section>
+<section id="id84">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.7.3...v1.8.0">1.8.0</a> - 2022-05-04<a class="headerlink" href="#id84" title="Link to this heading">¶</a></h2>
+<section id="id85">
+<h3>Added<a class="headerlink" href="#id85" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Feature to use configuration syntax resolution in evaluated configuration
+entries.</p></li>
+<li><p>Add option to <code class="docutils literal notranslate"><span class="pre">MultiProcessFactoryStash</span></code> to preemptively calculate data
+existence on a field parameter.</p></li>
+<li><p>Add <code class="docutils literal notranslate"><span class="pre">CacheFactoryStash</span></code> for read only stashes with a fixed key set that need
+a backing store.</p></li>
+<li><p>Command line application <code class="docutils literal notranslate"><span class="pre">CLI_META</span></code> combination useful for inheritance.</p></li>
+<li><p>Add log format setter to <code class="docutils literal notranslate"><span class="pre">LogConfigurator</span></code>.</p></li>
+<li><p>A YAML configuration importation class (<code class="docutils literal notranslate"><span class="pre">ImportYamlConfig</span></code>) like
+<code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code>.</p></li>
+</ul>
+</section>
+<section id="id86">
+<h3>Changed<a class="headerlink" href="#id86" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Ignore of single configuration file from <code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code> bug fix.</p></li>
+<li><p>More robust error messages for <code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code> reads.</p></li>
+<li><p>Better configuration <code class="docutils literal notranslate"><span class="pre">eval:</span></code> import support.</p></li>
+</ul>
+</section>
+</section>
+<section id="id87">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.7.2...v1.7.3">1.7.3</a> - 2022-02-12<a class="headerlink" href="#id87" title="Link to this heading">¶</a></h2>
+<section id="id88">
+<h3>Changed<a class="headerlink" href="#id88" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed delete and clear functionality in <code class="docutils literal notranslate"><span class="pre">ShelveStash</span></code>.</p></li>
+<li><p>Make <code class="docutils literal notranslate"><span class="pre">Settings</span></code> more dictionary like and inherit from <code class="docutils literal notranslate"><span class="pre">Dictable</span></code>.</p></li>
+<li><p>Move <code class="docutils literal notranslate"><span class="pre">DictResolver</span></code> and <code class="docutils literal notranslate"><span class="pre">ClassResolver</span></code> to introspection module.</p></li>
+</ul>
+</section>
+</section>
+<section id="id89">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.7.1...v1.7.2">1.7.2</a> - 2022-01-30<a class="headerlink" href="#id89" title="Link to this heading">¶</a></h2>
+<section id="id90">
+<h3>Added<a class="headerlink" href="#id90" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>The CLI class <code class="docutils literal notranslate"><span class="pre">EditConfiguration</span></code>, which edits the configuration file.</p></li>
+<li><p>The CLI class <code class="docutils literal notranslate"><span class="pre">ProgramNameConfigurator</span></code>, which adds the inferred program name
+as a section.</p></li>
+</ul>
+</section>
+<section id="id91">
+<h3>Changed<a class="headerlink" href="#id91" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Section for <code class="docutils literal notranslate"><span class="pre">ActionCli</span></code> decorators over-write that which is defined at the
+class level for an application in <code class="docutils literal notranslate"><span class="pre">CLI_META</span></code>.</p></li>
+<li><p>Bug fixes for missing configuration when configured to not expect it.</p></li>
+<li><p>Remove need for the <code class="docutils literal notranslate"><span class="pre">class_name</span></code> in the <code class="docutils literal notranslate"><span class="pre">cli</span></code> section for application
+contexts.</p></li>
+<li><p>Remove need for the <code class="docutils literal notranslate"><span class="pre">cli</span></code> section, which defaults to loading the single
+application section <code class="docutils literal notranslate"><span class="pre">app</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id92">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.7.0...v1.7.1">1.7.1</a> - 2022-01-12<a class="headerlink" href="#id92" title="Link to this heading">¶</a></h2>
+<section id="id93">
+<h3>Changed<a class="headerlink" href="#id93" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Shelve extension calculation is not heuristically calculated by creating a
+file to fix tests across various (g)dbm libraries across platforms.</p></li>
+<li><p>Add file name in <code class="docutils literal notranslate"><span class="pre">persisted</span></code> to pickle error messages.</p></li>
+<li><p>Better <code class="docutils literal notranslate"><span class="pre">DirectoryStash</span></code> pickle error messages.</p></li>
+<li><p>Robustly ignore missing config files when the configuration importer is
+configured not to expect them.</p></li>
+</ul>
+</section>
+<section id="id94">
+<h3>Added<a class="headerlink" href="#id94" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Simple CLI example.</p></li>
+<li><p>Class level properties set on <code class="docutils literal notranslate"><span class="pre">PersistableContainer</span></code> instances to
+automatically persist attributes.</p></li>
+<li><p>MacOS keychain <code class="docutils literal notranslate"><span class="pre">Configurable</span></code> for user/password access.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ImportConfigFactory</span></code> provides a way to create new instances with methods
+<code class="docutils literal notranslate"><span class="pre">new_instance</span></code> and <code class="docutils literal notranslate"><span class="pre">new_deep_instance</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id95">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.6.3...v1.7.0">1.7.0</a> - 2021-10-22<a class="headerlink" href="#id95" title="Link to this heading">¶</a></h2>
+<section id="id96">
+<h3>Added<a class="headerlink" href="#id96" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">frozendict</span></code> as a dependency.</p></li>
+<li><p>App config configuration have a new type (<code class="docutils literal notranslate"><span class="pre">import</span></code>), which allows a
+<code class="docutils literal notranslate"><span class="pre">^{config_path}</span></code> to be substituted with the <code class="docutils literal notranslate"><span class="pre">--config</span></code> file name giving more
+control over the start up load process.</p></li>
+<li><p>More harness/app factory convenience methods and functionality, such as
+creating a harness from the app factory.</p></li>
+<li><p>Jupyter harness is now reloadable.</p></li>
+<li><p>First pass applications return useful data, such as the <code class="docutils literal notranslate"><span class="pre">config</span></code> first pass
+app.</p></li>
+</ul>
+</section>
+<section id="id97">
+<h3>Changed<a class="headerlink" href="#id97" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>All options in the <code class="docutils literal notranslate"><span class="pre">import</span></code> section of <code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code> must now be proper
+config data types, which are all lists prefixed with <code class="docutils literal notranslate"><span class="pre">list:</span> </code>.</p></li>
+<li><p>Fixed argument splitting in <code class="docutils literal notranslate"><span class="pre">CliHarness</span></code>.</p></li>
+<li><p>Changed many cached <code class="docutils literal notranslate"><span class="pre">dict</span></code> to type <code class="docutils literal notranslate"><span class="pre">frozendict</span></code> to guard against
+unintentional modification of immutable data structures.</p></li>
+</ul>
+</section>
+</section>
+<section id="id98">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.6.2...v1.6.3">1.6.3</a> - 2021-10-03<a class="headerlink" href="#id98" title="Link to this heading">¶</a></h2>
+<section id="id99">
+<h3>Changed<a class="headerlink" href="#id99" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CliHarness</span></code> uses <code class="docutils literal notranslate"><span class="pre">LogConfigurator</span></code> to configure the logging system instead
+of <code class="docutils literal notranslate"><span class="pre">logging.basicConfig</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">OneShotFactoryStash</span></code> inherits from <code class="docutils literal notranslate"><span class="pre">PrimablePreemptiveStash</span></code> and uses its
+overridden methods to preempt data creation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CliHarness</span></code> is now more robust, and the default entry point class for large
+and small Python templates.</p></li>
+</ul>
+</section>
+<section id="id100">
+<h3>Added<a class="headerlink" href="#id100" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added Jupyter notebook harness.</p></li>
+<li><p>New CLI <code class="docutils literal notranslate"><span class="pre">ApplicationError</span></code> to differentiate between types of errors and
+when to print the stack trace by having the application factory handle the
+exception.</p></li>
+</ul>
+</section>
+</section>
+<section id="id101">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.6.1...v1.6.2">1.6.2</a> - 2021-09-21<a class="headerlink" href="#id101" title="Link to this heading">¶</a></h2>
+<section id="id102">
+<h3>Changed<a class="headerlink" href="#id102" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>CLI: configuration file option <code class="docutils literal notranslate"><span class="pre">--config</span></code> expected for list action.</p></li>
+</ul>
+</section>
+</section>
+<section id="id103">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.6.0...v1.6.1">1.6.1</a> - 2021-09-21<a class="headerlink" href="#id103" title="Link to this heading">¶</a></h2>
+<section id="id104">
+<h3>Changed<a class="headerlink" href="#id104" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fix option field mapping and JSON of CLI metadata for list app.</p></li>
+<li><p>Do not stringify class in <code class="docutils literal notranslate"><span class="pre">Dictable.asdict</span></code>.</p></li>
+<li><p>Move dump on load <code class="docutils literal notranslate"><span class="pre">Stash</span></code> to <code class="docutils literal notranslate"><span class="pre">PreemptiveStash</span></code> and create a
+<code class="docutils literal notranslate"><span class="pre">PrimablePreemptiveStash</span></code> to replace previously dual merged behavior.</p></li>
+<li><p>Fix entry point infinite loop call in multi-process in <code class="docutils literal notranslate"><span class="pre">CliHarness</span></code>.</p></li>
+</ul>
+</section>
+<section id="id105">
+<h3>Added<a class="headerlink" href="#id105" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Positional documentation was added to metadata and list action app output.</p></li>
+<li><p>Add a <code class="docutils literal notranslate"><span class="pre">class:</span></code> configuration type to create new classes.</p></li>
+<li><p>Can now load resources on multiple config files in <code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id106">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.5.3...v1.6.0">1.6.0</a> - 2021-09-07<a class="headerlink" href="#id106" title="Link to this heading">¶</a></h2>
+<section id="id107">
+<h3>Changed<a class="headerlink" href="#id107" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fix GitHub workflows continuous integration.</p></li>
+<li><p>Make private data structures that are private and subclass private
+respectfully: <code class="docutils literal notranslate"><span class="pre">Dealloc.ALLOCATIONS</span></code> and
+<code class="docutils literal notranslate"><span class="pre">PersistableContainer.PERSISTABLE_TRANSIENT_ATTRIBUTE</span></code>.</p></li>
+<li><p>Fix to <code class="docutils literal notranslate"><span class="pre">FactoryStash</span></code> for persisting <code class="docutils literal notranslate"><span class="pre">None</span></code> to file system instead of using
+the factory stash to create the item.</p></li>
+<li><p>When created instances with a <code class="docutils literal notranslate"><span class="pre">ConfigFactory</span></code>, attributes <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">config</span></code>
+and <code class="docutils literal notranslate"><span class="pre">config_factory</span></code> are only set when passed keyword arguments do not have
+them set.</p></li>
+</ul>
+</section>
+<section id="id108">
+<h3>Removed<a class="headerlink" href="#id108" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Removed <code class="docutils literal notranslate"><span class="pre">zensols.util.Downloader</span></code>, which now is relocated to the
+<a class="reference external" href="https://github.com/plandes/install">zensols.install</a> package.</p></li>
+</ul>
+</section>
+</section>
+<section id="id109">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.5.2...v1.5.3">1.5.3</a> - 2021-08-16<a class="headerlink" href="#id109" title="Link to this heading">¶</a></h2>
+<section id="id110">
+<h3>Added<a class="headerlink" href="#id110" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>A simple download with scroll bar utility class (<code class="docutils literal notranslate"><span class="pre">zensols.util.Downloader</span></code>).</p></li>
+<li><p>Additional logging.</p></li>
+<li><p>Speed <code class="docutils literal notranslate"><span class="pre">OneShotFactoryStash</span></code> by declaring worker type.</p></li>
+</ul>
+</section>
+<section id="id111">
+<h3>Changed<a class="headerlink" href="#id111" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DelegateStash</span></code> and <code class="docutils literal notranslate"><span class="pre">PreemptiveStash</span></code> now only calls the delegate <code class="docutils literal notranslate"><span class="pre">clear()</span></code>
+method when their <code class="docutils literal notranslate"><span class="pre">clear()</span></code> method.  This is a pretty big change since
+before, the delegate would call the super method to delete all data by key.
+This would chain from the <code class="docutils literal notranslate"><span class="pre">PreemptiveStash</span></code> to calculate where there is any
+data at all.  Now, the delegate is trusted to simply clear all data from the
+stash.</p></li>
+<li><p>Fixed empty INI error, and instead, return empty section set for empty INI
+files.</p></li>
+</ul>
+</section>
+</section>
+<section id="id112">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.5.1...v1.5.2">1.5.2</a> - 2021-08-07<a class="headerlink" href="#id112" title="Link to this heading">¶</a></h2>
+<section id="id113">
+<h3>Added<a class="headerlink" href="#id113" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Class resolution in config factories.</p></li>
+</ul>
+</section>
+<section id="id114">
+<h3>Changed<a class="headerlink" href="#id114" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Better de-allocation handling in de-allocation monitor.</p></li>
+<li><p>Shelve stash defaults to write back and auto close on, which is the expected
+and conforming behavior to most other stashes.</p></li>
+</ul>
+</section>
+</section>
+<section id="id115">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.5.0...v1.5.1">1.5.1</a> - 2021-06-29<a class="headerlink" href="#id115" title="Link to this heading">¶</a></h2>
+<section id="id116">
+<h3>Changed<a class="headerlink" href="#id116" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Switch to raw <code class="docutils literal notranslate"><span class="pre">IniConfig</span></code> as default in config factory for <code class="docutils literal notranslate"><span class="pre">ini</span></code> extension
+files from the <code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code>.  This simplifies when using with an
+<code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code>, reduces substitution dependencies and suites most use
+cases.  In most cases, it’s the <code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code> using this setting, which
+ends up doing the string interpolation after everything is imported, thus
+creating less start up configuration read issues.</p></li>
+<li><p>Shelve stash auto closes between client invocations.</p></li>
+</ul>
+</section>
+<section id="id117">
+<h3>Added<a class="headerlink" href="#id117" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Use caught errors in application CLI to generate error messages, including
+missing configuration files.</p></li>
+<li><p>Allow CLI configuration importer to set the type of importer.</p></li>
+<li><p>Resource de-allocation added to multi-processing stashes.</p></li>
+<li><p>Resource de-allocation added to application CLI.</p></li>
+<li><p>Resource de-alloocation keywords added to <code class="docutils literal notranslate"><span class="pre">persisted</span></code> and <code class="docutils literal notranslate"><span class="pre">PersistedWork</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id118">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.4.1...v1.5.0">1.5.0</a> - 2021-04-29<a class="headerlink" href="#id118" title="Link to this heading">¶</a></h2>
+<section id="id119">
+<h3>Changed<a class="headerlink" href="#id119" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Follow the same pattern with mnemonics as options: includes/excludes.  The
+<code class="docutils literal notranslate"><span class="pre">mnemonics</span></code> action attribute has changed to <code class="docutils literal notranslate"><span class="pre">mnemonic_overrides</span></code>.  Both
+<code class="docutils literal notranslate"><span class="pre">mnemonic_includes</span></code>, <code class="docutils literal notranslate"><span class="pre">mnemonic_excludes</span></code> are now optional to more easily
+select mnemonics in the CLI application class.</p></li>
+<li><p>Better CLI application usage and support.</p></li>
+<li><p>Upgraded PyYAML library for security fix.</p></li>
+<li><p>Better <code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code> option dependency handling support.</p></li>
+<li><p>More conventional capitalized messages for raised errors.</p></li>
+</ul>
+</section>
+<section id="id120">
+<h3>Added<a class="headerlink" href="#id120" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Multi-processing factory stash.</p></li>
+<li><p>Support for single process stash creation (set <code class="docutils literal notranslate"><span class="pre">workers=1</span></code>).</p></li>
+<li><p>More typehints and documentation.</p></li>
+<li><p>New error class hierarchy.</p></li>
+<li><p>Backward 3.7 compatibility abstract syntax tree compatibility for
+<code class="docutils literal notranslate"><span class="pre">ClassInspector</span></code>.</p></li>
+<li><p>Support for overriding configuration in application CLI.</p></li>
+</ul>
+</section>
+</section>
+<section id="id121">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.4.0...v1.4.1">1.4.1</a> - 2021-03-10<a class="headerlink" href="#id121" title="Link to this heading">¶</a></h2>
+<section id="id122">
+<h3>Changed<a class="headerlink" href="#id122" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Bug fix release: enumeration mapping for CLI.</p></li>
+</ul>
+</section>
+</section>
+<section id="id123">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.3.3...v1.4.0">1.4.0</a> - 2021-03-05<a class="headerlink" href="#id123" title="Link to this heading">¶</a></h2>
+<section id="id124">
+<h3>Added<a class="headerlink" href="#id124" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>A new command line generated from configurables, configuration factories and
+the meta data of <code class="docutils literal notranslate"><span class="pre">dataclass</span></code>s.</p></li>
+<li><p>Tutorial based documentation for the new introspection based command line
+system.</p></li>
+</ul>
+</section>
+<section id="id125">
+<h3>Removed<a class="headerlink" href="#id125" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Old (simple) command line documentation.</p></li>
+</ul>
+</section>
+</section>
+<section id="id126">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.3.2...v1.3.3">1.3.3</a> - 2021-02-17<a class="headerlink" href="#id126" title="Link to this heading">¶</a></h2>
+<section id="id127">
+<h3>Added<a class="headerlink" href="#id127" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>A new <code class="docutils literal notranslate"><span class="pre">Configurable</span></code> class that imports using other <code class="docutils literal notranslate"><span class="pre">Configurable</span></code> classes:
+<code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code>.</p></li>
+<li><p>A new environment based configuration that can be loaded by
+<code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code>.</p></li>
+<li><p>Configuration can now <em>quote</em> with a string prefix.</p></li>
+<li><p>Configuration can parse lists and create instances of tuple, lists and
+dictionaries.</p></li>
+</ul>
+</section>
+<section id="id128">
+<h3>Changed<a class="headerlink" href="#id128" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ClassResolver</span></code> moved to <code class="docutils literal notranslate"><span class="pre">zensols.config</span></code> to be used by the new
+<code class="docutils literal notranslate"><span class="pre">ImportIniConfig</span></code>.</p></li>
+</ul>
+</section>
+</section>
+<section id="id129">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.3.1...v1.3.2">1.3.2</a> - 2021-02-13<a class="headerlink" href="#id129" title="Link to this heading">¶</a></h2>
+<section id="id130">
+<h3>Removed<a class="headerlink" href="#id130" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Remove unused <code class="docutils literal notranslate"><span class="pre">StashMapReducer</span></code> and <code class="docutils literal notranslate"><span class="pre">FunctionStashMapReducer</span></code> since they are
+obviated by <code class="docutils literal notranslate"><span class="pre">MultiProcessStash</span></code>.</p></li>
+</ul>
+</section>
+<section id="id131">
+<h3>Added<a class="headerlink" href="#id131" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Type hints added to wrapped methods using <code class="docutils literal notranslate"><span class="pre">&#64;persisted</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Writable</span></code> plays better with <code class="docutils literal notranslate"><span class="pre">Dictable</span></code> using <code class="docutils literal notranslate"><span class="pre">write</span></code>.</p></li>
+<li><p>Anonymous object instances (using <code class="docutils literal notranslate"><span class="pre">Settings</span></code>) used for configuration with
+given class (<code class="docutils literal notranslate"><span class="pre">class_name</span></code>) property.</p></li>
+<li><p>Basic test case for <code class="docutils literal notranslate"><span class="pre">MultiProcessStash</span></code>.</p></li>
+<li><p>Instance graphs in documentation.</p></li>
+</ul>
+</section>
+<section id="id132">
+<h3>Changed<a class="headerlink" href="#id132" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Inline <code class="docutils literal notranslate"><span class="pre">dataclass</span></code> documentation and reference fixes.</p></li>
+</ul>
+</section>
+</section>
+<section id="id133">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.3.0...v1.3.1">1.3.1</a> - 2021-01-12<a class="headerlink" href="#id133" title="Link to this heading">¶</a></h2>
+<section id="id134">
+<h3>Changed<a class="headerlink" href="#id134" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Add sections support to <code class="docutils literal notranslate"><span class="pre">zensols.config.YamlConfig</span></code> and other compatibility
+with super class.</p></li>
+<li><p>Fix tests for Python 3.9.</p></li>
+<li><p>Copy forward documentation from decorators, so <code class="docutils literal notranslate"><span class="pre">&#64;persisted</span></code> (for example)
+fields generate Sphinx documentation.</p></li>
+</ul>
+</section>
+</section>
+<section id="id135">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.2.5...v1.3.0">1.3.0</a> - 2020-12-09<a class="headerlink" href="#id135" title="Link to this heading">¶</a></h2>
+<p>Major release.</p>
+<section id="id136">
+<h3>Added<a class="headerlink" href="#id136" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>In depth top level documentation, including sphinx/API linked docs.</p></li>
+<li><p>New <code class="docutils literal notranslate"><span class="pre">Dictable</span></code> creates dictionaries working with <code class="docutils literal notranslate"><span class="pre">dataclasses</span></code> and
+automatically human (more or less) readable using <code class="docutils literal notranslate"><span class="pre">Writable</span></code>.</p></li>
+<li><p>Much more documentation, both at the API level and top level <code class="docutils literal notranslate"><span class="pre">README.md</span></code> and
+in <code class="docutils literal notranslate"><span class="pre">./doc</span></code>, which now gets compiled in to sphinx docs.</p></li>
+<li><p>Support for creation of <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code> from configuration.</p></li>
+<li><p>Support for resources from configuration with transparent <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code>
+creation as either installed or run from source tree.</p></li>
+<li><p>Configuration environment section.</p></li>
+<li><p>More test cases for existing and new classes.</p></li>
+<li><p>Add class metadata “explorer”.</p></li>
+</ul>
+</section>
+<section id="id137">
+<h3>Changed<a class="headerlink" href="#id137" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Default for <code class="docutils literal notranslate"><span class="pre">zensols.config.ImportConfigFactory.shared</span></code> is <code class="docutils literal notranslate"><span class="pre">True</span></code>.
+<strong>Important:</strong> this is a big change, so it would be prudent to retest your
+dependent code.</p></li>
+<li><p>Finalize <code class="docutils literal notranslate"><span class="pre">Writable</span></code> interface and change dependent code.</p></li>
+<li><p>Fixes to deallocation and resource clean up.</p></li>
+<li><p>Refactored configuration files by purpose and class with better class
+hierarchy.</p></li>
+<li><p>Refactored stash files by purpose and classes.</p></li>
+<li><p>Better more stable <code class="docutils literal notranslate"><span class="pre">DelegateStash</span></code> attribute resolution handling.</p></li>
+</ul>
+</section>
+</section>
+<section id="id138">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.2.4...v1.2.5">1.2.5</a> - 2020-05-23<a class="headerlink" href="#id138" title="Link to this heading">¶</a></h2>
+<section id="id139">
+<h3>Added<a class="headerlink" href="#id139" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>API and framework Sphinx documentation.</p></li>
+</ul>
+</section>
+</section>
+<section id="id140">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.2.3...v1.2.4">1.2.4</a> - 2020-05-23<a class="headerlink" href="#id140" title="Link to this heading">¶</a></h2>
+<section id="id141">
+<h3>Changed<a class="headerlink" href="#id141" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Better logging.</p></li>
+</ul>
+</section>
+<section id="id142">
+<h3>Added<a class="headerlink" href="#id142" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Writable</span></code> abstract class used to as an object oriented pretty print based
+API.</p></li>
+<li><p>Delegate attribute: flag to pass messages to the delegate.</p></li>
+<li><p>Class space defaults set for delegate attribute.</p></li>
+</ul>
+</section>
+</section>
+<section id="id143">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.2.2...v1.2.3">1.2.3</a> - 2020-05-10<a class="headerlink" href="#id143" title="Link to this heading">¶</a></h2>
+<section id="id144">
+<h3>Added<a class="headerlink" href="#id144" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Meta data walker with class level annotation to better debug stash instance
+graphs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Writable</span></code> interface that provides a basic multi-line indention specific
+pretty print.</p></li>
+<li><p>More unit tests for stashes and increased coverage in other areas.</p></li>
+</ul>
+</section>
+<section id="id145">
+<h3>Changed<a class="headerlink" href="#id145" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">testall</span></code> to invoke all unit tests.  Standard <code class="docutils literal notranslate"><span class="pre">test</span></code> tests all but the
+<em>time</em> specific unit tests.</p></li>
+<li><p>More robust configuration reloading strategy.</p></li>
+</ul>
+</section>
+</section>
+<section id="id146">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.2.1...v1.2.2">1.2.2</a> - 2020-05-05<a class="headerlink" href="#id146" title="Link to this heading">¶</a></h2>
+<section id="id147">
+<h3>Changed<a class="headerlink" href="#id147" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Better documentation.</p></li>
+<li><p>Fix reload module for <code class="docutils literal notranslate"><span class="pre">ImportConfigFactory</span></code> on <code class="docutils literal notranslate"><span class="pre">reload=True</span></code>.</p></li>
+<li><p>Pass parameters and optionally reload by parameters in <code class="docutils literal notranslate"><span class="pre">instance</span></code> directive
+in configuration files.</p></li>
+<li><p>Update super method call style (Python 3.7 at least).</p></li>
+<li><p>Make consistent pretty print naming.</p></li>
+</ul>
+</section>
+<section id="id148">
+<h3>Removed<a class="headerlink" href="#id148" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>CLI stubs.</p></li>
+<li><p>Removed the <code class="docutils literal notranslate"><span class="pre">ConfigFactory</span></code> class.  Use <code class="docutils literal notranslate"><span class="pre">ImportConfigFactory</span></code> is its place.</p></li>
+</ul>
+</section>
+<section id="id149">
+<h3>Added<a class="headerlink" href="#id149" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Persistable work injections.</p></li>
+<li><p>Evaluation statements in configuration now allow for local imports.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ImportConfigFactory</span></code> shares in memory instances across configuration sections.</p></li>
+</ul>
+</section>
+</section>
+<section id="id150">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v1.2.0...v1.2.1">1.2.1</a> - 2020-04-26<a class="headerlink" href="#id150" title="Link to this heading">¶</a></h2>
+<section id="id151">
+<h3>Changed<a class="headerlink" href="#id151" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Fix nested modules not importing.</p></li>
+</ul>
+</section>
+</section>
+<section id="id152">
+<h2><a class="reference external" href="https://github.com/plandes/util/compare/v0.0.0...v1.2.0">1.2.0</a> - 2020-04-24<a class="headerlink" href="#id152" title="Link to this heading">¶</a></h2>
+<section id="id153">
+<h3>Added<a class="headerlink" href="#id153" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Initial version.</p></li>
+</ul>
+<!-- links --></section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025 Paul Landes
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Change Log</a><ul>
+<li><a class="reference internal" href="#unreleased">Unreleased</a></li>
+<li><a class="reference internal" href="#id1">1.15.11 - 2025-06-21</a><ul>
+<li><a class="reference internal" href="#changed">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id2">1.15.10 - 2025-06-21</a><ul>
+<li><a class="reference internal" href="#id3">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id4">1.15.9 - 2025-06-20</a><ul>
+<li><a class="reference internal" href="#change">Change</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id5">1.15.8 - 2025-05-15</a><ul>
+<li><a class="reference internal" href="#changes">Changes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id6">1.15.7 - 2025-05-11</a></li>
+<li><a class="reference internal" href="#id7">Changed</a></li>
+<li><a class="reference internal" href="#id8">1.15.6 - 2025-03-22</a><ul>
+<li><a class="reference internal" href="#added">Added</a></li>
+<li><a class="reference internal" href="#id9">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id10">1.15.5 - 2025-02-13</a><ul>
+<li><a class="reference internal" href="#id11">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id12">1.15.4 - 2025-02-12</a><ul>
+<li><a class="reference internal" href="#id13">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id14">1.15.3 - 2025-02-05</a><ul>
+<li><a class="reference internal" href="#id15">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id16">1.15.2 - 2025-01-25</a><ul>
+<li><a class="reference internal" href="#id17">Added</a></li>
+<li><a class="reference internal" href="#id18">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id19">1.15.1 - 2025-01-23</a><ul>
+<li><a class="reference internal" href="#id20">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id21">1.15.0 - 2025-01-11</a><ul>
+<li><a class="reference internal" href="#removed">Removed</a></li>
+<li><a class="reference internal" href="#id22">Changed</a></li>
+<li><a class="reference internal" href="#id23">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id24">1.14.5 - 2024-10-14</a><ul>
+<li><a class="reference internal" href="#id25">Added</a></li>
+<li><a class="reference internal" href="#id26">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id27">1.14.4 - 2024-05-11</a><ul>
+<li><a class="reference internal" href="#id28">Added</a></li>
+<li><a class="reference internal" href="#id29">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id30">1.14.3 - 2024-04-14</a><ul>
+<li><a class="reference internal" href="#id31">Added</a></li>
+<li><a class="reference internal" href="#id32">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id33">1.14.2 - 2024-02-27</a><ul>
+<li><a class="reference internal" href="#id34">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id35">1.14.1 - 2024-01-04</a><ul>
+<li><a class="reference internal" href="#id36">Changes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id37">1.14.0 - 2023-12-05</a><ul>
+<li><a class="reference internal" href="#id38">Added</a></li>
+<li><a class="reference internal" href="#id39">Removed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id40">1.13.3 - 2023-11-29</a><ul>
+<li><a class="reference internal" href="#id41">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id42">1.13.2 - 2023-09-30</a><ul>
+<li><a class="reference internal" href="#add">Add</a></li>
+<li><a class="reference internal" href="#id43">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id44">1.13.1 - 2023-08-25</a><ul>
+<li><a class="reference internal" href="#id45">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id46">1.13.0 - 2023-08-16</a><ul>
+<li><a class="reference internal" href="#id47">Added</a></li>
+<li><a class="reference internal" href="#id48">Changed</a></li>
+<li><a class="reference internal" href="#id49">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id50">1.12.6 - 2023-07-02</a><ul>
+<li><a class="reference internal" href="#id51">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id52">1.12.5 - 2023-06-11</a><ul>
+<li><a class="reference internal" href="#id53">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id54">1.12.4 - 2023-06-09</a><ul>
+<li><a class="reference internal" href="#id55">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id56">1.12.3 - 2023-06-07</a><ul>
+<li><a class="reference internal" href="#id57">Added</a></li>
+<li><a class="reference internal" href="#id58">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id59">1.12.2 - 2023-04-05</a><ul>
+<li><a class="reference internal" href="#id60">Added</a></li>
+<li><a class="reference internal" href="#id61">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id62">1.12.1 - 2023-02-02</a><ul>
+<li><a class="reference internal" href="#id63">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id64">1.12.0 - 2023-01-22</a><ul>
+<li><a class="reference internal" href="#id65">Added</a></li>
+<li><a class="reference internal" href="#id66">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id67">1.11.1 - 2022-09-30</a><ul>
+<li><a class="reference internal" href="#id68">Added</a></li>
+<li><a class="reference internal" href="#id69">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id70">1.11.0 - 2022-08-06</a><ul>
+<li><a class="reference internal" href="#id71">Added</a></li>
+<li><a class="reference internal" href="#id72">Changed</a></li>
+<li><a class="reference internal" href="#id73">Removed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id74">1.10.1 - 2022-06-15</a><ul>
+<li><a class="reference internal" href="#id75">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id76">1.10.0 - 2022-06-13</a><ul>
+<li><a class="reference internal" href="#id77">Added</a></li>
+<li><a class="reference internal" href="#id78">Changed</a></li>
+<li><a class="reference internal" href="#id79">Removed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id80">1.9.0 - 2022-05-14</a><ul>
+<li><a class="reference internal" href="#id81">Removed</a></li>
+<li><a class="reference internal" href="#id82">Added</a></li>
+<li><a class="reference internal" href="#id83">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id84">1.8.0 - 2022-05-04</a><ul>
+<li><a class="reference internal" href="#id85">Added</a></li>
+<li><a class="reference internal" href="#id86">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id87">1.7.3 - 2022-02-12</a><ul>
+<li><a class="reference internal" href="#id88">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id89">1.7.2 - 2022-01-30</a><ul>
+<li><a class="reference internal" href="#id90">Added</a></li>
+<li><a class="reference internal" href="#id91">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id92">1.7.1 - 2022-01-12</a><ul>
+<li><a class="reference internal" href="#id93">Changed</a></li>
+<li><a class="reference internal" href="#id94">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id95">1.7.0 - 2021-10-22</a><ul>
+<li><a class="reference internal" href="#id96">Added</a></li>
+<li><a class="reference internal" href="#id97">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id98">1.6.3 - 2021-10-03</a><ul>
+<li><a class="reference internal" href="#id99">Changed</a></li>
+<li><a class="reference internal" href="#id100">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id101">1.6.2 - 2021-09-21</a><ul>
+<li><a class="reference internal" href="#id102">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id103">1.6.1 - 2021-09-21</a><ul>
+<li><a class="reference internal" href="#id104">Changed</a></li>
+<li><a class="reference internal" href="#id105">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id106">1.6.0 - 2021-09-07</a><ul>
+<li><a class="reference internal" href="#id107">Changed</a></li>
+<li><a class="reference internal" href="#id108">Removed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id109">1.5.3 - 2021-08-16</a><ul>
+<li><a class="reference internal" href="#id110">Added</a></li>
+<li><a class="reference internal" href="#id111">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id112">1.5.2 - 2021-08-07</a><ul>
+<li><a class="reference internal" href="#id113">Added</a></li>
+<li><a class="reference internal" href="#id114">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id115">1.5.1 - 2021-06-29</a><ul>
+<li><a class="reference internal" href="#id116">Changed</a></li>
+<li><a class="reference internal" href="#id117">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id118">1.5.0 - 2021-04-29</a><ul>
+<li><a class="reference internal" href="#id119">Changed</a></li>
+<li><a class="reference internal" href="#id120">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id121">1.4.1 - 2021-03-10</a><ul>
+<li><a class="reference internal" href="#id122">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id123">1.4.0 - 2021-03-05</a><ul>
+<li><a class="reference internal" href="#id124">Added</a></li>
+<li><a class="reference internal" href="#id125">Removed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id126">1.3.3 - 2021-02-17</a><ul>
+<li><a class="reference internal" href="#id127">Added</a></li>
+<li><a class="reference internal" href="#id128">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id129">1.3.2 - 2021-02-13</a><ul>
+<li><a class="reference internal" href="#id130">Removed</a></li>
+<li><a class="reference internal" href="#id131">Added</a></li>
+<li><a class="reference internal" href="#id132">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id133">1.3.1 - 2021-01-12</a><ul>
+<li><a class="reference internal" href="#id134">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id135">1.3.0 - 2020-12-09</a><ul>
+<li><a class="reference internal" href="#id136">Added</a></li>
+<li><a class="reference internal" href="#id137">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id138">1.2.5 - 2020-05-23</a><ul>
+<li><a class="reference internal" href="#id139">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id140">1.2.4 - 2020-05-23</a><ul>
+<li><a class="reference internal" href="#id141">Changed</a></li>
+<li><a class="reference internal" href="#id142">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id143">1.2.3 - 2020-05-10</a><ul>
+<li><a class="reference internal" href="#id144">Added</a></li>
+<li><a class="reference internal" href="#id145">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id146">1.2.2 - 2020-05-05</a><ul>
+<li><a class="reference internal" href="#id147">Changed</a></li>
+<li><a class="reference internal" href="#id148">Removed</a></li>
+<li><a class="reference internal" href="#id149">Added</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id150">1.2.1 - 2020-04-26</a><ul>
+<li><a class="reference internal" href="#id151">Changed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id152">1.2.0 - 2020-04-24</a><ul>
+<li><a class="reference internal" href="#id153">Added</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=1d459eb3"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>
