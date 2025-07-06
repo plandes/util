@@ -4,7 +4,7 @@
 ## Build system
 #
 PROJ_TYPE=		python
-PROJ_MODULES=		python/doc python/deploy
+PROJ_MODULES=		python/doc python/package python/deploy
 PY_TEST_ALL_TARGETS +=	testexamples
 ADD_CLEAN +=		example/config/counter.dat
 
