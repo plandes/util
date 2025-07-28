@@ -19,7 +19,17 @@ class WarningSilencer(object):
     """
     filters: Tuple[Dict[str, str], ...] = field()
     """A tuple of dictionaries that will be given to the
-    :function:`warning.filterwarnings` function.
+    :function:`warning.filterwarnings` function.  This is meant to be added to
+    an application configuration.
+
+    For example, in a Zensols YAML configuration::
+
+        warn_silencer:
+            class_name: zensols.util.warn.WarningSilencer
+            filters:
+              - action: 'ignore'
+                category: FutureWarning
+                message: '^Some error message.*'
 
     """
     @property
