@@ -393,9 +393,6 @@ class ClassInspector(object):
             if isinstance(node, ast.Expr) and \
                isinstance(node.value, ast.Constant):
                 doc = ClassDoc(node.value.value)
-            # ast.Str added for Python 3.7 backward compat
-            elif isinstance(node, ast.Expr) and isinstance(node.value, ast.Str):
-                doc = ClassDoc(node.value.s)
             else:
                 doc = None
             if logger.isEnabledFor(logging.DEBUG):
