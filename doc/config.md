@@ -221,6 +221,8 @@ in how it reads data, which uses the following rules:
   string.
 * A string starting with `list:` or `tuple:` parsed as a comma delimited string
   with optional space around each element.
+* A string starting with `asdict:` sets the entries in a section as a
+  dictionary (see the [Dictionary Sections](#dictionary-sections) section.
 * A string starting with `path:` parsed as a [pathlib.Path] instance.
 * A string starting with `resource:` parsed as `path:`, but points to a
   resource path either locally, or from a `setuptools` installed package (see
