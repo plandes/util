@@ -37,7 +37,9 @@ class LogConfigurator(object):
     """
     CLI_META = {'first_pass': True,  # not a separate action
                 # don't add the '-l' as a short option
-                'option_overrides': {'level': {'short_name': None}},
+                'option_overrides': {
+                    'level': {'short_name': None,
+                              'doc': 'logger level'}},
                 # we configure this class, but use a better naming for
                 # debugging
                 'mnemonic_overrides': {'config': 'log'},
