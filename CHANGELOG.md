@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.15.12] - 2025-08-20
+### Changed
+- Fix `ast` Python 3.12 warning by removing 3.7 `str` type.
+- The CLI `loglevel` option documentation was abbreviated.
+
+
 ## [1.15.11] - 2025-06-21
 ### Changed
 - Switch to the `packaging` module for requirements parsing.
@@ -704,7 +710,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.15.11...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.12...HEAD
+[1.15.12]: https://github.com/plandes/util/compare/v1.15.11...v1.15.12
 [1.15.11]: https://github.com/plandes/util/compare/v1.15.10...v1.15.11
 [1.15.10]: https://github.com/plandes/util/compare/v1.15.9...v1.15.10
 [1.15.9]: https://github.com/plandes/util/compare/v1.15.8...v1.15.9
