@@ -487,7 +487,8 @@ class ClassInspector(object):
                     logger.warning(
                         f'assign: {node.target.id}, {node.annotation}')
             else:
-                msg = f'not processed node: {type(node)}: {node.value}'
+                msg_val = node.value if hasattr(node, 'value') else str(node)
+                msg = f'not processed node: {type(node)}: {msg_val}'
                 if self.strict == 'w' and logger.isEnabledFor(logging.WARNING):
                     logger.warning(msg)
                 else:
