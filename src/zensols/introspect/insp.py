@@ -533,7 +533,10 @@ class ClassInspector(object):
             self._decorator_includes = meta.get('includes', set())
         else:
             self._decorator_includes = set()
-        cls = self._get_class(self.cls)
+        try:
+            cls = self._get_class(self.cls)
+        except Exception as e:
+            raise ClassError(f'Could not parse class: {self.cls}: {e}') from e
         if hasattr(self.cls, self.INSPECT_META):
             meta: Dict[str, str] = getattr(self.cls, self.INSPECT_META)
             if not isinstance(meta, dict):
