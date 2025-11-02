@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.15.13] - 2025-11-02
+### Added
+- Context manager `zensols.util.std.stdout` has a flag to create parent
+  directories.
+
+### Changed
+- Fix `ast` "value" in `ClassInspector`.
+
+
 ## [1.15.12] - 2025-08-20
 ### Changed
 - Fix `ast` Python 3.12 warning by removing 3.7 `str` type.
@@ -710,7 +719,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.15.12...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.13...HEAD
+[1.15.13]: https://github.com/plandes/util/compare/v1.15.12...v1.15.13
 [1.15.12]: https://github.com/plandes/util/compare/v1.15.11...v1.15.12
 [1.15.11]: https://github.com/plandes/util/compare/v1.15.10...v1.15.11
 [1.15.10]: https://github.com/plandes/util/compare/v1.15.9...v1.15.10

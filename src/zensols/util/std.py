@@ -128,7 +128,8 @@ class stdout(object):
 
     def __init__(self, path: Union[str, Path] = None, extension: str = None,
                  recommend_name: str = 'unnamed', capture: bool = False,
-                 logger: logging.Logger = logger, open_args: str = 'w'):
+                 logger: logging.Logger = logger, open_args: str = 'w',
+                 mkdir: bool = False):
         """Initailize where to write.  If the path is ``None`` or its name is
         :obj:`STANDARD_OUT_PATH`, then standard out is used instead of opening a
         file.  If ``path`` is set to :obj:`FILE_RECOMMEND_NAME`, it is
@@ -153,6 +154,9 @@ class stdout(object):
         :param open_args: the arguments given to :func:`open`, which defaults to
                           ``w`` if none are given
 
+        :param mkdir: make directories that do not already exist up to the
+                      parent directory of :obj:`path` when not standard out
+
         """
         path = Path(path) if isinstance(path, str) else path
         if path is not None and self.is_stdout(path):
@@ -172,6 +176,7 @@ class stdout(object):
         self._logger: logging.Logger = logger
         self._capture: bool = capture
         self._stdwrite: stdwrite = None
+        self._mkdir: bool = mkdir
 
     @classmethod
     def is_stdout(self, path: Path) -> bool:
@@ -183,6 +188,8 @@ class stdout(object):
             self._sink = sys.stdout
             self._should_close = False
         else:
+            if self._mkdir:
+                self._path.parent.mkdir(parents=True, exist_ok=True)
             self._sink = open(self._path, self._args)
             self._should_close = True
             if self._capture:
