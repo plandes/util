@@ -65,6 +65,9 @@ class Settings(Dictable):
     def __getitem__(self, key: str) -> str:
         return self.__dict__[key]
 
+    def __setitem__(self, key: str, value: Any):
+        self.__dict__[key] = value
+
     def __len__(self) -> int:
         return len(self.__dict__)
 
