@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.15.14] - 2025-11-26
+### Added
+- A `mkdir` flag to `std.stdout` to create non-existent parent directories when
+  writing to files.
+
+### Changed
+- More configuration options and default settings for URLs and file names in
+  class `Hasher`.
+- Add more error reporting in `ClassInspector`.
+- Fix class level for keyword `pass` during AST parsing.
+
+
 ## [1.15.13] - 2025-11-02
 ### Added
 - Context manager `zensols.util.std.stdout` has a flag to create parent
@@ -719,7 +731,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.15.13...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.15.14...HEAD
+[1.15.14]: https://github.com/plandes/util/compare/v1.15.13...v1.15.14
 [1.15.13]: https://github.com/plandes/util/compare/v1.15.12...v1.15.13
 [1.15.12]: https://github.com/plandes/util/compare/v1.15.11...v1.15.12
 [1.15.11]: https://github.com/plandes/util/compare/v1.15.10...v1.15.11
