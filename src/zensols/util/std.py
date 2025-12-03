@@ -109,7 +109,9 @@ class stdout(object):
     Application class can pass a :class:`pathlib.Path` to a method with this
     class.
 
-    Example::
+    Example:
+
+    .. code-block:: python
 
         def write(self, output_file: Path = Path('-')):
             """Write data.
