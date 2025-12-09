@@ -64,11 +64,11 @@ class CommandAction(Dictable):
 
 @dataclass
 class CommandActionSet(Deallocatable, Dictable):
-    """The actions that are parsed by :class:`.CommandLineParser` as the output of
-    the parse phase.  This is indexable by command action name and iterable
+    """The actions that are parsed by :class:`.CommandLineParser` as the output
+    of the parse phase.  This is indexable by command action name and iterable
     across all actions.  Properties :obj:`first_pass_actions` and
-    :obj:`second_pass_action` give access to the split from the respective
-    types of actions.
+    :obj:`second_pass_action` give access to the split from the respective types
+    of actions.
 
     """
     _DICTABLE_WRITABLE_DESCENDANTS = True
@@ -281,7 +281,7 @@ class CommandLineParser(Deallocatable, Dictable):
         parser: UsageActionOptionParser = self._get_first_pass_parser(False)
         parser.error(msg)
 
-    def _parse_type(self, s: str, t: type, name: str) -> Any:
+    def _parse_value(self, s: str, t: type, name: str) -> Any:
         tpe = None
         if issubclass(t, Enum):
             tpe = t.__members__.get(s)
@@ -305,17 +305,48 @@ class CommandLineParser(Deallocatable, Dictable):
         for k, v in op_args.items():
             opt: OptionMetaData = opts.get(k)
             if v is not None and opt is not None:
-                v = self._parse_type(v, opt.dtype, opt.long_option)
+                v = self._parse_value(v, opt.dtype, opt.long_option)
             parsed[k] = v
         return parsed
 
-    def _parse_positional(self, metas: List[PositionalMetaData],
+    def _parse_positional(self, action_name: str,
+                          metas: List[PositionalMetaData],
                           vals: List[str]) -> Tuple[Any, ...]:
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'parsing positional args: {metas} <--> {vals}')
-        return tuple(
-            map(lambda x: self._parse_type(x[0], x[1].dtype, x[1].name),
-                zip(vals, metas)))
+        action_meta: ActionMetaData = \
+            self.config.actions_by_name.get(action_name)
+        mlen: int = len(metas)
+        vlen: int = len(vals)
+        parsed: List[Any] = []
+        expect_len: int = sum(map(
+            lambda m: 0 if m.dtype == Tuple else 1, metas))
+        extra_meta: Tuple[int, PositionalMetaData] = None
+        val: Any
+        meta: PositionalMetaData
+        for mix, meta in enumerate(metas):
+            if meta.dtype == Tuple:
+                if extra_meta is not None:
+                    raise CommandLineError(
+                        f"Action '{action_meta.name}' has more than one tuple "
+                        f'argument: {extra_meta[1].name}, {meta.name}')
+                extra_meta = (mix, meta)
+                continue
+            if len(vals) == 0:
+                raise CommandLineError(
+                    f"Action '{action_meta.name}' expects at least " +
+                    f'{expect_len} positional parameter(s) but got {vlen}')
+            val: Any = vals.pop(0)
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'fitting meta: {meta} -> {val}')
+            parsed.append(self._parse_value(val, meta.dtype, meta.name))
+        if len(vals) > 0 and extra_meta is None:
+            raise CommandLineError(
+                f"Action '{action_meta.name}' expects {mlen} " +
+                f"argument(s) but got {expect_len}: {', '.join(vals)}")
+        if extra_meta is not None:
+            parsed.insert(extra_meta[0], tuple(vals))
+        return tuple(parsed)
 
     def _get_help_action(self, args: List[str]) -> \
             Tuple[List[ActionMetaData], List[str]]:
@@ -430,11 +461,12 @@ class CommandLineParser(Deallocatable, Dictable):
                 f"{len(action_meta.positional)} argument(s), but " +
                 f"'{single_sp}' is counted as a positional argument " +
                 'and should be omitted')
-        if pos_arg_diff != 0:
-            raise CommandLineError(
-                f"Action '{action_meta.name}' expects " +
-                f"{len(action_meta.positional)} " +
-                f"argument(s) but got {len(op_args)}: {', '.join(op_args)}")
+        # if pos_arg_diff != 0:
+        #     raise CommandLineError(
+        #         f"Action '{action_meta.name}' expects " +
+        #         f"{len(action_meta.positional)} " +
+        #         f"argument(s) but got {len(op_args)}: {', '.join(op_args)}")
+
         # if there is more than one second pass action, we must re-parse using
         # the specific options and positional argument for that action
         if second_pass:
@@ -497,7 +529,7 @@ class CommandLineParser(Deallocatable, Dictable):
         # the second pass action should _not_ get the first pass options
         options = {k: options[k] for k in (set(options.keys()) - fp_opts)}
         # parse positional arguments much like the OptionParser did options
-        pos_args = self._parse_positional(action_meta.positional, op_args)
+        pos_args = self._parse_positional(action_name, action_meta.positional, op_args)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating action with {options} {pos_args}')
         # create and add the second pass action

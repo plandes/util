@@ -21,9 +21,6 @@ class TestActionSecondPass(LogTestCase):
             'zensols.testapp', 'test-resources/test-app-sec-pass.conf')
 
     def test_metadata(self):
-        if 0:
-            print()
-            self.cli.parser.write_help()
         mng: ActionCliManager = self.cli.cli_manager
         actions: Dict[str, ActionCli] = mng.actions
         self.assertEqual(2, len(actions))
@@ -194,7 +191,7 @@ class TestActionType(LogTestCase):
         res: Application = insts[0]
         self.assertEqual(('action1', True), res.result)
 
-        msg: str = r"^Action 'action2' expects 1.*"
+        msg: str = r"^Action 'action2' expects at least 1.*"
         with self.assertRaisesRegex(CommandLineError, msg):
             aset: CommandActionSet = self.cli.create('action2'.split())
 

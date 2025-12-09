@@ -28,7 +28,7 @@ class ClassError(Exception):
 
 def _create_data_types() -> Dict[str, Type]:
     types = {t.__name__: t for t in
-             [str, int, float, bool, list, dict, Path, IntegerSelection]}
+             [str, int, float, bool, Tuple, Path, IntegerSelection]}
     types['pathlib.Path'] = Path
     return types
 
@@ -88,7 +88,7 @@ class TypeMapper(object):
                 logger.error(f'Could not narrow to class: {stype}: {e}',
                              exc_info=True)
         if tpe is None:
-            raise ClassError(f'Non-supported data type: {stype}')
+            raise ClassError(f'Unsupported data type: {stype}')
         return tpe
 
 

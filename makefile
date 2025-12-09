@@ -39,7 +39,6 @@ testexample:
 # run all example
 .PHONY:			testexamples
 testexamples:
-#			$(eval action := showexample)
 			$(eval action := testexample)
 			@$(MAKE) $(action) $(PY_MAKE_ARGS) LINES=4 \
 				ARG="( cd example/app ; ./fsinfo.py ls --format long 2>&1 )"

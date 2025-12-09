@@ -1,3 +1,4 @@
+from typing import Tuple
 from dataclasses import dataclass, field
 from pathlib import Path
 from enum import Enum, auto
@@ -117,3 +118,65 @@ class TestActionOverride(Dictable):
         """Run the test command"""
         self.invoke_state = (self.basket)
         return self.invoke_state
+
+
+@dataclass
+class TestPositionalArguments(Dictable):
+    """Testing positional arguments
+
+    """
+    def no_arg(self):
+        return {}
+
+    def one_arg(self, first: str):
+        return {'first': first}
+
+    def two_arg(self, first: str, second: str):
+        return {
+            'first': first,
+            'second': second}
+
+    def multi_args(self, args: Tuple[str, ...]):
+        return {'margs': args}
+
+    def multi_args_w_first(self, first: str, args: Tuple[str, ...]):
+        return {'first': first, 'margs': args}
+
+    def multi_args_w_second(self, first: str, second: str,
+                            args: Tuple[str, ...]):
+        return {
+            'first': first,
+            'second': second,
+            'margs': args}
+
+    def multi_args_margloc(self, first: str, args: Tuple[str, ...],
+                           second: str):
+        return {
+            'first': first,
+            'second': second,
+            'margs': args}
+
+    def multi_args_margloc2(self, args: Tuple[str, ...], first: str,
+                            second: str):
+        return {
+            'first': first,
+            'second': second,
+            'margs': args}
+
+    def muti_w_def(self, first: str, second: str, args: Tuple[str, ...],
+                   val: str = 'defaultval', vdef: str = 'defaultdef'):
+        return {
+            'val': val,
+            'vdef': vdef,
+            'first': first,
+            'second': second,
+            'args': args}
+
+    def muti_w_def2(self, first: str, args: Tuple[str, ...], second: str,
+                    val: str = 'defaultval', vdef: str = 'defaultdef'):
+        return {
+            'val': val,
+            'vdef': vdef,
+            'first': first,
+            'second': second,
+            'args': args}
