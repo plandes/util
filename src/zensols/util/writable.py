@@ -291,6 +291,9 @@ _WRITABLE_CLASS = Writable
 class WritableContext(object):
     """A text data sync given to a :class:`.Writable` as a convenience object.
 
+    .. document private functions
+    .. automethod:: __call__
+
     """
     target: Writable = field()
     """The client of this class."""

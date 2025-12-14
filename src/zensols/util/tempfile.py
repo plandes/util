@@ -12,14 +12,14 @@ logger = logging.getLogger(__name__)
 
 
 class TemporaryFileName(object):
-    """Create a temporary file names on the file system.  Note that this does not
-    create the file object itself, only the file names.  In addition, the
+    """Create a temporary file names on the file system.  Note that this does
+    not create the file object itself, only the file names.  In addition, the
     generated file names are tracked and allow for deletion.  Specified
     directories are also created, which is only needed for non-system temporary
     directories.
 
-    The object is iterable, so usage with ``itertools.islice`` can be used to
-    get as many temporary file names as desired.  Calling instances (no
+    The object is iterable, so usage with :func:`itertools.islice` can be used
+    to get as many temporary file names as desired.  Calling instances (no
     arguments) generate a single file name.
 
     """
@@ -94,8 +94,9 @@ class TemporaryFileName(object):
 
 class tempfile(object):
     """Generate a temporary file name and return the name in the ``with``
-    statement.  Arguments to the form are the same as ``TemporaryFileName``.
-    The temporary file is deleted after completion (see ``TemporaryFileName``).
+    statement.  Arguments to the form are the same as
+    :class:`.TemporaryFileName`.  The temporary file is deleted after
+    the context manager's code block scope.
 
     Example:
 

@@ -57,6 +57,16 @@ def apperror(method: Callable = None, *,
     An optional exception parameter can be provided so the exception is rethrown
     for only certain caught exceptions.
 
+    Example:
+
+    .. code-block:: python
+
+       class Application(object):
+            ....
+            @apperror(exception=BriefcaseError)
+            def some_action(self, dry_run: bool = False):
+                ...
+
     """
     def no_args(*args, **kwargs):
         if method is not None:
