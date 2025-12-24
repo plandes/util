@@ -733,7 +733,7 @@ class ApplicationFactory(PersistableContainer):
             if isinstance(ex, ConfigurableFileNotFoundError):
                 self._dump_error(ex, False)
             elif isinstance(ex, ApplicationError):
-                self._dump_error(ex)
+                self._dump_error(ex, ex.is_usage)
             else:
                 raise ex
 

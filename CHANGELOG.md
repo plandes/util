@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Whether to print usage is optional when raising `ApplicationError` but
+  default to no usage.
+
+
 ## [1.15.14] - 2025-11-26
 ### Added
 - A `mkdir` flag to `std.stdout` to create non-existent parent directories when

@@ -26,7 +26,14 @@ class ApplicationError(ActionCliError):
     rather than produce a full stack trace.
 
     """
-    pass
+    def __init__(self, *args, is_usage: bool = False, **kwargs):
+        """
+        :param is_usage: whether the error was raised as a result of bad
+                         command-line arguments, in which case, the CLI usage
+                         will be written on exit
+        """
+        super().__init__(*args, **kwargs)
+        self.is_usage = is_usage
 
 
 @dataclass
