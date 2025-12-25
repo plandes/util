@@ -192,12 +192,15 @@ class CommandLineParser(Deallocatable, Dictable):
 
     force_default: str = field(default=False)
     """Choice of action becomes ambiguous when the positional arguments are
-    given and the action name matches the argument.  An error is raised when the
-    application is configured in this way.
+    given and the action name matches the argument.  For example, if action
+    ``show`` is set as the default and is invoked with positional parameter
+    ``config``, then it is unclear if ``show`` shoud be invoked or ``config``.
 
-    When this attribute is ``True``, the command parsing will insert the default
-    action when the first non-option isn't found as an action.  However, this
-    leads to the mentioned ambiguouity and is inefficient.
+    An error is raised when the application is configured in this way unless
+    this attribute is set to ``True``.  At run time, the command parsing will
+    insert the default action when the first non-option isn't found as an
+    action.  However, this leads to the mentioned ambiguouity and is
+    inefficient.
 
     """
     application_doc: str = field(default=None)
@@ -484,7 +487,11 @@ class CommandLineParser(Deallocatable, Dictable):
         return action_meta, options, op_args
 
     def _validate_setup(self):
-        """Make sure we don't have a default action with positional args."""
+        """Make sure we don't have a default action with positional args.  This
+        checks to make sure positional arguments are used for the default
+        action, unless :obj:`force_default` suppresses it.
+
+        """
         if self.default_action is not None and not self.force_default:
             action_meta: ActionMetaData
             for action_meta in self.config.second_pass_actions:
