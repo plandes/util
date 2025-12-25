@@ -461,12 +461,6 @@ class CommandLineParser(Deallocatable, Dictable):
                 f"{len(action_meta.positional)} argument(s), but " +
                 f"'{single_sp}' is counted as a positional argument " +
                 'and should be omitted')
-        # if pos_arg_diff != 0:
-        #     raise CommandLineError(
-        #         f"Action '{action_meta.name}' expects " +
-        #         f"{len(action_meta.positional)} " +
-        #         f"argument(s) but got {len(op_args)}: {', '.join(op_args)}")
-
         # if there is more than one second pass action, we must re-parse using
         # the specific options and positional argument for that action
         if second_pass:
