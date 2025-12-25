@@ -112,7 +112,6 @@ class CommandLineConfig(PersistableContainer, Dictable):
     """Given to configure the :class:`.CommandLineParser`.
 
     """
-
     actions: Tuple[ActionMetaData, ...] = field()
     """The action meta data used to parse and print help."""
 
@@ -125,6 +124,13 @@ class CommandLineConfig(PersistableContainer, Dictable):
     @persisted('_second_pass_actions')
     def second_pass_actions(self) -> Tuple[ActionMetaData, ...]:
         return tuple(filter(lambda a: not a.first_pass, self.actions))
+
+    @property
+    @persisted('_second_pass_usage_visible_actions')
+    def second_pass_usage_visible_actions(self) -> Tuple[ActionMetaData, ...]:
+        return tuple(filter(
+            lambda a: not a.first_pass and a.is_usage_visible,
+            self.actions))
 
     @property
     @persisted('_actions_by_name')
@@ -407,11 +413,11 @@ class CommandLineParser(Deallocatable, Dictable):
                     logger.debug(f'adding first pass action: {action}')
                 actions.append(action)
                 added_first_pass.add(fp_action_meta.name)
-        # if only one option for second pass actions are given, the user need
-        # not give the action mnemonic/name, instead, just add all its options
-        # to the top level
-        if len(self.config.second_pass_actions) == 1:
-            action_name = self.config.second_pass_actions[0].name
+        # if only one option for second pass actions (of usage visible in help)
+        # are given, the user need not give the action mnemonic/name, instead,
+        # just add all its options to the top level
+        if len(self.config.second_pass_usage_visible_actions) == 1:
+            action_name = self.config.second_pass_usage_visible_actions[0].name
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'using singleton fp action: {action_name} ' +
                              f'with options {options}')

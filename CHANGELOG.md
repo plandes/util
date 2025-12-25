@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Whether to print usage is optional when raising `ApplicationError` but
   default to no usage.
+- Fix single action conflicts with non-visible (in usage help specified with
+  `is_usage_visible=False` in `CLI_META`) such as prototyping actions and
+  `zensols.cli.harness.ConfigFactoryAccessor`.
 
 
 ## [1.15.14] - 2025-11-26
