@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Removed
+- The `list` action is no longer a default in resource `cli-config.conf`.
 
 ### Changed
 - Whether to print usage is optional when raising `ApplicationError` but
