@@ -97,8 +97,8 @@ class ConfigurationOverrider(object):
 
     """
     override: str = field(default=None)
-    """A config file/dir or a comma delimited section.key=value string that
-    overrides configuration.
+    """A file/dir or a comma delimited ``section.key=value`` that overrides
+    config.
 
     """
     option_sep_regex: str = field(default=r'\s*,\s*')
