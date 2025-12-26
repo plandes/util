@@ -136,34 +136,34 @@ class TestPositionalArguments(Dictable):
             'first': first,
             'second': second}
 
-    def multi_args(self, args: Tuple[str, ...]):
+    def multi_args(self, args: Tuple[...]):
         return {'margs': args}
 
-    def multi_args_w_first(self, first: str, args: Tuple[str, ...]):
+    def multi_args_w_first(self, first: str, args: Tuple[...]):
         return {'first': first, 'margs': args}
 
     def multi_args_w_second(self, first: str, second: str,
-                            args: Tuple[str, ...]):
+                            args: Tuple[...]):
         return {
             'first': first,
             'second': second,
             'margs': args}
 
-    def multi_args_margloc(self, first: str, args: Tuple[str, ...],
+    def multi_args_margloc(self, first: str, args: Tuple[...],
                            second: str):
         return {
             'first': first,
             'second': second,
             'margs': args}
 
-    def multi_args_margloc2(self, args: Tuple[str, ...], first: str,
+    def multi_args_margloc2(self, args: Tuple[...], first: str,
                             second: str):
         return {
             'first': first,
             'second': second,
             'margs': args}
 
-    def muti_w_def(self, first: str, second: str, args: Tuple[str, ...],
+    def muti_w_def(self, first: str, second: str, args: Tuple[...],
                    val: str = 'defaultval', vdef: str = 'defaultdef'):
         return {
             'val': val,
@@ -172,8 +172,17 @@ class TestPositionalArguments(Dictable):
             'second': second,
             'args': args}
 
-    def muti_w_def2(self, first: str, args: Tuple[str, ...], second: str,
+    def muti_w_def2(self, first: str, args: Tuple[...], second: str,
                     val: str = 'defaultval', vdef: str = 'defaultdef'):
+        return {
+            'val': val,
+            'vdef': vdef,
+            'first': first,
+            'second': second,
+            'args': args}
+
+    def muti_w_minone(self, first: str, args: Tuple[str, ...], second: str,
+                      val: str = 'defaultval', vdef: str = 'defaultdef'):
         return {
             'val': val,
             'vdef': vdef,

@@ -196,7 +196,8 @@ class ActionCli(PersistableContainer, Dictable):
                         # use the argument name in the method but normalize it
                         # to make it appear in CLI parlance
                         pname = self._normalize_name(arg.name)
-                    pmeta = PositionalMetaData(pname, arg.dtype, pdoc)
+                    pmeta = PositionalMetaData(
+                        pname, arg.dtype, arg.inner_types, pdoc)
                     if opt is not None:
                         poverridess = dict(opt)
                         poverridess.pop('long_name', None)
@@ -316,7 +317,7 @@ class ActionCliManager(PersistableContainer, Dictable):
     """The sections to remove after the application is built."""
 
     app_removes: InitVar[Set[str]] = field(default=None)
-    """Removes apps from :obj:`apps, which is helpful when a single section to
+    """Removes apps from :obj:`apps`, which is helpful when a single section to
     remove is needed when importing from other files.
 
     """

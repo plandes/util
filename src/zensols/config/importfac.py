@@ -34,7 +34,7 @@ class RedefinedInjectionError(FactoryError):
 @dataclass
 class ModulePrototype(Dictable):
     """Contains the prototype information necessary to create an object instance
-    using :class:`.ImportConfigFactoryModule.
+    using :class:`.ImportConfigFactoryModule`.
 
     """
     _DICTABLE_ATTRIBUTES: ClassVar[Set[str]] = {'params', 'config'}

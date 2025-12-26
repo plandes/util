@@ -3,7 +3,8 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import List, Tuple, Dict, Any, Type, Optional, ClassVar
+from typing import List, Tuple, Dict, Any, Type, Optional, Callable, ClassVar
+from types import EllipsisType
 from dataclasses import dataclass, field
 import dataclasses
 import logging
@@ -28,8 +29,11 @@ class ClassError(Exception):
 
 def _create_data_types() -> Dict[str, Type]:
     types = {t.__name__: t for t in
-             [str, int, float, bool, Tuple, Path, IntegerSelection]}
+             [str, int, float, bool,
+              list, List, tuple, Tuple,
+              Path, IntegerSelection]}
     types['pathlib.Path'] = Path
+    types['...'] = EllipsisType
     return types
 
 
@@ -179,6 +183,11 @@ class ClassMethodArg(ClassParam):
     default: str = field()
     """The default if any, otherwise ``None``."""
 
+    inner_types: Tuple[Type, ...] = field()
+    """The inner types of the argument, such as [:class:`str`] in
+    ``Tuple[str]``.
+
+    """
     is_positional: bool = field()
     """``True`` is the argument is positional vs. a keyword argument."""
 
@@ -200,6 +209,9 @@ class ClassMethod(object):
 
 @dataclass(eq=True)
 class Class(object):
+    """Metadata about a Python class.
+
+    """
     class_type: type = field()
     """The class that was inspected."""
 
@@ -343,16 +355,20 @@ class ClassInspector(object):
             raise ClassError(f'Could not map {item}: {def_node}: {e}')
 
     def _get_args(self, node: ast.arguments) -> List[ClassMethodArg]:
-        args = []
-        defaults = node.defaults
+        args: List[ClassMethodArg] = []
+        defaults: List[ast.Constant] = node.defaults
         dsidx = len(node.args) - len(defaults)
+        map_type: Callable = self.data_type_mapper.map_type
+        i: int
+        arg: ast.arg
         for i, arg in enumerate(node.args):
-            name = arg.arg
+            name: str = arg.arg
             try:
-                dtype = None
-                is_positional = True
-                default = None
-                didx = i - dsidx
+                dtype: Type = None
+                is_positional: bool = True
+                default: Any = None
+                didx: int = i - dsidx
+                inners: Tuple[Type, ...] = None
                 if didx >= 0:
                     default = self._map_default(f'arg {arg}', defaults[didx])
                     is_positional = False
@@ -361,11 +377,23 @@ class ClassInspector(object):
                         dtype = arg.annotation.value.id
                     else:
                         dtype = arg.annotation.id
-                mtype = self.data_type_mapper.map_type(dtype)
+                mtype: Type = map_type(dtype)
+                if mtype == Tuple or mtype == tuple:
+                    inner_data: List[ast.Name] = None
+                    if hasattr(arg.annotation, 'slice') and \
+                       hasattr(arg.annotation.slice, 'elts'):
+                        inner_data = arg.annotation.slice.elts
+                    if inner_data is not None:
+                        inners = tuple(map(
+                            lambda t: map_type(ast.unparse(t)),
+                            inner_data))
+                    else:
+                        inners = ()
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'mapped {name}:{dtype} -> {mtype}, ' +
                                  f'default={default}')
-                arg = ClassMethodArg(name, mtype, None, default, is_positional)
+                arg = ClassMethodArg(
+                    name, mtype, None, default, inners, is_positional)
             except Exception as e:
                 raise ClassError(f'Could not map argument {name}: {e}')
             args.append(arg)

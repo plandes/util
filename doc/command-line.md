@@ -44,13 +44,13 @@ help usage for the command line:
 class Application(object):
     """Toy application example that provides file system information.
 
-	"""
+    """
     # tell the framework to not treat the executor field as an option
     CLI_META = {'option_excludes': {'executor'}}
 
     executor: Executor = field()
     """The executor."""
-...
+
     def echo(self, text: str):
         """Repeat back what is given as text.
         """
@@ -426,10 +426,9 @@ the configuration and add it to the application context.  It is configured as a
 
 #### Two Pass Command Line Parser
 
-Generally speaking, there are many first pass actions that prepare for one of
-many second pass actions indicated by the user using the *action*'s mnemonic.
-The framework parses the command line parameters given by the user in two
-passes:
+There are many first pass actions that prepare for one of many second pass
+actions indicated by the user using the *action*'s mnemonic.  The framework
+parses the command line parameters given by the user in two passes:
 
 1. The first pass parses options common to all applications and pertinent
    to tasks that usually prepare the environment before the application runs.
@@ -534,9 +533,10 @@ add access it from the main application data class `Tracker`:
 ```python
 def report_costly(self):
     """Report high salaried employees."""
-	emp: Person
-	for emp in self.db.costly_employees:
-		print(emp)
+    emp: Person
+
+    for emp in self.db.costly_employees:
+        print(emp)
 ```
 
 which now yields the following help usage:
@@ -655,11 +655,12 @@ do this, and put our application logger in its own name space, then set the
 level for that name space.  Here's the first part added to `payroll.py`:
 ```python
 import logging
-...
+
 logger = logging.getLogger(__name__)
-...
+
 class Tracker(object):
-...
+    ...
+
 logger.info(f'printing employees using format: {format}')
 ```
 
@@ -757,7 +758,6 @@ def print_employees(self, format: Format):
 	:param format: the detail of reporting
 
 	"""
-...
 ```
 which shows up in the help usage as a positional argument rather than an option:
 ```bash
@@ -771,6 +771,40 @@ and to run it:
 INFO:payroll:printing employees using format: Format.terse
 human_resources: homer, bob
 ```
+
+A variable number of positional arguments is specified with a tuple.  The inner
+types of the type hint specify how many and how to parse additional command line
+arguments.  For example, the following can be used to parse a variable number
+of arguments on the command line:
+```python
+def print_employees(self, employe_names: tuple[str, ...]):
+    """Show employees by name.
+
+    :param employ_names: names (at least one) of employess to print
+
+    """
+```
+
+The previous example tells the CLI framework to parse at least one argument and
+complains if does not get one.  To specify zero or more arguments:
+```python
+def print_employees(self, employe_names: tuple[...]):
+    """Show employees by name.
+
+    :param employ_names: zero or more names of employess to print
+
+    """
+```
+
+A specified number (and type) can also be specified, for example, a string,
+integer and float can be specified with the following:
+```python
+def add_employee_data(self, employe_data: tuple[str, int, float]):
+	"""Add an employee by name, age and income."""
+```
+
+The position of where the tuple array is given can be in any order.  However,
+only tuple array can be given.
 
 
 ### Environment

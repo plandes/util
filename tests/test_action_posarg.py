@@ -1,4 +1,4 @@
-from typing import Tuple, Any
+from typing import Tuple, Dict, Any
 from logutil import LogTestCase
 import mockapp.app as ma
 from zensols.cli import (
@@ -85,7 +85,15 @@ class TestActionSecondPass(LogTestCase):
         multarg('multiargsmargloc2', 'foo', ('foo',))
         multarg('multiargsmargloc2', 'foo bar', ('foo', 'bar'))
 
-    def _test_multi_opt(self, name: str):
+    def _test_multi_opt(self, name: str, expect: bool = False):
+        def test_expect(args: str, should: Dict[str, str]):
+            if expect:
+                with self.assertRaisesRegex(
+                        CommandLineError,
+                        f"^Action '{name}' positional 'args' expected at least one argument but got 0"):
+                    self._test(args, should)
+            else:
+                self._test(args, should)
         should = {
             'val': 'defaultval',
             'vdef': 'defaultdef',
@@ -93,14 +101,14 @@ class TestActionSecondPass(LogTestCase):
             'second': 'sarg',
             'args': ()}
 
-        self._test(f'{name} farg sarg', should)
-        self._test(f'{name} farg sarg --val aval', should | {'val': 'aval'})
-        self._test(f'{name} --val aval farg sarg', should | {'val': 'aval'})
-        self._test(f'{name} farg --val aval sarg', should | {'val': 'aval'})
-        self._test(f'{name} farg --val aval --vdef adef sarg',
-                   should | {'val': 'aval', 'vdef': 'adef'})
-        self._test(f'{name} --vdef adef farg --val aval sarg',
-                   should | {'val': 'aval', 'vdef': 'adef'})
+        test_expect(f'{name} farg sarg', should)
+        test_expect(f'{name} farg sarg --val aval', should | {'val': 'aval'})
+        test_expect(f'{name} --val aval farg sarg', should | {'val': 'aval'})
+        test_expect(f'{name} farg --val aval sarg', should | {'val': 'aval'})
+        test_expect(f'{name} farg --val aval --vdef adef sarg',
+                    should | {'val': 'aval', 'vdef': 'adef'})
+        test_expect(f'{name} --vdef adef farg --val aval sarg',
+                    should | {'val': 'aval', 'vdef': 'adef'})
 
         self._test(f'{name} farg sarg one', should | {'args': ('one',)})
         self._test(f'{name} farg sarg one --val aval',
@@ -121,3 +129,4 @@ class TestActionSecondPass(LogTestCase):
     def test_multi_opt(self):
         self._test_multi_opt('mutiwdef')
         self._test_multi_opt('mutiwdef2')
+        self._test_multi_opt('mutiwminone', True)

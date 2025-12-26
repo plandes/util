@@ -7,15 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-### Removed
-- The `list` action is no longer a default in resource `cli-config.conf`.
-
 ### Changed
 - Whether to print usage is optional when raising `ApplicationError` but
   default to no usage.
+- Add feature to parse a variable number of arguments with `tuple` or
+  `typing.Tuple`in application classes invoked from the command line.
 - Fix single action conflicts with non-visible (in usage help specified with
   `is_usage_visible=False` in `CLI_META`) such as prototyping actions and
   `zensols.cli.harness.ConfigFactoryAccessor`.
+- The `list` action is no longer a default in resource `cli-config.conf`.
 
 
 ## [1.15.14] - 2025-11-26

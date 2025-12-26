@@ -3,7 +3,8 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, Dict, Any, Type, Callable
+from typing import Tuple, Dict, List, Any, Optional, Type, Callable
+from types import EllipsisType
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -69,7 +70,6 @@ def apperror(method: Callable = None, *,
     .. code-block:: python
 
        class Application(object):
-            ....
             @apperror(exception=BriefcaseError)
             def some_action(self, dry_run: bool = False):
                 ...
@@ -119,6 +119,11 @@ class _MetavarFormatter(object):
         """
         return len(self.choices) > 0
 
+    @property
+    def is_multi_arg(self) -> bool:
+        """Whether the metadata """
+        return (self.dtype == Tuple or self.dtype == tuple)
+
     def _set_metvar(self) -> str:
         if self.is_choice:
             metavar = f"<{'|'.join(self.choices)}>"
@@ -130,6 +135,13 @@ class _MetavarFormatter(object):
             metavar = None
         elif self.dtype == str:
             metavar = 'STRING'
+        elif self.is_multi_arg:
+            inners: tuple[...]
+            metavar = '[ARG1 [ARG2 ...]]'
+            if hasattr(self, 'inner_types'):
+                inners = getattr(self, 'inner_types')
+                if EllipsisType in inners:
+                    metavar = 'ARG1 [ARG2 ...]'
         else:
             metavar = self.dtype.__name__.upper()
         if logger.isEnabledFor(logging.DEBUG):
@@ -281,6 +293,8 @@ class PositionalMetaData(Dictable, _MetavarFormatter):
     """A command line required argument that has no option switches.
 
     """
+    _DICTABLE_ATTRIBUTES = {'is_multi_arg'}
+
     name: str = field()
     """The name of the positional argument.  Used in the documentation and when
     parsing the type.
@@ -290,6 +304,11 @@ class PositionalMetaData(Dictable, _MetavarFormatter):
     """The type of the positional argument.
 
     :see: :obj:`.Option.dtype`
+
+    """
+    inner_types: Tuple[Type, ...] = field(default=())
+    """The inner types (i.e. :class:`str` in ``tuple[str]`` or empty if
+    :obj:`is_multi_arg` is ``False``.
 
     """
     doc: str = field(default=None)
@@ -306,6 +325,48 @@ class PositionalMetaData(Dictable, _MetavarFormatter):
 
     def __post_init__(self):
         _MetavarFormatter.__post_init__(self)
+
+    @property
+    def is_vararg(self) -> bool:
+        """Whether the number of arguments is variable if :obj:`is_multi_arg` it
+        ``True``.
+
+        """
+        return len(self.inner_types) == 0 or EllipsisType in self.inner_types
+
+    def validate_args(self, args: List[str]) -> Optional[str]:
+        """Validate mult-arg ``args`` matches :obj:`inner_types`."""
+        if len(self.inner_types) > 0:
+            if self.is_vararg:
+                if len(args) < 1:
+                    return (f"positional '{self.name}' "
+                            'expected at least one argument')
+            else:
+                if len(args) != len(self.inner_types):
+                    return (f"positional '{self.name}' "
+                            f'expecting {len(self.inner_types)} arguments')
+
+    def map_args(self, args: List[str]) -> Tuple[Any, ...]:
+        """Validate mult-arg ``args`` matches :obj:`inner_types`."""
+        try:
+            if EllipsisType in self.inner_types:
+                return tuple(map(self.inner_types[0], args))
+            elif len(self.inner_types) == 0:
+                return tuple(args)
+            else:
+                return tuple(map(
+                    lambda t: t[0](t[1]),
+                    zip(self.inner_types, self.args)))
+        except ValueError as e:
+            stypes: str = ', '.join(map(str, args))
+            itypes: str
+            if self.is_vararg:
+                itypes = str(self.inner_types[0].__name__)
+            else:
+                itypes = ', '.join(lambda c: c.__name__, self.inner_types)
+            raise ActionCliError(
+                f"positional '{self.name}' expecting arguments of type(s) " +
+                f"'{itypes}' but got '{stypes}': {e}")
 
 
 class OptionFactory(object):

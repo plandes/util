@@ -16,7 +16,8 @@ from frozendict import frozendict
 from zensols.persist import persisted, PersistableContainer, Deallocatable
 from zensols.config import Dictable
 from . import (
-    ApplicationError, OptionMetaData, PositionalMetaData, ActionMetaData,
+    ApplicationError, ActionCliError,
+    OptionMetaData, PositionalMetaData, ActionMetaData,
     UsageConfig, UsageActionOptionParser,
 )
 
@@ -74,8 +75,8 @@ class CommandActionSet(Deallocatable, Dictable):
     _DICTABLE_WRITABLE_DESCENDANTS = True
 
     actions: Tuple[CommandAction, ...] = field()
-    """The actions parsed.  The first N actions are first pass where as the last is
-    the second pass action.
+    """The actions parsed.  The first N actions are first pass where as the last
+    is the second pass action.
 
     """
     @property
@@ -328,13 +329,12 @@ class CommandLineParser(Deallocatable, Dictable):
         mlen: int = len(metas)
         vlen: int = len(vals)
         parsed: List[Any] = []
-        expect_len: int = sum(map(
-            lambda m: 0 if m.dtype == Tuple else 1, metas))
-        extra_meta: Tuple[int, PositionalMetaData] = None
+        expect_len: int = sum(map(lambda m: 0 if m.is_multi_arg else 1, metas))
+        extra_meta: tuple[int, PositionalMetaData] = None
         val: Any
         meta: PositionalMetaData
         for mix, meta in enumerate(metas):
-            if meta.dtype == Tuple:
+            if meta.is_multi_arg:
                 if extra_meta is not None:
                     raise CommandLineError(
                         f"Action '{action_meta.name}' has more than one tuple "
@@ -354,7 +354,18 @@ class CommandLineParser(Deallocatable, Dictable):
                 f"Action '{action_meta.name}' expects {mlen} " +
                 f"argument(s) but got {expect_len}: {', '.join(vals)}")
         if extra_meta is not None:
-            parsed.insert(extra_meta[0], tuple(vals))
+            meta: PositionalMetaData = extra_meta[1]
+            val_err: str = meta.validate_args(vals)
+            eargs: Tuple[Any, ...]
+            if val_err is not None:
+                raise CommandLineError(
+                    f"Action '{action_meta.name}' {val_err} " +
+                    f"but got {len(vals)}: {', '.join(vals)}")
+            try:
+                eargs = meta.map_args(vals)
+            except ActionCliError as e:
+                raise CommandLineError(f"Action '{action_meta.name}': {e}")
+            parsed.insert(extra_meta[0], eargs)
         return tuple(parsed)
 
     def _get_help_action(self, args: List[str]) -> \
@@ -536,7 +547,8 @@ class CommandLineParser(Deallocatable, Dictable):
         # the second pass action should _not_ get the first pass options
         options = {k: options[k] for k in (set(options.keys()) - fp_opts)}
         # parse positional arguments much like the OptionParser did options
-        pos_args = self._parse_positional(action_name, action_meta.positional, op_args)
+        pos_args = self._parse_positional(
+            action_name, action_meta.positional, op_args)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'creating action with {options} {pos_args}')
         # create and add the second pass action
