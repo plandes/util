@@ -356,7 +356,7 @@ class PositionalMetaData(Dictable, _MetavarFormatter):
             else:
                 return tuple(map(
                     lambda t: t[0](t[1]),
-                    zip(self.inner_types, self.args)))
+                    zip(self.inner_types, args)))
         except ValueError as e:
             stypes: str = ', '.join(map(str, args))
             itypes: str

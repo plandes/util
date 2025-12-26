@@ -185,9 +185,9 @@ def add_logging_level(level_name, level_num: int, method_name: str = None):
     raise an `AttributeError` if the level name is already an attribute of the
     `logging` module or if the method name is already present.
 
-    See `Stack Overflow`_ for attribution.
+    See `Stack Overflow <SOlog>`_ for attribution.
 
-    .. Stack Overflow: http://stackoverflow.com/a/13638084/2988730
+    .. _SOlog: http://stackoverflow.com/a/13638084/2988730
 
     """
     import logging

@@ -325,7 +325,7 @@ class EditConfiguration(object):
     """The section of the CLI configuration that contains the entry."""
 
     command: str = field(default='emacsclient -n {path}')
-    """The command used on the :function:`os.system` command to edit the file.
+    """The command used on the :func:`os.system` command to edit the file.
 
     """
     def edit_configuration(self):
@@ -351,15 +351,17 @@ class ProgramNameConfigurator(object):
     To add it to the logging output add it to the
     :class:`~zensols.cli.LogConfigurator` section's ``format`` property.
 
-    Example::
+    Example:
 
-        [add_prog_cli]
-        class_name = zensols.cli.ProgramNameConfigurator
-        default = someprog
+    .. code-block:: ini
 
-        [log_cli]
-        class_name = zensols.cli.LogConfigurator
-        format = ${program:name}: %%(message)s
+       [add_prog_cli]
+       class_name = zensols.cli.ProgramNameConfigurator
+       default = someprog
+
+       [log_cli]
+       class_name = zensols.cli.LogConfigurator
+       format = ${program:name}: %%(message)s
 
     """
     CLI_META = {'first_pass': True,  # not a separate action

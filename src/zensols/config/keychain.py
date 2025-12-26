@@ -52,15 +52,17 @@ class KeychainConfig(DictionaryConfig):
     Keychain.app entry.  The account (user name) and service (a grouping in
     Keychain.app) is provided and the password is fetched.
 
-    Example::
+    Example:
 
-        [import]
-        sections = list: keychain_imp
+    .. code-block:: ini
 
-        [keychain_imp]
-        type = keychain
-        account = my-user-name
-        default_section = login
+       [import]
+       sections = list: keychain_imp
+
+       [keychain_imp]
+       type = keychain
+       account = my-user-name
+       default_section = login
 
     """
     def __init__(self, account: str, user: str = None,

@@ -19,8 +19,8 @@ class WarningSilencer(object):
     """
     filters: Tuple[Dict[str, str], ...] = field()
     """A tuple of dictionaries that will be given to the
-    :function:`warning.filterwarnings` function.  This is meant to be added to
-    an application configuration.
+    :func:`warning.filterwarnings` function.  This is meant to be added to an
+    application configuration.
 
     For example, in a Zensols YAML configuration::
 
@@ -35,7 +35,7 @@ class WarningSilencer(object):
     @property
     def filter_parameters(self) -> Tuple[Dict[str, Any], ...]:
         """A list of dictionaries, each of which are used as keyword parameters
-        to :function:`warning.filterwarnings`.
+        to :func:`warning.filterwarnings`.
 
         """
         param_sets: List[Dict[str, Any]] = []

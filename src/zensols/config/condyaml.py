@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class _Condition(object):
     """Contains data needed to branch at the level of node replacement.
+
     """
     serializer: Serializer = field(repr=False)
     name: str
@@ -50,6 +51,7 @@ class ConditionalYamlConfig(ImportYamlConfig):
     recommended to use boolean constants or ``eval:`` syntax.
 
     For example::
+
         condition:
           if: ${default:testvar}
           then:

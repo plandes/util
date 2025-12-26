@@ -50,27 +50,41 @@ class SomeClass(PersistableContainer):
         print('returning unsaved value')
         return self.n * 3
 
->>> inst = SomeClass(5)
->>> print(Path('.').iterdir())
+inst = SomeClass(5)
+print(Path('.').iterdir())
+```
+output:
+```bash
 (PosixPath('example.py'),)
->>> inst.count
+```
+
+Get the count property:
+```python
+print(inst.count)
+```
+output:
+```bash
 returning count value
 10
->>> print(Path('.').iterdir())
+```
+
+Show the cached pickle files created with the `@persist` properties:
+```python
+print(Path('.').iterdir())
+```
+output:
+```bash
 (PosixPath('example.py'), PosixPath('counter.dat'),)
->>> inst.count
-10
->>> inst.notsaved
+```
+
+Invoke a property that is persisted in the class instance memory:
+```python
+print(inst.notsaved)
+```
+output:
+```bash
 returning unsaved value
 15
->>> inst.notsaved
-15
->>> inst = SomeClass(10)
->>> inst.count
-10
->>> inst.notsaved
-returning unsaved value
-30
 ```
 
 See the test case [test_persist.py] for more examples.

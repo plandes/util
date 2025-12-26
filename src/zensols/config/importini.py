@@ -173,20 +173,22 @@ class ImportIniConfig(IniConfig):
          :class:`~configparser.ConfigParser` using
          :class:`~configparser.ExtendedInterpolation`.
 
-    The ``import`` section has a ``sections`` entry as list of sections to
-    load, a ``references`` entry indicating which sections to provide as
-    children sections in child loaders, a ``config_file`` and ``config_files`
-    entries to load as children directly.
+    The ``import`` section has a ``sections`` entry as list of sections to load,
+    a ``references`` entry indicating which sections to provide as children
+    sections in child loaders, a ``config_file`` and ``config_files`` entries to
+    load as children directly.
 
-    For example::
+    For example:
 
-        [import]
-        references = list: default, package, env
-        sections = list: imp_obj
+    .. code-block:: ini
 
-        [imp_obj]
-        type = importini
-        config_file = resource: resources/obj.conf
+       [import]
+       references = list: default, package, env
+       sections = list: imp_obj
+
+       [imp_obj]
+       type = importini
+       config_file = resource: resources/obj.conf
 
     This configuration loads a resource import INI, which is an implementation
     of this class, and provides sections ``default``, ``package`` and ``env``

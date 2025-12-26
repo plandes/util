@@ -307,13 +307,16 @@ import domain
 
 factory = ImportConfigFactory(ExtendedInterpolationEnvConfig('obj.conf'))
 bob: domain.Person = factory('bob')
+print(bob)
 company: domain.Organization = factory('bob_co')
+print(company)
+print(id(company.boss) == id(bob))
+```
 
->>> bob
+output:
+```bash
 Person(age=56, aliases=['sideshow bob', 'Robert Underdunk Terwilliger Jr'])
->>> company
 Organization(boss=Person(age=45))
->>> id(company.boss) == id(bob)
 True
 ```
 
@@ -364,8 +367,10 @@ Note that the Python code in the `eval` is multi-line.
 We then create the new *company* object and print with:
 ```python
 school_clique: domain.Organization = factory('school_clique')
-
->>> school_clique
+print(school_clique)
+```
+output:
+```bash
 Organization(boss=Person(age=16, aliases=['cool dude (0)', 'bad dude (1)']))
 ```
 
@@ -475,8 +480,10 @@ boss = object({'param':
 We then create the new *company* object and print with:
 ```python
 senior_company: domain.Organization = factory('bobs_senior_center')
-
->>> senior_company
+print(senior_company)
+```
+output:
+```bash
 Organization(boss=Person(age=69, aliases=['Homer', 'Homer Simpson']))
 ```
 
@@ -729,7 +736,10 @@ import domain
 factory = ImportConfigFactory(ImportIniConfig('imp.conf'))
 company: domain.Organization = factory('bobs_youth_center')
 print(f"homer's new age: {company.boss.age}")
->>> homer's new age: 18
+```
+output:
+```bash
+homer's new age: 18
 ```
 
 

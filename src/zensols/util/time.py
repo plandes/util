@@ -127,23 +127,26 @@ class time(object):
             self.logger.write(msg + '\n')
 
 
-def timeout(seconds=TIMEOUT_DEFAULT, error_message=os.strerror(errno.ETIME)):
+def timeout(seconds: int = TIMEOUT_DEFAULT,
+            error_message: str = os.strerror(errno.ETIME)):
     """This creates a decorator called @timeout that can be applied to any long
     running functions.
 
-    So, in your application code, you can use the decorator like so::
+    So, in your application code, you can use the decorator in the follow way:
 
-        from timeout import timeout
+    .. code-block:: python
 
-        # Timeout a long running function with the default expiry of
-        # TIMEOUT_DEFAULT seconds.
-        @timeout
-        def long_running_function1():
-            pass
+       from timeout import timeout
 
-    This was derived from the David Narayan's `StackOverflow`_  thread.
+       # Timeout a long running function with the default expiry of
+       # TIMEOUT_DEFAULT seconds.
+       @timeout
+       def long_running_function1():
+           pass
 
-    .. StackOverflow: https://stackoverflow.com/questions/2281850/timeout-function-if-it-takes-too-long-to-finish
+    This was derived from the David Narayan's `StackOverflow <SOtime>`_  thread.
+
+    .. _SOtime: https://stackoverflow.com/questions/2281850/timeout-function-if-it-takes-too-long-to-finish
 
     """
     def decorator(func):

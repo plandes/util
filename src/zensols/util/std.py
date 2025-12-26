@@ -22,7 +22,7 @@ class FileLikeType(Enum):
     helper methods specify how an object might be readable and in what way.
     This class describes types can be files-like, :class:`pathlib.Path`, strings
     that point to files, and :obj:`sys.stdin`.  The string or path
-    :class:`~.stdout.STANDARD_OUT_PATH` is treated as standard in.
+    :obj:`~.stdout.STANDARD_OUT_PATH` is treated as standard in.
 
     """
     filelike = auto()
@@ -68,7 +68,7 @@ class FileLikeType(Enum):
 
     @property
     def is_openable(self) -> bool:
-        """Whether an object can be opened with :function:`open`."""
+        """Whether an object can be opened with :func:`open`."""
         return self.value == self.path.value or \
             self.value == self.string_path.value
 
@@ -113,16 +113,16 @@ class stdout(object):
 
     .. code-block:: python
 
-        def write(self, output_file: Path = Path('-')):
-            """Write data.
+       def write(self, output_file: Path = Path('-')):
+           """Write data.
 
-            :param output_file: the output file name, ``-`` for standard out, or
-                                ``+`` for a default
+           :param output_file: the output file name, ``-`` for standard out, or
+                               ``+`` for a default
 
-            """
-            with stdout(output_file, recommend_name='unknown-file-name',
-                        extension='txt', capture=True, logger=logger):
-                print('write data')
+           """
+           with stdout(output_file, recommend_name='unknown-file-name',
+                       extension='txt', capture=True, logger=logger):
+               print('write data')
 
     '''
     STANDARD_OUT_PATH: ClassVar[str] = _STANDARD_IN_OUT_SYMBOL
