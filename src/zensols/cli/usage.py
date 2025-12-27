@@ -329,11 +329,14 @@ class _ActionFormatter(_Formatter):
         return action_name
 
     def add_first_col_width(self, widths: List[int]):
-        widths.append(len(self.action_desc))
-        for of in self.opts:
-            of.add_first_col_width(widths)
-        for pos in self.pos:
-            pos.add_first_col_width(widths)
+        if not self.action.is_usage_visible:
+            widths.append(0)
+        else:
+            widths.append(len(self.action_desc))
+            for of in self.opts:
+                of.add_first_col_width(widths)
+            for pos in self.pos:
+                pos.add_first_col_width(widths)
 
     def write(self, depth: int = 0, writer: TextIOBase = sys.stdout,
               format: str = 'long'):
