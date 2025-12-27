@@ -197,7 +197,7 @@ class ActionCli(PersistableContainer, Dictable):
                         # to make it appear in CLI parlance
                         pname = self._normalize_name(arg.name)
                     pmeta = PositionalMetaData(
-                        pname, arg.dtype, arg.inner_types, pdoc)
+                        pname, arg.dtype, arg.inner_types, pdoc, dest=arg.name)
                     if opt is not None:
                         poverridess = dict(opt)
                         poverridess.pop('long_name', None)

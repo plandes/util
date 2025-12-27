@@ -93,7 +93,7 @@ def apperror(method: Callable = None, *,
 
 
 @dataclass
-class _MetavarFormatter(object):
+class ArgumentMetaData(object):
     """Formats the meta variable string for options.  This is the data type or
     example printed next to the argument or option in the usage help.
 
@@ -151,7 +151,7 @@ class _MetavarFormatter(object):
 
 
 @dataclass(eq=True, order=True, unsafe_hash=True)
-class OptionMetaData(PersistableContainer, Dictable, _MetavarFormatter):
+class OptionMetaData(PersistableContainer, Dictable, ArgumentMetaData):
     """A command line option."""
 
     DATA_TYPES = frozenset(TypeMapper.DEFAULT_DATA_TYPES.values())
@@ -191,7 +191,7 @@ class OptionMetaData(PersistableContainer, Dictable, _MetavarFormatter):
     def __post_init__(self):
         if self.dest is None:
             self.dest = self.long_name
-        _MetavarFormatter.__post_init__(self)
+        ArgumentMetaData.__post_init__(self)
 
     def _str_vals(self) -> Tuple[str, str, str]:
         default = self.default
@@ -289,7 +289,7 @@ class OptionMetaData(PersistableContainer, Dictable, _MetavarFormatter):
 
 
 @dataclass
-class PositionalMetaData(Dictable, _MetavarFormatter):
+class PositionalMetaData(Dictable, ArgumentMetaData):
     """A command line required argument that has no option switches.
 
     """
@@ -323,8 +323,11 @@ class PositionalMetaData(Dictable, _MetavarFormatter):
     metavar: str = field(default=None, repr=False)
     """Used in the command line help for the type of the option."""
 
+    dest: str = field(default=None, repr=False)
+    """The the field/parameter name used to on the target class."""
+
     def __post_init__(self):
-        _MetavarFormatter.__post_init__(self)
+        ArgumentMetaData.__post_init__(self)
 
     @property
     def is_vararg(self) -> bool:
@@ -446,6 +449,27 @@ class ActionMetaData(PersistableContainer, Dictable):
     @persisted('_options_by_dest')
     def options_by_dest(self) -> Dict[str, OptionMetaData]:
         return frozendict({m.dest: m for m in self.options})
+
+    @property
+    @persisted('_positional_by_dest')
+    def positional_by_dest(self) -> Dict[str, OptionMetaData]:
+        return frozendict({m.dest: m for m in self.positional})
+
+    @property
+    @persisted('_options_by_dest')
+    def arguments_by_dest(self) -> Dict[str, ArgumentMetaData]:
+        return frozendict(self.options_by_dest | self.positional_by_dest)
+
+    @property
+    @persisted('_dest_to_switch')
+    def dest_to_switch(self) -> Dict[str, str]:
+        dests: Dict[str, str] = {}
+        arg: ArgumentMetaData
+        for arg in self.arguments_by_dest.values():
+            is_op: bool = isinstance(arg, OptionMetaData)
+            name: str = f'-{arg.short_name}' if is_op else arg.name
+            dests[arg.dest] = name
+        return frozendict(dests)
 
     def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:
         dct = super()._from_dictable(*args, **kwargs)
