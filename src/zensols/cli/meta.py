@@ -460,15 +460,22 @@ class ActionMetaData(PersistableContainer, Dictable):
     def arguments_by_dest(self) -> Dict[str, ArgumentMetaData]:
         return frozendict(self.options_by_dest | self.positional_by_dest)
 
+    def _argument_to_switch(self, arg: ArgumentMetaData) -> str:
+        switch: str
+        is_op: bool = isinstance(arg, OptionMetaData)
+        if is_op:
+            switch = arg.shortest_option
+        else:
+            switch = arg.name
+        return switch
+
     @property
     @persisted('_dest_to_switch')
     def dest_to_switch(self) -> Dict[str, str]:
         dests: Dict[str, str] = {}
         arg: ArgumentMetaData
         for arg in self.arguments_by_dest.values():
-            is_op: bool = isinstance(arg, OptionMetaData)
-            name: str = f'-{arg.short_name}' if is_op else arg.name
-            dests[arg.dest] = name
+            dests[arg.dest] = self._argument_to_switch(arg)
         return frozendict(dests)
 
     def _from_dictable(self, *args, **kwargs) -> Dict[str, Any]:

@@ -701,11 +701,10 @@ taking it from the class docstring.
 
 ### More Actions
 
-Speaking of the package, perhaps we want to report some information about it.
-Already we have a way of getting it's version with the `--version` option.  But
-we could print out, among other package meta data, the name.  Since it doesn't
-seem to fit as a method in our employee tracking class, we'll add a new class
-to `payroll.py`:
+We may want to report some information about the package.  Already we have a
+way of getting it's version with the `--version` option.  But we could print
+out, among other package meta data, the name.  Since it doesn't seem to fit as
+a method in our employee tracking class, we'll add a new class to `payroll.py`:
 ```python
 @dataclass
 class PackageReporter(object):
@@ -721,10 +720,10 @@ The `config` data class field is populated by the configuration factory that
 created it with the configuration used to create it (see the [configuration]
 documentation).  We then only need to report it's section's contents.
 
-We'll add it to the list of applications:
+We'll add it to the list of applications (the `class_name` property is not
+needed):
 ```ini
 [cli]
-class_name = zensols.cli.ActionCliManager
 apps = list: config_cli, package_cli, log_cli, app, package_reporter
 
 [package_reporter]
@@ -805,6 +804,42 @@ def add_employee_data(self, employe_data: tuple[str, int, float]):
 
 The position of where the tuple array is given can be in any order.  However,
 only tuple array can be given.
+
+
+### Option Switch References
+
+To refer to options as switches in the documentation, use Sphinx double back
+ticks using the option name in the action method prototype.  For example:
+
+```python
+def print_employees(self, format: Format, employee_id: int = None):
+    """Show employee by ID or all when ``employee_id`` is not given.
+
+    :param format: the detail of reporting for employee ``employee_id``
+
+    :param employee_id: the ID of the employee
+
+    """
+```
+
+with application configuration:
+```ini
+[app]
+class_name = zensols.someproj.Application
+
+[app_decorator]
+option_overrides = dict: {
+  'employee_id': {'long_name': 'empid'}}
+mnemonic_overrides = dict: {
+  'print_employees': 'print'}
+```
+
+will output the usage:
+```bash
+print <format>        show employee by id or all when "-e" is not given
+  format <one|two>    output format for employee "-e"
+  -e, --empid INT     the id of the employee
+```
 
 
 ### Environment

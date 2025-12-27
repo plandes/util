@@ -6,7 +6,7 @@
 from __future__ import annotations
 __author__ = 'Paul Landes'
 from typing import (
-    Tuple, Iterable, List, Union, Optional, Sequence, Set, ClassVar
+    Tuple, Iterable, List, Dict, Union, Optional, Sequence, Set, ClassVar
 )
 from dataclasses import dataclass, field
 import logging
@@ -17,6 +17,7 @@ from itertools import chain
 from pathlib import Path
 from io import TextIOBase
 from optparse import OptionParser
+from frozendict import frozendict
 from zensols.util import APIError
 from zensols.introspect import IntegerSelection
 from zensols.config import Writable, Dictable
@@ -144,11 +145,30 @@ class _Formatter(Writable):
     """A formattingn base class that has utility methods.
 
     """
-    _BACKTICKS_REGEX = re.compile(r"``([^`]+)``")
+    _BACKTICKS_REGEX: ClassVar[re.Pattern] = re.compile(r"``([^`]+)``")
+    SWITCH_FORMAT: ClassVar[str] = '"{0}"'
+
+    @staticmethod
+    def _get_dest_to_switch_from_actions(actions: Tuple[ActionMetaData, ...]) \
+            -> Dict[str, str]:
+        dests: Dict[str, str] = {}
+        action: ActionMetaData
+        for action in actions:
+            dests.update(action.dest_to_switch)
+        return frozendict(dests)
+
+    def _get_dest_to_switch(self) -> Dict[str, str]:
+        return frozendict()
 
     def _format_doc(self, doc: str = None) -> str:
+        def replacer(m: re.Pattern):
+            key: str = m.group(1)
+            repl: str = dest2name.get(key, key)
+            return self.SWITCH_FORMAT.format(repl)
+
+        dest2name: dict[str, str] = self._get_dest_to_switch()
         doc = '' if doc is None else doc
-        doc = re.sub(self._BACKTICKS_REGEX, r'"\1"', doc)
+        doc = self._BACKTICKS_REGEX.sub(replacer, doc)
         return doc
 
     def _write_one_col(self, text: str, depth: int, writer: TextIOBase):
@@ -174,7 +194,7 @@ class _OptionFormatter(_Formatter):
     """Write the option, which includes the option name and documenation.
 
     """
-    usage_formatter: _UsageWriter
+    usage_formatter: _UsageFormatter
     opt: OptionMetaData
     usage_config: UsageConfig
 
@@ -206,6 +226,9 @@ class _OptionFormatter(_Formatter):
             self._opt_str += f' {metavar}'
         if over:
             self.doc += f' with default {self.opt.default_str}'
+
+    def _get_dest_to_switch(self) -> Dict[str, str]:
+        return self.usage_formatter._get_dest_to_switch()
 
     def _get_min_default_len(self) -> Tuple[Optional[int], bool]:
         mdlen: int = None
@@ -249,6 +272,9 @@ class _PositionalFormatter(_Formatter):
         self.name = f'{sp}{self.pos.name}{mv}'
         self.doc = self._format_doc(self.pos.doc)
 
+    def _get_dest_to_switch(self) -> Dict[str, str]:
+        return self.usage_formatter._get_dest_to_switch()
+
     def add_first_col_width(self, widths: List[int]):
         widths.append(len(self.name))
 
@@ -279,6 +305,9 @@ class _ActionFormatter(_Formatter):
             lambda pos: _PositionalFormatter(self.usage_formatter, pos),
             self.action.positional))
         self.doc = self._format_doc(self.action.doc)
+
+    def _get_dest_to_switch(self) -> Dict[str, str]:
+        return self.action.dest_to_switch
 
     @property
     @persisted('_position_args_str')
@@ -349,6 +378,10 @@ class _UsageFormatter(_Formatter):
                 self.pos_formatters.extend(af.pos)
             self.action_formatters.clear()
 
+    @persisted('__get_dest_to_switch')
+    def _get_dest_to_switch(self) -> Dict[str, str]:
+        return self._get_dest_to_switch_from_actions(self.actions)
+
     @property
     def is_singleton_action(self) -> bool:
         return len(self.visible_actions) == 1
@@ -387,7 +420,7 @@ class _UsageFormatter(_Formatter):
 
     @property
     @persisted('_visible_actions')
-    def visible_actions(self) -> Tuple[ActionMetaData]:
+    def visible_actions(self) -> Tuple[ActionMetaData, ...]:
         return tuple(filter(lambda a: a.is_usage_visible, self.actions))
 
     def get_option_usage_names(self, expand: bool = True) -> str:
@@ -530,6 +563,10 @@ class _UsageWriter(_Formatter):
             prog_path: Path = Path(sys.argv[0])
             prog = prog_path.name
         return prog
+
+    @persisted('__get_dest_to_switch')
+    def _get_dest_to_switch(self) -> Dict[str, str]:
+        return self._get_dest_to_switch_from_actions(self.actions)
 
     def _get_short_option_str(self, opts: Tuple[OptionMetaData, ...]) -> str:
         def filter_short(o: OptionMetaData) -> bool:
