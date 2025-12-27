@@ -44,4 +44,4 @@ doc:
     intersphinx_mapping:
       frozendict:
         modules: ['frozendict']
-        url: 'https://cawdrey.readthedocs.io/'
+        url: 'https://cawdrey.readthedocs.io/en/latest/'

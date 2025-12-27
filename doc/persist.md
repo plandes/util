@@ -54,7 +54,7 @@ inst = SomeClass(5)
 print(Path('.').iterdir())
 ```
 output:
-```bash
+```console
 (PosixPath('example.py'),)
 ```
 
@@ -63,7 +63,7 @@ Get the count property:
 print(inst.count)
 ```
 output:
-```bash
+```console
 returning count value
 10
 ```
@@ -73,7 +73,7 @@ Show the cached pickle files created with the `@persist` properties:
 print(Path('.').iterdir())
 ```
 output:
-```bash
+```console
 (PosixPath('example.py'), PosixPath('counter.dat'),)
 ```
 
@@ -82,7 +82,7 @@ Invoke a property that is persisted in the class instance memory:
 print(inst.notsaved)
 ```
 output:
-```bash
+```console
 returning unsaved value
 15
 ```

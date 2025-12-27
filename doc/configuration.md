@@ -314,7 +314,7 @@ print(id(company.boss) == id(bob))
 ```
 
 output:
-```bash
+```console
 Person(age=56, aliases=['sideshow bob', 'Robert Underdunk Terwilliger Jr'])
 Organization(boss=Person(age=45))
 True
@@ -370,7 +370,7 @@ school_clique: domain.Organization = factory('school_clique')
 print(school_clique)
 ```
 output:
-```bash
+```console
 Organization(boss=Person(age=16, aliases=['cool dude (0)', 'bad dude (1)']))
 ```
 
@@ -483,7 +483,7 @@ senior_company: domain.Organization = factory('bobs_senior_center')
 print(senior_company)
 ```
 output:
-```bash
+```console
 Organization(boss=Person(age=69, aliases=['Homer', 'Homer Simpson']))
 ```
 
@@ -738,7 +738,7 @@ company: domain.Organization = factory('bobs_youth_center')
 print(f"homer's new age: {company.boss.age}")
 ```
 output:
-```bash
+```console
 homer's new age: 18
 ```
 

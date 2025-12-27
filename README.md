@@ -26,7 +26,7 @@ Some features include:
 
 A secondary goal of the API is to make prototyping Python code quick and easy
 using the REPL.  Examples include reloading modules in the [configuration
-factory](doc/config.md).
+factory](doc/configuration.md).
 
 
 ## Documentation
@@ -179,11 +179,18 @@ If you use this project in your research please use the following BibTeX entry:
 An extensive changelog is available [here](CHANGELOG.md).
 
 
+## Community
+
+Please star this repository and let me know how and where you use this API.
+[Contributions](CONTRIBUTIONS.md) as pull requests, feedback and any input is
+welcome.
+
+
 ## License
 
 [MIT License](LICENSE.md)
 
-Copyright (c) 2020 - 2025 Paul Landes
+Copyright (c) 2020 - 2026 Paul Landes
 
 
 <!-- links -->
@@ -208,7 +215,7 @@ Copyright (c) 2020 - 2025 Paul Landes
 [optparse]: https://docs.python.org/3/library/optparse.html
 
 [command action library]: doc/command-line.md
-[configuration]: doc/config.md
+[configuration]: doc/configuration.md
 
 [full example]: https://github.com/plandes/util/blob/master/example/app/fsinfo.py
 [examples]: https://github.com/plandes/util/blob/master/example

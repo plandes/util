@@ -177,7 +177,7 @@ context*, which as mentioned usually goes in the `resources` directory.
 However, to keep things simple, ours points to a file in the root directory for
 this example.  When we run this application from the command line using a help
 flag (`--help`), we get:
-```bash
+```console
 $ ./main.py --help
 
 Usage: main.py [options]:
@@ -196,7 +196,7 @@ documentation since we have not given any docstrings in our class.
 The version, when built and installed as an entry point command line file, will
 print the version.  Since there is only one method, and thus one action mapped
 to that method, the CLI calls it and produces the expected output.
-```bash
+```console
 $ ./main.py --help
 hello world
 ```
@@ -281,7 +281,7 @@ class Tracker(object):
 ```
 
 which gives the following help:
-```bash
+```console
 Usage: main.py [options]:
 
 Show all employees.
@@ -374,7 +374,7 @@ def print_employees(self, format: Format = Format.short):
 
 Our generated help reflects the option as a keyword parameter and its default
 to the method:
-```bash
+```console
 Usage: main.py [options]:
 
 Show all employees.
@@ -389,7 +389,7 @@ Options:
 
 Finally, we run the program with no options to invoke the `print_employees`
 method:
-```bash
+```console
 $ ./main.py 
 printing employees using format: Format.short
 human_resources: homer
@@ -462,7 +462,7 @@ class_name = zensols.cli.ConfigurationImporter
 We've added the section `config_cli` to the list of sections to read, which
 gives a definition for a new class of type [ConfigurationImporter], which in
 turn adds the `-c` option:
-```bash
+```console
 Usage: main.py [options]:
 
 Show all employees.
@@ -540,7 +540,7 @@ def report_costly(self):
 ```
 
 which now yields the following help usage:
-```bash
+```console
 Usage: main.py <printemployees|reportcostly> [options]:
 
 Tracks and distributes employee payroll.
@@ -601,7 +601,7 @@ mnemonics = dict: {
 ```
 which has a new entry `mnemonics` as a `dict` with keys as method names and
 mnemonics as values, which produces a better usage:
-```bash
+```console
 Usage: main.py <show|highcost> [options]:
 ...
 Actions:
@@ -615,7 +615,7 @@ highcost     report high salaried employees
 
 Now we can in run the `report_costly` method with the `highcost` mnemonic and
 user configuration file:
-```bash
+```console
 $ ./main.py -c payroll.conf highcost
 Person(name='bob', age=32, salary=13.5)
 ```
@@ -731,13 +731,13 @@ class_name = payroll.PackageReporter
 ```
 which will register it as a second pass action, and thus a separate action and
 mnemonic:
-```bash
+```console
 Usage: main.py <show|highcost|report> [options]:
 ...
 report       print package information
 ```
 and gives the same name of the package as provided in the `main`:
-```bash
+```console
 $ ./main.py report -c payroll.conf 
 package: payroll
 ```
@@ -759,13 +759,13 @@ def print_employees(self, format: Format):
 	"""
 ```
 which shows up in the help usage as a positional argument rather than an option:
-```bash
+```console
 Actions:
 show <format>     show all employees
   -d, --dryrun    if given, don't do anything, just act like it
 ```
 and to run it:
-```bash
+```console
 ./main.py show -c payroll.conf terse
 INFO:payroll:printing employees using format: Format.terse
 human_resources: homer, bob
@@ -835,7 +835,7 @@ mnemonic_overrides = dict: {
 ```
 
 will output the usage:
-```bash
+```console
 print <format>        show employee by id or all when "-e" is not given
   format <one|two>    output format for employee "-e"
   -e, --empid INT     the id of the employee
@@ -971,7 +971,7 @@ option_overrides = dict: {'config_path': {'default': '${default:root_dir}/etc/pa
 The `--override` flag takes a configuration file, a directory of configuration
 files, or a string in the format `<section>.<option>=<value>` form.  For
 example, if we invoke the script and *override* Homer's salary by:
-```bash
+```console
 ./main.py show -f verbose --override homer.salary=100.5
 ```
 we get
@@ -1005,7 +1005,7 @@ the `example/cli/1-boilerplate` directory in the source repository.
 [example]: https://github.com/plandes/util/tree/master/example/cli
 [fsinfo.py]: https://github.com/plandes/util/blob/master/example/app/fsinfo.py
 [application context]: config.html#application-context
-[configuration]: config.md
+[configuration]: configuration.md
 [setuptools]: https://setuptools.readthedocs.io/en/latest/
 [dataclass]: https://docs.python.org/3/library/dataclasses.html
 [Jupyter notebooks]: https://jupyter.org
