@@ -175,9 +175,11 @@ class ActionCli(PersistableContainer, Dictable):
         if self.sort_methods:
             meth_keys = sorted(meth_keys)
         # create an action from each method
-        for name in meth_keys:
+        dest: str
+        for dest in meth_keys:
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'creating method {name}')
+                logger.debug(f'creating method {dest}')
+            name: str = dest
             meth: ClassMethod = self.class_meta.methods[name]
             meth_params: Set[OptionMetaData] = set(field_params)
             pos_args: List[PositionalMetaData] = []
@@ -249,6 +251,7 @@ class ActionCli(PersistableContainer, Dictable):
                     doc = DocUtil.normalize(doc.text)
             # add the meta data
             meta = ActionMetaData(
+                dest=dest,
                 name=name,
                 doc=doc,
                 options=tuple(sorted(meth_params)),

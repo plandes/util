@@ -6,7 +6,7 @@
 from __future__ import annotations
 __author__ = 'Paul Landes'
 from typing import (
-    Tuple, Iterable, List, Dict, Union, Optional, Sequence, Set, ClassVar
+    Tuple, Iterable, List, Dict, Union, Optional, Sequence, Set, ClassVar, Type
 )
 from dataclasses import dataclass, field
 import logging
@@ -145,30 +145,57 @@ class _Formatter(Writable):
     """A formattingn base class that has utility methods.
 
     """
-    _BACKTICKS_REGEX: ClassVar[re.Pattern] = re.compile(r"``([^`]+)``")
-    SWITCH_FORMAT: ClassVar[str] = '"{0}"'
+    _SPHINX_REGEX: ClassVar[re.Pattern] = re.compile(r':([^:]+):`([^`]+)`')
+    _BACKTICKS_REGEX: ClassVar[re.Pattern] = re.compile(r'``([^`]+)``')
+    _PROG: ClassVar[re.Pattern] = r'|prog|'
+    BACK_TICK_FORMAT: ClassVar[str] = '"{0}"'
+    SWITCH_FORMAT: ClassVar[str] = '{0}'
 
     @staticmethod
-    def _get_dest_to_switch_from_actions(actions: Tuple[ActionMetaData, ...]) \
-            -> Dict[str, str]:
+    def get_program_name() -> str:
+        prog: str = '<python>'
+        if len(sys.argv) > 0:
+            prog_path: Path = Path(sys.argv[0])
+            if len(prog_path.name) > 0:
+                prog = prog_path.name
+        return prog
+
+    @classmethod
+    def _get_dest_to_replaces_from_actions(
+            cls: Type,
+            actions: Tuple[ActionMetaData, ...]) -> Dict[str, str]:
         dests: Dict[str, str] = {}
         action: ActionMetaData
         for action in actions:
-            dests.update(action.dest_to_switch)
+            dests[f':meth:`{action.dest}`'] = action.name
+            for op, switch in action.dest_to_switch.items():
+                dests[f':obj:`{op}`'] = switch
         return frozendict(dests)
 
-    def _get_dest_to_switch(self) -> Dict[str, str]:
+    def _get_dest_to_replaces(self) -> Dict[str, str]:
         return frozendict()
 
     def _format_doc(self, doc: str = None) -> str:
-        def replacer(m: re.Pattern):
-            key: str = m.group(1)
-            repl: str = dest2name.get(key, key)
+        def sphinx_replacer(m: re.Pattern):
+            name: key = m.group(2)
+            key: str = f':{m.group(1)}:`{name}`'
+            repl: str = dest2name.get(key, name)
             return self.SWITCH_FORMAT.format(repl)
 
-        dest2name: dict[str, str] = self._get_dest_to_switch()
+        def backtick_replacer(m: re.Pattern):
+            name: str = m.group(1)
+            key: str = f':obj:`{name}`'
+            repl: str = dest2name.get(key)
+            if repl is not None:
+                return self.SWITCH_FORMAT.format(repl)
+            else:
+                return self.BACK_TICK_FORMAT.format(name)
+
+        dest2name: dict[str, str] = self._get_dest_to_replaces()
         doc = '' if doc is None else doc
-        doc = self._BACKTICKS_REGEX.sub(replacer, doc)
+        doc = self._SPHINX_REGEX.sub(sphinx_replacer, doc)
+        doc = self._BACKTICKS_REGEX.sub(backtick_replacer, doc)
+        doc = doc.replace(self._PROG, self.get_program_name())
         return doc
 
     def _write_one_col(self, text: str, depth: int, writer: TextIOBase):
@@ -227,8 +254,9 @@ class _OptionFormatter(_Formatter):
         if over:
             self.doc += f' with default {self.opt.default_str}'
 
-    def _get_dest_to_switch(self) -> Dict[str, str]:
-        return self.usage_formatter._get_dest_to_switch()
+    @persisted('__get_dest_to_replaces')
+    def _get_dest_to_replaces(self) -> Dict[str, str]:
+        return self.usage_formatter._get_dest_to_replaces()
 
     def _get_min_default_len(self) -> Tuple[Optional[int], bool]:
         mdlen: int = None
@@ -272,8 +300,9 @@ class _PositionalFormatter(_Formatter):
         self.name = f'{sp}{self.pos.name}{mv}'
         self.doc = self._format_doc(self.pos.doc)
 
-    def _get_dest_to_switch(self) -> Dict[str, str]:
-        return self.usage_formatter._get_dest_to_switch()
+    @persisted('__get_dest_to_replaces')
+    def _get_dest_to_replaces(self) -> Dict[str, str]:
+        return self.usage_formatter._get_dest_to_replaces()
 
     def add_first_col_width(self, widths: List[int]):
         widths.append(len(self.name))
@@ -306,8 +335,9 @@ class _ActionFormatter(_Formatter):
             self.action.positional))
         self.doc = self._format_doc(self.action.doc)
 
-    def _get_dest_to_switch(self) -> Dict[str, str]:
-        return self.action.dest_to_switch
+    @persisted('__get_dest_to_replaces')
+    def _get_dest_to_replaces(self) -> Dict[str, str]:
+        return self._get_dest_to_replaces_from_actions((self.action,))
 
     @property
     @persisted('_position_args_str')
@@ -381,9 +411,9 @@ class _UsageFormatter(_Formatter):
                 self.pos_formatters.extend(af.pos)
             self.action_formatters.clear()
 
-    @persisted('__get_dest_to_switch')
-    def _get_dest_to_switch(self) -> Dict[str, str]:
-        return self._get_dest_to_switch_from_actions(self.actions)
+    @persisted('__get_dest_to_replaces')
+    def _get_dest_to_replaces(self) -> Dict[str, str]:
+        return self._get_dest_to_replaces_from_actions(self.actions)
 
     @property
     def is_singleton_action(self) -> bool:
@@ -559,17 +589,9 @@ class _UsageWriter(_Formatter):
         self.usage_formatter = _UsageFormatter(
             self, actions, self.usage_config, self.global_options)
 
-    @property
-    def program_name(self) -> str:
-        prog: str = '<python>'
-        if len(sys.argv) > 0:
-            prog_path: Path = Path(sys.argv[0])
-            prog = prog_path.name
-        return prog
-
-    @persisted('__get_dest_to_switch')
-    def _get_dest_to_switch(self) -> Dict[str, str]:
-        return self._get_dest_to_switch_from_actions(self.actions)
+    @persisted('__get_dest_to_replaces')
+    def _get_dest_to_replaces(self) -> Dict[str, str]:
+        return self._get_dest_to_replaces_from_actions(self.actions)
 
     def _get_short_option_str(self, opts: Tuple[OptionMetaData, ...]) -> str:
         def filter_short(o: OptionMetaData) -> bool:
@@ -602,15 +624,16 @@ class _UsageWriter(_Formatter):
                 return f'[{o.shortest_option}]'
             return f'[{o.shortest_option} {o.metavar}]'
 
+        program_name: str = self.get_program_name()
         usage = self.USAGE_STR if usage is None else usage
         usage_ind: int = len(usage)
         sp: str = self._sp(depth)
         option_sp: str = self._get_str_space(
-            usage_ind + len(self.program_name) + 1)
+            usage_ind + len(program_name) + 1)
         option_ind: int = len(option_sp)
         shorts: str = '|'.join(map(
             lambda o: o.short_option, filter(filter_short, opts)))
-        blocks: List[str] = [(usage + self.program_name)]
+        blocks: List[str] = [(usage + program_name)]
         ind: int = 0
         if start_blocks is not None:
             blocks.extend(start_blocks)
@@ -641,7 +664,7 @@ class _UsageWriter(_Formatter):
         writer.write('\n')
 
     def _write_long_usage(self, depth: int, writer: TextIOBase):
-        prog: str = self.program_name
+        prog: str = self.get_program_name()
         opt_usage: str = '[options]:'
         opts = self.usage_formatter.get_option_usage_names()
         usage = f'{self.USAGE_STR}{prog} {opts}{opt_usage}'

@@ -124,18 +124,16 @@ Our initial application context just provides the `cli` section with it's
 referenced `app`:
 ```ini
 [cli]
-class_name = zensols.cli.ActionCliManager
 apps = list: app
 
 [app]
 class_name = payroll.Tracker
 ```
 
-The class [ActionCliManager] is the framework class that builds the command
-line and links it to the target class(es).  The `app` section gives the class
-to instantiate, which has the method to call from the command line `__main__`.
-The `apps` line in the `cli` section lists all the application to create, each
-of which maps as an *action* using a mnemonic for each of it's methods.
+The `app` section gives the class to instantiate, which has the method to call
+from the command line `__main__`.  The `apps` line in the `cli` section lists
+all the application to create, each of which maps as an *action* using a
+mnemonic for each of it's methods.
 
 **Note**: in this example, the `cli` section can be omitted since it uses the
 default entry of the `apps` property set to the singleton `app` section.
@@ -806,39 +804,93 @@ The position of where the tuple array is given can be in any order.  However,
 only tuple array can be given.
 
 
-### Option Switch References
+### Docstring Command Line Help
 
-To refer to options as switches in the documentation, use Sphinx double back
-ticks using the option name in the action method prototype.  For example:
+A very minimal Sphinx reST markup to replace command line artifacts is used to
+replace options, positional arguments, action names and the program name.  To
+refer to options in docstrings, use ``` :obj:`parameter_name` ``` to replace
+with command line switch and back ticks using the option names in the action
+method prototype.  Actions are replaced with ``` :meth:`method_name` ``` and
+the program name is replaced with `|prog|`.  Two back ticks are replaced with
+double quotes when not replacing a switch.  For example:
 
 ```python
-def print_employees(self, format: Format, employee_id: int = None):
-    """Show employee by ID or all when ``employee_id`` is not given.
+from enum import Enum, auto
 
-    :param format: the detail of reporting for employee ``employee_id``
 
-    :param employee_id: the ID of the employee
+class Format(Enum):
+    one = auto()
+    two = auto()
+
+
+@dataclass
+class Application(object):
+    """An employee database application (print using ``|prog|
+    :meth:`print_employees` :obj:`dry_run```).
 
     """
+    dry_run: bool = field(default=False)
+    """If given, don't do anything, just act like it."""
+
+    def print_employees(self, out_format: Format, employee_id: int = None):
+        """Show employee by ID.
+
+        :param out_format: output format for employee with ID given by
+                           ``employee_id``
+
+        :param employee_id: the ID of the employee
+
+        """
+        pass
+
+    def process_organizations(self, org_id: int = None):
+        """Process organizations by ID or print with :obj:`dry_run`.
+
+        :param org_id: a unique ID
+
+        """
+        pass
 ```
 
 with application configuration:
 ```ini
 [app]
-class_name = zensols.someproj.Application
+class_name = payroll.Tracker
 
 [app_decorator]
+option_excludes = set: config_factory
 option_overrides = dict: {
+  'out_format': {'long_name': 'format', 'short_name': None},
   'employee_id': {'long_name': 'empid'}}
 mnemonic_overrides = dict: {
-  'print_employees': 'print'}
+  'print_employees': 'emp',
+  'process_organizations': 'org'}
 ```
 
 will output the usage:
 ```console
-print <format>        show employee by id or all when "-e" is not given
-  format <one|two>    output format for employee "-e"
-  -e, --empid INT     the id of the employee
+Usage: tracker <emp|org> [options]:
+
+An employee database application (print using "tracker emp -d").
+
+Options:
+  -h, --help [actions]    show this help message and exit
+  --version               show the program version and exit
+  --level X               logger level, X is one of: crit, debug, err, info,
+                          notset, trace, warn
+  -c, --config FILE       the configuration file
+  --override X            a file/dir or a comma delimited "section.key=value" that
+                          overrides config, X is one of: FILE, DIR, STRING
+
+Actions:
+emp <format>              show employee by id
+  format <one|two>        output format for employee with ID given by -e
+  -d, --dryrun            whether to execute an action
+  -e, --empid INT         the id of the employee
+
+org                       process organizations by id or print with -d
+  -d, --dryrun            whether to execute an action
+  -r, --orgid INT         a unique id
 ```
 
 
@@ -983,13 +1035,6 @@ employees:
     age: 32
     salary: 100.5
 ```
-
-
-## Conclusion
-
-This tutorial was meant to instruct quickly on how to create applications.
-There are many details and other features not covered, such as the listing
-actions and documentation second pass action given in the last example.
 
 
 ## Complete Examples

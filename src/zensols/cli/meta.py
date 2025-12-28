@@ -439,6 +439,9 @@ class ActionMetaData(PersistableContainer, Dictable):
     usage, is an example of where this is used.
 
     """
+    dest: str = field(default=None)
+    """The the field/parameter name used to on the target class."""
+
     def __post_init__(self):
         if self.first_pass and len(self.positional) > 0:
             raise ActionCliError(
