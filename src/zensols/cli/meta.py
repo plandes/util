@@ -469,7 +469,7 @@ class ActionMetaData(PersistableContainer, Dictable):
         if is_op:
             switch = arg.shortest_option
         else:
-            switch = arg.name
+            switch = f'<{arg.name}>'
         return switch
 
     @property

@@ -8,13 +8,12 @@ Options:
   -c, --config FILE       the configuration file
 
 Actions:
-emp <format>              show employee by id (should not replace "org_idd")
-  format <one|two>        output format for employee with ID given by -e
+emp <format>              output employee by id with <format> (should not replace "org_id")
+  format <json|txt>       output format for employee with ID given by -e
   -d, --dryrun            whether to execute an action
   -e, --empid INT         the id of the employee
 
-org                       process organizations by id or print with -d (should
-                          replace -o)
+org                       process organizations by id or print with -d (should replace -o)
   -d, --dryrun            whether to execute an action
   -o, --orgid INT         a unique id
 exit: 0

@@ -12,6 +12,7 @@ CONFIG = """\
 [cli]
 apps = list: config_cli, app
 cleanups = list: config_cli, app, cli
+usage_config = object({'param': {'width': 1000}}): zensols.cli.UsageConfig
 
 [config_cli]
 class_name = zensols.cli.ConfigurationImporter
@@ -34,8 +35,8 @@ mnemonic_overrides = dict: {
 
 
 class Format(Enum):
-    one = auto()
-    two = auto()
+    txt = auto()
+    json = auto()
 
 
 @dataclass
@@ -48,7 +49,8 @@ class Application(object):
     """Whether to execute an action."""
 
     def print_employees(self, out_format: Format, employee_id: int = None):
-        """Show employee by ID (should not replace ``org_idd``).
+        """Output employee by ID with ``out_format`` (should not replace
+        ``org_id``).
 
         :param out_format: output format for employee with ID given by
                            ``employee_id``

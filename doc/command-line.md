@@ -806,21 +806,20 @@ only tuple array can be given.
 
 ### Docstring Command Line Help
 
-A very minimal Sphinx reST markup to replace command line artifacts is used to
-replace options, positional arguments, action names and the program name.  To
-refer to options in docstrings, use ``` :obj:`parameter_name` ``` to replace
-with command line switch and back ticks using the option names in the action
-method prototype.  Actions are replaced with ``` :meth:`method_name` ``` and
-the program name is replaced with `|prog|`.  Two back ticks are replaced with
-double quotes when not replacing a switch.  For example:
+A very minimal Sphinx reST markup replaces command line options, positional
+arguments, action names and the program name.  Switches are interpolated using
+``` :obj:`parameter_name` ```, and with backticks (``parameter_name``).
+Actions are replaced with ``` :meth:`method_name` ``` and the program name is
+replaced with `|prog|`.  Two backticks are replaced with double quotes when not
+replacing a switch.  For example:
 
 ```python
 from enum import Enum, auto
 
 
 class Format(Enum):
-    one = auto()
-    two = auto()
+    json = auto()
+    txt = auto()
 
 
 @dataclass
@@ -884,7 +883,7 @@ Options:
 
 Actions:
 emp <format>              show employee by id
-  format <one|two>        output format for employee with ID given by -e
+  format <json|txt>       output format for employee with ID given by -e
   -d, --dryrun            whether to execute an action
   -e, --empid INT         the id of the employee
 

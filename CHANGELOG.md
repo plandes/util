@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   `is_usage_visible=False` in `CLI_META`) such as prototyping actions and
   `zensols.cli.harness.ConfigFactoryAccessor`.
 - The `list` action is no longer a default in resource `cli-config.conf`.
-- Add argument switch substitution (i.e. `param_name` becomes ``-p`).
+- Add CLI artifact substitution (i.e. ``` :obj:`param_name` ``` becomes `-p`).
 
 
 ## [1.15.14] - 2025-11-26
