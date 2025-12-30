@@ -47,7 +47,7 @@ doc:
         url: 'https://cawdrey.readthedocs.io/en/latest/'
 build:
   table_appends:
-    tool.pixi.environments.test311:
-      features: ['pyver311', 'test311']
+    tool.pixi.environments.testlegacy:
+      features: ['pyverlegacy', 'testlegacy']
   pyproject_template_files:
     - test.toml

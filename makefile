@@ -29,7 +29,7 @@ showexample:
 .PHONY:			pytestlegacy
 pytestlegacy:		$(PY_PYPROJECT_FILE) $(PY_TEST_PRE_TARGETS)
 			@PYTHONPATH=$(PY_TEST_PATH) \
-			 $(PY_PX_BIN) run test311 ''$(PY_TEST_GLOB)''
+			 $(PY_PX_BIN) run testlegacy ''$(PY_TEST_GLOB)''
 
 
 # compare line output counts of examples as a poor man's integration test

@@ -1,8 +1,9 @@
 # Zensols Utilities
 
 [![PyPI][pypi-badge]][pypi-link]
-[![Python 3.12][python312-badge]][python312-link]
 [![Python 3.13][python313-badge]][python313-link]
+[![Python 3.12][python312-badge]][python312-link]
+[![Python 3.11][python311-badge]][python311-link]
 [![Build Status][build-badge]][build-link]
 
 Command line, configuration and persistence utilities generally used for any
@@ -197,6 +198,8 @@ Copyright (c) 2020 - 2026 Paul Landes
 [pypi]: https://pypi.org/project/zensols.util/
 [pypi-link]: https://pypi.python.org/pypi/zensols.util
 [pypi-badge]: https://img.shields.io/pypi/v/zensols.util.svg
+[python311-badge]: https://img.shields.io/badge/python-3.11-blue.svg
+[python311-link]: https://www.python.org/downloads/release/python-3110
 [python312-badge]: https://img.shields.io/badge/python-3.12-blue.svg
 [python312-link]: https://www.python.org/downloads/release/python-3120
 [python313-badge]: https://img.shields.io/badge/python-3.13-blue.svg
