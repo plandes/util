@@ -1,0 +1,7 @@
+[tool.pixi.feature.pyver311.dependencies]
+python = "~=3.11.12"
+
+[tool.pixi.feature.test311.tasks.test311]
+args = [{ "arg" = "glob_pat" }]
+env = { PYTHONPATH = "src" }
+cmd = "python -m unittest discover -s tests -p '{% raw %}{{glob_pat}}{% endraw %}' -v"

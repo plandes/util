@@ -26,7 +26,8 @@ class TestArgumentParse(LogTestCase):
         self.assertEqual('APIError: Test error', repr(fail))
         self.assertTrue(fail.traceback_str.startswith(
             'Traceback (most recent call last):'))
-        self.assertEqual(7, len(fail.traceback_str.split('\n')))
+        should = 8 if sys.version_info.minor > 12 else 7
+        self.assertEqual(should, len(fail.traceback_str.split('\n')))
 
     def test_raise(self):
         with self.assertRaisesRegex(APIError, r'^Test error.*'):
@@ -46,7 +47,8 @@ class TestArgumentParse(LogTestCase):
             traceback.print_exception(*sys.exc_info(), file=sio)
             ftrace = sio.getvalue()
         self.assertTrue(ftrace.startswith('Traceback (most recent call last):'))
-        self.assertEqual(11, len(ftrace.split('\n')))
+        should = 13 if sys.version_info.minor > 12 else 11
+        self.assertEqual(should, len(ftrace.split('\n')))
         with self.assertRaisesRegex(APIError, r'^Test error.*'):
             fail.rethrow()
 

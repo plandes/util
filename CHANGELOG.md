@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   `zensols.cli.harness.ConfigFactoryAccessor`.
 - The `list` action is no longer a default in resource `cli-config.conf`.
 - Add CLI artifact substitution (i.e. ``` :obj:`param_name` ``` becomes `-p`).
+- Add support for Python 3.13, but keep support for 3.11.
 
 
 ## [1.15.14] - 2025-11-26

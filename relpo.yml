@@ -21,13 +21,13 @@ project:
     # Python interpreter versions
     version:
       # constraint on install eligibility
-      required: '>=3.11,<3.13'
+      required: '>=3.11,<3.14'
       # last supported version of Python supported for the project
-      previous: '3.11.12'
+      previous: '3.12.10'
       # Python version supported for current development
-      current: '3.12.10'
+      current: '3.13.11'
       # version of Python used to build/link specific to the host
-      package_host: '3.11.6'
+      package_host: '3.12.10'
     # pypi dependencies added to 'project'
     dependencies:
       - 'frozendict~=2.4.6'
@@ -45,3 +45,9 @@ doc:
       frozendict:
         modules: ['frozendict']
         url: 'https://cawdrey.readthedocs.io/en/latest/'
+build:
+  table_appends:
+    tool.pixi.environments.test311:
+      features: ['pyver311', 'test311']
+  pyproject_template_files:
+    - test.toml

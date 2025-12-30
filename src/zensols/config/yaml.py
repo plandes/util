@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Tuple, Set, Any, Union
+from typing import Dict, Tuple, Set, Any, Type, Union
 import logging
 from pathlib import Path
 from io import TextIOBase, StringIO
@@ -96,7 +96,7 @@ class YamlConfig(TreeConfigurable):
         return content, struct, context
 
     def _make_class(self) -> type:
-        class_name = 'YamlTemplate{}'.format(self.CLASS_VER)
+        class_name = 'YamlTemplate{0}'.format(self.CLASS_VER)
         self.CLASS_VER += 1
         # note we have to give the option of different delimiters since the
         # default '$$' (use case=OS env vars) is always resolved to '$' given
@@ -112,9 +112,10 @@ from string import Template
 class """ + class_name + """(Template):
      idpattern = r'[a-z][_a-z0-9.]*'
      delimiter = '""" + self.delimiter + '\''
-        exec(code)
-        cls = eval(class_name)
-        return cls
+        # createa an explicit namespace for the exec call
+        namespace: Dict[Type, Any] = {}
+        exec(code, namespace)
+        return namespace[class_name]
 
     def _compile(self) -> Dict[str, Any]:
         content, struct, context = self._parse()

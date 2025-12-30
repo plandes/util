@@ -6,6 +6,7 @@
 PROJ_TYPE=		python
 PROJ_MODULES=		python/doc python/package python/deploy
 PY_TEST_ALL_TARGETS +=	testexamples
+PY_TEST_TARGETS ?=	pytestprev pytestcur pytestlegacy
 ADD_CLEAN +=		example/config/counter.dat
 
 
@@ -23,6 +24,13 @@ showexample:
 				'.environments_info|.[]|select(.name=="testcur").prefix' ))
 			@export PYTHONPATH=$(abspath .)/src ; \
 			 export PATH="$(pybin)/bin:$(PATH)" ; $(ARG)
+
+# run unit tests on previous Python version
+.PHONY:			pytestlegacy
+pytestlegacy:		$(PY_PYPROJECT_FILE) $(PY_TEST_PRE_TARGETS)
+			@PYTHONPATH=$(PY_TEST_PATH) \
+			 $(PY_PX_BIN) run test311 ''$(PY_TEST_GLOB)''
+
 
 # compare line output counts of examples as a poor man's integration test
 .PHONY:			testexample

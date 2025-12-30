@@ -202,7 +202,7 @@ class Configurable(Dictable, metaclass=ABCMeta):
 
         """
         val = self.get_option(name, section)
-        if val:
+        if val is not None:
             return self.serializer.parse_object(val)
 
     @property

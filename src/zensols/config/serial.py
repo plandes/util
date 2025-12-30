@@ -7,6 +7,7 @@ from typing import Dict, Union, Any, Set, Tuple, List, Iterable, Type
 from dataclasses import dataclass, field
 import logging
 import json
+from io import StringIO
 from json import JSONEncoder
 from itertools import chain
 import re
@@ -124,6 +125,7 @@ class Serializer(object):
             isinstance(value, self.allow_classes)
 
     def _parse_eval(self, pconfig: str, evalstr: str = None) -> str:
+        sio = StringIO()
         if pconfig is not None:
             pconfig = eval(pconfig)
             bad_keys = set(pconfig.keys()) - self._EVAL_KEYS
@@ -131,22 +133,31 @@ class Serializer(object):
                 raise ConfigurationError(
                     f'Unknown evaluation keys: {", ".join(bad_keys)}')
             if 'import' in pconfig:
-                imports = pconfig['import']
+                imports: str = pconfig['import']
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'imports: {imports}')
+                i: str
                 for i in imports:
                     if logger.isEnabledFor(logging.DEBUG):
                         logger.debug(f'importing: {i}')
                     if i.startswith('from'):
-                        exec(i)
+                        sio.write(f'{i}\n')
                     else:
-                        exec(f'import {i}')
+                        sio.write(f'import {i}\n')
             if 'resolve' in pconfig:
                 for k, v in pconfig['resolve'].items():
                     v = self.parse_object(v)
                     locals()[k] = v
         if evalstr is not None:
-            return eval(evalstr)
+            sio.write(f'__ret = {evalstr}\n')
+            code: str = sio.getvalue()
+            locs: Dict[str, Any] = {}
+            exec(code, None, locs)
+            ret: Any = locs['__ret']
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f'pconfig: <<{pconfig}>>, code: <<{code}>>, ' +
+                             f'ret: <<{ret}>>')
+            return ret
 
     def parse_list(self, v: str) -> List[str]:
         """Parse a comma separated list in to a string list.
