@@ -8,7 +8,6 @@ from dataclasses import dataclass, field
 import sys
 import os
 import logging
-import inspect
 from io import TextIOBase
 from pathlib import Path
 import shlex
@@ -180,24 +179,22 @@ class CliHarness(object):
 
     @property
     def invoke_method(self) -> str:
-        """Return how the program was invoked.
+        """The method in which the program was invoked.
 
         :return: one of ``eval`` for re-evaluating the file, ``repl`` from the
                  REPL or ``main`` for invocation from the main command line
 
         """
-        meth = None
-        finf: inspect.FrameInfo = inspect.stack()[-1]
-        mod_name = finf.frame.f_globals['__name__']
-        if mod_name == '__main__':
-            if finf.filename == '<stdin>':
-                meth = 'repl'
-            elif finf.filename == '<string>':
-                meth = 'eval'
-        meth = 'main' if meth is None else meth
+        meth: str = None
+        if sys.flags.interactive:
+            meth = 'repl'
+        elif len(sys.argv) > 0 and sys.argv[0] == '-c':
+            meth = 'eval'
+        else:
+            meth = 'main'
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'module name: {mod_name}, file: {finf.filename}, ' +
-                         f'method: {meth}')
+            logger.debug(f'interactive: {sys.flags.interactive}, '
+                         f'args: {sys.argv}, method: {meth}')
         return meth
 
     def _handle_exit(self, se: SystemExit):
@@ -258,8 +255,8 @@ class CliHarness(object):
         cur_path = Path('.')
         src_path = None
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'args: {args}')
-        if len(args) > 0:
+            logger.debug(f'relocate args: {args}')
+        if len(args) > 0 and len(args[0]) > 0:
             entry_path = Path(args[0]).parents[0]
             args = args[1:]
         if entry_path is None:
@@ -511,6 +508,8 @@ class CliHarness(object):
         :return: the application results if it did not try to exit
 
         """
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'proto args: {args}')
         if self.proto_header is not None:
             print(self.proto_header)
         args = self.proto_args if args is None else args
@@ -525,7 +524,9 @@ class CliHarness(object):
         :return: the application results if it did not exit
 
         """
-        invoke_method = self.invoke_method
+        invoke_method: str = self.invoke_method
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'run inovke method: {invoke_method}')
         if invoke_method == 'main':
             # when running from a shell, run the CLI entry point
             return self.invoke()
