@@ -526,7 +526,7 @@ class CliHarness(object):
         """
         invoke_method: str = self.invoke_method
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug(f'run inovke method: {invoke_method}')
+            logger.debug(f'run invoke method: {invoke_method}')
         if invoke_method == 'main':
             # when running from a shell, run the CLI entry point
             return self.invoke()

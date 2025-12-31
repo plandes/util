@@ -430,7 +430,7 @@ class CommandLineParser(Deallocatable, Dictable):
         # if only one option for second pass actions (of usage visible in help)
         # are given, the user need not give the action mnemonic/name, instead,
         # just add all its options to the top level
-        if len(self.config.second_pass_usage_visible_actions) == 1 and False:
+        if len(self.config.second_pass_usage_visible_actions) == 1:
             action_name = self.config.second_pass_usage_visible_actions[0].name
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'using singleton fp action: {action_name} ' +
