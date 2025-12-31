@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.16.1] - 2025-12-31
+### Changed
+- Fix deploy issue.
+
+
 ## [1.16.0] - 2025-12-31
 ### Changed
 - Whether to print usage is optional when raising `ApplicationError` but
@@ -745,7 +750,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.16.0...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.16.1...HEAD
+[1.16.1]: https://github.com/plandes/util/compare/v1.16.0...v1.16.1
 [1.16.0]: https://github.com/plandes/util/compare/v1.15.14...v1.16.0
 [1.15.14]: https://github.com/plandes/util/compare/v1.15.13...v1.15.14
 [1.15.13]: https://github.com/plandes/util/compare/v1.15.12...v1.15.13
