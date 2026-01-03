@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Fix ignoring of prototype methods.  This is fixed by adding a `is_prototype`
+  to `CLI_META`.
+
+
 ## [1.16.2] - 2025-12-31
 ### Changed
 - Fix run detection method (REPL vs command line).

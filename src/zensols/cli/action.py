@@ -112,6 +112,9 @@ class ActionCli(PersistableContainer, Dictable):
     is_usage_visible: bool = field(default=True)
     """Whether the action CLI is included in the usage help."""
 
+    is_prototype: bool = field(default=False)
+    """Whether the action is used for protyping."""
+
     sort_methods: bool = field(default=False)
     """Whether to sort methods, which has an effect on action usage."""
 
@@ -257,7 +260,8 @@ class ActionCli(PersistableContainer, Dictable):
                 options=tuple(sorted(meth_params)),
                 positional=tuple(pos_args),
                 first_pass=self.first_pass,
-                is_usage_visible=self.is_usage_visible)
+                is_usage_visible=self.is_usage_visible,
+                is_prototype=self.is_prototype)
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'adding metadata: {meta}')
             meths[name] = ActionCliMethod(meta, meth)

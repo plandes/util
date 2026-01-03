@@ -439,6 +439,9 @@ class ActionMetaData(PersistableContainer, Dictable):
     usage, is an example of where this is used.
 
     """
+    is_prototype: bool = field(default=False)
+    """Whether the action is used for protyping."""
+
     dest: str = field(default=None)
     """The the field/parameter name used to on the target class."""
 

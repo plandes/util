@@ -3,7 +3,7 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Tuple, List, Any, Dict, Iterable, Sequence
+from typing import Tuple, List, Any, Dict, Set, Iterable, Sequence
 from dataclasses import dataclass, field
 from enum import Enum
 import logging
@@ -131,6 +131,13 @@ class CommandLineConfig(PersistableContainer, Dictable):
     def second_pass_usage_visible_actions(self) -> Tuple[ActionMetaData, ...]:
         return tuple(filter(
             lambda a: not a.first_pass and a.is_usage_visible,
+            self.actions))
+
+    @property
+    @persisted('_second_pass_proto_actions')
+    def second_pass_prototype_actions(self) -> Tuple[ActionMetaData, ...]:
+        return tuple(filter(
+            lambda a: not a.first_pass and a.is_prototype,
             self.actions))
 
     @property
@@ -384,6 +391,14 @@ class CommandLineParser(Deallocatable, Dictable):
     def _parse_first_pass(self, args: List[str],
                           actions: List[CommandAction]) -> \
             Tuple[bool, str, Dict[str, Any], Dict[str, Any], Tuple[str, ...]]:
+
+        def is_proto() -> bool:
+            if len(args) > 0:
+                protos: Set[str] = set(map(
+                    lambda a: a.name, self.config.second_pass_prototype_actions))
+                return args[0] in protos
+            return False
+
         second_pass = False
         fp_opts = set(map(lambda o: o.dest, self.config.first_pass_options))
         # first fish out the action name (if given) as a positional parameter
@@ -430,7 +445,8 @@ class CommandLineParser(Deallocatable, Dictable):
         # if only one option for second pass actions (of usage visible in help)
         # are given, the user need not give the action mnemonic/name, instead,
         # just add all its options to the top level
-        if len(self.config.second_pass_usage_visible_actions) == 1:
+        if len(self.config.second_pass_usage_visible_actions) == 1 and \
+           not is_proto():
             action_name = self.config.second_pass_usage_visible_actions[0].name
             if logger.isEnabledFor(logging.DEBUG):
                 logger.debug(f'using singleton fp action: {action_name} ' +
