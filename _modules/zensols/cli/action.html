@@ -1,0 +1,976 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+        <title>zensols.cli.action - Zensols Utilities 1.16.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/codeautolink.css?v=57550ae3" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../top.html"><div class="brand">Zensols Utilities 1.16.3 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../top.html">
+  
+  <span class="sidebar-brand-text">Zensols Utilities 1.16.3 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../api.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../api/zensols.cli.html">zensols.cli package</a><input aria-label="Toggle navigation of zensols.cli package" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/zensols.config.html">zensols.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/zensols.introspect.html">zensols.introspect package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/zensols.multi.html">zensols.multi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/zensols.persist.html">zensols.persist package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/zensols.util.html">zensols.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../LICENSE.html">License</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for zensols.cli.action</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;A more object oriented data driven command line set of classes.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Paul Landes&#39;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">InitVar</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zensols.persist</span><span class="w"> </span><span class="kn">import</span> <span class="n">persisted</span><span class="p">,</span> <span class="n">PersistableContainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zensols.introspect</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Class</span><span class="p">,</span> <span class="n">ClassField</span><span class="p">,</span> <span class="n">ClassParam</span><span class="p">,</span> <span class="n">ClassMethod</span><span class="p">,</span> <span class="n">ClassMethodArg</span><span class="p">,</span>
+    <span class="n">ClassInspector</span><span class="p">,</span> <span class="n">ClassImporter</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zensols.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Configurable</span><span class="p">,</span> <span class="n">Dictable</span><span class="p">,</span> <span class="n">ConfigFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DocUtil</span><span class="p">,</span> <span class="n">ActionCliError</span><span class="p">,</span> <span class="n">PositionalMetaData</span><span class="p">,</span>
+    <span class="n">OptionMetaData</span><span class="p">,</span> <span class="n">ActionMetaData</span><span class="p">,</span> <span class="n">UsageConfig</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ActionCliManagerError">
+<a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.action.ActionCliManagerError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActionCliManagerError</span><span class="p">(</span><span class="n">ActionCliError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised by :class:`.ActionCliManager` for any problems creating</span>
+<span class="sd">    :class:`.ActionCli` instances.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="ActionCliMethod">
+<a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.action.ActionCliMethod">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActionCliMethod</span><span class="p">(</span><span class="n">Dictable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A &quot;married&quot; action meta data / class method pair.  This is a pair of</span>
+<span class="sd">    action meta data that describes how to interpret it as a CLI action and the</span>
+<span class="sd">    Python class meta data method, which is used later to invoke the action</span>
+<span class="sd">    (really command).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">action_meta_data</span><span class="p">:</span> <span class="n">ActionMetaData</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The action meta data for ``method``.&quot;&quot;&quot;</span>
+
+    <span class="n">method</span><span class="p">:</span> <span class="n">ClassMethod</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The method containing information about the source class method to invoke</span>
+<span class="sd">    later.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ActionCli">
+<a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.action.ActionCli">[docs]</a>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActionCli</span><span class="p">(</span><span class="n">PersistableContainer</span><span class="p">,</span> <span class="n">Dictable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A set of commands that is invokeable on the command line, one for each</span>
+<span class="sd">    registered method of a class (usually a :class:`dataclasses.dataclass`.</span>
+<span class="sd">    This contains meta data necesary to create a full usage command line</span>
+<span class="sd">    documentation and parse the user&#39;s input.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">section</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The application section to introspect.&quot;&quot;&quot;</span>
+
+    <span class="n">class_meta</span><span class="p">:</span> <span class="n">Class</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The target class meta data parsed by :class:`.ClassInspector`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">options</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">OptionMetaData</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Options added by :class:`.ActionCliManager`, which are those options</span>
+<span class="sd">    parsed by the entire class metadata.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mnemonic_includes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of mnemonicss to include, or all if ``None``.&quot;&quot;&quot;</span>
+
+    <span class="n">mnemonic_excludes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of mnemonicss to exclude, or none if ``None``.&quot;&quot;&quot;</span>
+
+    <span class="n">mnemonic_overrides</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The name of the action given on the command line, which defaults to the</span>
+<span class="sd">    name of the action.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">option_includes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of options to include, or all if ``None``.&quot;&quot;&quot;</span>
+
+    <span class="n">option_excludes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of options to exclude, or none if ``None``.&quot;&quot;&quot;</span>
+
+    <span class="n">option_overrides</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Overrides when creating new :class:`.OptionMetaData` where the keys are</span>
+<span class="sd">    the option names (field or method parameter) and the values are the dict</span>
+<span class="sd">    that clobbers respective keys.</span>
+
+<span class="sd">    :see: :meth:`.ActionCliManager._create_op_meta_data`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">first_pass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether or not this is a first pass action (i.e. such as setting the</span>
+<span class="sd">    level in :class:`~zensols.cli.LogConfigurator`).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">always_invoke</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;If ``True``, always invoke all methods for the action regardless if an</span>
+<span class="sd">    action mnemonic and options pertaining to the action are not given by the</span>
+<span class="sd">    user/command line.  This is useful for configuration first pass type</span>
+<span class="sd">    classes like :class:`.PackageInfoImporter` to force the CLI API to invoke</span>
+<span class="sd">    it, as otherwise there&#39;s no indication to the CLI that it needs to be</span>
+<span class="sd">    called.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">is_usage_visible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether the action CLI is included in the usage help.&quot;&quot;&quot;</span>
+
+    <span class="n">is_prototype</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether the action is used for protyping.&quot;&quot;&quot;</span>
+
+    <span class="n">sort_methods</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether to sort methods, which has an effect on action usage.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_option_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return ``True`` if the option is enabled and eligible to be added to</span>
+<span class="sd">        the command line.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">incs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">option_includes</span>
+        <span class="n">excs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">option_excludes</span>
+        <span class="n">enabled</span> <span class="o">=</span> <span class="p">((</span><span class="n">incs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">name</span> <span class="ow">in</span> <span class="n">incs</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;option </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> is enabled: </span><span class="si">{</span><span class="n">enabled</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">enabled</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_mnemonic_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return ``True`` if the action for the mnemonic is enabled and</span>
+<span class="sd">        eligible to be added to the command line.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">incs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnemonic_includes</span>
+        <span class="n">excs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnemonic_excludes</span>
+        <span class="n">enabled</span> <span class="o">=</span> <span class="p">((</span><span class="n">incs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">name</span> <span class="ow">in</span> <span class="n">incs</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">excs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;mnemonic </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">section</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> is enabled: </span><span class="si">{</span><span class="n">enabled</span><span class="si">}</span><span class="s1"> for &#39;</span> <span class="o">+</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">class_meta</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">: [inc=</span><span class="si">{</span><span class="n">incs</span><span class="si">}</span><span class="s1">,exc=</span><span class="si">{</span><span class="n">excs</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">enabled</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_option</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">omds</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">OptionMetaData</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an :class:`.OptionMetaData` from the previously collected</span>
+<span class="sd">        options.</span>
+
+<span class="sd">        :param name: the name of the option</span>
+
+<span class="sd">        :param omds: the set to populate from :obj:`options`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_option_enabled</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="n">opt</span><span class="p">:</span> <span class="n">OptionMetaData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="n">omds</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_normalize_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalize text of mneomincs and positional arguments.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@persisted</span><span class="p">(</span><span class="s1">&#39;_methods&#39;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">methods</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ActionCliMethod</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the methods for this action CLI with method name keys.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">meths</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ActionCliMethod</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="n">field_params</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">OptionMetaData</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">meth_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_meta</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_usage_visible</span><span class="p">:</span>
+            <span class="c1"># add the dataclass fields that will populate the CLI as options</span>
+            <span class="n">f</span><span class="p">:</span> <span class="n">ClassField</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_meta</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_add_option</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">field_params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sort_methods</span><span class="p">:</span>
+            <span class="n">meth_keys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">meth_keys</span><span class="p">)</span>
+        <span class="c1"># create an action from each method</span>
+        <span class="n">dest</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="k">for</span> <span class="n">dest</span> <span class="ow">in</span> <span class="n">meth_keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;creating method </span><span class="si">{</span><span class="n">dest</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">dest</span>
+            <span class="n">meth</span><span class="p">:</span> <span class="n">ClassMethod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_meta</span><span class="o">.</span><span class="n">methods</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="n">meth_params</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">OptionMetaData</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">field_params</span><span class="p">)</span>
+            <span class="n">pos_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">PositionalMetaData</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">arg</span><span class="p">:</span> <span class="n">ClassMethodArg</span>
+            <span class="c1"># add positionl arguments from the class meta data</span>
+            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">meth</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_positional</span><span class="p">:</span>
+                    <span class="n">opt</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="n">pdoc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">doc</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">arg</span><span class="o">.</span><span class="n">doc</span><span class="o">.</span><span class="n">text</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">option_overrides</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">opt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">option_overrides</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="c1"># first try to get it from any mapping from the long name</span>
+                    <span class="k">if</span> <span class="n">opt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="s1">&#39;long_name&#39;</span> <span class="ow">in</span> <span class="n">opt</span><span class="p">:</span>
+                        <span class="n">pname</span> <span class="o">=</span> <span class="n">opt</span><span class="p">[</span><span class="s1">&#39;long_name&#39;</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># use the argument name in the method but normalize it</span>
+                        <span class="c1"># to make it appear in CLI parlance</span>
+                        <span class="n">pname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_name</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="n">pmeta</span> <span class="o">=</span> <span class="n">PositionalMetaData</span><span class="p">(</span>
+                        <span class="n">pname</span><span class="p">,</span> <span class="n">arg</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">arg</span><span class="o">.</span><span class="n">inner_types</span><span class="p">,</span> <span class="n">pdoc</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">opt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">poverridess</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span>
+                        <span class="n">poverridess</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;long_name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="n">pmeta</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">poverridess</span><span class="p">)</span>
+                    <span class="n">pos_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pmeta</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;adding option: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_add_option</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">meth_params</span><span class="p">)</span>
+            <span class="c1"># skip disabled mnemonics (using mnemonic_includes)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_mnemonic_enabled</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="c1"># customize mnemonic/action data if given (either string names, or</span>
+            <span class="c1"># dictionaries with more information)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnemonic_overrides</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> \
+               <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnemonic_overrides</span><span class="p">:</span>
+                <span class="n">override</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnemonic_overrides</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">override</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">override</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">override</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">o_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">override</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+                    <span class="n">option_includes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">override</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;option_includes&#39;</span><span class="p">)</span>
+                    <span class="n">option_excludes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">override</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;option_excludes&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">o_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">name</span> <span class="o">=</span> <span class="n">o_name</span>
+                    <span class="k">if</span> <span class="n">option_includes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">meth_params</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">OptionMetaData</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+                            <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">dest</span> <span class="ow">in</span> <span class="n">option_includes</span><span class="p">,</span>
+                                   <span class="n">meth_params</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">option_excludes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">meth_params</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">OptionMetaData</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+                            <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">o</span><span class="p">:</span> <span class="n">o</span><span class="o">.</span><span class="n">dest</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">option_excludes</span><span class="p">,</span>
+                                   <span class="n">meth_params</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ActionCliManagerError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;unknown override: </span><span class="si">{</span><span class="n">override</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">override</span><span class="p">)</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># no underscores in the CLI action names</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="c1"># get the action help from the method if available, then class</span>
+            <span class="k">if</span> <span class="n">meth</span><span class="o">.</span><span class="n">doc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">doc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_meta</span><span class="o">.</span><span class="n">doc</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">doc</span> <span class="o">=</span> <span class="n">meth</span><span class="o">.</span><span class="n">doc</span>
+            <span class="k">if</span> <span class="n">doc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">doc</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">doc</span> <span class="o">=</span> <span class="n">DocUtil</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+            <span class="c1"># add the meta data</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="n">ActionMetaData</span><span class="p">(</span>
+                <span class="n">dest</span><span class="o">=</span><span class="n">dest</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">doc</span><span class="o">=</span><span class="n">doc</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">meth_params</span><span class="p">)),</span>
+                <span class="n">positional</span><span class="o">=</span><span class="nb">tuple</span><span class="p">(</span><span class="n">pos_args</span><span class="p">),</span>
+                <span class="n">first_pass</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">first_pass</span><span class="p">,</span>
+                <span class="n">is_usage_visible</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_usage_visible</span><span class="p">,</span>
+                <span class="n">is_prototype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_prototype</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;adding metadata: </span><span class="si">{</span><span class="n">meta</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">meths</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ActionCliMethod</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">meth</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">meths</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@persisted</span><span class="p">(</span><span class="s1">&#39;_meta_datas&#39;</span><span class="p">,</span> <span class="n">deallocate_recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">meta_datas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ActionMetaData</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return action meta data across all methods.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span></div>
+
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">action_meta_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+
+<div class="viewcode-block" id="ActionCliManager">
+<a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.action.ActionCliManager">[docs]</a>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ActionCliManager</span><span class="p">(</span><span class="n">PersistableContainer</span><span class="p">,</span> <span class="n">Dictable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages instances of :class:`.ActionCli`.  An :class:`.ActionCli` is</span>
+<span class="sd">    created from the configuration given by the section.  Optionally, another</span>
+<span class="sd">    section using :obj:`decorator_section_format` will be read to add additional</span>
+<span class="sd">    metadata and configuration to instantiated object.  The decorated</span>
+<span class="sd">    information is used to help bridge between the class given to be</span>
+<span class="sd">    instantiated and the CLI.</span>
+
+<span class="sd">    :see: :obj:`actions`</span>
+
+<span class="sd">    :see: :obj:`actions_by_meta_data_name`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">SECTION</span> <span class="o">=</span> <span class="s1">&#39;cli&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The application context section.&quot;&quot;&quot;</span>
+
+    <span class="n">CLASS_META_ATTRIBUTE</span> <span class="o">=</span> <span class="s1">&#39;CLI_META&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The class level attribute on application classes containing a stand in</span>
+<span class="sd">    (otherwise missing section configuration :class:`.ActionCli`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_CLI_META_ATTRIBUTE_NAMES</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
+        <span class="p">(</span><span class="s1">&#39;mnemonic_includes mnemonic_excludes mnemonic_overrides &#39;</span> <span class="o">+</span>
+         <span class="s1">&#39;option_includes option_excludes option_overrides&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of keys used in the static class metadata variable named</span>
+<span class="sd">    :obj:`CLASS_META_ATTRIBUTE`, which is used to merge static class CLI</span>
+<span class="sd">    metadata.</span>
+
+<span class="sd">    :see: :meth:`combine_meta`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_CLASS_IMPORTERS</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolved class cache (see :meth:`_resolve_class`).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config_factory</span><span class="p">:</span> <span class="n">ConfigFactory</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The configuration factory used to create :class:`.ActionCli` instances.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">apps</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The application section names.&quot;&quot;&quot;</span>
+
+    <span class="n">cleanups</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The sections to remove after the application is built.&quot;&quot;&quot;</span>
+
+    <span class="n">app_removes</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes apps from :obj:`apps`, which is helpful when a single section to</span>
+<span class="sd">    remove is needed when importing from other files.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cleanup_removes</span><span class="p">:</span> <span class="n">InitVar</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clean ups to remove from :obj:`cleanups`, which is helpful when a single</span>
+<span class="sd">    section to remove is needed when importing from other files.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">decorator_section_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{section}</span><span class="s1">_decorator&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format of :class:`.ActionCli` configuration classes.&quot;&quot;&quot;</span>
+
+    <span class="n">doc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The application documentation.&quot;&quot;&quot;</span>
+
+    <span class="n">default_action</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The default mnemonic use when the user does not supply one.</span>
+
+<span class="sd">    :see: :obj:`.CommandLineParser.default_action`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">force_default</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;When `True``, the command parsing will insert the default action when the</span>
+<span class="sd">    first non-option isn&#39;t found as an action.  However, this leads to</span>
+<span class="sd">    ambiguouity in identifiction of the action and is inefficient.</span>
+
+<span class="sd">    :see: :obj:`.CommandLineParser.force_default`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">usage_config</span><span class="p">:</span> <span class="n">UsageConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">UsageConfig</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuraiton information for the command line help.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_removes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">cleanup_removes</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">app_removes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">apps</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+                <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">app_removes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">cleanup_removes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanups</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cleanups</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+                <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cleanup_removes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanups</span><span class="p">))</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_combine_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Type</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+                      <span class="n">target</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">keys</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">keys</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_CLI_META_ATTRIBUTE_NAMES</span> <span class="o">&amp;</span> <span class="n">source</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">src_val</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+            <span class="n">targ_val</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attr</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;attr: </span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">src_val</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">targ_val</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">src_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">targ_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src_val</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">both_keys</span> <span class="o">=</span> <span class="n">src_val</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">|</span> <span class="n">targ_val</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">both_keys</span><span class="p">:</span>
+                        <span class="n">sv</span> <span class="o">=</span> <span class="n">src_val</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                        <span class="n">tv</span> <span class="o">=</span> <span class="n">targ_val</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">sv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">tv</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>\
+                           <span class="nb">isinstance</span><span class="p">(</span><span class="n">sv</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tv</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                            <span class="n">targ_val</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tv</span> <span class="o">|</span> <span class="n">sv</span>
+                            <span class="n">src_val</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tv</span> <span class="o">|</span> <span class="n">sv</span>
+                <span class="n">target</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">targ_val</span> <span class="o">|</span> <span class="n">src_val</span>
+            <span class="k">elif</span> <span class="n">src_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">target</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">src_val</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+<div class="viewcode-block" id="ActionCliManager.combine_meta">
+<a class="viewcode-back" href="../../../api/zensols.cli.html#zensols.cli.action.ActionCliManager.combine_meta">[docs]</a>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;result: </span><span class="si">{</span><span class="n">target</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">combine_meta</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Type</span><span class="p">,</span> <span class="n">parent</span><span class="p">:</span> <span class="n">Type</span><span class="p">,</span> <span class="n">cli_meta</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Merge static class CLI metadata of the variable named</span>
+<span class="sd">        :obj:`CLASS_META_ATTRIBUTE`.</span>
+
+<span class="sd">        :param self: this class</span>
+
+<span class="sd">        :param parent: the parent class of the caller, which is used to get the</span>
+<span class="sd">                       parent classes CLI metadata to merge</span>
+
+<span class="sd">        :param cli_meta: the metadata identified by the</span>
+<span class="sd">                         :obj:`CLASS_META_ATTRIBUTE`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">classes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Type</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">parent</span><span class="p">]</span>
+        <span class="n">classes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">)</span>
+        <span class="n">cli_meta</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">cli_meta</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">ans</span> <span class="ow">in</span> <span class="n">classes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ans</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">CLASS_META_ATTRIBUTE</span><span class="p">):</span>
+                <span class="n">meta</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ans</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">CLASS_META_ATTRIBUTE</span><span class="p">)</span></div>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_combine_meta</span><span class="p">(</span><span class="n">meta</span><span class="p">,</span> <span class="n">cli_meta</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cli_meta</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Configurable</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span><span class="o">.</span><span class="n">config</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_short_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">long_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Auto generate  a single letter short option name.</span>
+
+<span class="sd">        :param long_name: the name from which to pick a letter</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">long_name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_short_names</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;adding short name for </span><span class="si">{</span><span class="n">long_name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">c</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_short_names</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">c</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_op_meta_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pmeta</span><span class="p">:</span> <span class="n">ClassParam</span><span class="p">,</span> <span class="n">meth</span><span class="p">:</span> <span class="n">ClassMethod</span><span class="p">,</span>
+                             <span class="n">action_cli</span><span class="p">:</span> <span class="n">ActionCli</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptionMetaData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an option meta data used in the CLI from a method parsed from</span>
+<span class="sd">        the class&#39;s Python source code.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">meta</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">action_cli</span><span class="o">.</span><span class="n">_is_option_enabled</span><span class="p">(</span><span class="n">pmeta</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+            <span class="n">long_name</span> <span class="o">=</span> <span class="n">pmeta</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">short_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_short_name</span><span class="p">(</span><span class="n">long_name</span><span class="p">)</span>
+            <span class="n">dest</span> <span class="o">=</span> <span class="n">pmeta</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">pmeta</span><span class="o">.</span><span class="n">dtype</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="n">pmeta</span><span class="o">.</span><span class="n">doc</span>
+            <span class="k">if</span> <span class="n">doc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">meth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">meth</span><span class="o">.</span><span class="n">doc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="n">doc</span> <span class="o">=</span> <span class="n">meth</span><span class="o">.</span><span class="n">doc</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">long_name</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">doc</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">text</span>
+            <span class="k">if</span> <span class="n">doc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">doc</span> <span class="o">=</span> <span class="n">DocUtil</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="n">long_name</span><span class="p">,</span>
+                <span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="n">short_name</span><span class="p">,</span>
+                <span class="s1">&#39;dest&#39;</span><span class="p">:</span> <span class="n">dest</span><span class="p">,</span>
+                <span class="s1">&#39;dtype&#39;</span><span class="p">:</span> <span class="n">dtype</span><span class="p">,</span>
+                <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="n">pmeta</span><span class="o">.</span><span class="n">default</span><span class="p">,</span>
+                <span class="s1">&#39;doc&#39;</span><span class="p">:</span> <span class="n">doc</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">action_cli</span><span class="o">.</span><span class="n">option_overrides</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">overrides</span> <span class="o">=</span> <span class="n">action_cli</span><span class="o">.</span><span class="n">option_overrides</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pmeta</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">overrides</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">overrides</span><span class="p">)</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="n">OptionMetaData</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;created option meta: </span><span class="si">{</span><span class="n">meta</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">meta</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">omd</span><span class="p">:</span> <span class="n">OptionMetaData</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds the field by name that will later be used in a</span>
+<span class="sd">        :class:`.ActionCli`.</span>
+
+<span class="sd">        :raises ActionCliManagerError: if ``name`` has already been</span>
+<span class="sd">                                       *registered*</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prexist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fields</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prexist</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># we have to skip the short option compare since</span>
+            <span class="c1"># ``_create_op_meta_data`` reassigns a new letter for all created</span>
+            <span class="c1"># options</span>
+            <span class="n">prexist</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">prexist</span><span class="p">)</span>
+            <span class="n">prexist</span><span class="o">.</span><span class="n">short_name</span> <span class="o">=</span> <span class="n">omd</span><span class="o">.</span><span class="n">short_name</span>
+            <span class="k">if</span> <span class="n">omd</span> <span class="o">!=</span> <span class="n">prexist</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ActionCliManagerError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;duplicate field </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">omd</span><span class="si">}</span><span class="s1"> in &#39;</span> <span class="o">+</span>
+                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">section</span><span class="si">}</span><span class="s1"> but not equal to </span><span class="si">{</span><span class="n">prexist</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">omd</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">ActionCli</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds add an action for each method parsed from the action cli Python</span>
+<span class="sd">        source code.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">section</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actions</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ActionCliError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Duplicate action for section: </span><span class="si">{</span><span class="n">action</span><span class="o">.</span><span class="n">section</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># for each dataclass field used to create OptionMetaData&#39;s</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">fmd</span> <span class="ow">in</span> <span class="n">action</span><span class="o">.</span><span class="n">class_meta</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">omd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_op_meta_data</span><span class="p">(</span><span class="n">fmd</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">omd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_add_field</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">section</span><span class="p">,</span> <span class="n">fmd</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">omd</span><span class="p">)</span>
+        <span class="n">meth</span><span class="p">:</span> <span class="n">ClassMethod</span>
+        <span class="c1"># add a field for the arguments of each method</span>
+        <span class="k">for</span> <span class="n">meth</span> <span class="ow">in</span> <span class="n">action</span><span class="o">.</span><span class="n">class_meta</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">arg</span><span class="p">:</span> <span class="n">ClassMethodArg</span>
+            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">meth</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+                <span class="c1"># positional arguments are only referenced in the</span>
+                <span class="c1"># ClassInspector parsed source code</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_positional</span><span class="p">:</span>
+                    <span class="n">omd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_op_meta_data</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">meth</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">omd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_add_field</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">section</span><span class="p">,</span> <span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">omd</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_actions</span><span class="p">[</span><span class="n">action</span><span class="o">.</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">action</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">type</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve a class using the caching those already dynamically resolved.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cls_imp</span><span class="p">:</span> <span class="n">ClassImporter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_CLASS_IMPORTERS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">class_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cls_imp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># resolve the string fully qualified class name to a Python class</span>
+            <span class="c1"># type</span>
+            <span class="n">cls_imp</span> <span class="o">=</span> <span class="n">ClassImporter</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">reload</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="n">cls_imp</span><span class="o">.</span><span class="n">get_class</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_CLASS_IMPORTERS</span><span class="p">[</span><span class="n">class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cls_imp</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;storing cachced </span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="n">cls_imp</span><span class="o">.</span><span class="n">get_class</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">cls</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_action_from_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">conf_sec</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                                    <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ActionCli</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an action from a section in the configuration.  If both the</span>
+<span class="sd">        class ``CLI_META`` and the decorator section exists, then this will</span>
+<span class="sd">        replace all options (properties) defined.</span>
+
+<span class="sd">        :param conf_sec: the section name in the configuration that has the</span>
+<span class="sd">                         action to create/overwrite the data</span>
+
+<span class="sd">        :param params: the parameters used to create the :class:`.ActionCli`</span>
+<span class="sd">                       from the decorator</span>
+
+<span class="sd">        :return: an instance of :class:`.ActionCli` that represents the what is</span>
+<span class="sd">                 given in the configuration section</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sec</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span>
+            <span class="p">{},</span> <span class="n">section</span><span class="o">=</span><span class="n">conf_sec</span><span class="p">)</span>
+        <span class="n">cn_attr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">ConfigFactory</span><span class="o">.</span><span class="n">CLASS_NAME</span>
+        <span class="n">sec</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">cn_attr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cn_attr</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="n">cn_attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">ClassImporter</span><span class="o">.</span><span class="n">full_classname</span><span class="p">(</span><span class="n">ActionCli</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_combine_meta</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;creating action from section </span><span class="si">{</span><span class="n">conf_sec</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">sec</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span><span class="o">.</span><span class="n">instance</span><span class="p">(</span><span class="n">conf_sec</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">ActionCli</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ActionCliManagerError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Section instance </span><span class="si">{</span><span class="n">conf_sec</span><span class="si">}</span><span class="s1"> is not a class of &#39;</span> <span class="o">+</span>
+                <span class="sa">f</span><span class="s1">&#39;type ActionCli, but </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">action</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_add_app</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an :class:`.ActionCli` instanced from the configuration given by</span>
+<span class="sd">        a section.  The application is added to :obj:`._actions`.  The section</span>
+<span class="sd">        is parsed and use to instantiate an object using</span>
+<span class="sd">        :class:`~zensols.config.factory.ImportConfigFactory`.</span>
+
+<span class="sd">        Optionally, another section using :obj:`decorator_section_format` will</span>
+<span class="sd">        be read to add additional metadata and configuration to instantiated</span>
+<span class="sd">        object.  See the class docs.</span>
+
+<span class="sd">        :param section: indicates which section to use with config factory</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">class_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">&#39;class_name&#39;</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;building CLI on class: </span><span class="si">{</span><span class="n">class_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># resolve the string fully qualified class name to a Python class type</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_class</span><span class="p">(</span><span class="n">class_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;resolved to class: </span><span class="si">{</span><span class="bp">cls</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">is_dataclass</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ActionCliError</span><span class="p">(</span><span class="s1">&#39;application CLI app must be a dataclass&#39;</span><span class="p">)</span>
+        <span class="c1"># parse the source Python code for the class</span>
+        <span class="n">inspector</span> <span class="o">=</span> <span class="n">ClassInspector</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">meta</span><span class="p">:</span> <span class="n">Class</span> <span class="o">=</span> <span class="n">inspector</span><span class="o">.</span><span class="n">get_class</span><span class="p">()</span>
+        <span class="c1"># parameters to create the application with the config factory</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;section&#39;</span><span class="p">:</span> <span class="n">section</span><span class="p">,</span>
+                  <span class="s1">&#39;class_meta&#39;</span><span class="p">:</span> <span class="n">meta</span><span class="p">,</span>
+                  <span class="s1">&#39;options&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fields</span><span class="p">}</span>
+        <span class="n">conf_sec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decorator_section_format</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="s1">&#39;section&#39;</span><span class="p">:</span> <span class="n">section</span><span class="p">})</span>
+        <span class="c1"># start with class level meta data, allowing it to be overriden at the</span>
+        <span class="c1"># application configuration level; note: tested with</span>
+        <span class="c1"># `mnemonic_includes`, which appears to merge dictionaries, which is</span>
+        <span class="c1"># probably the new 3.9 dictionary set union operations working by</span>
+        <span class="c1"># default</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">CLASS_META_ATTRIBUTE</span><span class="p">):</span>
+            <span class="n">cmconf</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">CLASS_META_ATTRIBUTE</span><span class="p">)</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">cmconf</span><span class="p">)</span>
+        <span class="c1"># if we found a decorator action cli config section, use it to set the</span>
+        <span class="c1"># configuraiton of the CLI interacts</span>
+        <span class="k">if</span> <span class="n">conf_sec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;found configuration section: </span><span class="si">{</span><span class="n">conf_sec</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_action_from_section</span><span class="p">(</span><span class="n">conf_sec</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># use a default with parameters collected</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="n">ActionCli</span><span class="p">(</span><span class="o">**</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;created action: </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_action</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@persisted</span><span class="p">(</span><span class="s1">&#39;_actions_pw&#39;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">actions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ActionCli</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a list of action CLIs that is used in :class:`.CommandLineParser`</span>
+<span class="sd">        to create instances of the application.  Each action CLI has a</span>
+<span class="sd">        collection of :class:`.ActionMetaData` instances.</span>
+
+<span class="sd">        :return: keys are the configuration sections with the action CLIs as</span>
+<span class="sd">                 values</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_short_names</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;h&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fields</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">OptionMetaData</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_actions</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ActionCli</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">app</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">apps</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_add_app</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+            <span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actions</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actions</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_short_names</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fields</span>
+        <span class="k">return</span> <span class="n">actions</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@persisted</span><span class="p">(</span><span class="s1">&#39;_actions_ordered&#39;</span><span class="p">,</span> <span class="n">deallocate_recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">actions_ordered</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ActionCli</span><span class="p">,</span> <span class="o">...</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all actions in the order they were given in the configuration.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">acts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">first_pass</span><span class="p">,</span> <span class="n">acts</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="n">sp</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="ow">not</span> <span class="n">a</span><span class="o">.</span><span class="n">first_pass</span><span class="p">,</span> <span class="n">acts</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">([</span><span class="n">fp</span><span class="p">,</span> <span class="n">sp</span><span class="p">]))</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@persisted</span><span class="p">(</span><span class="s1">&#39;_actions_by_meta_data_name_pw&#39;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">actions_by_meta_data_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ActionCli</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a dict of :class:`.ActionMetaData` instances, each of which is</span>
+<span class="sd">        each mnemonic by name and the meta data by values.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">action</span><span class="p">:</span> <span class="n">ActionCli</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">meta</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">ActionMetaData</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">meta</span> <span class="ow">in</span> <span class="n">action</span><span class="o">.</span><span class="n">meta_datas</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">meta</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ActionCliError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Duplicate meta data: </span><span class="si">{</span><span class="n">meta</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">actions</span><span class="p">[</span><span class="n">meta</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">action</span>
+        <span class="k">return</span> <span class="n">actions</span>
+</div>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_dictable_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span> <span class="s1">&#39;actions&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026 Paul Landes
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../_static/documentation_options.js?v=d5528024"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

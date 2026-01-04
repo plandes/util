@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+
+<html class="no-js" data-content_root="./" lang="en">
+<head><meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/><meta content="width=device-width, initial-scale=1" name="viewport">
+<link href="genindex.html" rel="index" title="Index"/><link href="search.html" rel="search" title="Search"/><link href="doc/command-line.html" rel="next" title="Command Line Interface"/><link href="top.html" rel="prev" title="Zensols Utilities"/>
+<!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+<title>Zensols Utilities - Zensols Utilities 1.16.3 documentation</title>
+<link href="_static/pygments.css?v=03e43079" rel="stylesheet" type="text/css">
+<link href="_static/styles/furo.css?v=7bdb33bb" rel="stylesheet" type="text/css">
+<link href="_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css">
+<link href="_static/sphinx-codeautolink.css?v=b2176991" rel="stylesheet" type="text/css">
+<link href="_static/graphviz.css" rel="stylesheet" type="text/css"/>
+<link href="_static/styles/furo-extensions.css?v=8dab3a3b" rel="stylesheet" type="text/css"/>
+<link href="_static/codeautolink.css?v=57550ae3" rel="stylesheet" type="text/css"/>
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></link></link></link></link></meta></head>
+<body>
+<script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+<svg style="display: none;" xmlns="http://www.w3.org/2000/svg">
+<symbol id="svg-toc" viewbox="0 0 24 24">
+<title>Contents</title>
+<svg fill="currentColor" stroke="currentColor" stroke-width="0" viewbox="0 0 1024 1024">
+<path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"></path>
+</svg>
+</symbol>
+<symbol id="svg-menu" viewbox="0 0 24 24">
+<title>Menu</title>
+<svg class="feather-menu" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<line x1="3" x2="21" y1="12" y2="12"></line>
+<line x1="3" x2="21" y1="6" y2="6"></line>
+<line x1="3" x2="21" y1="18" y2="18"></line>
+</svg>
+</symbol>
+<symbol id="svg-arrow-right" viewbox="0 0 24 24">
+<title>Expand</title>
+<svg class="feather-chevron-right" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<polyline points="9 18 15 12 9 6"></polyline>
+</svg>
+</symbol>
+<symbol id="svg-sun" viewbox="0 0 24 24">
+<title>Light mode</title>
+<svg class="feather-sun" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle cx="12" cy="12" r="5"></circle>
+<line x1="12" x2="12" y1="1" y2="3"></line>
+<line x1="12" x2="12" y1="21" y2="23"></line>
+<line x1="4.22" x2="5.64" y1="4.22" y2="5.64"></line>
+<line x1="18.36" x2="19.78" y1="18.36" y2="19.78"></line>
+<line x1="1" x2="3" y1="12" y2="12"></line>
+<line x1="21" x2="23" y1="12" y2="12"></line>
+<line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line>
+<line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line>
+</svg>
+</symbol>
+<symbol id="svg-moon" viewbox="0 0 24 24">
+<title>Dark mode</title>
+<svg class="icon-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0h24v24H0z" fill="none" stroke="none"></path>
+<path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+</svg>
+</symbol>
+<symbol id="svg-sun-with-moon" viewbox="0 0 24 24">
+<title>Auto light/dark, in light mode</title>
+<svg class="icon-custom-derived-from-feather-sun-and-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z" style="opacity: 50%"></path>
+<line x1="14.5" x2="14.5" y1="3.25" y2="1.25"></line>
+<line x1="14.5" x2="14.5" y1="15.85" y2="17.85"></line>
+<line x1="10.044" x2="8.63" y1="5.094" y2="3.68"></line>
+<line x1="19" x2="20.414" y1="14.05" y2="15.464"></line>
+<line x1="8.2" x2="6.2" y1="9.55" y2="9.55"></line>
+<line x1="20.8" x2="22.8" y1="9.55" y2="9.55"></line>
+<line x1="10.044" x2="8.63" y1="14.006" y2="15.42"></line>
+<line x1="19" x2="20.414" y1="5.05" y2="3.636"></line>
+<circle cx="14.5" cy="9.55" r="3.6"></circle>
+</svg>
+</symbol>
+<symbol id="svg-moon-with-sun" viewbox="0 0 24 24">
+<title>Auto light/dark, in dark mode</title>
+<svg class="icon-custom-derived-from-feather-sun-and-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"></path>
+<line style="opacity: 50%" x1="18" x2="18" y1="3.705" y2="2.5"></line>
+<line style="opacity: 50%" x1="18" x2="18" y1="11.295" y2="12.5"></line>
+<line style="opacity: 50%" x1="15.316" x2="14.464" y1="4.816" y2="3.964"></line>
+<line style="opacity: 50%" x1="20.711" x2="21.563" y1="10.212" y2="11.063"></line>
+<line style="opacity: 50%" x1="14.205" x2="13.001" y1="7.5" y2="7.5"></line>
+<line style="opacity: 50%" x1="21.795" x2="23" y1="7.5" y2="7.5"></line>
+<line style="opacity: 50%" x1="15.316" x2="14.464" y1="10.184" y2="11.036"></line>
+<line style="opacity: 50%" x1="20.711" x2="21.563" y1="4.789" y2="3.937"></line>
+<circle cx="18" cy="7.5" r="2.169" style="opacity: 50%"></circle>
+</svg>
+</symbol>
+<symbol id="svg-pencil" viewbox="0 0 24 24">
+<svg class="icon-tabler-pencil-code" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"></path>
+<path d="M13.5 6.5l4 4"></path>
+<path d="M20 21l2 -2l-2 -2"></path>
+<path d="M17 17l-2 2l2 2"></path>
+</svg>
+</symbol>
+<symbol id="svg-eye" viewbox="0 0 24 24">
+<svg class="icon-tabler-eye-code" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0h24v24H0z" fill="none" stroke="none"></path>
+<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+<path d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008"></path>
+<path d="M20 21l2 -2l-2 -2"></path>
+<path d="M17 17l-2 2l2 2"></path>
+</svg>
+</symbol>
+</svg>
+<input aria-label="Toggle site navigation sidebar" class="sidebar-toggle" id="__navigation" name="__navigation" type="checkbox"/>
+<input aria-label="Toggle table of contents sidebar" class="sidebar-toggle" id="__toc" name="__toc" type="checkbox"/>
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+<div class="page">
+<header class="mobile-header">
+<div class="header-left">
+<label class="nav-overlay-icon" for="__navigation">
+<span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+</label>
+</div>
+<div class="header-center">
+<a href="top.html"><div class="brand">Zensols Utilities 1.16.3 documentation</div></a>
+</div>
+<div class="header-right">
+<div class="theme-toggle-container theme-toggle-header">
+<button aria-label="Toggle Light / Dark / Auto color theme" class="theme-toggle">
+<svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+<svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+<svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+<svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+</button>
+</div>
+<label class="toc-overlay-icon toc-header-icon" for="__toc">
+<span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+</label>
+</div>
+</header>
+<aside class="sidebar-drawer">
+<div class="sidebar-container">
+<div class="sidebar-sticky"><a class="sidebar-brand" href="top.html">
+<span class="sidebar-brand-text">Zensols Utilities 1.16.3 documentation</span>
+</a><form action="search.html" class="sidebar-search-container" method="get" role="search">
+<input aria-label="Search" class="sidebar-search" name="q" placeholder="Search"/>
+<input name="check_keywords" type="hidden" value="yes"/>
+<input name="area" type="hidden" value="default"/>
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="doc/persist.html">Persistence</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api/zensols.cli.html">zensols.cli package</a><input aria-label="Toggle navigation of zensols.cli package" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+</ul>
+</input></li>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.config.html">zensols.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.introspect.html">zensols.introspect package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.multi.html">zensols.multi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.persist.html">zensols.persist package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/zensols.util.html">zensols.util package</a></li>
+</ul>
+</input></li>
+<li class="toctree-l1"><a class="reference internal" href="CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="LICENSE.html">License</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<div class="main">
+<div class="content">
+<div class="article-container">
+<a class="back-to-top muted-link" href="#">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+</svg>
+<span>Back to top</span>
+</a>
+<div class="content-icon-container">
+<div class="view-this-page">
+<a class="muted-link" href="_sources/index.md.txt" title="View this page">
+<svg><use href="#svg-eye"></use></svg>
+<span class="visually-hidden">View this page</span>
+</a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+<button aria-label="Toggle Light / Dark / Auto color theme" class="theme-toggle">
+<svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+<svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+<svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+<svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+</button>
+</div>
+<label class="toc-overlay-icon toc-content-icon" for="__toc">
+<span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+</label>
+</div>
+<article id="furo-main-content" role="main">
+<section id="zensols-utilities">
+<h1>Zensols Utilities<a class="headerlink" href="#zensols-utilities" title="Link to this heading">¶</a></h1>
+<p><a class="reference external" href="https://pypi.python.org/pypi/zensols.util"><img alt="PyPI" src="https://img.shields.io/pypi/v/zensols.util.svg"/></a>
+<a class="reference external" href="https://www.python.org/downloads/release/python-3130"><img alt="Python 3.13" src="https://img.shields.io/badge/python-3.13-blue.svg"/></a>
+<a class="reference external" href="https://www.python.org/downloads/release/python-3120"><img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-blue.svg"/></a>
+<a class="reference external" href="https://www.python.org/downloads/release/python-3110"><img alt="Python 3.11" src="https://img.shields.io/badge/python-3.11-blue.svg"/></a>
+<a class="reference external" href="https://github.com/plandes/util/actions"><img alt="Build Status" src="https://github.com/plandes/util/workflows/CI/badge.svg"/></a></p>
+<p>Command line, configuration and persistence utilities generally used for any
+more than basic application.  This general purpose library is small, has few
+dependencies, and helpful across many applications.</p>
+<ul class="simple">
+<li><p>See the <a class="reference external" href="https://plandes.github.io/util/">full documentation</a>.</p></li>
+<li><p>Paper on <a class="reference external" href="http://arxiv.org/abs/2109.03383">arXiv</a>.</p></li>
+</ul>
+<p>Some features include:</p>
+<ul class="simple">
+<li><p>A <a class="reference external" href="https://github.com/facebookresearch/hydra">Hydra</a> or <a class="reference external" href="https://spring.io">Java Spring</a> like application level support for <a class="reference internal" href="doc/configuration.html"><span class="doc">configuration</span></a>
+than <a class="reference external" href="https://docs.python.org/3/library/configparser.html">configparser</a>.</p>
+<ul>
+<li><p>Construct objects using configuration files (both INI and YAML).</p></li>
+<li><p>Parse primitives, dictionaries, file system objects, instances of classes.</p></li>
+</ul>
+</li>
+<li><p>A <a class="reference internal" href="doc/command-line.html"><span class="doc">command action library</span></a> using an action mnemonic to invocation of a
+handler that is integrated with a the configuration API.  This supports long
+and short GNU style options as provided by <a class="reference external" href="https://docs.python.org/3/library/optparse.html">optparse</a>.</p></li>
+<li><p>Streamline in memory and on disk <a class="reference internal" href="doc/persist.html"><span class="doc">persistence</span></a>.</p></li>
+<li><p>Multi-processing work with a <a class="reference internal" href="doc/persist.html"><span class="doc">persistence layer</span></a>.</p></li>
+</ul>
+<p>A secondary goal of the API is to make prototyping Python code quick and easy
+using the REPL.  Examples include reloading modules in the <a class="reference internal" href="doc/configuration.html"><span class="doc">configuration
+factory</span></a>.</p>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://plandes.github.io/util/">Full documentation</a></p></li>
+<li><p><a class="reference external" href="https://plandes.github.io/util/doc/config.html">Configuration</a>: powerful but
+simple configuration system much like <a class="reference external" href="https://github.com/facebookresearch/hydra">Hydra</a> or <a class="reference external" href="https://spring.io">Java Spring</a></p></li>
+<li><p><a class="reference external" href="https://plandes.github.io/util/doc/command-line.html">Command line</a>:
+automagically creates a fully functional command with help from a Python
+<a class="reference external" href="https://docs.python.org/3/library/dataclasses.html">dataclass</a></p></li>
+<li><p><a class="reference external" href="https://plandes.github.io/util/doc/persist.html">Persistence</a>: cache
+intermediate data(structures) to the file system</p></li>
+<li><p><a class="reference external" href="https://plandes.github.io/install/api.html">API reference</a></p></li>
+</ul>
+</section>
+<section id="obtaining">
+<h2>Obtaining<a class="headerlink" href="#obtaining" title="Link to this heading">¶</a></h2>
+<p>The easiest way to install the command line program is via the <code class="docutils literal notranslate"><span class="pre">pip</span></code> installer:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip3<span class="w"> </span>install<span class="w"> </span>zensols.util
+</pre></div>
+</div>
+</section>
+<section id="command-line-usage">
+<h2>Command Line Usage<a class="headerlink" href="#command-line-usage" title="Link to this heading">¶</a></h2>
+<p>This library contains a full persistence layer and other utilities.  However, a
+quick and dirty example that uses the configuration and command line
+functionality is given below.  See the other <a class="reference external" href="https://github.com/plandes/util/blob/master/example">examples</a> to learn how else to
+use it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#module-enum" title="enum"><span class="nn">enum</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="enum.Enum"><span class="n">Enum</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">auto</span></a>
+<span class="kn">import</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/os.html#module-os" title="os"><span class="nn">os</span></a>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/io.html#module-io" title="io"><span class="nn">io</span></a><span class="w"> </span><span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="api/zensols.cli.html#module-zensols.cli" title="zensols.cli"><span class="nn">zensols.cli</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="api/zensols.cli.html#zensols.cli.harness.CliHarness" title="zensols.cli.harness.CliHarness"><span class="n">CliHarness</span></a>
+
+<span class="n">CONFIG</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2"># configure the command line</span>
+<span class="s2">[cli]</span>
+<span class="s2">apps = list: app</span>
+
+<span class="s2"># define the application, whose code is given below</span>
+<span class="s2">[app]</span>
+<span class="s2">class_name = fsinfo.Application</span>
+<span class="s2">"""</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="enum.Enum"><span class="n">Enum</span></a><span class="p">):</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">short</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">auto</span></a><span class="p">()</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">long</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">auto</span></a><span class="p">()</span>
+
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Application</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#object" title="object"><span class="nb">object</span></a><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Toy application example that provides file system information.</span>
+
+<span class="sd">    """</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Format</span> <span class="o">=</span> <span class="n">Format</span><span class="o">.</span><span class="n">short</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""List the contents of the directory.</span>
+
+<span class="sd">        :param format: the output format</span>
+
+<span class="sd">        """</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'ls'</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">Format</span><span class="o">.</span><span class="n">long</span><span class="p">:</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'-l'</span><span class="p">)</span>
+        <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/os.html#os.system" title="os.system"><span class="n">os</span><span class="o">.</span><span class="n">system</span></a><span class="p">(</span><span class="s1">' '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">))</span>
+
+
+<span class="k">if</span> <span class="p">(</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">):</span>
+    <a class="sphinx-codeautolink-a" href="api/zensols.cli.html#zensols.cli.harness.CliHarness" title="zensols.cli.harness.CliHarness"><span class="n">harnes</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="api/zensols.cli.html#zensols.cli.harness.CliHarness" title="zensols.cli.harness.CliHarness"><span class="n">CliHarness</span></a><span class="p">(</span><span class="n">app_config_resource</span><span class="o">=</span><span class="n">StringIO</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">))</span>
+    <a class="sphinx-codeautolink-a" href="api/zensols.cli.html#zensols.cli.harness.CliHarness.run" title="zensols.cli.harness.CliHarness.run"><span class="n">harnes</span><span class="o">.</span><span class="n">run</span></a><span class="p">()</span>
+</pre></div>
+</div>
+<p>The framework automatically links each command line action mnemonic (i.e. <code class="docutils literal notranslate"><span class="pre">ls</span></code>)
+to the data class <code class="docutils literal notranslate"><span class="pre">Application</span></code> method <code class="docutils literal notranslate"><span class="pre">ls</span></code> and command line help.  For
+example:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>./fsinfo.py<span class="w"> </span>-h
+Usage:<span class="w"> </span>fsinfo.py<span class="w"> </span><span class="o">[</span>options<span class="o">]</span>:
+
+List<span class="w"> </span>the<span class="w"> </span>contents<span class="w"> </span>of<span class="w"> </span>the<span class="w"> </span>directory.
+
+Options:
+<span class="w">  </span>-h,<span class="w"> </span>--help<span class="w">                        </span>show<span class="w"> </span>this<span class="w"> </span><span class="nb">help</span><span class="w"> </span>message<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
+<span class="w">  </span>--version<span class="w">                         </span>show<span class="w"> </span>the<span class="w"> </span>program<span class="w"> </span>version<span class="w"> </span>and<span class="w"> </span><span class="nb">exit</span>
+<span class="w">  </span>-f,<span class="w"> </span>--format<span class="w"> </span>&lt;long<span class="p">|</span>short&gt;<span class="w">  </span>short<span class="w">  </span>the<span class="w"> </span>output<span class="w"> </span>format
+
+$<span class="w"> </span>python<span class="w"> </span>./fsinfo.py<span class="w"> </span>-f<span class="w"> </span>short
+__pycache__<span class="w">  </span>fsinfo.py
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="https://github.com/plandes/util/blob/master/example/app/fsinfo.py">full example</a> that demonstrates more complex command line handling,
+documentation and explanation.</p>
+</section>
+<section id="template">
+<h2>Template<a class="headerlink" href="#template" title="Link to this heading">¶</a></h2>
+<p>The easiest to get started is to <a class="reference external" href="https://github.com/plandes/template">template</a> out this project is to create your
+own boilerplate project with the <code class="docutils literal notranslate"><span class="pre">mkproj</span></code> utility.  This requires a <a class="reference external" href="https://java.com/en/download/">Java
+installation</a>, and easy to create a Python boilerplate with the following
+commands:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># clone the boilerplate repo</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/plandes/template
+<span class="c1"># download the boilerplate tool</span>
+wget<span class="w"> </span>https://github.com/plandes/clj-mkproj/releases/download/v0.0.7/mkproj.jar
+<span class="c1"># create a python template and build it out</span>
+java<span class="w"> </span>-jar<span class="w"> </span>mkproj.jar<span class="w"> </span>config<span class="w"> </span>-s<span class="w"> </span>template/python
+java<span class="w"> </span>-jar<span class="w"> </span>mkproj.jar
+</pre></div>
+</div>
+<p>This creates a project customized with your organization’s name, author, and
+other details about the project.  In addition, it also creates a sample
+configuration file and command line that is ready to be invoked by either a
+Python REPL or from the command line via <a class="reference external" href="https://www.gnu.org/software/make/">GNU make</a>.</p>
+<p>If you don’t want to bother installing this program, the following sections
+have generated code as examples from which you can copy/paste.</p>
+</section>
+<section id="citation">
+<h2>Citation<a class="headerlink" href="#citation" title="Link to this heading">¶</a></h2>
+<p>If you use this project in your research please use the following BibTeX entry:</p>
+<div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@inproceedings</span><span class="p">{</span><span class="nl">landes-etal-2023-deepzensols</span><span class="p">,</span>
+<span class="w">    </span><span class="na">title</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"{D}eep{Z}ensols: A Deep Learning Natural Language Processing Framework for Experimentation and Reproducibility"</span><span class="p">,</span>
+<span class="w">    </span><span class="na">author</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"Landes, Paul  and</span>
+<span class="s">      Di Eugenio, Barbara  and</span>
+<span class="s">      Caragea, Cornelia"</span><span class="p">,</span>
+<span class="w">    </span><span class="na">editor</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"Tan, Liling  and</span>
+<span class="s">      Milajevs, Dmitrijs  and</span>
+<span class="s">      Chauhan, Geeticka  and</span>
+<span class="s">      Gwinnup, Jeremy  and</span>
+<span class="s">      Rippeth, Elijah"</span><span class="p">,</span>
+<span class="w">    </span><span class="na">booktitle</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"Proceedings of the 3rd Workshop for Natural Language Processing Open Source Software (NLP-OSS 2023)"</span><span class="p">,</span>
+<span class="w">    </span><span class="na">month</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nv">dec</span><span class="p">,</span>
+<span class="w">    </span><span class="na">year</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"2023"</span><span class="p">,</span>
+<span class="w">    </span><span class="na">address</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"Singapore, Singapore"</span><span class="p">,</span>
+<span class="w">    </span><span class="na">publisher</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"Association for Computational Linguistics"</span><span class="p">,</span>
+<span class="w">    </span><span class="na">url</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"https://aclanthology.org/2023.nlposs-1.16"</span><span class="p">,</span>
+<span class="w">    </span><span class="na">pages</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">"141--146"</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="changelog">
+<h2>Changelog<a class="headerlink" href="#changelog" title="Link to this heading">¶</a></h2>
+<p>An extensive changelog is available <a class="reference external" href="https://docs.python.org/3/whatsnew/changelog.html#changelog" title="(in Python v3.14)"><a class="reference external" href="CHANGELOG">here</a></a>.</p>
+</section>
+<section id="community">
+<h2>Community<a class="headerlink" href="#community" title="Link to this heading">¶</a></h2>
+<p>Please star this repository and let me know how and where you use this API.
+<a class="reference internal" href="CONTRIBUTING.html"><span class="doc">Contributions</span></a> as pull requests, feedback, and any input is
+welcome.</p>
+</section>
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="LICENSE.html"><span class="doc">MIT License</span></a></p>
+<p>Copyright (c) 2020 - 2026 Paul Landes</p>
+<!-- links --></section>
+</section>
+</article>
+</div>
+<footer>
+<div class="related-pages">
+<a class="next-page" href="doc/command-line.html">
+<div class="page-info">
+<div class="context">
+<span>Next</span>
+</div>
+<div class="title">Command Line Interface</div>
+</div>
+<svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+</a>
+<a class="prev-page" href="top.html">
+<svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+<div class="page-info">
+<div class="context">
+<span>Previous</span>
+</div>
+<div class="title">Home</div>
+</div>
+</a>
+</div>
+<div class="bottom-of-page">
+<div class="left-details">
+<div class="copyright">
+                Copyright © 2026 Paul Landes
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+</div>
+<div class="right-details">
+</div>
+</div>
+</footer>
+</div>
+<aside class="toc-drawer">
+<div class="toc-sticky toc-scroll">
+<div class="toc-title-container">
+<span class="toc-title">
+            On this page
+          </span>
+</div>
+<div class="toc-tree-container">
+<div class="toc-tree">
+<ul>
+<li><a class="reference internal" href="#">Zensols Utilities</a><ul>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#obtaining">Obtaining</a></li>
+<li><a class="reference internal" href="#command-line-usage">Command Line Usage</a></li>
+<li><a class="reference internal" href="#template">Template</a></li>
+<li><a class="reference internal" href="#citation">Citation</a></li>
+<li><a class="reference internal" href="#changelog">Changelog</a></li>
+<li><a class="reference internal" href="#community">Community</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div><script src="_static/documentation_options.js?v=d5528024"></script>
+<script src="_static/doctools.js?v=9a2dae69"></script>
+<script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="_static/scripts/furo.js?v=46bd48cc"></script>
+<script src="_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="_static/copybutton.js?v=f281be69"></script>
+</body>
+</html>

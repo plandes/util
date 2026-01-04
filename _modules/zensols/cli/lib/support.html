@@ -1,0 +1,885 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html"><link rel="search" title="Search" href="../../../../search.html">
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+        <title>zensols.cli.lib.support - Zensols Utilities 1.16.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/codeautolink.css?v=57550ae3" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../../top.html"><div class="brand">Zensols Utilities 1.16.3 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../top.html">
+  
+  <span class="sidebar-brand-text">Zensols Utilities 1.16.3 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../doc/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../api.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../api/zensols.cli.html">zensols.cli package</a><input aria-label="Toggle navigation of zensols.cli package" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/zensols.config.html">zensols.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/zensols.introspect.html">zensols.introspect package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/zensols.multi.html">zensols.multi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/zensols.persist.html">zensols.persist package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/zensols.util.html">zensols.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../LICENSE.html">License</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for zensols.cli.lib.support</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;General purpose first pass applications to support the build and</span>
+<span class="sd">configuration functionality.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Paul Landes&#39;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span><span class="p">,</span> <span class="n">EnumMeta</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">json</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONEncoder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">TextIOBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zensols.config</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Configurable</span><span class="p">,</span> <span class="n">Dictable</span><span class="p">,</span> <span class="n">ConfigFactory</span><span class="p">,</span> <span class="n">DictionaryConfig</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zensols.introspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassImporter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Action</span><span class="p">,</span> <span class="n">ActionCli</span><span class="p">,</span> <span class="n">ActionCliError</span><span class="p">,</span> <span class="n">ActionCliMethod</span><span class="p">,</span> <span class="n">ActionMetaData</span><span class="p">,</span>
+    <span class="n">ActionCliManager</span><span class="p">,</span> <span class="n">Application</span><span class="p">,</span> <span class="n">ApplicationObserver</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConfigurationImporter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zensols.config.importfac</span><span class="w"> </span><span class="kn">import</span> <span class="n">_AliasImportConfigFactoryModule</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ExportFormat">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ExportFormat">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportFormat</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The format for the environment export with the</span>
+<span class="sd">    :class:`.ExportEnvironment` first pass application.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bash</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">make</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ListFormat">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ListFormat">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ListFormat</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Options for outputing the action list in :class:`.ListActions`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">json</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ConfigFormat">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ConfigFormat">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigFormat</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Options for outputing the action list in :class:`.ShowConfiguration`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">ini</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">json</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">yaml</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">shell</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="DryRunApplication">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.DryRunApplication">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DryRunApplication</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">CLI_META</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;option_overrides&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;dry_run&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="s1">&#39;d&#39;</span><span class="p">}}}</span>
+
+    <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Don&#39;t do anything; just act like it.&quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ExportEnvironment">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ExportEnvironment">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ExportEnvironment</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The class dumps a list of bash shell export statements for sourcing in</span>
+<span class="sd">    build shell scripts.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># we can&#39;t use &quot;output_format&quot; because ListActions would use the same</span>
+    <span class="c1"># causing a name collision</span>
+    <span class="n">OUTPUT_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;export_output_format&#39;</span>
+    <span class="n">OUTPUT_PATH</span> <span class="o">=</span> <span class="s1">&#39;output_path&#39;</span>
+    <span class="n">CLI_META</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;option_includes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">OUTPUT_FORMAT</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span><span class="p">},</span>
+                <span class="s1">&#39;option_overrides&#39;</span><span class="p">:</span>
+                <span class="p">{</span><span class="n">OUTPUT_FORMAT</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="s1">&#39;eformat&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                 <span class="n">OUTPUT_PATH</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="s1">&#39;eout&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}}}</span>
+
+    <span class="n">config</span><span class="p">:</span> <span class="n">Configurable</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The configuration used to get section information used to generate the</span>
+<span class="sd">    export commands.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">section</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The section to dump as a series of export statements.&quot;&quot;&quot;</span>
+
+    <span class="n">output_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The output file name for the export script.&quot;&quot;&quot;</span>
+
+    <span class="n">export_output_format</span><span class="p">:</span> <span class="n">ExportFormat</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">ExportFormat</span><span class="o">.</span><span class="n">bash</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The output format.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">writer</span><span class="p">:</span> <span class="n">TextIOBase</span><span class="p">):</span>
+        <span class="n">exports</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">populate</span><span class="p">(</span><span class="n">section</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">section</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">export_output_format</span> <span class="o">==</span> <span class="n">ExportFormat</span><span class="o">.</span><span class="n">bash</span><span class="p">:</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;export </span><span class="si">{k}</span><span class="s1">=&quot;</span><span class="si">{v}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{k}</span><span class="s1">=</span><span class="si">{v}</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">exports</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="s1">&#39;k&#39;</span><span class="p">:</span> <span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span> <span class="n">v</span><span class="p">}))</span>
+
+<div class="viewcode-block" id="ExportEnvironment.export">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ExportEnvironment.export">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create exports for shell sourcing.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">export</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ListActions">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ListActions">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ListActions</span><span class="p">(</span><span class="n">ApplicationObserver</span><span class="p">,</span> <span class="n">Dictable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List command line actions with their help information.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LONG_NAME_SKIP</span> <span class="o">=</span> <span class="s1">&#39;add_ConfigFactoryAccessor_to_app_config&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The :class:`.ActionCliMethod` name to skip,which indicates the first pass</span>
+<span class="sd">    action used to get the application in the :class:`.CliHarness` used by</span>
+<span class="sd">    :class:`.ConfigFactoryAccessor`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># we can&#39;t use &quot;output_format&quot; because ExportEnvironment would use the same</span>
+    <span class="c1"># causing a name collision</span>
+    <span class="n">OUTPUT_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;list_output_format&#39;</span>
+    <span class="n">CLI_META</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;option_includes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">OUTPUT_FORMAT</span><span class="p">},</span>
+                <span class="s1">&#39;option_overrides&#39;</span><span class="p">:</span>
+                <span class="p">{</span><span class="n">OUTPUT_FORMAT</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="s1">&#39;lstfmt&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}}}</span>
+
+    <span class="n">list_output_format</span><span class="p">:</span> <span class="n">ListFormat</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">ListFormat</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The output format for the action listing.&quot;&quot;&quot;</span>
+
+    <span class="n">type_to_string</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Type</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{</span><span class="n">Path</span><span class="p">:</span> <span class="s1">&#39;path&#39;</span><span class="p">})</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Map Python type to a string used in the JSON formatted list output.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_command_line</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_application_created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span> <span class="n">Application</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">Action</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;In this call back, set the app and action for using in the invocation</span>
+<span class="sd">        :meth:`add`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;configurator created with </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_app</span> <span class="o">=</span> <span class="n">app</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_action</span> <span class="o">=</span> <span class="n">action</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_from_dictable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">action_cli</span><span class="p">:</span> <span class="n">ActionCli</span>
+        <span class="n">ac_docs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">action_cli</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">cli_manager</span><span class="o">.</span><span class="n">actions_ordered</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">action_cli</span><span class="o">.</span><span class="n">first_pass</span><span class="p">:</span>
+                <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+                <span class="n">meth</span><span class="p">:</span> <span class="n">ActionCliMethod</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">meth</span> <span class="ow">in</span> <span class="n">action_cli</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">LONG_NAME_SKIP</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">meta</span><span class="p">:</span> <span class="n">ActionMetaData</span> <span class="o">=</span> <span class="n">meth</span><span class="o">.</span><span class="n">action_meta_data</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_command_line</span><span class="p">:</span>
+                        <span class="n">md</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+                        <span class="k">del</span> <span class="n">md</span><span class="p">[</span><span class="s1">&#39;first_pass&#39;</span><span class="p">]</span>
+                        <span class="n">ac_docs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">md</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ac_docs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">doc</span>
+        <span class="k">return</span> <span class="n">ac_docs</span>
+
+<div class="viewcode-block" id="ListActions.list">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ListActions.list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;List all actions and help.&quot;&quot;&quot;</span>
+        <span class="k">class</span><span class="w"> </span><span class="nc">ActionEncoder</span><span class="p">(</span><span class="n">JSONEncoder</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">EnumMeta</span><span class="p">)</span> <span class="ow">or</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isclass</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">tm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">val</span> <span class="o">=</span> <span class="n">ClassImporter</span><span class="o">.</span><span class="n">full_classname</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">val</span>
+                <span class="k">return</span> <span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span>
+
+        <span class="n">tm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_to_string</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">list_json</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_command_line</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asjson</span><span class="p">(</span><span class="n">flatten</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">ActionEncoder</span><span class="p">))</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_command_line</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">ListFormat</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span>
+            <span class="n">ListFormat</span><span class="o">.</span><span class="n">text</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(),</span>
+            <span class="n">ListFormat</span><span class="o">.</span><span class="n">json</span><span class="p">:</span> <span class="n">list_json</span><span class="p">,</span>
+        <span class="p">}[</span><span class="bp">self</span><span class="o">.</span><span class="n">list_output_format</span><span class="p">]()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">list</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="ShowConfiguration">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ShowConfiguration">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ShowConfiguration</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The class dumps a list of bash shell export statements for sourcing in</span>
+<span class="sd">    build shell scripts.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># we can&#39;t use &quot;output_format&quot; because ListActions would use the same</span>
+    <span class="c1"># causing a name collision</span>
+    <span class="n">OUTPUT_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;config_output_format&#39;</span>
+    <span class="n">OUTPUT_PATH</span> <span class="o">=</span> <span class="s1">&#39;config_output_path&#39;</span>
+    <span class="n">SECTION_NAME</span> <span class="o">=</span> <span class="s1">&#39;sections&#39;</span>
+    <span class="n">EVAL_NAME</span> <span class="o">=</span> <span class="s1">&#39;evaluate&#39;</span>
+    <span class="n">CLI_META</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;mnemonic_overrides&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;show_config&#39;</span><span class="p">:</span> <span class="s1">&#39;config&#39;</span><span class="p">},</span>
+                <span class="s1">&#39;option_includes&#39;</span><span class="p">:</span>
+                <span class="p">{</span><span class="n">OUTPUT_FORMAT</span><span class="p">,</span> <span class="n">OUTPUT_PATH</span><span class="p">,</span> <span class="n">SECTION_NAME</span><span class="p">,</span> <span class="n">EVAL_NAME</span><span class="p">},</span>
+                <span class="s1">&#39;option_overrides&#39;</span><span class="p">:</span>
+                <span class="p">{</span><span class="n">OUTPUT_FORMAT</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="s1">&#39;cformat&#39;</span><span class="p">,</span> <span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                 <span class="n">OUTPUT_PATH</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="s1">&#39;cout&#39;</span><span class="p">,</span> <span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                 <span class="n">SECTION_NAME</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="s1">&#39;csec&#39;</span><span class="p">,</span> <span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span>
+                 <span class="n">EVAL_NAME</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="s1">&#39;eval&#39;</span><span class="p">,</span> <span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}}}</span>
+
+    <span class="n">config_factory</span><span class="p">:</span> <span class="n">ConfigFactory</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The configuration factory which is returned from the app.&quot;&quot;&quot;</span>
+
+    <span class="n">config_output_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The output file name for the configuration.&quot;&quot;&quot;</span>
+
+    <span class="n">config_output_format</span><span class="p">:</span> <span class="n">ConfigFormat</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">ConfigFormat</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The output format.&quot;&quot;&quot;</span>
+
+    <span class="n">evaluate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether to evaluate as the application sees it.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_eval_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Configurable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Configurable</span><span class="p">:</span>
+        <span class="n">secs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">sec_name</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="k">for</span> <span class="n">sec_name</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
+            <span class="n">sec</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">str</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">populate</span><span class="p">({},</span> <span class="n">sec_name</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+            <span class="n">secs</span><span class="p">[</span><span class="n">sec_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">sec</span>
+        <span class="k">return</span> <span class="n">DictionaryConfig</span><span class="p">(</span><span class="n">secs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_write_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">writer</span><span class="p">:</span> <span class="n">TextIOBase</span><span class="p">,</span> <span class="n">fmt</span><span class="p">:</span> <span class="n">ConfigFormat</span><span class="p">,</span>
+                      <span class="n">sections</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">pr</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">prshell</span><span class="p">():</span>
+            <span class="n">i</span><span class="p">:</span> <span class="nb">int</span>
+            <span class="n">sec</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sec</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">sections</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;# </span><span class="si">{</span><span class="n">sec</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">conf</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span><span class="n">sec</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}</span><span class="s1">=&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="n">conf</span><span class="p">:</span> <span class="n">Configurable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span><span class="o">.</span><span class="n">config</span>
+        <span class="k">if</span> <span class="n">sections</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dconf</span> <span class="o">=</span> <span class="n">DictionaryConfig</span><span class="p">()</span>
+            <span class="n">conf</span><span class="o">.</span><span class="n">copy_sections</span><span class="p">(</span><span class="n">dconf</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s*,\s*&#39;</span><span class="p">,</span> <span class="n">sections</span><span class="p">))</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">dconf</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">:</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eval_config</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">ConfigFormat</span><span class="o">.</span><span class="n">text</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">writer</span><span class="o">=</span><span class="n">writer</span><span class="p">),</span>
+            <span class="n">ConfigFormat</span><span class="o">.</span><span class="n">ini</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">pr</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">get_raw_str</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()),</span>
+            <span class="n">ConfigFormat</span><span class="o">.</span><span class="n">json</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">pr</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">asjson</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)),</span>
+            <span class="n">ConfigFormat</span><span class="o">.</span><span class="n">yaml</span><span class="p">:</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">pr</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">asyaml</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)),</span>
+            <span class="n">ConfigFormat</span><span class="o">.</span><span class="n">shell</span><span class="p">:</span> <span class="n">prshell</span><span class="p">,</span>
+        <span class="p">}[</span><span class="n">fmt</span><span class="p">]()</span>
+
+<div class="viewcode-block" id="ShowConfiguration.show_config">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ShowConfiguration.show_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">show_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sections</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Configurable</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Print the configuration and exit.</span>
+
+<span class="sd">        :param sections: comma separated sections to show, all if not given, or</span>
+<span class="sd">                         - for names</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_output_format</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_output_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_output_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sections</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+                <span class="n">secs</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sections</span><span class="p">))</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">secs</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_config</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">fmt</span><span class="p">,</span> <span class="n">sections</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_output_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">writer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_config</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="EditConfiguration">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.EditConfiguration">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EditConfiguration</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Edits the configuration file given on the command line.  This must be</span>
+<span class="sd">    added *after* the :class:`~zensols.cli.ConfigurationImporter` class.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">CLI_META</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;option_includes&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span>
+                <span class="s1">&#39;mnemonic_overrides&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;edit_configuration&#39;</span><span class="p">:</span> <span class="s1">&#39;editconf&#39;</span><span class="p">}}</span>
+
+    <span class="n">config_factory</span><span class="p">:</span> <span class="n">ConfigFactory</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The configuration factory which is returned from the app.&quot;&quot;&quot;</span>
+
+    <span class="n">section_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;config_cli&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The section of the CLI configuration that contains the entry.&quot;&quot;&quot;</span>
+
+    <span class="n">command</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;emacsclient -n </span><span class="si">{path}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The command used on the :func:`os.system` command to edit the file.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="EditConfiguration.edit_configuration">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.EditConfiguration.edit_configuration">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">edit_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Edit the configuration file.&quot;&quot;&quot;</span>
+        <span class="n">sec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">section_name</span><span class="p">)</span>
+        <span class="n">attr</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">ConfigurationImporter</span><span class="o">.</span><span class="n">CONFIG_PATH_FIELD</span>
+        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sec</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">command</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;editing file: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;system: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ProgramNameConfigurator">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ProgramNameConfigurator">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgramNameConfigurator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a section with the name of the program to use.  This is useful for</span>
+<span class="sd">    adding the program name to the beginning of logging lines to confirm to</span>
+<span class="sd">    UNIX conventions.</span>
+
+<span class="sd">    To add it to the logging output add it to the</span>
+<span class="sd">    :class:`~zensols.cli.LogConfigurator` section&#39;s ``format`` property.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">    .. code-block:: ini</span>
+
+<span class="sd">       [add_prog_cli]</span>
+<span class="sd">       class_name = zensols.cli.ProgramNameConfigurator</span>
+<span class="sd">       default = someprog</span>
+
+<span class="sd">       [log_cli]</span>
+<span class="sd">       class_name = zensols.cli.LogConfigurator</span>
+<span class="sd">       format = ${program:name}: %%(message)s</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">CLI_META</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;first_pass&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># not a separate action</span>
+                <span class="c1"># since there are no options and this is a first pass, force</span>
+                <span class="c1"># the CLI API to invoke it as otherwise there&#39;s no indication</span>
+                <span class="c1"># to the CLI that it needs to be called</span>
+                <span class="s1">&#39;always_invoke&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="c1"># only the path to the configuration should be exposed as a</span>
+                <span class="c1"># an option on the comamnd line</span>
+                <span class="s1">&#39;mnemonic_includes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;add_program_name&#39;</span><span class="p">},</span>
+                <span class="s1">&#39;option_includes&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+
+    <span class="n">config</span><span class="p">:</span> <span class="n">Configurable</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The parent configuration, which is populated with the package</span>
+<span class="sd">    information.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">section</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;program&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The name of the section to create with the package information.&quot;&quot;&quot;</span>
+
+    <span class="n">default</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;prog&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The default progran name to use when can not be inferred.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ProgramNameConfigurator.infer_program_name">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ProgramNameConfigurator.infer_program_name">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">infer_program_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Infer the program name using the system arguments.</span>
+
+<span class="sd">        :param entry_path: used to infer the program name from the entry point</span>
+<span class="sd">                           script, which defaults ``sys.argv[0]``</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">entry_path</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">entry_path</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">entry_path</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;command line leading arg: &lt;</span><span class="si">{</span><span class="n">entry_path</span><span class="si">}</span><span class="s1">&gt;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">entry_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry_path</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">entry_path</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span></div>
+
+
+<div class="viewcode-block" id="ProgramNameConfigurator.create_section">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ProgramNameConfigurator.create_section">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a dict with the contents of the program and name section.</span>
+
+<span class="sd">        :param entry_path: used to infer the program name from the entry point</span>
+<span class="sd">                           script, which defaults ``sys.argv[0]``</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prog_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infer_program_name</span><span class="p">(</span><span class="n">entry_path</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;using program name: </span><span class="si">{</span><span class="n">prog_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">section</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">prog_name</span><span class="p">}}</span></div>
+
+
+<div class="viewcode-block" id="ProgramNameConfigurator.add_program_name">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.ProgramNameConfigurator.add_program_name">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_program_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add the program name as a single configuration section and parameter.</span>
+
+<span class="sd">        :see: :obj:`section`</span>
+
+<span class="sd">        :see: :obj:`default`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d_conf</span> <span class="o">=</span> <span class="n">DictionaryConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">create_section</span><span class="p">())</span>
+        <span class="n">d_conf</span><span class="o">.</span><span class="n">copy_sections</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Cleaner">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.Cleaner">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Cleaner</span><span class="p">(</span><span class="n">DryRunApplication</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clean (removes) files and directories not needed by the project.  The</span>
+<span class="sd">    first tuple of paths will get deleted at any level, the next needs a level</span>
+<span class="sd">    of 1 and so on.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">CLASS_INSPECTOR</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">CLI_META</span> <span class="o">=</span> <span class="n">ActionCliManager</span><span class="o">.</span><span class="n">combine_meta</span><span class="p">(</span>
+        <span class="n">DryRunApplication</span><span class="p">,</span>
+        <span class="p">{</span><span class="s1">&#39;mnemonic_includes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;clean&#39;</span><span class="p">},</span>
+         <span class="s1">&#39;option_excludes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;paths&#39;</span><span class="p">},</span>
+         <span class="s1">&#39;option_overrides&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;clean_level&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="s1">&#39;clevel&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}}})</span>
+
+    <span class="n">paths</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="o">...</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Paths to delete (files or directories) with each group corresponding to a</span>
+<span class="sd">    level (see class docs).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">clean_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The level at which to delete.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;cleaner: created with paths: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_remove_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">glob</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;cleaning at level </span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s1"> using </span><span class="si">{</span><span class="n">glob</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">glob</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;**&#39;</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
+            <span class="n">pat</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">glob</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">glob</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">parent</span>
+            <span class="n">pat</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">parent</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">pat</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;removing (level </span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s1">): </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Cleaner.clean">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.Cleaner.clean">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clean up unecessary files.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;cleaning at max level </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">clean_level</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">level</span><span class="p">,</span> <span class="n">paths</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">paths</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">level</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clean_level</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_remove_path</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="CacheClearer">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.CacheClearer">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CacheClearer</span><span class="p">(</span><span class="n">DryRunApplication</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Clear cached data by iterating through a list of application context</span>
+<span class="sd">    instances that have a ``clear`` method.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">CLASS_INSPECTOR</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">CLI_META</span> <span class="o">=</span> <span class="n">ActionCliManager</span><span class="o">.</span><span class="n">combine_meta</span><span class="p">(</span>
+        <span class="n">DryRunApplication</span><span class="p">,</span>
+        <span class="p">{</span><span class="s1">&#39;mnemonic_includes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;clear&#39;</span><span class="p">},</span>
+         <span class="s1">&#39;option_excludes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;config_factory&#39;</span><span class="p">,</span> <span class="s1">&#39;clearables&#39;</span><span class="p">},</span>
+         <span class="s1">&#39;option_overrides&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;clean_level&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="s1">&#39;clevel&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}}})</span>
+
+    <span class="n">config_factory</span><span class="p">:</span> <span class="n">ConfigFactory</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The parent application context factory, which is populated from the child</span>
+<span class="sd">    configuration (see class docs).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">clearables</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A list of instance aliases (``&lt;section&gt;:&lt;option&gt;``), each with their own</span>
+<span class="sd">    list of instances to invoke ``clear`` to remove cached data.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="CacheClearer.clear">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.support.CacheClearer.clear">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear *all* cached data&quot;&quot;&quot;</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Configurable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span><span class="o">.</span><span class="n">config</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;clearing: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">clearables</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">clearable</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="k">for</span> <span class="n">clearable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clearables</span><span class="p">:</span>
+            <span class="n">sec</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="n">option</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="n">sec</span><span class="p">,</span> <span class="n">option</span> <span class="o">=</span> <span class="n">_AliasImportConfigFactoryModule</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">clearable</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;clearing section: </span><span class="si">{</span><span class="n">sec</span><span class="si">}</span><span class="s1">, option: </span><span class="si">{</span><span class="n">option</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sec</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ActionCliError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Missing section to clear: </span><span class="si">{</span><span class="n">sec</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">inst_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_option_list</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">sec</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;clearing instances: </span><span class="si">{</span><span class="n">inst_names</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">inst_name</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="k">for</span> <span class="n">inst_name</span> <span class="ow">in</span> <span class="n">inst_names</span><span class="p">:</span>
+                <span class="n">inst</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_factory</span><span class="p">(</span><span class="n">inst_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">):</span>
+                    <span class="n">nm</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">inst</span><span class="p">))</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;clearing instance: </span><span class="si">{</span><span class="n">nm</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">inst</span><span class="p">,</span> <span class="s1">&#39;clear&#39;</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">ActionCliError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;No clear method on &#39;</span><span class="si">{</span><span class="n">inst_name</span><span class="si">}</span><span class="s2">&#39; (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
+                    <span class="n">inst</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026 Paul Landes
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../../_static/documentation_options.js?v=d5528024"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

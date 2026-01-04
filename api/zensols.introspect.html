@@ -1,0 +1,1266 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="zensols.multi package" href="zensols.multi.html"><link rel="prev" title="zensols.config package" href="zensols.config.html">
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+        <title>zensols.introspect package - Zensols Utilities 1.16.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/codeautolink.css?v=57550ae3" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../top.html"><div class="brand">Zensols Utilities 1.16.3 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../top.html">
+  
+  <span class="sidebar-brand-text">Zensols Utilities 1.16.3 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">API Reference</a><input aria-label="Toggle navigation of API Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="zensols.cli.html">zensols.cli package</a><input aria-label="Toggle navigation of zensols.cli package" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.config.html">zensols.config package</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">zensols.introspect package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.multi.html">zensols.multi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.persist.html">zensols.persist package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.util.html">zensols.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LICENSE.html">License</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/api/zensols.introspect.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="zensols-introspect-package">
+<h1>zensols.introspect package<a class="headerlink" href="#zensols-introspect-package" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-zensols.introspect.imp">
+<span id="zensols-introspect-imp-module"></span><h2>zensols.introspect.imp module<a class="headerlink" href="#module-zensols.introspect.imp" title="Link to this heading">¶</a></h2>
+<p>A utility class to load classes from modules.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.imp.</span></span><span class="sig-name descname"><span class="pre">ClassImporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassImporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassImporter" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Utility class that reloads a module and instantiates a class from a
+string class name.  This is handy for prototyping code in a Python REPL.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassImporter.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassImporter.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialize with the class name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>class_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – the fully qualifed name of the class (including the
+module portion of the class name)</p></li>
+<li><p><strong>reload</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code> then reload the module before returning the
+class</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporter.full_classname">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">full_classname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassImporter.full_classname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassImporter.full_classname" title="Link to this definition">¶</a></dt>
+<dd><p>Return a fully qualified class name string for class <code class="docutils literal notranslate"><span class="pre">cls</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporter.get_class">
+<span class="sig-name descname"><span class="pre">get_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassImporter.get_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassImporter.get_class" title="Link to this definition">¶</a></dt>
+<dd><p>Return the given class in the initializer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporter.get_class_or_global">
+<span class="sig-name descname"><span class="pre">get_class_or_global</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassImporter.get_class_or_global"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassImporter.get_class_or_global" title="Link to this definition">¶</a></dt>
+<dd><p>Like <a class="reference internal" href="#zensols.introspect.imp.ClassImporter.get_class" title="zensols.introspect.imp.ClassImporter.get_class"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_class()</span></code></a> but try globals if the class isn’t fully
+qualified (i.e. sans module).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporter.get_module">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassImporter.get_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassImporter.get_module" title="Link to this definition">¶</a></dt>
+<dd><p>Return the module that has <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – the string name, which can have dots (<code class="docutils literal notranslate"><span class="pre">.</span></code>) to for sub
+modules</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporter.get_module_class">
+<span class="sig-name descname"><span class="pre">get_module_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolve_module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassImporter.get_module_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassImporter.get_module_class" title="Link to this definition">¶</a></dt>
+<dd><p>Return the module and class as a tuple of the given class in the
+initializer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>resolve_module</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – if <code class="docutils literal notranslate"><span class="pre">True</span></code> then resolve the module from the
+class rather than the module portion of the
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">class_name</span></code> string</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/types.html#types.ModuleType" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModuleType</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a>]</span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a tuple of the module and class represented by
+<code class="xref py py-obj docutils literal notranslate"><span class="pre">class_name</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporter.instance">
+<span class="sig-name descname"><span class="pre">instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassImporter.instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassImporter.instance" title="Link to this definition">¶</a></dt>
+<dd><p>Create an instance of the specified class in the initializer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – the arguments given to the initializer of the new class</p></li>
+<li><p><strong>kwargs</strong> – the keyword arguments given to the initializer of the
+new class</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporter.is_valid_class_name">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_valid_class_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassImporter.is_valid_class_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassImporter.is_valid_class_name" title="Link to this definition">¶</a></dt>
+<dd><p>Return whether a string represents a valid class name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporter.parse_module_class">
+<span class="sig-name descname"><span class="pre">parse_module_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassImporter.parse_module_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassImporter.parse_module_class" title="Link to this definition">¶</a></dt>
+<dd><p>Parse the module and class name part of the fully qualifed class
+name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporter.set_log_level">
+<span class="sig-name descname"><span class="pre">set_log_level</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassImporter.set_log_level"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassImporter.set_log_level" title="Link to this definition">¶</a></dt>
+<dd><p>Convenciene method to set the log level of the module given in the
+initializer of this class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – a logging level in <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporterError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.imp.</span></span><span class="sig-name descname"><span class="pre">ClassImporterError</span></span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassImporterError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassImporterError" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Raised for any run time exceptions during resolving and instantiating
+classes with <a class="reference internal" href="#zensols.introspect.imp.ClassImporter" title="zensols.introspect.imp.ClassImporter"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassImporter</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporterError.__firstlineno__">
+<span class="sig-name descname"><span class="pre">__firstlineno__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">18</span></em><a class="headerlink" href="#zensols.introspect.imp.ClassImporterError.__firstlineno__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporterError.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'zensols.introspect.imp'</span></em><a class="headerlink" href="#zensols.introspect.imp.ClassImporterError.__module__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporterError.__static_attributes__">
+<span class="sig-name descname"><span class="pre">__static_attributes__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></em><a class="headerlink" href="#zensols.introspect.imp.ClassImporterError.__static_attributes__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassImporterError.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#zensols.introspect.imp.ClassImporterError.__weakref__" title="Link to this definition">¶</a></dt>
+<dd><p>list of weak references to the object</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassResolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.imp.</span></span><span class="sig-name descname"><span class="pre">ClassResolver</span></span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassResolver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassResolver" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<p>Used to resolve a class from a string.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassResolver.find_class">
+<span class="sig-name descname"><span class="pre">find_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassResolver.find_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassResolver.find_class" title="Link to this definition">¶</a></dt>
+<dd><p>Return a class given the name of the class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>class_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – represents the class name, which might or might not
+have the module as part of that name</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.ClassResolver.full_classname">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">full_classname</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#ClassResolver.full_classname"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.ClassResolver.full_classname" title="Link to this definition">¶</a></dt>
+<dd><p>Return a fully qualified class name string for class <code class="docutils literal notranslate"><span class="pre">cls</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.imp.DictionaryClassResolver">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.imp.</span></span><span class="sig-name descname"><span class="pre">DictionaryClassResolver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance_classes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#DictionaryClassResolver"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.DictionaryClassResolver" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.introspect.imp.ClassResolver" title="zensols.introspect.imp.ClassResolver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassResolver</span></code></a></p>
+<p>Resolve a class name from a list of registered class names without the
+module part.  This is used with the <code class="docutils literal notranslate"><span class="pre">register</span></code> method on
+<code class="docutils literal notranslate"><span class="pre">ConfigFactory</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">See<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ConfigFactory.register</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.DictionaryClassResolver.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance_classes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#DictionaryClassResolver.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.DictionaryClassResolver.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.imp.DictionaryClassResolver.find_class">
+<span class="sig-name descname"><span class="pre">find_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/imp.html#DictionaryClassResolver.find_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.imp.DictionaryClassResolver.find_class" title="Link to this definition">¶</a></dt>
+<dd><p>Return a class given the name of the class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>class_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – represents the class name, which might or might not
+have the module as part of that name</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-zensols.introspect.insp">
+<span id="zensols-introspect-insp-module"></span><h2>zensols.introspect.insp module<a class="headerlink" href="#module-zensols.introspect.insp" title="Link to this heading">¶</a></h2>
+<p>Utility classes to help with dataclasses.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.insp.Class">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.insp.</span></span><span class="sig-name descname"><span class="pre">Class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methods</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/insp.html#Class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.insp.Class" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Metadata about a Python class.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.insp.Class.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methods</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.introspect.insp.Class.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.Class.class_type">
+<span class="sig-name descname"><span class="pre">class_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></em><a class="headerlink" href="#zensols.introspect.insp.Class.class_type" title="Link to this definition">¶</a></dt>
+<dd><p>The class that was inspected.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.Class.doc">
+<span class="sig-name descname"><span class="pre">doc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#zensols.introspect.insp.ClassDoc" title="zensols.introspect.insp.ClassDoc"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassDoc</span></code></a></em><a class="headerlink" href="#zensols.introspect.insp.Class.doc" title="Link to this definition">¶</a></dt>
+<dd><p>The docstring of the class.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.Class.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference internal" href="#zensols.introspect.insp.ClassField" title="zensols.introspect.insp.ClassField"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassField</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#zensols.introspect.insp.Class.fields" title="Link to this definition">¶</a></dt>
+<dd><p>The fields of the class.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="zensols.introspect.insp.Class.is_dataclass">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_dataclass</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#zensols.introspect.insp.Class.is_dataclass" title="Link to this definition">¶</a></dt>
+<dd><p>Whether or not the class is a <code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.dataclass</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.Class.methods">
+<span class="sig-name descname"><span class="pre">methods</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference internal" href="#zensols.introspect.insp.ClassMethod" title="zensols.introspect.insp.ClassMethod"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassMethod</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#zensols.introspect.insp.Class.methods" title="Link to this definition">¶</a></dt>
+<dd><p>The methods of the class.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="zensols.introspect.insp.Class.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#zensols.introspect.insp.Class.name" title="Link to this definition">¶</a></dt>
+<dd><p>The fully qualified class name.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassDoc">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.insp.</span></span><span class="sig-name descname"><span class="pre">ClassDoc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/insp.html#ClassDoc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.insp.ClassDoc" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A meta data for documentation at any level of the class code (methods
+etc).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassDoc.PARAM_REGEX">
+<span class="sig-name descname"><span class="pre">PARAM_REGEX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">re.compile('^\\s*:param</span> <span class="pre">([^:]+):\\s*(.+)$')</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassDoc.PARAM_REGEX" title="Link to this definition">¶</a></dt>
+<dd><p>documentation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Matches</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>param</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassDoc.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.introspect.insp.ClassDoc.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassDoc.params">
+<span class="sig-name descname"><span class="pre">params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassDoc.params" title="Link to this definition">¶</a></dt>
+<dd><p>The parsed parameter documentation.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassDoc.text">
+<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#zensols.introspect.insp.ClassDoc.text" title="Link to this definition">¶</a></dt>
+<dd><p>The text of the documentation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.insp.</span></span><span class="sig-name descname"><span class="pre">ClassError</span></span><a class="reference internal" href="../_modules/zensols/introspect/insp.html#ClassError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.insp.ClassError" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Raised by <code class="xref py py-class docutils literal notranslate"><span class="pre">ClassInspector.</span></code> when a class can not be inspected or
+parsed by <a class="reference external" href="https://docs.python.org/3/library/ast.html#module-ast" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ast</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassError.__firstlineno__">
+<span class="sig-name descname"><span class="pre">__firstlineno__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">22</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassError.__firstlineno__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassError.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'zensols.introspect.insp'</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassError.__module__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassError.__static_attributes__">
+<span class="sig-name descname"><span class="pre">__static_attributes__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassError.__static_attributes__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassError.__weakref__">
+<span class="sig-name descname"><span class="pre">__weakref__</span></span><a class="headerlink" href="#zensols.introspect.insp.ClassError.__weakref__" title="Link to this definition">¶</a></dt>
+<dd><p>list of weak references to the object</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.insp.</span></span><span class="sig-name descname"><span class="pre">ClassField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/insp.html#ClassField"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.insp.ClassField" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.introspect.insp.ClassParam" title="zensols.introspect.insp.ClassParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassParam</span></code></a></p>
+<p>Represents a <code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.dataclass</span></code> field.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassField.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.introspect.insp.ClassField.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassField.default">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">default</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a></em><a class="headerlink" href="#zensols.introspect.insp.ClassField.default" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassField.kwargs">
+<span class="sig-name descname"><span class="pre">kwargs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassField.kwargs" title="Link to this definition">¶</a></dt>
+<dd><p>The field arguments.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassInspector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.insp.</span></span><span class="sig-name descname"><span class="pre">ClassInspector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type_mapper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_private</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'y'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/insp.html#ClassInspector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.insp.ClassInspector" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A utility class to return all <code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.dataclass</span></code> attribute
+(field) documentation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassInspector.DECORATOR_META">
+<span class="sig-name descname"><span class="pre">DECORATOR_META</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">ClassVar</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'CLASS_DECORATOR'</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassInspector.DECORATOR_META" title="Link to this definition">¶</a></dt>
+<dd><p>Attribute to set which must be a <code class="xref py py-class docutils literal notranslate"><span class="pre">builtins.dict</span></code> with the
+following keys:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">includes</span></code>: as a set of decorator names that can be set on methods to
+indicate inclusion on introspected method set.  Otherwise the decorated
+method (such as <cite>&#64;property</cite>) is omitted from the class metadata</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassInspector.INSPECT_META">
+<span class="sig-name descname"><span class="pre">INSPECT_META</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">ClassVar</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'CLASS_INSPECTOR'</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassInspector.INSPECT_META" title="Link to this definition">¶</a></dt>
+<dd><p>Attribute to set to indicate to traverse superclasses as well.  This is
+set as an empty <code class="docutils literal notranslate"><span class="pre">dict</span></code> to allow future implementations to filter on what’s
+traversed (i.e. <code class="docutils literal notranslate"><span class="pre">include_fields</span></code>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassInspector.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type_mapper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_private</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'y'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.introspect.insp.ClassInspector.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassInspector.attrs">
+<span class="sig-name descname"><span class="pre">attrs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassInspector.attrs" title="Link to this definition">¶</a></dt>
+<dd><p>The class attributes to inspect, or all found are returned when <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassInspector.cls">
+<span class="sig-name descname"><span class="pre">cls</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></em><a class="headerlink" href="#zensols.introspect.insp.ClassInspector.cls" title="Link to this definition">¶</a></dt>
+<dd><p>The class to inspect.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassInspector.data_type_mapper">
+<span class="sig-name descname"><span class="pre">data_type_mapper</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#zensols.introspect.insp.TypeMapper" title="zensols.introspect.insp.TypeMapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeMapper</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassInspector.data_type_mapper" title="Link to this definition">¶</a></dt>
+<dd><p>The mapper used for narrowing a type from a string parsed from the Python
+AST.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassInspector.get_class">
+<span class="sig-name descname"><span class="pre">get_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/insp.html#ClassInspector.get_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.insp.ClassInspector.get_class" title="Link to this definition">¶</a></dt>
+<dd><p>Return a dict of attribute (field) to metadata and docstring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#zensols.introspect.insp.Class" title="zensols.introspect.insp.Class"><code class="xref py py-class docutils literal notranslate"><span class="pre">Class</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassInspector.include_init">
+<span class="sig-name descname"><span class="pre">include_init</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassInspector.include_init" title="Link to this definition">¶</a></dt>
+<dd><p>Whether to include the <code class="docutils literal notranslate"><span class="pre">__init__</span></code> method.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassInspector.include_private">
+<span class="sig-name descname"><span class="pre">include_private</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassInspector.include_private" title="Link to this definition">¶</a></dt>
+<dd><p>Whether to include private methods that start with <code class="docutils literal notranslate"><span class="pre">_</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassInspector.strict">
+<span class="sig-name descname"><span class="pre">strict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'y'</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassInspector.strict" title="Link to this definition">¶</a></dt>
+<dd><p>Indicates what to do for undefined or unsupported structures.</p>
+<p>One of:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>y: raise errors</p></li>
+<li><p>n: ignore</p></li>
+<li><p>w: log as warning</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassMethod">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.insp.</span></span><span class="sig-name descname"><span class="pre">ClassMethod</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/insp.html#ClassMethod"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.insp.ClassMethod" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Meta data for a method in a dataclass.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassMethod.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.introspect.insp.ClassMethod.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassMethod.args">
+<span class="sig-name descname"><span class="pre">args</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a><span class="pre">[</span><a class="reference internal" href="#zensols.introspect.insp.ClassMethodArg" title="zensols.introspect.insp.ClassMethodArg"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassMethodArg</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassMethod.args" title="Link to this definition">¶</a></dt>
+<dd><p>The arguments of the method.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassMethod.doc">
+<span class="sig-name descname"><span class="pre">doc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#zensols.introspect.insp.ClassDoc" title="zensols.introspect.insp.ClassDoc"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassDoc</span></code></a></em><a class="headerlink" href="#zensols.introspect.insp.ClassMethod.doc" title="Link to this definition">¶</a></dt>
+<dd><p>The docstring of the method.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassMethod.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#zensols.introspect.insp.ClassMethod.name" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the method.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassMethodArg">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.insp.</span></span><span class="sig-name descname"><span class="pre">ClassMethodArg</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_positional</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/insp.html#ClassMethodArg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.insp.ClassMethodArg" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.introspect.insp.ClassParam" title="zensols.introspect.insp.ClassParam"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassParam</span></code></a></p>
+<p>Meta data for an argument in a method.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassMethodArg.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inner_types</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_positional</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.introspect.insp.ClassMethodArg.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassMethodArg.default">
+<span class="sig-name descname"><span class="pre">default</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#zensols.introspect.insp.ClassMethodArg.default" title="Link to this definition">¶</a></dt>
+<dd><p>The default if any, otherwise <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassMethodArg.inner_types">
+<span class="sig-name descname"><span class="pre">inner_types</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#zensols.introspect.insp.ClassMethodArg.inner_types" title="Link to this definition">¶</a></dt>
+<dd><p>The inner types of the argument, such as [<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>] in
+<code class="docutils literal notranslate"><span class="pre">Tuple[str]</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassMethodArg.is_positional">
+<span class="sig-name descname"><span class="pre">is_positional</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><a class="headerlink" href="#zensols.introspect.insp.ClassMethodArg.is_positional" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">True</span></code> is the argument is positional vs. a keyword argument.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassParam">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.insp.</span></span><span class="sig-name descname"><span class="pre">ClassParam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/insp.html#ClassParam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.insp.ClassParam" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represents a <code class="xref py py-class docutils literal notranslate"><span class="pre">dataclasses.dataclass</span></code> field.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassParam.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.introspect.insp.ClassParam.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassParam.doc">
+<span class="sig-name descname"><span class="pre">doc</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#zensols.introspect.insp.ClassDoc" title="zensols.introspect.insp.ClassDoc"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassDoc</span></code></a></em><a class="headerlink" href="#zensols.introspect.insp.ClassParam.doc" title="Link to this definition">¶</a></dt>
+<dd><p>The documentation of the field.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassParam.dtype">
+<span class="sig-name descname"><span class="pre">dtype</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a></em><a class="headerlink" href="#zensols.introspect.insp.ClassParam.dtype" title="Link to this definition">¶</a></dt>
+<dd><p>The data type.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.ClassParam.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#zensols.introspect.insp.ClassParam.name" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the field.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.insp.TypeMapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.insp.</span></span><span class="sig-name descname"><span class="pre">TypeMapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_types=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_type=&lt;class</span> <span class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_class=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/insp.html#TypeMapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.insp.TypeMapper" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A utility class to map string types parsed from <a class="reference internal" href="#zensols.introspect.insp.ClassInspector" title="zensols.introspect.insp.ClassInspector"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClassInspector</span></code></a>
+to Python types.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.TypeMapper.DEFAULT_DATA_TYPES">
+<span class="sig-name descname"><span class="pre">DEFAULT_DATA_TYPES</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">ClassVar</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a><span class="pre">]]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'...':</span> <span class="pre">&lt;class</span> <span class="pre">'ellipsis'&gt;,</span> <span class="pre">'IntegerSelection':</span> <span class="pre">&lt;class</span> <span class="pre">'zensols.introspect.intsel.IntegerSelection'&gt;,</span> <span class="pre">'List':</span> <span class="pre">typing.List,</span> <span class="pre">'Path':</span> <span class="pre">&lt;class</span> <span class="pre">'pathlib._local.Path'&gt;,</span> <span class="pre">'Tuple':</span> <span class="pre">typing.Tuple,</span> <span class="pre">'bool':</span> <span class="pre">&lt;class</span> <span class="pre">'bool'&gt;,</span> <span class="pre">'float':</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">'int':</span> <span class="pre">&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">'list':</span> <span class="pre">&lt;class</span> <span class="pre">'list'&gt;,</span> <span class="pre">'pathlib.Path':</span> <span class="pre">&lt;class</span> <span class="pre">'pathlib._local.Path'&gt;,</span> <span class="pre">'str':</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">'tuple':</span> <span class="pre">&lt;class</span> <span class="pre">'tuple'&gt;}</span></em><a class="headerlink" href="#zensols.introspect.insp.TypeMapper.DEFAULT_DATA_TYPES" title="Link to this definition">¶</a></dt>
+<dd><p>Supported data types mapped from data class fields.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.insp.TypeMapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_types=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_type=&lt;class</span> <span class="pre">'str'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_class=True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.introspect.insp.TypeMapper.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.TypeMapper.allow_class">
+<span class="sig-name descname"><span class="pre">allow_class</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#zensols.introspect.insp.TypeMapper.allow_class" title="Link to this definition">¶</a></dt>
+<dd><p>Whether or not to allow classes acceptable types.  When the mapper
+encouters these classes, the class is loaded from the module and returned as
+a type.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.TypeMapper.cls">
+<span class="sig-name descname"><span class="pre">cls</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a></em><a class="headerlink" href="#zensols.introspect.insp.TypeMapper.cls" title="Link to this definition">¶</a></dt>
+<dd><p>The class to map.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.TypeMapper.data_types">
+<span class="sig-name descname"><span class="pre">data_types</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#zensols.introspect.insp.TypeMapper.data_types" title="Link to this definition">¶</a></dt>
+<dd><p>Data type mapping for this instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.insp.TypeMapper.default_type">
+<span class="sig-name descname"><span class="pre">default_type</span></span><a class="headerlink" href="#zensols.introspect.insp.TypeMapper.default_type" title="Link to this definition">¶</a></dt>
+<dd><p>Default type for when no type is given.</p>
+<p>alias of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.insp.TypeMapper.map_type">
+<span class="sig-name descname"><span class="pre">map_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stype</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/insp.html#TypeMapper.map_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.insp.TypeMapper.map_type" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-zensols.introspect.intsel">
+<span id="zensols-introspect-intsel-module"></span><h2>zensols.introspect.intsel module<a class="headerlink" href="#module-zensols.introspect.intsel" title="Link to this heading">¶</a></h2>
+<p>A class that parses a slice or element of an array.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.IntegerSelection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.intsel.</span></span><span class="sig-name descname"><span class="pre">IntegerSelection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/intsel.html#IntegerSelection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.intsel.IntegerSelection" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Parses an string that selects integers.  These (<a class="reference internal" href="#zensols.introspect.intsel.IntegerSelection.kind" title="zensols.introspect.intsel.IntegerSelection.kind"><code class="xref py py-obj docutils literal notranslate"><span class="pre">kind</span></code></a>) include:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><a class="reference internal" href="#zensols.introspect.intsel.Kind.single" title="zensols.introspect.intsel.Kind.single"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Kind.single</span></code></a>: <code class="docutils literal notranslate"><span class="pre">&lt;int&gt;</span></code>: a singleton integers</p></li>
+<li><p><a class="reference internal" href="#zensols.introspect.intsel.Kind.interval" title="zensols.introspect.intsel.Kind.interval"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Kind.interval</span></code></a>: <code class="docutils literal notranslate"><span class="pre">&lt;int&gt;-&lt;int&gt;</span></code>: all the integers in the inclusive
+interval</p></li>
+<li><p><a class="reference internal" href="#zensols.introspect.intsel.Kind.list" title="zensols.introspect.intsel.Kind.list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Kind.list</span></code></a>: <code class="docutils literal notranslate"><span class="pre">&lt;int&gt;,&lt;int&gt;,...</span></code>: a comma separated list (space
+optional)</p></li>
+</ul>
+</div></blockquote>
+<p>To use, create it with <code class="xref py py-meth docutils literal notranslate"><span class="pre">from_string()</span></code> and use <code class="xref py py-meth docutils literal notranslate"><span class="pre">tuple()</span></code>,
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">list()</span></code>, then use as an iterable.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.IntegerSelection.INTERVAL_DELIM">
+<span class="sig-name descname"><span class="pre">INTERVAL_DELIM</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.ClassVar" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">ClassVar</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">':'</span></em><a class="headerlink" href="#zensols.introspect.intsel.IntegerSelection.INTERVAL_DELIM" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.IntegerSelection.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/intsel.html#IntegerSelection.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.intsel.IntegerSelection.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Parse an integer selection from string <code class="docutils literal notranslate"><span class="pre">raw</span></code>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.IntegerSelection.kind">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kind</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#zensols.introspect.intsel.Kind" title="zensols.introspect.intsel.Kind"><span class="pre">Kind</span></a></em><a class="headerlink" href="#zensols.introspect.intsel.IntegerSelection.kind" title="Link to this definition">¶</a></dt>
+<dd><p>The kind of selection (see class docs).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.IntegerSelection.select">
+<span class="sig-name descname"><span class="pre">select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/intsel.html#IntegerSelection.select"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.intsel.IntegerSelection.select" title="Link to this definition">¶</a></dt>
+<dd><p>Return element(s) <code class="docutils literal notranslate"><span class="pre">arr</span></code> based on the <a class="reference internal" href="#zensols.introspect.intsel.IntegerSelection.selection" title="zensols.introspect.intsel.IntegerSelection.selection"><code class="xref py py-obj docutils literal notranslate"><span class="pre">selection</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.IntegerSelection.selection">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">selection</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#zensols.introspect.intsel.IntegerSelection.selection" title="Link to this definition">¶</a></dt>
+<dd><p>The selection data based on what was parsed in the initializer (see
+class docs).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.IntegerSelectionError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.intsel.</span></span><span class="sig-name descname"><span class="pre">IntegerSelectionError</span></span><a class="reference internal" href="../_modules/zensols/introspect/intsel.html#IntegerSelectionError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.intsel.IntegerSelectionError" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="zensols.util.html#zensols.util.fail.APIError" title="zensols.util.fail.APIError"><code class="xref py py-class docutils literal notranslate"><span class="pre">APIError</span></code></a></p>
+<p>Raised for errors parsing or working with <a class="reference internal" href="#zensols.introspect.intsel.IntegerSelection" title="zensols.introspect.intsel.IntegerSelection"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntegerSelection</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.IntegerSelectionError.__annotations__">
+<span class="sig-name descname"><span class="pre">__annotations__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#zensols.introspect.intsel.IntegerSelectionError.__annotations__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.IntegerSelectionError.__firstlineno__">
+<span class="sig-name descname"><span class="pre">__firstlineno__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#zensols.introspect.intsel.IntegerSelectionError.__firstlineno__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.IntegerSelectionError.__module__">
+<span class="sig-name descname"><span class="pre">__module__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'zensols.introspect.intsel'</span></em><a class="headerlink" href="#zensols.introspect.intsel.IntegerSelectionError.__module__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.IntegerSelectionError.__static_attributes__">
+<span class="sig-name descname"><span class="pre">__static_attributes__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">()</span></em><a class="headerlink" href="#zensols.introspect.intsel.IntegerSelectionError.__static_attributes__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.Kind">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.intsel.</span></span><span class="sig-name descname"><span class="pre">Kind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names=&lt;not</span> <span class="pre">given&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/intsel.html#Kind"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.intsel.Kind" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>The kind of integer selection provided by <a class="reference internal" href="#zensols.introspect.intsel.IntegerSelection" title="zensols.introspect.intsel.IntegerSelection"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntegerSelection</span></code></a>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.Kind.from_class">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cls</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/intsel.html#Kind.from_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.intsel.Kind.from_class" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#zensols.introspect.intsel.Kind" title="zensols.introspect.intsel.Kind"><code class="xref py py-class docutils literal notranslate"><span class="pre">Kind</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.Kind.interval">
+<span class="sig-name descname"><span class="pre">interval</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#zensols.introspect.intsel.Kind.interval" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.Kind.list">
+<span class="sig-name descname"><span class="pre">list</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#zensols.introspect.intsel.Kind.list" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.intsel.Kind.single">
+<span class="sig-name descname"><span class="pre">single</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#zensols.introspect.intsel.Kind.single" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-zensols.introspect.tester">
+<span id="zensols-introspect-tester-module"></span><h2>zensols.introspect.tester module<a class="headerlink" href="#module-zensols.introspect.tester" title="Link to this heading">¶</a></h2>
+<p>Runs test cases from the Python REPL.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.introspect.tester.UnitTester">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.introspect.tester.</span></span><span class="sig-name descname"><span class="pre">UnitTester</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PosixPath('tests')</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/tester.html#UnitTester"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.tester.UnitTester" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A class that runs <a class="reference external" href="https://docs.python.org/3/library/unittest.html#module-unittest" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">unittest</span></code></a> unit test cases for the rapid
+prototyping use case.  It does this by reloading the unit test case module,
+and then runs it for every invocation of this <code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Callable</span></code>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.tester.UnitTester.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PosixPath('tests')</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.introspect.tester.UnitTester.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.tester.UnitTester.module_name">
+<span class="sig-name descname"><span class="pre">module_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#zensols.introspect.tester.UnitTester.module_name" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the module, which is the Python source file name sans
+extension.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.introspect.tester.UnitTester.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/introspect/tester.html#UnitTester.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.introspect.tester.UnitTester.run" title="Link to this definition">¶</a></dt>
+<dd><p>Run all test cases in the module identified by <a class="reference internal" href="#zensols.introspect.tester.UnitTester.module_name" title="zensols.introspect.tester.UnitTester.module_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">module_name</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextTestResult</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.introspect.tester.UnitTester.test_path">
+<span class="sig-name descname"><span class="pre">test_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('tests')</span></em><a class="headerlink" href="#zensols.introspect.tester.UnitTester.test_path" title="Link to this definition">¶</a></dt>
+<dd><p>The path to the source file.  This is added to <a class="reference external" href="https://docs.python.org/3/library/sys.html#sys.path" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sys.path</span></code></a> if
+non-<code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-zensols.introspect">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-zensols.introspect" title="Link to this heading">¶</a></h2>
+<p>Contains modules for introspect and reflection.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="zensols.multi.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">zensols.multi package</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="zensols.config.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">zensols.config package</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026 Paul Landes
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">zensols.introspect package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-zensols.introspect.imp">zensols.introspect.imp module</a><ul>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporter"><code class="docutils literal notranslate"><span class="pre">ClassImporter</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporter.__init__"><code class="docutils literal notranslate"><span class="pre">ClassImporter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporter.full_classname"><code class="docutils literal notranslate"><span class="pre">ClassImporter.full_classname()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporter.get_class"><code class="docutils literal notranslate"><span class="pre">ClassImporter.get_class()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporter.get_class_or_global"><code class="docutils literal notranslate"><span class="pre">ClassImporter.get_class_or_global()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporter.get_module"><code class="docutils literal notranslate"><span class="pre">ClassImporter.get_module()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporter.get_module_class"><code class="docutils literal notranslate"><span class="pre">ClassImporter.get_module_class()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporter.instance"><code class="docutils literal notranslate"><span class="pre">ClassImporter.instance()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporter.is_valid_class_name"><code class="docutils literal notranslate"><span class="pre">ClassImporter.is_valid_class_name()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporter.parse_module_class"><code class="docutils literal notranslate"><span class="pre">ClassImporter.parse_module_class()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporter.set_log_level"><code class="docutils literal notranslate"><span class="pre">ClassImporter.set_log_level()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporterError"><code class="docutils literal notranslate"><span class="pre">ClassImporterError</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporterError.__firstlineno__"><code class="docutils literal notranslate"><span class="pre">ClassImporterError.__firstlineno__</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporterError.__module__"><code class="docutils literal notranslate"><span class="pre">ClassImporterError.__module__</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporterError.__static_attributes__"><code class="docutils literal notranslate"><span class="pre">ClassImporterError.__static_attributes__</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassImporterError.__weakref__"><code class="docutils literal notranslate"><span class="pre">ClassImporterError.__weakref__</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassResolver"><code class="docutils literal notranslate"><span class="pre">ClassResolver</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassResolver.find_class"><code class="docutils literal notranslate"><span class="pre">ClassResolver.find_class()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.ClassResolver.full_classname"><code class="docutils literal notranslate"><span class="pre">ClassResolver.full_classname()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.imp.DictionaryClassResolver"><code class="docutils literal notranslate"><span class="pre">DictionaryClassResolver</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.imp.DictionaryClassResolver.__init__"><code class="docutils literal notranslate"><span class="pre">DictionaryClassResolver.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.imp.DictionaryClassResolver.find_class"><code class="docutils literal notranslate"><span class="pre">DictionaryClassResolver.find_class()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-zensols.introspect.insp">zensols.introspect.insp module</a><ul>
+<li><a class="reference internal" href="#zensols.introspect.insp.Class"><code class="docutils literal notranslate"><span class="pre">Class</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.insp.Class.__init__"><code class="docutils literal notranslate"><span class="pre">Class.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.Class.class_type"><code class="docutils literal notranslate"><span class="pre">Class.class_type</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.Class.doc"><code class="docutils literal notranslate"><span class="pre">Class.doc</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.Class.fields"><code class="docutils literal notranslate"><span class="pre">Class.fields</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.Class.is_dataclass"><code class="docutils literal notranslate"><span class="pre">Class.is_dataclass</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.Class.methods"><code class="docutils literal notranslate"><span class="pre">Class.methods</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.Class.name"><code class="docutils literal notranslate"><span class="pre">Class.name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassDoc"><code class="docutils literal notranslate"><span class="pre">ClassDoc</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassDoc.PARAM_REGEX"><code class="docutils literal notranslate"><span class="pre">ClassDoc.PARAM_REGEX</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassDoc.__init__"><code class="docutils literal notranslate"><span class="pre">ClassDoc.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassDoc.params"><code class="docutils literal notranslate"><span class="pre">ClassDoc.params</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassDoc.text"><code class="docutils literal notranslate"><span class="pre">ClassDoc.text</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassError"><code class="docutils literal notranslate"><span class="pre">ClassError</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassError.__firstlineno__"><code class="docutils literal notranslate"><span class="pre">ClassError.__firstlineno__</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassError.__module__"><code class="docutils literal notranslate"><span class="pre">ClassError.__module__</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassError.__static_attributes__"><code class="docutils literal notranslate"><span class="pre">ClassError.__static_attributes__</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassError.__weakref__"><code class="docutils literal notranslate"><span class="pre">ClassError.__weakref__</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassField"><code class="docutils literal notranslate"><span class="pre">ClassField</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassField.__init__"><code class="docutils literal notranslate"><span class="pre">ClassField.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassField.default"><code class="docutils literal notranslate"><span class="pre">ClassField.default</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassField.kwargs"><code class="docutils literal notranslate"><span class="pre">ClassField.kwargs</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassInspector"><code class="docutils literal notranslate"><span class="pre">ClassInspector</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassInspector.DECORATOR_META"><code class="docutils literal notranslate"><span class="pre">ClassInspector.DECORATOR_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassInspector.INSPECT_META"><code class="docutils literal notranslate"><span class="pre">ClassInspector.INSPECT_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassInspector.__init__"><code class="docutils literal notranslate"><span class="pre">ClassInspector.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassInspector.attrs"><code class="docutils literal notranslate"><span class="pre">ClassInspector.attrs</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassInspector.cls"><code class="docutils literal notranslate"><span class="pre">ClassInspector.cls</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassInspector.data_type_mapper"><code class="docutils literal notranslate"><span class="pre">ClassInspector.data_type_mapper</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassInspector.get_class"><code class="docutils literal notranslate"><span class="pre">ClassInspector.get_class()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassInspector.include_init"><code class="docutils literal notranslate"><span class="pre">ClassInspector.include_init</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassInspector.include_private"><code class="docutils literal notranslate"><span class="pre">ClassInspector.include_private</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassInspector.strict"><code class="docutils literal notranslate"><span class="pre">ClassInspector.strict</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassMethod"><code class="docutils literal notranslate"><span class="pre">ClassMethod</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassMethod.__init__"><code class="docutils literal notranslate"><span class="pre">ClassMethod.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassMethod.args"><code class="docutils literal notranslate"><span class="pre">ClassMethod.args</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassMethod.doc"><code class="docutils literal notranslate"><span class="pre">ClassMethod.doc</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassMethod.name"><code class="docutils literal notranslate"><span class="pre">ClassMethod.name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassMethodArg"><code class="docutils literal notranslate"><span class="pre">ClassMethodArg</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassMethodArg.__init__"><code class="docutils literal notranslate"><span class="pre">ClassMethodArg.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassMethodArg.default"><code class="docutils literal notranslate"><span class="pre">ClassMethodArg.default</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassMethodArg.inner_types"><code class="docutils literal notranslate"><span class="pre">ClassMethodArg.inner_types</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassMethodArg.is_positional"><code class="docutils literal notranslate"><span class="pre">ClassMethodArg.is_positional</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassParam"><code class="docutils literal notranslate"><span class="pre">ClassParam</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassParam.__init__"><code class="docutils literal notranslate"><span class="pre">ClassParam.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassParam.doc"><code class="docutils literal notranslate"><span class="pre">ClassParam.doc</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassParam.dtype"><code class="docutils literal notranslate"><span class="pre">ClassParam.dtype</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.ClassParam.name"><code class="docutils literal notranslate"><span class="pre">ClassParam.name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.insp.TypeMapper"><code class="docutils literal notranslate"><span class="pre">TypeMapper</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.insp.TypeMapper.DEFAULT_DATA_TYPES"><code class="docutils literal notranslate"><span class="pre">TypeMapper.DEFAULT_DATA_TYPES</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.TypeMapper.__init__"><code class="docutils literal notranslate"><span class="pre">TypeMapper.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.TypeMapper.allow_class"><code class="docutils literal notranslate"><span class="pre">TypeMapper.allow_class</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.TypeMapper.cls"><code class="docutils literal notranslate"><span class="pre">TypeMapper.cls</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.TypeMapper.data_types"><code class="docutils literal notranslate"><span class="pre">TypeMapper.data_types</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.TypeMapper.default_type"><code class="docutils literal notranslate"><span class="pre">TypeMapper.default_type</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.insp.TypeMapper.map_type"><code class="docutils literal notranslate"><span class="pre">TypeMapper.map_type()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-zensols.introspect.intsel">zensols.introspect.intsel module</a><ul>
+<li><a class="reference internal" href="#zensols.introspect.intsel.IntegerSelection"><code class="docutils literal notranslate"><span class="pre">IntegerSelection</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.intsel.IntegerSelection.INTERVAL_DELIM"><code class="docutils literal notranslate"><span class="pre">IntegerSelection.INTERVAL_DELIM</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.intsel.IntegerSelection.__init__"><code class="docutils literal notranslate"><span class="pre">IntegerSelection.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.intsel.IntegerSelection.kind"><code class="docutils literal notranslate"><span class="pre">IntegerSelection.kind</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.intsel.IntegerSelection.select"><code class="docutils literal notranslate"><span class="pre">IntegerSelection.select()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.intsel.IntegerSelection.selection"><code class="docutils literal notranslate"><span class="pre">IntegerSelection.selection</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.intsel.IntegerSelectionError"><code class="docutils literal notranslate"><span class="pre">IntegerSelectionError</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.intsel.IntegerSelectionError.__annotations__"><code class="docutils literal notranslate"><span class="pre">IntegerSelectionError.__annotations__</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.intsel.IntegerSelectionError.__firstlineno__"><code class="docutils literal notranslate"><span class="pre">IntegerSelectionError.__firstlineno__</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.intsel.IntegerSelectionError.__module__"><code class="docutils literal notranslate"><span class="pre">IntegerSelectionError.__module__</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.intsel.IntegerSelectionError.__static_attributes__"><code class="docutils literal notranslate"><span class="pre">IntegerSelectionError.__static_attributes__</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.introspect.intsel.Kind"><code class="docutils literal notranslate"><span class="pre">Kind</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.intsel.Kind.from_class"><code class="docutils literal notranslate"><span class="pre">Kind.from_class()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.intsel.Kind.interval"><code class="docutils literal notranslate"><span class="pre">Kind.interval</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.intsel.Kind.list"><code class="docutils literal notranslate"><span class="pre">Kind.list</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.intsel.Kind.single"><code class="docutils literal notranslate"><span class="pre">Kind.single</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-zensols.introspect.tester">zensols.introspect.tester module</a><ul>
+<li><a class="reference internal" href="#zensols.introspect.tester.UnitTester"><code class="docutils literal notranslate"><span class="pre">UnitTester</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.introspect.tester.UnitTester.__init__"><code class="docutils literal notranslate"><span class="pre">UnitTester.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.tester.UnitTester.module_name"><code class="docutils literal notranslate"><span class="pre">UnitTester.module_name</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.tester.UnitTester.run"><code class="docutils literal notranslate"><span class="pre">UnitTester.run()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.introspect.tester.UnitTester.test_path"><code class="docutils literal notranslate"><span class="pre">UnitTester.test_path</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-zensols.introspect">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=d5528024"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

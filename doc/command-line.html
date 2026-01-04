@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+
+<html class="no-js" data-content_root="../" lang="en">
+<head><meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/><meta content="width=device-width, initial-scale=1" name="viewport">
+<link href="../genindex.html" rel="index" title="Index"/><link href="../search.html" rel="search" title="Search"/><link href="configuration.html" rel="next" title="Configuration"/><link href="../index.html" rel="prev" title="Zensols Utilities"/>
+<!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+<title>Command Line Interface - Zensols Utilities 1.16.3 documentation</title>
+<link href="../_static/pygments.css?v=03e43079" rel="stylesheet" type="text/css">
+<link href="../_static/styles/furo.css?v=7bdb33bb" rel="stylesheet" type="text/css">
+<link href="../_static/copybutton.css?v=76b2166b" rel="stylesheet" type="text/css">
+<link href="../_static/sphinx-codeautolink.css?v=b2176991" rel="stylesheet" type="text/css">
+<link href="../_static/graphviz.css" rel="stylesheet" type="text/css"/>
+<link href="../_static/styles/furo-extensions.css?v=8dab3a3b" rel="stylesheet" type="text/css"/>
+<link href="../_static/codeautolink.css?v=57550ae3" rel="stylesheet" type="text/css"/>
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></link></link></link></link></meta></head>
+<body>
+<script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+<svg style="display: none;" xmlns="http://www.w3.org/2000/svg">
+<symbol id="svg-toc" viewbox="0 0 24 24">
+<title>Contents</title>
+<svg fill="currentColor" stroke="currentColor" stroke-width="0" viewbox="0 0 1024 1024">
+<path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"></path>
+</svg>
+</symbol>
+<symbol id="svg-menu" viewbox="0 0 24 24">
+<title>Menu</title>
+<svg class="feather-menu" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<line x1="3" x2="21" y1="12" y2="12"></line>
+<line x1="3" x2="21" y1="6" y2="6"></line>
+<line x1="3" x2="21" y1="18" y2="18"></line>
+</svg>
+</symbol>
+<symbol id="svg-arrow-right" viewbox="0 0 24 24">
+<title>Expand</title>
+<svg class="feather-chevron-right" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<polyline points="9 18 15 12 9 6"></polyline>
+</svg>
+</symbol>
+<symbol id="svg-sun" viewbox="0 0 24 24">
+<title>Light mode</title>
+<svg class="feather-sun" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle cx="12" cy="12" r="5"></circle>
+<line x1="12" x2="12" y1="1" y2="3"></line>
+<line x1="12" x2="12" y1="21" y2="23"></line>
+<line x1="4.22" x2="5.64" y1="4.22" y2="5.64"></line>
+<line x1="18.36" x2="19.78" y1="18.36" y2="19.78"></line>
+<line x1="1" x2="3" y1="12" y2="12"></line>
+<line x1="21" x2="23" y1="12" y2="12"></line>
+<line x1="4.22" x2="5.64" y1="19.78" y2="18.36"></line>
+<line x1="18.36" x2="19.78" y1="5.64" y2="4.22"></line>
+</svg>
+</symbol>
+<symbol id="svg-moon" viewbox="0 0 24 24">
+<title>Dark mode</title>
+<svg class="icon-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0h24v24H0z" fill="none" stroke="none"></path>
+<path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z"></path>
+</svg>
+</symbol>
+<symbol id="svg-sun-with-moon" viewbox="0 0 24 24">
+<title>Auto light/dark, in light mode</title>
+<svg class="icon-custom-derived-from-feather-sun-and-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z" style="opacity: 50%"></path>
+<line x1="14.5" x2="14.5" y1="3.25" y2="1.25"></line>
+<line x1="14.5" x2="14.5" y1="15.85" y2="17.85"></line>
+<line x1="10.044" x2="8.63" y1="5.094" y2="3.68"></line>
+<line x1="19" x2="20.414" y1="14.05" y2="15.464"></line>
+<line x1="8.2" x2="6.2" y1="9.55" y2="9.55"></line>
+<line x1="20.8" x2="22.8" y1="9.55" y2="9.55"></line>
+<line x1="10.044" x2="8.63" y1="14.006" y2="15.42"></line>
+<line x1="19" x2="20.414" y1="5.05" y2="3.636"></line>
+<circle cx="14.5" cy="9.55" r="3.6"></circle>
+</svg>
+</symbol>
+<symbol id="svg-moon-with-sun" viewbox="0 0 24 24">
+<title>Auto light/dark, in dark mode</title>
+<svg class="icon-custom-derived-from-feather-sun-and-tabler-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"></path>
+<line style="opacity: 50%" x1="18" x2="18" y1="3.705" y2="2.5"></line>
+<line style="opacity: 50%" x1="18" x2="18" y1="11.295" y2="12.5"></line>
+<line style="opacity: 50%" x1="15.316" x2="14.464" y1="4.816" y2="3.964"></line>
+<line style="opacity: 50%" x1="20.711" x2="21.563" y1="10.212" y2="11.063"></line>
+<line style="opacity: 50%" x1="14.205" x2="13.001" y1="7.5" y2="7.5"></line>
+<line style="opacity: 50%" x1="21.795" x2="23" y1="7.5" y2="7.5"></line>
+<line style="opacity: 50%" x1="15.316" x2="14.464" y1="10.184" y2="11.036"></line>
+<line style="opacity: 50%" x1="20.711" x2="21.563" y1="4.789" y2="3.937"></line>
+<circle cx="18" cy="7.5" r="2.169" style="opacity: 50%"></circle>
+</svg>
+</symbol>
+<symbol id="svg-pencil" viewbox="0 0 24 24">
+<svg class="icon-tabler-pencil-code" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"></path>
+<path d="M13.5 6.5l4 4"></path>
+<path d="M20 21l2 -2l-2 -2"></path>
+<path d="M17 17l-2 2l2 2"></path>
+</svg>
+</symbol>
+<symbol id="svg-eye" viewbox="0 0 24 24">
+<svg class="icon-tabler-eye-code" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0h24v24H0z" fill="none" stroke="none"></path>
+<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+<path d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008"></path>
+<path d="M20 21l2 -2l-2 -2"></path>
+<path d="M17 17l-2 2l2 2"></path>
+</svg>
+</symbol>
+</svg>
+<input aria-label="Toggle site navigation sidebar" class="sidebar-toggle" id="__navigation" name="__navigation" type="checkbox"/>
+<input aria-label="Toggle table of contents sidebar" class="sidebar-toggle" id="__toc" name="__toc" type="checkbox"/>
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+<div class="page">
+<header class="mobile-header">
+<div class="header-left">
+<label class="nav-overlay-icon" for="__navigation">
+<span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+</label>
+</div>
+<div class="header-center">
+<a href="../top.html"><div class="brand">Zensols Utilities 1.16.3 documentation</div></a>
+</div>
+<div class="header-right">
+<div class="theme-toggle-container theme-toggle-header">
+<button aria-label="Toggle Light / Dark / Auto color theme" class="theme-toggle">
+<svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+<svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+<svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+<svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+</button>
+</div>
+<label class="toc-overlay-icon toc-header-icon" for="__toc">
+<span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+</label>
+</div>
+</header>
+<aside class="sidebar-drawer">
+<div class="sidebar-container">
+<div class="sidebar-sticky"><a class="sidebar-brand" href="../top.html">
+<span class="sidebar-brand-text">Zensols Utilities 1.16.3 documentation</span>
+</a><form action="../search.html" class="sidebar-search-container" method="get" role="search">
+<input aria-label="Search" class="sidebar-search" name="q" placeholder="Search"/>
+<input name="check_keywords" type="hidden" value="yes"/>
+<input name="area" type="hidden" value="default"/>
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Overview</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="persist.html">Persistence</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api/zensols.cli.html">zensols.cli package</a><input aria-label="Toggle navigation of zensols.cli package" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../api/zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+</ul>
+</input></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/zensols.config.html">zensols.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/zensols.introspect.html">zensols.introspect package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/zensols.multi.html">zensols.multi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/zensols.persist.html">zensols.persist package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/zensols.util.html">zensols.util package</a></li>
+</ul>
+</input></li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LICENSE.html">License</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<div class="main">
+<div class="content">
+<div class="article-container">
+<a class="back-to-top muted-link" href="#">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+</svg>
+<span>Back to top</span>
+</a>
+<div class="content-icon-container">
+<div class="view-this-page">
+<a class="muted-link" href="../_sources/doc/command-line.md.txt" title="View this page">
+<svg><use href="#svg-eye"></use></svg>
+<span class="visually-hidden">View this page</span>
+</a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+<button aria-label="Toggle Light / Dark / Auto color theme" class="theme-toggle">
+<svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+<svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+<svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+<svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+</button>
+</div>
+<label class="toc-overlay-icon toc-content-icon" for="__toc">
+<span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+</label>
+</div>
+<article id="furo-main-content" role="main">
+<section id="command-line-interface">
+<h1>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Link to this heading">¶</a></h1>
+<p>The goal of this API is to require little to no meta data to create a command
+line.  Instead, a complete command line interface is automatically built given
+a class and follows from the structure and meta data of the class itself.</p>
+<section id="harness-and-simple-example">
+<h2>Harness and Simple Example<a class="headerlink" href="#harness-and-simple-example" title="Link to this heading">¶</a></h2>
+<p>To start, and a good place to jump right in, the <a class="reference external" href="../#template">template</a>
+section’s example is expanded (see <a class="reference external" href="https://github.com/plandes/util/blob/master/example/app/fsinfo.py">fsinfo.py</a> for the complete example).  It
+provides an example of how to use the command line harness, which is a class
+that provides a command line interface, <a class="reference external" href="https://jupyter.org">Jupyter notebooks</a> and the Python REPL
+to the an <a class="reference external" href="config.html#application-context">application context</a>.</p>
+<p>In the <a class="reference external" href="https://github.com/plandes/util/blob/master/example/app/fsinfo.py">fsinfo.py</a> example, this application context is defined inline in INI
+format:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">CONFIG</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">[cli]</span>
+<span class="s2">apps = list: log_cli, app</span>
+<span class="s2">...</span>
+<span class="s2">[app]</span>
+<span class="s2">class_name = fsinfo.Application</span>
+<span class="s2">executor = instance: executor</span>
+<span class="s2">"""</span>
+</pre></div>
+</div>
+<p>The next enumeration class provides a programmatic way to identify a short
+verses long output format when listing a directory for our application.
+However, it is also used by the command line API to generate a help message and
+validate command line arguments:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">short</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">long</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The next part of the example application defines a <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html">dataclass</a> which is not
+only invoked by the command line API glue code, but also used to create the
+help usage for the command line:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Application</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#object" title="object"><span class="nb">object</span></a><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Toy application example that provides file system information.</span>
+
+<span class="sd">    """</span>
+    <span class="c1"># tell the framework to not treat the executor field as an option</span>
+    <span class="n">CLI_META</span> <span class="o">=</span> <span class="p">{</span><span class="s1">'option_excludes'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'executor'</span><span class="p">}}</span>
+
+    <span class="n">executor</span><span class="p">:</span> <span class="n">Executor</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">"""The executor."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">echo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Repeat back what is given as text.</span>
+<span class="sd">        """</span>
+        <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The top level usage documentation comes from the class documentation, method
+documentation for actions, and the parameters themselves for the arguments.
+The <code class="docutils literal notranslate"><span class="pre">CLI_META</span></code> is a class level hint to the API glue code to not add the
+<code class="docutils literal notranslate"><span class="pre">executor</span></code> class as part of the command line, which it would by default
+otherwise.  This parameter is added based on the <a class="reference external" href="config.html#application-context">application context</a> adds
+this to the class when one of the methods are run based on the user selected
+action that maps to the called method.</p>
+<p>Finally we create and run a harness based on the configuration we’ve created,
+which in turn points to our application <code class="docutils literal notranslate"><span class="pre">dataclass</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="p">(</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">):</span>
+    <span class="n">CliHarness</span><span class="p">(</span>
+        <span class="n">app_config_resource</span><span class="o">=</span><span class="n">StringIO</span><span class="p">(</span><span class="n">CONFIG</span><span class="p">),</span>
+        <span class="n">app_config_context</span><span class="o">=</span><span class="n">ProgramNameConfigurator</span><span class="p">(</span>
+            <span class="kc">None</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">'fsinfo'</span><span class="p">)</span><span class="o">.</span><span class="n">create_section</span><span class="p">(),</span>
+        <span class="n">proto_args</span><span class="o">=</span><span class="s1">'ls -f long'</span><span class="p">,</span>
+        <span class="n">proto_factory_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">'reload_pattern'</span><span class="p">:</span> <span class="s1">'^fsinfo'</span><span class="p">},</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>We provide the <code class="docutils literal notranslate"><span class="pre">app_config_resource</span></code> as a stream based object.  If this were a
+string or <code class="docutils literal notranslate"><span class="pre">pathlib.Path</span></code>, it would get the <a class="reference external" href="config.html#application-context">application context</a> from the file
+system.</p>
+<p>Next, the <code class="docutils literal notranslate"><span class="pre">app_config_context</span></code> parameter uses a <em>first pass</em> application (see
+the <a class="reference external" href="#two-pass-command-line-parser">Two Pass Command Line Parser</a> section) to
+create a section given to the application context that has the program info
+used by the logging setup.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">proto_args</span></code> parameter are the command line arguments used when prototyping
+the application in the Python REPL as if the application were run from the
+command line.</p>
+<p>Finally the <code class="docutils literal notranslate"><span class="pre">proto_factory_kwargs</span></code> tell the API to reload any module (matched
+as a regular expression) starting <code class="docutils literal notranslate"><span class="pre">fsinfo</span></code>, which is the module defined by this
+script.  This is more useful for larger applications with multiple module
+name spaces.</p>
+</section>
+<section id="tutorial">
+<h2>Tutorial<a class="headerlink" href="#tutorial" title="Link to this heading">¶</a></h2>
+<p>This tutorial covers the command line API in a breadth first manner.  Please
+read the <a class="reference internal" href="configuration.html"><span class="doc">configuration</span></a> documentation first as this document builds on it.  We
+will start with a simple application and build it up, with the final version
+being the CLI <a class="reference external" href="https://github.com/plandes/util/tree/master/example/cli">example</a> directory.</p>
+<p>The remainder of the tutorial shows by example of how to use the framework.
+The working example code at the end of each sub section can be found in the
+<a class="reference external" href="https://github.com/plandes/util/tree/master/example/cli">example</a> directory.  A more complete full example is given as a template as
+described in the main documentation <a class="reference external" href="../#template">template section</a>.</p>
+<section id="boilerplate">
+<h3>Boilerplate<a class="headerlink" href="#boilerplate" title="Link to this heading">¶</a></h3>
+<p>Every introspective CLI application needs an <em>application context</em> (see the
+<a class="reference external" href="config.html#application-context">configuration documentation</a>), which is just
+a specialized grouping of data specific to an application that has two forms:
+file(s) on the file system and their in-memory isomorphic form.  The files that
+make up the application context are those already detailed in the
+<a class="reference internal" href="configuration.html"><span class="doc">configuration</span></a> section.  The <em>application context</em> file, which by default, is
+<code class="docutils literal notranslate"><span class="pre">resources/app.conf</span></code>, which is added as a resource file to a package
+distribution built with <a class="reference external" href="https://setuptools.readthedocs.io/en/latest/">setuptools</a> since the file is located in <code class="docutils literal notranslate"><span class="pre">resources</span></code>.
+Our initial application context just provides the <code class="docutils literal notranslate"><span class="pre">cli</span></code> section with it’s
+referenced <code class="docutils literal notranslate"><span class="pre">app</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[cli]</span>
+<span class="na">apps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">list: app</span>
+
+<span class="k">[app]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">payroll.Tracker</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">app</span></code> section gives the class to instantiate, which has the method to call
+from the command line <code class="docutils literal notranslate"><span class="pre">__main__</span></code>.  The <code class="docutils literal notranslate"><span class="pre">apps</span></code> line in the <code class="docutils literal notranslate"><span class="pre">cli</span></code> section lists
+all the application to create, each of which maps as an <em>action</em> using a
+mnemonic for each of it’s methods.</p>
+<p><strong>Note</strong>: in this example, the <code class="docutils literal notranslate"><span class="pre">cli</span></code> section can be omitted since it uses the
+default entry of the <code class="docutils literal notranslate"><span class="pre">apps</span></code> property set to the singleton <code class="docutils literal notranslate"><span class="pre">app</span></code> section.</p>
+<p>Since this example creates a simple payroll application, we’ll create a <em>hello
+world</em> like class in <code class="docutils literal notranslate"><span class="pre">payroll.py</span></code> that will evolve in to a more complex
+application:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
+
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Tracker</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#object" title="object"><span class="nb">object</span></a><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_employees</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="s1">'hello world'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally, we need the entry point main, which is added to <code class="docutils literal notranslate"><span class="pre">main.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#module-zensols.cli" title="zensols.cli"><span class="nn">zensols.cli</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#zensols.cli.app.ApplicationFactory" title="zensols.cli.app.ApplicationFactory"><span class="n">ApplicationFactory</span></a>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#zensols.cli.app.ApplicationFactory" title="zensols.cli.app.ApplicationFactory"><span class="n">cli</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#zensols.cli.app.ApplicationFactory" title="zensols.cli.app.ApplicationFactory"><span class="n">ApplicationFactory</span></a><span class="p">(</span><span class="s1">'payroll'</span><span class="p">,</span> <span class="s1">'app.conf'</span><span class="p">)</span>
+    <a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#zensols.cli.app.ApplicationFactory.invoke" title="zensols.cli.app.ApplicationFactory.invoke"><span class="n">cli</span><span class="o">.</span><span class="n">invoke</span></a><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <a class="reference external" href="../api/zensols.cli.html#zensols.cli.app.ApplicationFactory">ApplicationFactory</a> is the framework entry point that requires only one
+parameter, which is the package distribution name and usually the name space of
+the application.  Large organizations or projects prefix the string with their
+name and the name is used in <code class="docutils literal notranslate"><span class="pre">setup.py</span></code> to resources that make up the package
+distribution.</p>
+<p>The second parameter is the <a class="reference external" href="config.html#resources">resource</a> <em>application
+context</em>, which as mentioned usually goes in the <code class="docutils literal notranslate"><span class="pre">resources</span></code> directory.
+However, to keep things simple, ours points to a file in the root directory for
+this example.  When we run this application from the command line using a help
+flag (<code class="docutils literal notranslate"><span class="pre">--help</span></code>), we get:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>./main.py<span class="w"> </span>--help
+
+<span class="go">Usage: main.py [options]:</span>
+
+<span class="go">Tracker().</span>
+
+<span class="go">Options:</span>
+<span class="go">  --version   show program's version number and exit</span>
+<span class="go">  -h, --help  show this help message and exit</span>
+</pre></div>
+</div>
+<p>The help usage message is built automatically, so the flag is always present in
+the usage.  The <code class="docutils literal notranslate"><span class="pre">Tracker()</span></code> is automatically generated program level
+documentation since we have not given any docstrings in our class.</p>
+<p>The version, when built and installed as an entry point command line file, will
+print the version.  Since there is only one method, and thus one action mapped
+to that method, the CLI calls it and produces the expected output.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>./main.py<span class="w"> </span>--help
+<span class="go">hello world</span>
+</pre></div>
+</div>
+</section>
+<section id="domain">
+<h3>Domain<a class="headerlink" href="#domain" title="Link to this heading">¶</a></h3>
+<p>Let’s add some container classes in <code class="docutils literal notranslate"><span class="pre">domain.py</span></code> to hold data for our payroll
+system, which are employees and their salaries and a grouping for them by
+department:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#module-typing" title="typing"><span class="nn">typing</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="typing.Tuple"><span class="n">Tuple</span></a>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.field" title="dataclasses.field"><span class="n">field</span></a>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="../api/zensols.config.html#module-zensols.config" title="zensols.config"><span class="nn">zensols.config</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../api/zensols.config.html#zensols.config.dictable.Dictable" title="zensols.config.dictable.Dictable"><span class="n">Dictable</span></a>
+
+
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="../api/zensols.config.html#zensols.config.dictable.Dictable" title="zensols.config.dictable.Dictable"><span class="n">Dictable</span></a><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a>
+    <span class="n">age</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a>
+    <span class="n">salary</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a>
+
+
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Department</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="../api/zensols.config.html#zensols.config.dictable.Dictable" title="zensols.config.dictable.Dictable"><span class="n">Dictable</span></a><span class="p">):</span>
+    <span class="n">name</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a>
+    <span class="n">employees</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="typing.Tuple"><span class="n">Tuple</span></a><span class="p">[</span><span class="n">Person</span><span class="p">]</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.field" title="dataclasses.field"><span class="n">field</span></a><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">emp_names</span> <span class="o">=</span> <span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#map" title="map"><span class="nb">map</span></a><span class="p">(</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">employees</span><span class="p">))</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">emp_names</span><span class="si">}</span><span class="s2">"</span>
+</pre></div>
+</div>
+<p>To access our container classes, we’ll create a data access object and add it
+to the <code class="docutils literal notranslate"><span class="pre">payroll.py</span></code> file:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EmployeeDatabase</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#object" title="object"><span class="nb">object</span></a><span class="p">):</span>
+    <span class="n">departments</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Department</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>We’ll create a mock set of data directly in the <code class="docutils literal notranslate"><span class="pre">app.conf</span></code> file to go
+along with our mock DB instance and add the DB instance to the main app:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[homer]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">domain.Person</span>
+<span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">40</span>
+<span class="na">salary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">5.25</span>
+
+<span class="k">[human_resources]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">domain.Department</span>
+<span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">hr</span>
+<span class="na">employees</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">instance: list: homer</span>
+
+<span class="k">[emp_db]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">payroll.EmployeeDatabase</span>
+<span class="na">departments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">instance: list: human_resources</span>
+
+<span class="k">[app]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">payroll.Tracker</span>
+<span class="na">db</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">instance: emp_db</span>
+</pre></div>
+</div>
+<section id="application-class-and-actions">
+<h4>Application Class and Actions<a class="headerlink" href="#application-class-and-actions" title="Link to this heading">¶</a></h4>
+<p>We’ll flesh out our main application class with documentation and data class
+field <code class="docutils literal notranslate"><span class="pre">dry_run</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Tracker</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#object" title="object"><span class="nb">object</span></a><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Tracks and distributes employee payroll."""</span>
+    <span class="n">db</span><span class="p">:</span> <span class="n">EmployeeDatabase</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">"""An instance not given on the commnd line."""</span>
+
+    <span class="n">dry_run</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#bool" title="bool"><span class="nb">bool</span></a> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""If given, don't do anything, just act like it."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_employees</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Format</span> <span class="o">=</span> <span class="n">Format</span><span class="o">.</span><span class="n">short</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Show all employees."""</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'printing employees using format: </span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>which gives the following help:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Usage: main.py [options]:</span>
+
+<span class="go">Show all employees.</span>
+
+<span class="go">Options:</span>
+<span class="go">  --version             show program's version number and exit</span>
+<span class="go">  -h, --help            show this help message and exit</span>
+<span class="go">  -r, --dryrun          if given, don't do anything, just act like it</span>
+<span class="go">  -d EMPLOYEEDATABASE, --db=EMPLOYEEDATABASE</span>
+<span class="go">                        an instance not given on the commnd line</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">print_employees</span></code> method is now identified as the method to run on a new
+instance of the class that will later be instantiated by the
+<a class="reference external" href="../api/zensols.config.html#zensols.config.factory.ImportConfigFactory">ImportConfigFactory</a> class by the framework.  The name for the framework
+plumbing that ties the command line to this method is called an <em>action</em>.  Each
+action has it’s own respective arguments used as fields at the class level, and
+optionally, any arguments given to the method (keyword or positional).</p>
+<p><strong>Note</strong>: By default, only the subclass is used to generate the CLI.  If you
+want to include the sub class for additional actions and options, set the class
+attribute <code class="docutils literal notranslate"><span class="pre">CLASS_INSPECTOR</span></code> (see <a class="reference external" href="../api/zensols.introspect.html#zensols.introspect.inspect.ClassInspector.INSPECT_META">INSPECT_META</a>) to <code class="docutils literal notranslate"><span class="pre">{}</span></code>.</p>
+</section>
+<section id="action-decorators">
+<h4>Action Decorators<a class="headerlink" href="#action-decorators" title="Link to this heading">¶</a></h4>
+<p>Now we have the try run boolean flag generated from our data class field
+attribute and we see the method docstring used as the program documentation.
+However, the <code class="docutils literal notranslate"><span class="pre">-d</span> <span class="pre">EMPLOYEEDATABASE</span></code> is the framework misinterpretation of the
+reference to the data base object, which it should instead ignore.  There are
+two ways to tell it to ignore it: a class space or a decorator class given in
+the configuration.</p>
+<p>The former is defined by creating the class space attribute <code class="docutils literal notranslate"><span class="pre">CLASS_META</span></code> that
+contains what to make options, option name changes and mnemonic to method
+mappings (see <a class="reference external" href="../api/zensols.cli.html#zensols.cli.lib.LogConfigurator.CLI_META">LogConfigurator.CONFIG_META</a> for an example).</p>
+<p>The latter is done by creating a new instance of a class in a section with the
+same information as the <a class="reference external" href="../api/zensols.cli.html#zensols.cli.lib.LogConfigurator.CLI_META">CONFIG_META</a> attribute.  The section name uses the
+same section it <em>decorates</em> appended with <code class="docutils literal notranslate"><span class="pre">_decorates</span></code> in <code class="docutils literal notranslate"><span class="pre">app.conf</span></code>,
+such as:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[app_decorator]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">zensols.cli.ActionCli</span>
+<span class="na">option_excludes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">set: db</span>
+</pre></div>
+</div>
+<p>which tells the framework to ignore the <code class="docutils literal notranslate"><span class="pre">db</span></code> field.  The <a class="reference external" href="../api/zensols.cli.html#zensols.cli.action.ActionCli">ActionCli</a> is the
+framework’s aforementioned plumbing that connects the class and method pair to
+the command line.  Each <code class="docutils literal notranslate"><span class="pre">ActionCli</span></code> describes the class and at least one of
+it’s methods, each of which is an action with it’s respective command line
+metadata given as an <a class="reference external" href="../api/zensols.cli.html#zensols.cli.meta.ActionMetaData">ActionMetaData</a>.</p>
+<p>The format of decorator sections can be modified with
+<code class="docutils literal notranslate"><span class="pre">decorator_section_format</span></code> given to the <a class="reference external" href="../api/zensols.cli.html#zensols.cli.action.ActionCliManager">ActionCliManager</a>.</p>
+</section>
+<section id="domain-and-choices">
+<h4>Domain and Choices<a class="headerlink" href="#domain-and-choices" title="Link to this heading">¶</a></h4>
+<p>We’ll want to be able to allow different formats to print employees for our
+<code class="docutils literal notranslate"><span class="pre">print_employees</span></code> method  However, this parameter will only apply to this
+method and not every method of the class (unlike the <code class="docutils literal notranslate"><span class="pre">dryrun</span></code> field), so it’s
+given to our Python method as an optional keyword argument.</p>
+<p>How we tell the program how to format is implemented as one of a set of
+predefined constants, which is usually given as a <em>choice</em> in <a class="reference external" href="https://docs.python.org/3/library/optparse.html">OptionParser</a>
+parlance.  The framework understands how to deal with choices as a Python
+<a class="reference external" href="https://docs.python.org/3/library/enum.html">Enum</a> class, so we’ll add an enumeration for each format type with the
+corresponding keyword argument to the method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#module-enum" title="enum"><span class="nn">enum</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="enum.Enum"><span class="n">Enum</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">auto</span></a>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="enum.Enum"><span class="n">Enum</span></a><span class="p">):</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">short</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">auto</span></a><span class="p">()</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">verbose</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">auto</span></a><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">print_employees</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Format</span> <span class="o">=</span> <span class="n">Format</span><span class="o">.</span><span class="n">short</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Show all employees.</span>
+
+<span class="sd">	:param format: the detail of reporting</span>
+
+<span class="sd">	"""</span>
+	<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'printing employees using format: </span><span class="si">{</span><span class="nb">format</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+	<span class="n">dept</span><span class="p">:</span> <span class="n">Department</span>
+	<span class="k">for</span> <span class="n">dept</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">departments</span><span class="p">:</span>
+		<span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="n">Format</span><span class="o">.</span><span class="n">short</span><span class="p">:</span>
+			<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">dept</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">dept</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Our generated help reflects the option as a keyword parameter and its default
+to the method:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Usage: main.py [options]:</span>
+
+<span class="go">Show all employees.</span>
+
+<span class="go">Options:</span>
+<span class="go">  --version             show program's version number and exit</span>
+<span class="go">  -h, --help            show this help message and exit</span>
+<span class="go">  -d, --dryrun          if given, don't do anything, just act like it</span>
+<span class="go">  -f &lt;short|verbose&gt;, --format=&lt;short|verbose&gt;</span>
+<span class="go">                        the detail of reporting</span>
+</pre></div>
+</div>
+<p>Finally, we run the program with no options to invoke the <code class="docutils literal notranslate"><span class="pre">print_employees</span></code>
+method:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>./main.py<span class="w"> </span>
+<span class="go">printing employees using format: Format.short</span>
+<span class="go">human_resources: homer</span>
+
+<span class="gp">$ </span>./main.py<span class="w"> </span>-f<span class="w"> </span>verbose
+<span class="go">printing employees using format: Format.verbose</span>
+<span class="go">name: human_resources</span>
+<span class="go">employees:</span>
+<span class="go">    name: homer</span>
+<span class="go">    age: 40</span>
+<span class="go">    salary: 5.25</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="user-configuration">
+<h3>User Configuration<a class="headerlink" href="#user-configuration" title="Link to this heading">¶</a></h3>
+<p>So far all the configuration we’ve seen is tied closely to the code, and not
+the kind of configuration the end user cares about or should want to see.  This
+framework allows a separation by inclusion of configuration with other files.
+Typically the user indicates what file with a flag on the command line, which
+the program then reads.</p>
+<p>These files can reference each other, and for most use cases and this example,
+refer from the application context to the user given data.  This user data will
+have things like paths, user names, parameters to scientific applications etc.
+The framework supports this and non-cyclical two way references: from the
+application context to the user configuration and vice versa.</p>
+<p>The framework implements this user configuration injection with the
+<a class="reference external" href="../api/zensols.cli.html#zensols.cli.lib.ConfigurationImporter">ConfigurationImporter</a> class, which is just a data class with a method to load
+the configuration and add it to the application context.  It is configured as a
+<em>first pass</em> class, which means it is run before the application.</p>
+<section id="two-pass-command-line-parser">
+<h4>Two Pass Command Line Parser<a class="headerlink" href="#two-pass-command-line-parser" title="Link to this heading">¶</a></h4>
+<p>There are many first pass actions that prepare for one of many second pass
+actions indicated by the user using the <em>action</em>’s mnemonic.  The framework
+parses the command line parameters given by the user in two passes:</p>
+<ol>
+<li><p>The first pass parses options common to all applications and pertinent
+to tasks that usually prepare the environment before the application runs.
+Examples are configuring the log system with a debugging level, and in this
+example, loads the configuration.</p>
+<p>In this phase, all options from all methods are added so we can “fish out”
+the action mnemonic, which is the string used to indicate which method to
+run as we’ve seen with the <code class="docutils literal notranslate"><span class="pre">print_employees</span></code> method in the <a class="reference external" href="#application-class-and-actions">application
+class</a> example</p>
+</li>
+<li><p>After the first pass completes, we know the action to run along with any
+other positional arguments given separated from the command line options.
+Now we know enough to build a new command line specialized for the <em>action</em>
+given by the user.</p></li>
+</ol>
+<p>The <a class="reference external" href="../api/zensols.cli.html#zensols.cli.lib.ConfigurationImporter">ConfigurationImporter</a> is both indicated it should run, and what file to
+load with a <code class="docutils literal notranslate"><span class="pre">-c/--config</span></code> option followed by a file name.  Again, the this
+option can be renamed with an <a class="reference external" href="#action-decorators">action decorator</a>, which
+obviates its <a class="reference external" href="#ConfigurationImporter.CLASS_META">CLASS_META</a> meta data.  Adding
+this capability is as simple as adding it as an application:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[cli]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">zensols.cli.ActionCliManager</span>
+<span class="na">apps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">list: config_cli, app</span>
+
+<span class="k">[config_cli]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">zensols.cli.ConfigurationImporter</span>
+</pre></div>
+</div>
+<p>We’ve added the section <code class="docutils literal notranslate"><span class="pre">config_cli</span></code> to the list of sections to read, which
+gives a definition for a new class of type <a class="reference external" href="../api/zensols.cli.html#zensols.cli.lib.ConfigurationImporter">ConfigurationImporter</a>, which in
+turn adds the <code class="docutils literal notranslate"><span class="pre">-c</span></code> option:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Usage: main.py [options]:</span>
+
+<span class="go">Show all employees.</span>
+
+<span class="go">Options:</span>
+<span class="go">  --version             show program's version number and exit</span>
+<span class="go">  -h, --help            show this help message and exit</span>
+<span class="go">  -d, --dryrun          if given, don't do anything, just act like it</span>
+<span class="go">  -f &lt;short|verbose&gt;, --format=&lt;short|verbose&gt;</span>
+<span class="go">                        the detail of reporting</span>
+<span class="go">  -c FILE, --config=FILE</span>
+<span class="go">                        the path to the configuration file</span>
+</pre></div>
+</div>
+<p>Note the <code class="docutils literal notranslate"><span class="pre">config_cli</span></code> section can type a <code class="docutils literal notranslate"><span class="pre">type</span></code> parameter to indicate what kind
+of configuration type, such as <code class="docutils literal notranslate"><span class="pre">ini</span></code>, <code class="docutils literal notranslate"><span class="pre">importini</span></code>, <code class="docutils literal notranslate"><span class="pre">json</span></code>, etc.  A special type
+is <code class="docutils literal notranslate"><span class="pre">import</span></code>, which requires a <code class="docutils literal notranslate"><span class="pre">section</span></code> property.  The section is then loaded
+just like the <code class="docutils literal notranslate"><span class="pre">[import]</span></code> of an <a class="reference external" href="config.html#import-ini-configuration">import ini configuration</a>.</p>
+</section>
+<section id="split-out-the-user-configuration">
+<h4>Split Out the User Configuration<a class="headerlink" href="#split-out-the-user-configuration" title="Link to this heading">¶</a></h4>
+<p>Now we can move what we think the user might edit to the user context
+<code class="docutils literal notranslate"><span class="pre">payroll.conf</span></code>, and we’ll add a few defaults while we’re at it:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[default]</span>
+<span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">32</span>
+<span class="na">high_cost</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">11.50</span>
+
+<span class="k">[bob]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">domain.Person</span>
+<span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">${default:age}</span>
+<span class="na">salary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">13.50</span>
+
+<span class="k">[homer]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">domain.Person</span>
+<span class="na">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">40</span>
+<span class="na">salary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">5.25</span>
+
+<span class="k">[human_resources]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">domain.Department</span>
+<span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">hr</span>
+<span class="na">employees</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">instance: list: homer, bob</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">high_cost</span></code> user configuration option gives what the company determines is
+a high cost employee and needs to be used to separate employees.</p>
+</section>
+</section>
+<section id="another-second-pass-action">
+<h3>Another Second Pass Action<a class="headerlink" href="#another-second-pass-action" title="Link to this heading">¶</a></h3>
+<p>Now we need to report on high salaried employees using the <code class="docutils literal notranslate"><span class="pre">high_cost</span></code> option
+in the user configuration, so let’s add that capability to the “database”:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EmployeeDatabase</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#object" title="object"><span class="nb">object</span></a><span class="p">):</span>
+    <span class="n">departments</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Department</span><span class="p">]</span>
+    <span class="n">high_cost</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a>
+
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#property" title="property"><span class="nd">@property</span></a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">costly_employees</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Person</span><span class="p">]:</span>
+        <span class="k">return</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="tuple"><span class="nb">tuple</span></a><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#filter" title="filter"><span class="nb">filter</span></a><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">e</span><span class="o">.</span><span class="n">salary</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">high_cost</span><span class="p">,</span>
+                            <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+                                <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#map" title="map"><span class="nb">map</span></a><span class="p">(</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="o">.</span><span class="n">employees</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">departments</span><span class="p">))))</span>
+</pre></div>
+</div>
+<p>add access it from the main application data class <code class="docutils literal notranslate"><span class="pre">Tracker</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">report_costly</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Report high salaried employees."""</span>
+    <span class="n">emp</span><span class="p">:</span> <span class="n">Person</span>
+
+    <span class="k">for</span> <span class="n">emp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">costly_employees</span><span class="p">:</span>
+        <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="n">emp</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>which now yields the following help usage:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Usage: main.py &lt;printemployees|reportcostly&gt; [options]:</span>
+
+<span class="go">Tracks and distributes employee payroll.</span>
+
+<span class="go">Options:</span>
+<span class="go">  --version             show program's version number and exit</span>
+<span class="go">  -h, --help            show this help message and exit</span>
+<span class="go">  -c FILE, --config=FILE</span>
+<span class="go">                        the path to the configuration file</span>
+
+<span class="go">Actions:</span>
+<span class="go">printemployees     show all employees</span>
+<span class="go">  -d, --dryrun                         if given, don't do anything, just act like it</span>
+<span class="go">  -f, --format &lt;short|verbose&gt;  short  the detail of reporting</span>
+
+<span class="go">reportcostly       report high salaried employees</span>
+<span class="go">  -d, --dryrun                         if given, don't do anything, just act like it</span>
+</pre></div>
+</div>
+<p>We now see an <code class="docutils literal notranslate"><span class="pre">Actions:</span></code> section, where we did not before.  Also notice the
+application expects either <code class="docutils literal notranslate"><span class="pre">printemployees</span></code>, <code class="docutils literal notranslate"><span class="pre">reportcostly</span></code> as indicated in the
+first usage line, and called <em>mnemonics</em>.  As mentioned, these are used as a
+positional parameter by the user to invoke an <em>action</em> in the main class, which
+for us, is in the <code class="docutils literal notranslate"><span class="pre">Tracker</span></code> class.</p>
+<p>Before adding this method, we saw no mnemonics or action usage because there
+was only a single second pass action given.  Since the framework had everything
+it needed to know which method to run (the singleton of the class), it made all
+input as a single set of options without requiring the action mnemonic.</p>
+<p>Also note that the top level program documentation under the <code class="docutils literal notranslate"><span class="pre">Usage:</span></code> line
+changed from:</p>
+<p><code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">all</span> <span class="pre">employees.</span></code></p>
+<p>to</p>
+<p><code class="docutils literal notranslate"><span class="pre">Tracks</span> <span class="pre">and</span> <span class="pre">distributes</span> <span class="pre">employee</span> <span class="pre">payroll.</span></code></p>
+<p>This is because the framework can’t decide between which method’s documentation
+to use since we have more than one eligible action, so instead it uses the
+class’s docstring.</p>
+<section id="renaming-the-mnemonics">
+<h4>Renaming the Mnemonics<a class="headerlink" href="#renaming-the-mnemonics" title="Link to this heading">¶</a></h4>
+<p>While the help messages look natural for a command line program, the long
+mnemonic names look out of place and would be cumbersome to type.  Again, we’ll
+address this with the decorated <a class="reference external" href="../api/zensols.cli.html#zensols.cli.action.ActionCli">ActionCli</a> class by adding to the <em>decorated</em>
+section:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[app_decorator]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">zensols.cli.ActionCli</span>
+<span class="na">option_excludes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">set: db</span>
+<span class="na">mnemonics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">dict: {</span>
+<span class="w">    </span><span class="na">'print_employees'</span><span class="o">:</span><span class="w"> </span><span class="s">'show'</span><span class="na">,</span>
+<span class="w">    </span><span class="na">'report_costly'</span><span class="o">:</span><span class="w"> </span><span class="s">'highcost'</span><span class="na">}</span>
+</pre></div>
+</div>
+<p>which has a new entry <code class="docutils literal notranslate"><span class="pre">mnemonics</span></code> as a <code class="docutils literal notranslate"><span class="pre">dict</span></code> with keys as method names and
+mnemonics as values, which produces a better usage:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Usage: main.py &lt;show|highcost&gt; [options]:</span>
+<span class="go">...</span>
+<span class="go">Actions:</span>
+<span class="go">show         show all employees</span>
+<span class="go">  -d, --dryrun                         if given, don't do anything, just act like it</span>
+<span class="go">  -f, --format &lt;short|verbose&gt;  short  the detail of reporting</span>
+
+<span class="go">highcost     report high salaried employees</span>
+<span class="go">  -d, --dryrun                         if given, don't do anything, just act like it</span>
+</pre></div>
+</div>
+<p>Now we can in run the <code class="docutils literal notranslate"><span class="pre">report_costly</span></code> method with the <code class="docutils literal notranslate"><span class="pre">highcost</span></code> mnemonic and
+user configuration file:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>./main.py<span class="w"> </span>-c<span class="w"> </span>payroll.conf<span class="w"> </span>highcost
+<span class="go">Person(name='bob', age=32, salary=13.5)</span>
+</pre></div>
+</div>
+<p>Note that we now refer from the <code class="docutils literal notranslate"><span class="pre">Tracker</span></code> application’s <code class="docutils literal notranslate"><span class="pre">emp_db</span></code> instance
+reference in the application context file <code class="docutils literal notranslate"><span class="pre">app.conf</span></code> to the <code class="docutils literal notranslate"><span class="pre">human_resources</span></code>
+<code class="docutils literal notranslate"><span class="pre">Department</span></code> section in the user configuration file <code class="docutils literal notranslate"><span class="pre">payroll.conf</span></code>.
+Conversely, we link from the <code class="docutils literal notranslate"><span class="pre">default</span></code> section’s <code class="docutils literal notranslate"><span class="pre">high_cost</span></code> parameter to the
+“data base” <code class="docutils literal notranslate"><span class="pre">emp_db</span></code> section for the <code class="docutils literal notranslate"><span class="pre">EmployeeDatabase.high_cost</span></code> attribute.</p>
+</section>
+<section id="default-action">
+<h4>Default Action<a class="headerlink" href="#default-action" title="Link to this heading">¶</a></h4>
+<p>A <code class="docutils literal notranslate"><span class="pre">default_action</span></code> attribute can be set on the <a class="reference external" href="../api/zensols.cli.html#zensols.cli.action.ActionCliManager">ActionCliManager</a> in the <code class="docutils literal notranslate"><span class="pre">cli</span></code>
+section when it is created to use an action by name if the user does not supply
+one.  Usage identifies which action is the default and will condense the output
+when possible.</p>
+<p>The choice of action becomes ambiguous when the positional arguments are given
+and the action name matches the argument.  An error is raised when the
+application is configured in this way.</p>
+<p>However, if the <code class="docutils literal notranslate"><span class="pre">cli</span></code> section contains <code class="docutils literal notranslate"><span class="pre">force_default</span> <span class="pre">=</span> <span class="pre">True</span></code>, the command
+parsing will insert the default action when the first non-option is not found
+as an action.  However, this leads to the mentioned ambiguity and is
+inefficient (arguments are re-parsed) so exercise caution when using this
+setting.</p>
+</section>
+</section>
+<section id="logging">
+<h3>Logging<a class="headerlink" href="#logging" title="Link to this heading">¶</a></h3>
+<p>It would be nice to be able to log some messages instead of print them for our
+application, but only our application.  If we turn on information level logging
+for the entire run time we could eventually get “polluting” logs that just
+bury important information.  We could use the default Python logging system to
+do this, and put our application logger in its own name space, then set the
+level for that name space.  Here’s the first part added to <code class="docutils literal notranslate"><span class="pre">payroll.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/logging.html#module-logging" title="logging"><span class="nn">logging</span></a>
+
+<span class="n">logger</span> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/logging.html#logging.getLogger" title="logging.getLogger"><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span></a><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Tracker</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#object" title="object"><span class="nb">object</span></a><span class="p">):</span>
+    <span class="o">...</span>
+
+<span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">'printing employees using format: </span><span class="si">{</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#format" title="format"><span class="nb">format</span></a><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>However, when we run the program, the print statement made in to a logging
+statement won’t be seen.  We need only to add a first pass action available in
+the framework as the <a class="reference external" href="../api/zensols.cli.html#zensols.cli.lib.LogConfigurator">LogConfigurator</a> added to the <code class="docutils literal notranslate"><span class="pre">cli</span></code> section of the
+<code class="docutils literal notranslate"><span class="pre">app.conf</span></code> file.  Part of it’s configuration, set as a data class field, is the
+application logger name <code class="docutils literal notranslate"><span class="pre">payroll</span></code> for the <code class="docutils literal notranslate"><span class="pre">__name__</span></code> used in our code.  We
+could add the name to the configuration, but then log messages would
+mysteriously disappear if the file name was changed.  Instead, we make the
+assumption the entire application is in the name space given by the
+<a class="reference external" href="https://setuptools.readthedocs.io/en/latest/">setuptools</a> and refer to the name space by the package distribution meta data
+we’ve already given in the <code class="docutils literal notranslate"><span class="pre">main.py</span></code> class.  This can be done with the
+<a class="reference external" href="../api/zensols.cli.html#zensols.cli.lib.PackageInfoImporter">PackageInfoImporter</a> class, which provides the name in a new section it
+creates called <code class="docutils literal notranslate"><span class="pre">package</span></code> and refer to it from the <a class="reference external" href="../api/zensols.cli.html#zensols.cli.lib.LogConfigurator">LogConfigurator</a> section:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[cli]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">zensols.cli.ActionCliManager</span>
+<span class="na">apps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">list: config_cli, package_cli, log_cli, app</span>
+<span class="na">doc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">A payroll program.</span>
+
+<span class="k">[package_cli]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">zensols.cli.PackageInfoImporter</span>
+
+<span class="k">[log_cli]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">zensols.cli.LogConfigurator</span>
+<span class="na">log_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">${package:name}</span>
+</pre></div>
+</div>
+<p>Note that we must add the <code class="docutils literal notranslate"><span class="pre">package_cli</span></code> <strong>before</strong> the <code class="docutils literal notranslate"><span class="pre">log_cli</span></code> in the <code class="docutils literal notranslate"><span class="pre">apps</span></code>
+option since they are processed in order and the log configurator needs the
+<code class="docutils literal notranslate"><span class="pre">package</span></code> section created first.</p>
+<p>We also add a <code class="docutils literal notranslate"><span class="pre">doc</span></code> option to the <code class="docutils literal notranslate"><span class="pre">cli</span></code> section to manually provide the
+documentation since we now have more than one class, which doesn’t allow for
+taking it from the class docstring.</p>
+</section>
+<section id="more-actions">
+<h3>More Actions<a class="headerlink" href="#more-actions" title="Link to this heading">¶</a></h3>
+<p>We may want to report some information about the package.  Already we have a
+way of getting it’s version with the <code class="docutils literal notranslate"><span class="pre">--version</span></code> option.  But we could print
+out, among other package meta data, the name.  Since it doesn’t seem to fit as
+a method in our employee tracking class, we’ll add a new class to <code class="docutils literal notranslate"><span class="pre">payroll.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PackageReporter</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#object" title="object"><span class="nb">object</span></a><span class="p">):</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Configurable</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Print package information."""</span>
+        <span class="n">name</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="s1">'package'</span><span class="p">)</span>
+        <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#print" title="print"><span class="nb">print</span></a><span class="p">(</span><span class="sa">f</span><span class="s1">'package: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">config</span></code> data class field is populated by the configuration factory that
+created it with the configuration used to create it (see the <a class="reference internal" href="configuration.html"><span class="doc">configuration</span></a>
+documentation).  We then only need to report it’s section’s contents.</p>
+<p>We’ll add it to the list of applications (the <code class="docutils literal notranslate"><span class="pre">class_name</span></code> property is not
+needed):</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[cli]</span>
+<span class="na">apps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">list: config_cli, package_cli, log_cli, app, package_reporter</span>
+
+<span class="k">[package_reporter]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">payroll.PackageReporter</span>
+</pre></div>
+</div>
+<p>which will register it as a second pass action, and thus a separate action and
+mnemonic:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Usage: main.py &lt;show|highcost|report&gt; [options]:</span>
+<span class="go">...</span>
+<span class="go">report       print package information</span>
+</pre></div>
+</div>
+<p>and gives the same name of the package as provided in the <code class="docutils literal notranslate"><span class="pre">main</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>./main.py<span class="w"> </span>report<span class="w"> </span>-c<span class="w"> </span>payroll.conf<span class="w"> </span>
+<span class="go">package: payroll</span>
+</pre></div>
+</div>
+</section>
+<section id="positional-arguments">
+<h3>Positional Arguments<a class="headerlink" href="#positional-arguments" title="Link to this heading">¶</a></h3>
+<p>Let’s suppose our formatting for employee printing changes and we no longer
+trust the default given on the command line.  Instead we want to force the user
+to provide the format over specifying it as an option.  To do this, we only
+need remove the default in the keyword argument making it a positional argument
+in the method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_employees</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Format</span><span class="p">):</span>
+<span class="w">	</span><span class="sd">"""Show all employees.</span>
+
+<span class="sd">	:param format: the detail of reporting</span>
+
+<span class="sd">	"""</span>
+</pre></div>
+</div>
+<p>which shows up in the help usage as a positional argument rather than an option:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Actions:</span>
+<span class="go">show &lt;format&gt;     show all employees</span>
+<span class="go">  -d, --dryrun    if given, don't do anything, just act like it</span>
+</pre></div>
+</div>
+<p>and to run it:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">./main.py show -c payroll.conf terse</span>
+<span class="go">INFO:payroll:printing employees using format: Format.terse</span>
+<span class="go">human_resources: homer, bob</span>
+</pre></div>
+</div>
+<p>A variable number of positional arguments is specified with a tuple.  The inner
+types of the type hint specify how many and how to parse additional command line
+arguments.  For example, the following can be used to parse a variable number
+of arguments on the command line:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_employees</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">employe_names</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="tuple"><span class="nb">tuple</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">,</span> <span class="o">...</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">"""Show employees by name.</span>
+
+<span class="sd">    :param employ_names: names (at least one) of employess to print</span>
+
+<span class="sd">    """</span>
+</pre></div>
+</div>
+<p>The previous example tells the CLI framework to parse at least one argument and
+complains if does not get one.  To specify zero or more arguments:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">print_employees</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">employe_names</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="tuple"><span class="nb">tuple</span></a><span class="p">[</span><span class="o">...</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">"""Show employees by name.</span>
+
+<span class="sd">    :param employ_names: zero or more names of employess to print</span>
+
+<span class="sd">    """</span>
+</pre></div>
+</div>
+<p>A specified number (and type) can also be specified, for example, a string,
+integer and float can be specified with the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">add_employee_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">employe_data</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="tuple"><span class="nb">tuple</span></a><span class="p">[</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#float" title="float"><span class="nb">float</span></a><span class="p">]):</span>
+<span class="w">	</span><span class="sd">"""Add an employee by name, age and income."""</span>
+</pre></div>
+</div>
+<p>The position of where the tuple array is given can be in any order.  However,
+only tuple array can be given.</p>
+</section>
+<section id="docstring-command-line-help">
+<h3>Docstring Command Line Help<a class="headerlink" href="#docstring-command-line-help" title="Link to this heading">¶</a></h3>
+<p>A very minimal Sphinx reST markup replaces command line options, positional
+arguments, action names and the program name.  Switches are interpolated using
+<code class="docutils literal notranslate"><span class="pre">:obj:`parameter_name`</span></code>, and with backticks (<code class="docutils literal notranslate"><span class="pre">parameter_name</span></code>).
+Actions are replaced with <code class="docutils literal notranslate"><span class="pre">:meth:`method_name`</span></code> and the program name is
+replaced with <code class="docutils literal notranslate"><span class="pre">|prog|</span></code>.  Two backticks are replaced with double quotes when not
+replacing a switch.  For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#module-enum" title="enum"><span class="nn">enum</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="enum.Enum"><span class="n">Enum</span></a><span class="p">,</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">auto</span></a>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="enum.Enum"><span class="n">Enum</span></a><span class="p">):</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">json</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">auto</span></a><span class="p">()</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">txt</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/enum.html#enum.auto" title="enum.auto"><span class="n">auto</span></a><span class="p">()</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Application</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#object" title="object"><span class="nb">object</span></a><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""An employee database application (print using ``|prog|</span>
+<span class="sd">    :meth:`print_employees` :obj:`dry_run```).</span>
+
+<span class="sd">    """</span>
+    <span class="n">dry_run</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#bool" title="bool"><span class="nb">bool</span></a> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">"""If given, don't do anything, just act like it."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">print_employees</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_format</span><span class="p">:</span> <span class="n">Format</span><span class="p">,</span> <span class="n">employee_id</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Show employee by ID.</span>
+
+<span class="sd">        :param out_format: output format for employee with ID given by</span>
+<span class="sd">                           ``employee_id``</span>
+
+<span class="sd">        :param employee_id: the ID of the employee</span>
+
+<span class="sd">        """</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">process_organizations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">org_id</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#int" title="int"><span class="nb">int</span></a> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Process organizations by ID or print with :obj:`dry_run`.</span>
+
+<span class="sd">        :param org_id: a unique ID</span>
+
+<span class="sd">        """</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>with application configuration:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[app]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">payroll.Tracker</span>
+
+<span class="k">[app_decorator]</span>
+<span class="na">option_excludes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">set: config_factory</span>
+<span class="na">option_overrides</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">dict: {</span>
+<span class="w">  </span><span class="na">'out_format': {'long_name'</span><span class="o">:</span><span class="w"> </span><span class="s">'format'</span><span class="na">, 'short_name'</span><span class="o">:</span><span class="w"> </span><span class="s">None},</span>
+<span class="w">  </span><span class="na">'employee_id': {'long_name'</span><span class="o">:</span><span class="w"> </span><span class="s">'empid'</span><span class="na">}}</span>
+<span class="na">mnemonic_overrides</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">dict: {</span>
+<span class="w">  </span><span class="na">'print_employees'</span><span class="o">:</span><span class="w"> </span><span class="s">'emp'</span><span class="na">,</span>
+<span class="w">  </span><span class="na">'process_organizations'</span><span class="o">:</span><span class="w"> </span><span class="s">'org'</span><span class="na">}</span>
+</pre></div>
+</div>
+<p>will output the usage:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Usage: tracker &lt;emp|org&gt; [options]:</span>
+
+<span class="go">An employee database application (print using "tracker emp -d").</span>
+
+<span class="go">Options:</span>
+<span class="go">  -h, --help [actions]    show this help message and exit</span>
+<span class="go">  --version               show the program version and exit</span>
+<span class="go">  --level X               logger level, X is one of: crit, debug, err, info,</span>
+<span class="go">                          notset, trace, warn</span>
+<span class="go">  -c, --config FILE       the configuration file</span>
+<span class="go">  --override X            a file/dir or a comma delimited "section.key=value" that</span>
+<span class="go">                          overrides config, X is one of: FILE, DIR, STRING</span>
+
+<span class="go">Actions:</span>
+<span class="go">emp &lt;format&gt;              show employee by id</span>
+<span class="go">  format &lt;json|txt&gt;       output format for employee with ID given by -e</span>
+<span class="go">  -d, --dryrun            whether to execute an action</span>
+<span class="go">  -e, --empid INT         the id of the employee</span>
+
+<span class="go">org                       process organizations by id or print with -d</span>
+<span class="go">  -d, --dryrun            whether to execute an action</span>
+<span class="go">  -r, --orgid INT         a unique id</span>
+</pre></div>
+</div>
+</section>
+<section id="environment">
+<h3>Environment<a class="headerlink" href="#environment" title="Link to this heading">¶</a></h3>
+<p>It is important to easily supply environment information to the application,
+for which the framework has two means:</p>
+<ol class="simple">
+<li><p>Provide environment variables using the <a class="reference external" href="../api/zensols.config.html#zensols.config.envconfig.EnvironmentConfig">EnvironmentConfig</a> using the
+<a class="reference external" href="config.html#import-ini-configuration">import ini configuration</a> as a section include.</p></li>
+<li><p>Provide it directly to the <a class="reference external" href="../api/zensols.cli.html#zensols.cli.app.ApplicationFactory">ApplicationFactory</a> in the <code class="docutils literal notranslate"><span class="pre">main.py</span></code> when we
+create it.</p></li>
+</ol>
+<p>Any sophisticated application will probably involve both, so let’s start with
+the first, which is simply to add the following in the <code class="docutils literal notranslate"><span class="pre">app.conf</span></code>:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[import]</span>
+<span class="na">sections</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">imp_env</span>
+
+<span class="k">[imp_env]</span>
+<span class="na">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">environment</span>
+<span class="na">section_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">env</span>
+<span class="na">includes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">set: HOME</span>
+</pre></div>
+</div>
+<p>which creates a new section <code class="docutils literal notranslate"><span class="pre">env</span></code> with the indicated environment variable
+<code class="docutils literal notranslate"><span class="pre">HOME</span></code>.  We can add all variables if we don’t provide <code class="docutils literal notranslate"><span class="pre">includes</span></code>, but some
+variables that contain dollar signs confuse the <code class="docutils literal notranslate"><span class="pre">configparser.ConfigParser</span></code>
+interpolation system.</p>
+<p>Our application factory added to <code class="docutils literal notranslate"><span class="pre">main.py</span></code> includes:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#module-dataclasses" title="dataclasses"><span class="nn">dataclasses</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="n">dataclass</span></a>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/pathlib.html#module-pathlib" title="pathlib"><span class="nn">pathlib</span></a><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="../api/zensols.config.html#module-zensols.config" title="zensols.config"><span class="nn">zensols.config</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../api/zensols.config.html#zensols.config.dictconfig.DictionaryConfig" title="zensols.config.dictconfig.DictionaryConfig"><span class="n">DictionaryConfig</span></a>
+<span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#module-zensols.cli" title="zensols.cli"><span class="nn">zensols.cli</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#zensols.cli.app.ApplicationFactory" title="zensols.cli.app.ApplicationFactory"><span class="n">ApplicationFactory</span></a>
+
+<a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass" title="dataclasses.dataclass"><span class="nd">@dataclass</span></a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PayrollApplicationFactory</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#zensols.cli.app.ApplicationFactory" title="zensols.cli.app.ApplicationFactory"><span class="n">ApplicationFactory</span></a><span class="p">):</span>
+    <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#classmethod" title="classmethod"><span class="nd">@classmethod</span></a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">instance</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/functions.html#type" title="type"><span class="nb">type</span></a><span class="p">,</span> <span class="n">root_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">'.'</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <a class="sphinx-codeautolink-a" href="../api/zensols.config.html#zensols.config.dictconfig.DictionaryConfig" title="zensols.config.dictconfig.DictionaryConfig"><span class="n">dconf</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../api/zensols.config.html#zensols.config.dictconfig.DictionaryConfig" title="zensols.config.dictconfig.DictionaryConfig"><span class="n">DictionaryConfig</span></a><span class="p">(</span>
+            <span class="p">{</span><span class="s1">'appenv'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'root_dir'</span><span class="p">:</span> <a class="sphinx-codeautolink-a" href="https://docs.python.org/3/library/stdtypes.html#str" title="str"><span class="nb">str</span></a><span class="p">(</span><span class="n">root_dir</span><span class="p">)},</span>
+             <span class="s1">'financial'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'salary'</span><span class="p">:</span> <span class="mf">15.</span><span class="p">}})</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="s1">'payroll'</span><span class="p">,</span> <span class="s1">'app.conf'</span><span class="p">,</span> <span class="n">children_configs</span><span class="o">=</span><span class="p">(</span><a class="sphinx-codeautolink-a" href="../api/zensols.config.html#zensols.config.dictconfig.DictionaryConfig" title="zensols.config.dictconfig.DictionaryConfig"><span class="n">dconf</span></a><span class="p">,))</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">cli</span> <span class="o">=</span> <span class="n">PayrollApplicationFactory</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span>
+    <span class="n">cli</span><span class="o">.</span><span class="n">invoke</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This gives the application <code class="docutils literal notranslate"><span class="pre">appenv</span></code> and <code class="docutils literal notranslate"><span class="pre">financial</span></code> sections with data we
+provide.  This is very handy in setting application roots that might have
+different data directories for scientific data, models, etc.</p>
+</section>
+<section id="directory-structure">
+<h3>Directory Structure<a class="headerlink" href="#directory-structure" title="Link to this heading">¶</a></h3>
+<p>So far, our examples have been small and had a simple flat directory
+structure.  However, in larger applications, we’ll want to branch out and
+create a source directory tree and probably another for configuration.  Here
+gives something simple, yet provides room for the application to grow:</p>
+<ul class="simple">
+<li><p><strong>root</strong></p>
+<ul>
+<li><p><strong>resources</strong>: contains files packaged in the distribution</p>
+<ul>
+<li><p><strong>app.conf</strong>: the application configuration</p></li>
+</ul>
+</li>
+<li><p><strong>etc</strong>: user directory tree (any name works)</p>
+<ul>
+<li><p><strong>payroll.conf</strong>: user configuration</p></li>
+</ul>
+</li>
+<li><p><strong>mycom</strong>: company module</p>
+<ul>
+<li><p><strong>payroll</strong>: our source app</p>
+<ul>
+<li><p><strong>domain.py</strong></p></li>
+<li><p><strong>payroll.py</strong></p></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>The final example provides this directory structure and provides a
+comprehensive <a class="reference external" href="#complete-examples">example</a> of the final product of this
+tutorial.</p>
+</section>
+<section id="overriding-configuration-and-harness">
+<h3>Overriding Configuration and Harness<a class="headerlink" href="#overriding-configuration-and-harness" title="Link to this heading">¶</a></h3>
+<p>The final version of our application will simplify the CLI by removing the
+<code class="docutils literal notranslate"><span class="pre">ApplicationFactory</span></code> class and using a <a class="reference external" href="../api/zensols.cli.html#zensols.cli.harness.CliHarness">CliHarness</a> in its place.  Now the
+entire <code class="docutils literal notranslate"><span class="pre">main.py</span></code> class has:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#module-zensols.cli" title="zensols.cli"><span class="nn">zensols.cli</span></a><span class="w"> </span><span class="kn">import</span> <a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#zensols.cli.harness.CliHarness" title="zensols.cli.harness.CliHarness"><span class="n">CliHarness</span></a>
+
+<span class="k">if</span> <span class="p">(</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">):</span>
+    <a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#zensols.cli.harness.CliHarness" title="zensols.cli.harness.CliHarness"><span class="n">harness</span></a> <span class="o">=</span> <a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#zensols.cli.harness.CliHarness" title="zensols.cli.harness.CliHarness"><span class="n">CliHarness</span></a><span class="p">(</span>
+        <span class="n">package_resource</span><span class="o">=</span><span class="s1">'mycom.payroll'</span><span class="p">,</span>
+        <span class="n">proto_factory_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">'reload_pattern'</span><span class="p">:</span> <span class="sa">r</span><span class="s1">'^mycom\.payroll'</span><span class="p">},</span>
+    <span class="p">)</span>
+    <a class="sphinx-codeautolink-a" href="../api/zensols.cli.html#zensols.cli.harness.CliHarness.run" title="zensols.cli.harness.CliHarness.run"><span class="n">harness</span><span class="o">.</span><span class="n">run</span></a><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">package_resource</span></code> tells the harness the application module to find the
+application as a package.  It also tells the framework where to find not only
+the <code class="docutils literal notranslate"><span class="pre">app.conf</span></code> but resolves the added <code class="docutils literal notranslate"><span class="pre">obj.conf</span></code> application resource file
+using <code class="docutils literal notranslate"><span class="pre">resource(mycom.payroll):</span> <span class="pre">resources/obj.conf</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">app.conf</span></code> application context file is much more simple now as well as it
+now imports path and command line defaults from the <code class="docutils literal notranslate"><span class="pre">zensols.util</span></code> <a class="reference external" href="config.html#resource-libraries">resource
+library</a>.  Also notice the how the configuration is loaded in the <code class="docutils literal notranslate"><span class="pre">config_imp</span></code>
+section:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[config_imp]</span>
+<span class="na">config_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">list:</span><span class="w"> </span>
+<span class="w">    </span><span class="na">^{config_path},</span>
+<span class="w">    </span><span class="na">^{override},</span>
+<span class="w">    </span><span class="na">resource(mycom.payroll)</span><span class="o">:</span><span class="w"> </span><span class="s">resources/obj.conf</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">config_imp</span></code> section is indicated as an importation section in the
+<a class="reference external" href="https://github.com/plandes/util/blob/master/resources/cli-config.conf">cli-config.conf</a> resource library.  The special syntax <code class="docutils literal notranslate"><span class="pre">^{config_path}</span></code>
+indicates to load the file given by the <code class="docutils literal notranslate"><span class="pre">--config</span></code> option and <code class="docutils literal notranslate"><span class="pre">^{override}</span></code>
+loads the configuration given in the <code class="docutils literal notranslate"><span class="pre">--override</span></code> option (see the
+<a class="reference external" href="../api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationOverrider">ConfigurationOverrider</a> first pass application).</p>
+<p>Finally, the <code class="docutils literal notranslate"><span class="pre">obj.conf</span></code> is loaded after the user and overriding configuration
+all in this order.  The developer can change this order to allow overriding or
+re-overriding configuration based on the needs of the application.</p>
+<p>Since we have only one configuration file, we can set it as the default so the
+user need not specify it.  To do this we add the following to <code class="docutils literal notranslate"><span class="pre">app.conf</span></code> with:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="c1"># set the default configuration file</span>
+<span class="k">[config_cli_decorator]</span>
+<span class="na">option_overrides = dict: {'config_path': {'default'</span><span class="o">:</span><span class="w"> </span><span class="s">'${default:root_dir}/etc/payroll.conf'</span><span class="na">}}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">--override</span></code> flag takes a configuration file, a directory of configuration
+files, or a string in the format <code class="docutils literal notranslate"><span class="pre">&lt;section&gt;.&lt;option&gt;=&lt;value&gt;</span></code> form.  For
+example, if we invoke the script and <em>override</em> Homer’s salary by:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">./main.py show -f verbose --override homer.salary=100.5</span>
+</pre></div>
+</div>
+<p>we get</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="n">hr</span>
+<span class="n">employees</span><span class="p">:</span>
+<span class="o">...</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">homer</span>
+    <span class="n">age</span><span class="p">:</span> <span class="mi">32</span>
+    <span class="n">salary</span><span class="p">:</span> <span class="mf">100.5</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="complete-examples">
+<h2>Complete Examples<a class="headerlink" href="#complete-examples" title="Link to this heading">¶</a></h2>
+<p>See the <a class="reference external" href="https://github.com/plandes/util/tree/master/example/cli">example</a> directory the complete code used to create the examples in
+this documentation.  There is one directory for each sub heading in this
+document, for example the <a class="reference external" href="#boilerplate">boilerplate</a> section’s steps are in
+the <code class="docutils literal notranslate"><span class="pre">example/cli/1-boilerplate</span></code> directory in the source repository.</p>
+<!-- links --></section>
+</section>
+</article>
+</div>
+<footer>
+<div class="related-pages">
+<a class="next-page" href="configuration.html">
+<div class="page-info">
+<div class="context">
+<span>Next</span>
+</div>
+<div class="title">Configuration</div>
+</div>
+<svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+</a>
+<a class="prev-page" href="../index.html">
+<svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+<div class="page-info">
+<div class="context">
+<span>Previous</span>
+</div>
+<div class="title">Zensols Utilities</div>
+</div>
+</a>
+</div>
+<div class="bottom-of-page">
+<div class="left-details">
+<div class="copyright">
+                Copyright © 2026 Paul Landes
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+</div>
+<div class="right-details">
+</div>
+</div>
+</footer>
+</div>
+<aside class="toc-drawer">
+<div class="toc-sticky toc-scroll">
+<div class="toc-title-container">
+<span class="toc-title">
+            On this page
+          </span>
+</div>
+<div class="toc-tree-container">
+<div class="toc-tree">
+<ul>
+<li><a class="reference internal" href="#">Command Line Interface</a><ul>
+<li><a class="reference internal" href="#harness-and-simple-example">Harness and Simple Example</a></li>
+<li><a class="reference internal" href="#tutorial">Tutorial</a><ul>
+<li><a class="reference internal" href="#boilerplate">Boilerplate</a></li>
+<li><a class="reference internal" href="#domain">Domain</a><ul>
+<li><a class="reference internal" href="#application-class-and-actions">Application Class and Actions</a></li>
+<li><a class="reference internal" href="#action-decorators">Action Decorators</a></li>
+<li><a class="reference internal" href="#domain-and-choices">Domain and Choices</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#user-configuration">User Configuration</a><ul>
+<li><a class="reference internal" href="#two-pass-command-line-parser">Two Pass Command Line Parser</a></li>
+<li><a class="reference internal" href="#split-out-the-user-configuration">Split Out the User Configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#another-second-pass-action">Another Second Pass Action</a><ul>
+<li><a class="reference internal" href="#renaming-the-mnemonics">Renaming the Mnemonics</a></li>
+<li><a class="reference internal" href="#default-action">Default Action</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#logging">Logging</a></li>
+<li><a class="reference internal" href="#more-actions">More Actions</a></li>
+<li><a class="reference internal" href="#positional-arguments">Positional Arguments</a></li>
+<li><a class="reference internal" href="#docstring-command-line-help">Docstring Command Line Help</a></li>
+<li><a class="reference internal" href="#environment">Environment</a></li>
+<li><a class="reference internal" href="#directory-structure">Directory Structure</a></li>
+<li><a class="reference internal" href="#overriding-configuration-and-harness">Overriding Configuration and Harness</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#complete-examples">Complete Examples</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div><script src="../_static/documentation_options.js?v=d5528024"></script>
+<script src="../_static/doctools.js?v=9a2dae69"></script>
+<script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+<script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+<script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+<script src="../_static/copybutton.js?v=f281be69"></script>
+</body>
+</html>

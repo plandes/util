@@ -1,0 +1,1541 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="zensols.config package" href="zensols.config.html"><link rel="prev" title="zensols.cli package" href="zensols.cli.html">
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+        <title>zensols.cli.lib namespace - Zensols Utilities 1.16.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../_static/codeautolink.css?v=57550ae3" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../top.html"><div class="brand">Zensols Utilities 1.16.3 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../top.html">
+  
+  <span class="sidebar-brand-text">Zensols Utilities 1.16.3 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../api.html">API Reference</a><input aria-label="Toggle navigation of API Reference" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="zensols.cli.html">zensols.cli package</a><input aria-label="Toggle navigation of zensols.cli package" checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">zensols.cli.lib namespace</a></li>
+</ul>
+</li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">zensols.cli.lib namespace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.config.html">zensols.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.introspect.html">zensols.introspect package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.multi.html">zensols.multi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.persist.html">zensols.persist package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zensols.util.html">zensols.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../LICENSE.html">License</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../_sources/api/zensols.cli.lib.rst.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section id="module-zensols.cli.lib">
+<span id="zensols-cli-lib-namespace"></span><h1>zensols.cli.lib namespace<a class="headerlink" href="#module-zensols.cli.lib" title="Link to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
+</section>
+<section id="module-zensols.cli.lib.config">
+<span id="zensols-cli-lib-config-module"></span><h2>zensols.cli.lib.config module<a class="headerlink" href="#module-zensols.cli.lib.config" title="Link to this heading">¶</a></h2>
+<p>Configuration merging first pass applications.  These utility applications
+allow a configuration option and then merge that configuration with the
+application context.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.config.</span></span><span class="sig-name descname"><span class="pre">ConfigurationImporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path_environ_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path_option_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config_path'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/config.html#ConfigurationImporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="zensols.cli.html#zensols.cli.app.ApplicationObserver" title="zensols.cli.app.ApplicationObserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationObserver</span></code></a>, <a class="reference internal" href="zensols.config.html#zensols.config.dictable.Dictable" title="zensols.config.dictable.Dictable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dictable</span></code></a></p>
+<p>This class imports a child configuration in to the application context.
+It does this by:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Attempt to load the configuration indicated by the <code class="docutils literal notranslate"><span class="pre">--config</span></code>
+option.</p></li>
+<li><p>If the option doesn’t exist, attempt to get the path to load from an
+environment variable (see <a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.get_environ_var_from_app" title="zensols.cli.lib.config.ConfigurationImporter.get_environ_var_from_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_environ_var_from_app()</span></code></a>).  For
+example, for package <code class="docutils literal notranslate"><span class="pre">zensols.util</span></code>, the environment variable
+<code class="docutils literal notranslate"><span class="pre">UTILRC</span></code> environment variable’s path is used.</p></li>
+<li><p>If the environment variable is not found, then look for the UNIX style
+resource file (see <a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.get_environ_path" title="zensols.cli.lib.config.ConfigurationImporter.get_environ_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_environ_path()</span></code></a>).  For example, package
+<code class="docutils literal notranslate"><span class="pre">zensols.util</span></code> would point to <code class="docutils literal notranslate"><span class="pre">~/.utilrc</span></code>.</p></li>
+<li><p>If the home directory <code class="docutils literal notranslate"><span class="pre">~/&lt;app&gt;rc</span></code> is not found, all paths (separated
+by <a class="reference external" href="https://docs.python.org/3/library/os.html#os.pathsep" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">os.pathsep</span></code></a>) set in the <code class="docutils literal notranslate"><span class="pre">ZENSOLSRC</span></code> environment variable are
+searched.</p></li>
+<li><p>Loads the <em>child</em> configuration.</p></li>
+<li><p>Copy all sections from the child configuration to <a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.config" title="zensols.cli.lib.config.ConfigurationImporter.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code></a>.</p></li>
+</ol>
+</div></blockquote>
+<p>The child configuration is created by <a class="reference internal" href="zensols.config.html#zensols.config.configfac.ConfigurableFactory" title="zensols.config.configfac.ConfigurableFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigurableFactory</span></code></a>.  If
+the child has a <cite>.conf</cite> extension, <a class="reference internal" href="zensols.config.html#zensols.config.importini.ImportIniConfig" title="zensols.config.importini.ImportIniConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImportIniConfig</span></code></a> is used with
+its child set as <a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.config" title="zensols.cli.lib.config.ConfigurationImporter.config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config</span></code></a> so the two can reference each other at
+property/factory resolve time.</p>
+<p>Special mnemonic <code class="docutils literal notranslate"><span class="pre">^{config_path}</span></code> can be used in an
+:class`.ImportIniConfig` import section in the <cite>config_files</cite> property to
+load the referred configuration file in any order with the other loaded
+files.  The special mnemonic <code class="docutils literal notranslate"><span class="pre">^{override}</span></code> does the same thing with the
+<a class="reference internal" href="#zensols.cli.lib.config.ConfigurationOverrider" title="zensols.cli.lib.config.ConfigurationOverrider"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigurationOverrider</span></code></a> one pass application as well.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.CLI_META">
+<span class="sig-name descname"><span class="pre">CLI_META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'first_pass':</span> <span class="pre">True,</span> <span class="pre">'mnemonic_includes':</span> <span class="pre">{'merge'},</span> <span class="pre">'mnemonic_overrides':</span> <span class="pre">{'merge':</span> <span class="pre">'_merge_config_as_import'},</span> <span class="pre">'option_includes':</span> <span class="pre">{'config_path'},</span> <span class="pre">'option_overrides':</span> <span class="pre">{'config_path':</span> <span class="pre">{'long_name':</span> <span class="pre">'config',</span> <span class="pre">'short_name':</span> <span class="pre">'c'}}}</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.CLI_META" title="Link to this definition">¶</a></dt>
+<dd><p>Command line meta data to avoid having to decorate this class in the
+configuration.  Given the complexity of this class, this configuration only
+exposes the parts of this class necessary for the CLI.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.CONFIG_PATH_FIELD">
+<span class="sig-name descname"><span class="pre">CONFIG_PATH_FIELD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'config_path'</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.CONFIG_PATH_FIELD" title="Link to this definition">¶</a></dt>
+<dd><p>The field name in this class of the child configuration path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">See<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.config_path" title="zensols.cli.lib.config.ConfigurationImporter.config_path"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_path</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.ENVIRON_SHARED_NAME">
+<span class="sig-name descname"><span class="pre">ENVIRON_SHARED_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ZENSOLSRC'</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.ENVIRON_SHARED_NAME" title="Link to this definition">¶</a></dt>
+<dd><p>Environment variable name that points to a directory for shared config
+files (see <a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.get_environ_path" title="zensols.cli.lib.config.ConfigurationImporter.get_environ_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_environ_path()</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.ENVIRON_VAR_REGEX">
+<span class="sig-name descname"><span class="pre">ENVIRON_VAR_REGEX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">re.compile('^.+\\.([a-z]+?)$')</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.ENVIRON_VAR_REGEX" title="Link to this definition">¶</a></dt>
+<dd><p>A regular expression to parse the name from the package name for the
+environment variable that might hold the configuration
+(i.e. <code class="docutils literal notranslate"><span class="pre">APPNAMERC</span></code>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.IMPORT_TYPE">
+<span class="sig-name descname"><span class="pre">IMPORT_TYPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'import'</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.IMPORT_TYPE" title="Link to this definition">¶</a></dt>
+<dd><p>The string value of the <code class="docutils literal notranslate"><span class="pre">type</span></code> parameter in the section config
+identifying an <a class="reference internal" href="zensols.config.html#zensols.config.importini.ImportIniConfig" title="zensols.config.importini.ImportIniConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImportIniConfig</span></code></a> import section.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expect</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path_environ_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arguments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path_option_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config_path'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.arguments">
+<span class="sig-name descname"><span class="pre">arguments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.arguments" title="Link to this definition">¶</a></dt>
+<dd><p>Additional arguments to pass to the <a class="reference internal" href="zensols.config.html#zensols.config.facbase.ConfigFactory" title="zensols.config.facbase.ConfigFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigFactory</span></code></a> when created.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.cache_path">
+<span class="sig-name descname"><span class="pre">cache_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.cache_path" title="Link to this definition">¶</a></dt>
+<dd><p>A path to a binary file of the cached configuration.  This is useful for
+large application contexts that have a lot of imports that take a long time
+to load.</p>
+<p>When this file is set, the imported configuration files and their modify
+timestamps are written along with the loaded configuration to this specified
+file.  On subsequent runs, previous configuration is used if none of the
+configuration files have changed.  Otherwise, they are reloaded and cached
+again.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.config">
+<span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.config" title="Link to this definition">¶</a></dt>
+<dd><p>The parent configuration, which is populated from the child configuration
+(see class docs).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.config_path">
+<span class="sig-name descname"><span class="pre">config_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.config_path" title="Link to this definition">¶</a></dt>
+<dd><p>The configuration file.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.config_path_environ_name">
+<span class="sig-name descname"><span class="pre">config_path_environ_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.config_path_environ_name" title="Link to this definition">¶</a></dt>
+<dd><p>An environment variable containing the default path to the configuration.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.config_path_option_name">
+<span class="sig-name descname"><span class="pre">config_path_option_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'config_path'</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.config_path_option_name" title="Link to this definition">¶</a></dt>
+<dd><p>If not <code class="docutils literal notranslate"><span class="pre">None</span></code>, the name of the option to set in the section defined for
+this instance (section = <a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.name" title="zensols.cli.lib.config.ConfigurationImporter.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.debug" title="Link to this definition">¶</a></dt>
+<dd><p>Printn the configuration after the merge operation.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.default">
+<span class="sig-name descname"><span class="pre">default</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.default" title="Link to this definition">¶</a></dt>
+<dd><p>Use this file as the default when given on the command line, which is not
+used unless :obj:<code class="docutils literal notranslate"><span class="pre">expect</span></code> is set to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
+<p>If this is set to <code class="docutils literal notranslate"><span class="pre">skip</span></code>, then do not load any file.  This is useful when
+the entire configuration is loaded by this class and there are
+configuration mentions in the <code class="docutils literal notranslate"><span class="pre">app.conf</span></code> application context.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.expect">
+<span class="sig-name descname"><span class="pre">expect</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.expect" title="Link to this definition">¶</a></dt>
+<dd><p>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, raise an <a class="reference internal" href="zensols.cli.html#zensols.cli.meta.ApplicationError" title="zensols.cli.meta.ApplicationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationError</span></code></a> if the option is not
+given.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.get_environ_path">
+<span class="sig-name descname"><span class="pre">get_environ_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/config.html#ConfigurationImporter.get_environ_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.get_environ_path" title="Link to this definition">¶</a></dt>
+<dd><p>Return the path to the resource configuration file.  The following
+files are searched in order:
+:rtype: <span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code>]</span></p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>This first uses <a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.get_environ_var_from_app" title="zensols.cli.lib.config.ConfigurationImporter.get_environ_var_from_app"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_environ_var_from_app()</span></code></a> to attempt to find
+an environment variable with a reference to file,</p></li>
+<li><p>A file pointed by the environment variable
+<code class="docutils literal notranslate"><span class="pre">ENVIRON_SHARED_NAME/&lt;application</span> <span class="pre">prefix&gt;</span></code> <em>without</em> the trailing
+<code class="docutils literal notranslate"><span class="pre">rc</span></code> (i.e. package <code class="docutils literal notranslate"><span class="pre">zensols.util</span></code> would point to
+<code class="docutils literal notranslate"><span class="pre">~/etc/util.{conf,yml}</span></code>),</p></li>
+<li><p>UNIX style file naming conventionsin the home directory
+(i.e. package <code class="docutils literal notranslate"><span class="pre">zensols.util</span></code> would point to <code class="docutils literal notranslate"><span class="pre">~/.utilrc</span></code>).</p></li>
+</ol>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.get_environ_var_from_app">
+<span class="sig-name descname"><span class="pre">get_environ_var_from_app</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/config.html#ConfigurationImporter.get_environ_var_from_app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.get_environ_var_from_app" title="Link to this definition">¶</a></dt>
+<dd><p>Return the environment variable based on the name of the application.
+This returns the <a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.config_path_environ_name" title="zensols.cli.lib.config.ConfigurationImporter.config_path_environ_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_path_environ_name</span></code></a> if set, otherwise, it
+generates it based on the name returned from the packge + <code class="docutils literal notranslate"><span class="pre">RC</span></code> and
+capitalizes it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.merge">
+<span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/config.html#ConfigurationImporter.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.merge" title="Link to this definition">¶</a></dt>
+<dd><p>Merge configuration at path to the current configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> – the path to the configuration file</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.name" title="Link to this definition">¶</a></dt>
+<dd><p>The section name.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.section">
+<span class="sig-name descname"><span class="pre">section</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.section" title="Link to this definition">¶</a></dt>
+<dd><p>Additional which section to load as an import.  This is only valid and
+used when <a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.type" title="zensols.cli.lib.config.ConfigurationImporter.type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">type</span></code></a> is set to <cite>import</cite>.  When it is, the section will
+replace the string <code class="docutils literal notranslate"><span class="pre">^{config_apth}</span></code> (and any other field in this instance
+using the same syntax) and load indicated remaining configuration using
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ImportIniConfig</span></code>.</p>
+<p>See the <a class="reference external" href="https://plandes.github.io/util/doc/config.html#import-ini-configuration">API documentation</a>
+for more information.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationImporter.type">
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationImporter.type" title="Link to this definition">¶</a></dt>
+<dd><p>The type of <a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a> use to create in
+<a class="reference internal" href="zensols.config.html#zensols.config.configfac.ConfigurableFactory" title="zensols.config.configfac.ConfigurableFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigurableFactory</span></code></a>.  If this is not provided, the factory
+decides based on the file extension.</p>
+<dl class="field-list simple">
+<dt class="field-odd">See<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="zensols.config.html#zensols.config.configfac.ConfigurableFactory" title="zensols.config.configfac.ConfigurableFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigurableFactory</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationOverrider">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.config.</span></span><span class="sig-name descname"><span class="pre">ConfigurationOverrider</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">option_sep_regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\\\s*,\\\\s*'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/config.html#ConfigurationOverrider"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationOverrider" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Overrides configuration in the app config.  This is useful for replacing
+on a per command line invocation basis.  Examples could include changing the
+number of epochs trained for a model.</p>
+<p>The <a class="reference internal" href="#zensols.cli.lib.config.ConfigurationOverrider.override" title="zensols.cli.lib.config.ConfigurationOverrider.override"><code class="xref py py-obj docutils literal notranslate"><span class="pre">override</span></code></a> field either contains a path to a file that contains
+the configuration file to use to clobber the given sections/values, or a
+string to be interpreted by <a class="reference internal" href="zensols.config.html#zensols.config.strconfig.StringConfig" title="zensols.config.strconfig.StringConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">StringConfig</span></code></a>.  This determination is
+made by whether or not the string points to an existing file or directory.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationOverrider.CLI_META">
+<span class="sig-name descname"><span class="pre">CLI_META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'first_pass':</span> <span class="pre">True,</span> <span class="pre">'mnemonic_includes':</span> <span class="pre">{'merge'},</span> <span class="pre">'option_includes':</span> <span class="pre">{'override'},</span> <span class="pre">'option_overrides':</span> <span class="pre">{'override':</span> <span class="pre">{'metavar':</span> <span class="pre">'&lt;FILE|DIR|STRING&gt;',</span> <span class="pre">'short_name':</span> <span class="pre">None}}}</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationOverrider.CLI_META" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationOverrider.OVERRIDE_FIELD">
+<span class="sig-name descname"><span class="pre">OVERRIDE_FIELD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'override'</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationOverrider.OVERRIDE_FIELD" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationOverrider.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">override</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">option_sep_regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'\\\\s*,\\\\s*'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationOverrider.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationOverrider.config">
+<span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationOverrider.config" title="Link to this definition">¶</a></dt>
+<dd><p>The parent configuration, which is populated from the child configuration
+(see class docs).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationOverrider.disable">
+<span class="sig-name descname"><span class="pre">disable</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationOverrider.disable" title="Link to this definition">¶</a></dt>
+<dd><p>Whether to disable the application, which is useful to set to <code class="docutils literal notranslate"><span class="pre">False</span></code>
+when used with <a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter" title="zensols.cli.lib.config.ConfigurationImporter"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigurationImporter</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationOverrider.get_configurable">
+<span class="sig-name descname"><span class="pre">get_configurable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/config.html#ConfigurationOverrider.get_configurable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationOverrider.get_configurable" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationOverrider.merge">
+<span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/config.html#ConfigurationOverrider.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationOverrider.merge" title="Link to this definition">¶</a></dt>
+<dd><p>Merge the string configuration with the application context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationOverrider.option_sep_regex">
+<span class="sig-name descname"><span class="pre">option_sep_regex</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'\\s*,\\s*'</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationOverrider.option_sep_regex" title="Link to this definition">¶</a></dt>
+<dd><p>The string used to delimit the each key/value pair.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.config.ConfigurationOverrider.override">
+<span class="sig-name descname"><span class="pre">override</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.config.ConfigurationOverrider.override" title="Link to this definition">¶</a></dt>
+<dd><p>A file/dir or a comma delimited <code class="docutils literal notranslate"><span class="pre">section.key=value</span></code> that overrides
+config.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-zensols.cli.lib.log">
+<span id="zensols-cli-lib-log-module"></span><h2>zensols.cli.lib.log module<a class="headerlink" href="#module-zensols.cli.lib.log" title="Link to this heading">¶</a></h2>
+<p>A first pass application to configure the <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.14)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> system.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.log.</span></span><span class="sig-name descname"><span class="pre">LogConfigurator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_app_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LogLevel.info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loggers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/log.html#LogConfigurator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A simple log configuration utility.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.CLI_META">
+<span class="sig-name descname"><span class="pre">CLI_META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'first_pass':</span> <span class="pre">True,</span> <span class="pre">'mnemonic_includes':</span> <span class="pre">{'config'},</span> <span class="pre">'mnemonic_overrides':</span> <span class="pre">{'config':</span> <span class="pre">'log'},</span> <span class="pre">'option_includes':</span> <span class="pre">{'level'},</span> <span class="pre">'option_overrides':</span> <span class="pre">{'level':</span> <span class="pre">{'doc':</span> <span class="pre">'logger</span> <span class="pre">level',</span> <span class="pre">'short_name':</span> <span class="pre">None}}}</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.CLI_META" title="Link to this definition">¶</a></dt>
+<dd><p>Command line meta data to avoid having to decorate this class in the
+configuration.  Given the complexity of this class, this configuration only
+exposes the parts of this class necessary for the CLI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_app_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">LogLevel.info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loggers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/log.html#LogConfigurator.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.config" title="Link to this definition">¶</a></dt>
+<dd><p>Configure the log system.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.config_file">
+<span class="sig-name descname"><span class="pre">config_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.config_file" title="Link to this definition">¶</a></dt>
+<dd><p>If provided, configure the log system with this configuration file.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.debug" title="Link to this definition">¶</a></dt>
+<dd><p>Print some logging to standard out to debug this class.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.default_app_level">
+<span class="sig-name descname"><span class="pre">default_app_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#zensols.cli.lib.log.LogLevel" title="zensols.cli.lib.log.LogLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogLevel</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.default_app_level" title="Link to this definition">¶</a></dt>
+<dd><p>The default log level to set the application logger when not given on the
+command line.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.default_level">
+<span class="sig-name descname"><span class="pre">default_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#zensols.cli.lib.log.LogLevel" title="zensols.cli.lib.log.LogLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogLevel</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.default_level" title="Link to this definition">¶</a></dt>
+<dd><p>The root logger level.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.format">
+<span class="sig-name descname"><span class="pre">format</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.format" title="Link to this definition">¶</a></dt>
+<dd><p>The format string to use for the logging system.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.level">
+<span class="sig-name descname"><span class="pre">level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#zensols.cli.lib.log.LogLevel" title="zensols.cli.lib.log.LogLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogLevel</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.level" title="Link to this definition">¶</a></dt>
+<dd><p>The application logger level.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.log_name">
+<span class="sig-name descname"><span class="pre">log_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.log_name" title="Link to this definition">¶</a></dt>
+<dd><p>The log name space.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.loggers">
+<span class="sig-name descname"><span class="pre">loggers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference internal" href="#zensols.cli.lib.log.LogLevel" title="zensols.cli.lib.log.LogLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogLevel</span></code></a><span class="pre">]]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.loggers" title="Link to this definition">¶</a></dt>
+<dd><p>Additional loggers to configure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.reset">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/log.html#LogConfigurator.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.reset" title="Link to this definition">¶</a></dt>
+<dd><p>Reset the logging system.  All configuration is removed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.set_format">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/log.html#LogConfigurator.set_format"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.set_format" title="Link to this definition">¶</a></dt>
+<dd><p>Set the format of the logger after previously set using this class.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogConfigurator.skip_config">
+<span class="sig-name descname"><span class="pre">skip_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogConfigurator.skip_config" title="Link to this definition">¶</a></dt>
+<dd><p>Whether to configure the logging system.  Set this to <code class="docutils literal notranslate"><span class="pre">False</span></code> to allow
+the application to configure the logging system while still leveraging this
+class.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogLevel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.log.</span></span><span class="sig-name descname"><span class="pre">LogLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names=&lt;not</span> <span class="pre">given&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/log.html#LogLevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.log.LogLevel" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Set of configurable log levels on the command line.  Note that we don’t
+include all so as to not overwhelm the help usage.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogLevel.crit">
+<span class="sig-name descname"><span class="pre">crit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">50</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogLevel.crit" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogLevel.debug">
+<span class="sig-name descname"><span class="pre">debug</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogLevel.debug" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogLevel.err">
+<span class="sig-name descname"><span class="pre">err</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">40</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogLevel.err" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogLevel.info">
+<span class="sig-name descname"><span class="pre">info</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogLevel.info" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogLevel.notset">
+<span class="sig-name descname"><span class="pre">notset</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogLevel.notset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogLevel.trace">
+<span class="sig-name descname"><span class="pre">trace</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogLevel.trace" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.log.LogLevel.warn">
+<span class="sig-name descname"><span class="pre">warn</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">30</span></em><a class="headerlink" href="#zensols.cli.lib.log.LogLevel.warn" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-zensols.cli.lib.package">
+<span id="zensols-cli-lib-package-module"></span><h2>zensols.cli.lib.package module<a class="headerlink" href="#module-zensols.cli.lib.package" title="Link to this heading">¶</a></h2>
+<p>First pass application to provide package information.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.package.PackageInfoImporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.package.</span></span><span class="sig-name descname"><span class="pre">PackageInfoImporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'package'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/package.html#PackageInfoImporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.package.PackageInfoImporter" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="zensols.cli.html#zensols.cli.app.ApplicationObserver" title="zensols.cli.app.ApplicationObserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationObserver</span></code></a></p>
+<p>Adds a section to the configuration with the application package
+information.  The section to add is given in <a class="reference internal" href="#zensols.cli.lib.package.PackageInfoImporter.section" title="zensols.cli.lib.package.PackageInfoImporter.section"><code class="xref py py-obj docutils literal notranslate"><span class="pre">section</span></code></a>, and the
+key/values are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>name</strong>: the package name (<code class="xref py py-obj docutils literal notranslate"><span class="pre">PackageResources.name</span></code>)</p></li>
+<li><p><strong>short_name</strong>: a shorter package name useful for setting in logging
+messages taken from <code class="xref py py-obj docutils literal notranslate"><span class="pre">PackageResources.name</span></code></p></li>
+<li><p><strong>version</strong>: the package version (<code class="xref py py-obj docutils literal notranslate"><span class="pre">PackageResources.version</span></code>)</p></li>
+</ul>
+</div></blockquote>
+<p>This class is useful to configure the default application module given by
+the package name for the <a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator" title="zensols.cli.lib.log.LogConfigurator"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogConfigurator</span></code></a> class.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.package.PackageInfoImporter.CLI_META">
+<span class="sig-name descname"><span class="pre">CLI_META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'always_invoke':</span> <span class="pre">True,</span> <span class="pre">'first_pass':</span> <span class="pre">True,</span> <span class="pre">'mnemonic_includes':</span> <span class="pre">{'add'},</span> <span class="pre">'mnemonic_overrides':</span> <span class="pre">{'add':</span> <span class="pre">'_add_package_info'},</span> <span class="pre">'option_includes':</span> <span class="pre">{}}</span></em><a class="headerlink" href="#zensols.cli.lib.package.PackageInfoImporter.CLI_META" title="Link to this definition">¶</a></dt>
+<dd><p>Command line meta data to avoid having to decorate this class in the
+configuration.  Given the complexity of this class, this configuration only
+exposes the parts of this class necessary for the CLI.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.package.PackageInfoImporter.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'package'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.cli.lib.package.PackageInfoImporter.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.package.PackageInfoImporter.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/package.html#PackageInfoImporter.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.package.PackageInfoImporter.add" title="Link to this definition">¶</a></dt>
+<dd><p>Add package information to the configuration (see class docs).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.package.PackageInfoImporter.config">
+<span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a></em><a class="headerlink" href="#zensols.cli.lib.package.PackageInfoImporter.config" title="Link to this definition">¶</a></dt>
+<dd><p>The parent configuration, which is populated with the package
+information.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.package.PackageInfoImporter.section">
+<span class="sig-name descname"><span class="pre">section</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'package'</span></em><a class="headerlink" href="#zensols.cli.lib.package.PackageInfoImporter.section" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the section to create with the package information.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-zensols.cli.lib.support">
+<span id="zensols-cli-lib-support-module"></span><h2>zensols.cli.lib.support module<a class="headerlink" href="#module-zensols.cli.lib.support" title="Link to this heading">¶</a></h2>
+<p>General purpose first pass applications to support the build and
+configuration functionality.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.CacheClearer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.support.</span></span><span class="sig-name descname"><span class="pre">CacheClearer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_factory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clearables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#CacheClearer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.CacheClearer" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.cli.lib.support.DryRunApplication" title="zensols.cli.lib.support.DryRunApplication"><code class="xref py py-class docutils literal notranslate"><span class="pre">DryRunApplication</span></code></a></p>
+<p>Clear cached data by iterating through a list of application context
+instances that have a <code class="docutils literal notranslate"><span class="pre">clear</span></code> method.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.CacheClearer.CLASS_INSPECTOR">
+<span class="sig-name descname"><span class="pre">CLASS_INSPECTOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#zensols.cli.lib.support.CacheClearer.CLASS_INSPECTOR" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.CacheClearer.CLI_META">
+<span class="sig-name descname"><span class="pre">CLI_META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'mnemonic_includes':</span> <span class="pre">{'clear'},</span> <span class="pre">'option_excludes':</span> <span class="pre">{'clearables',</span> <span class="pre">'config_factory'},</span> <span class="pre">'option_overrides':</span> <span class="pre">{'clean_level':</span> <span class="pre">{'long_name':</span> <span class="pre">'clevel',</span> <span class="pre">'short_name':</span> <span class="pre">None},</span> <span class="pre">'dry_run':</span> <span class="pre">{'short_name':</span> <span class="pre">'d'}}}</span></em><a class="headerlink" href="#zensols.cli.lib.support.CacheClearer.CLI_META" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.CacheClearer.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_factory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clearables</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.cli.lib.support.CacheClearer.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.CacheClearer.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#CacheClearer.clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.CacheClearer.clear" title="Link to this definition">¶</a></dt>
+<dd><p>Clear <em>all</em> cached data</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.CacheClearer.clearables">
+<span class="sig-name descname"><span class="pre">clearables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.support.CacheClearer.clearables" title="Link to this definition">¶</a></dt>
+<dd><p>A list of instance aliases (<code class="docutils literal notranslate"><span class="pre">&lt;section&gt;:&lt;option&gt;</span></code>), each with their own
+list of instances to invoke <code class="docutils literal notranslate"><span class="pre">clear</span></code> to remove cached data.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.CacheClearer.config_factory">
+<span class="sig-name descname"><span class="pre">config_factory</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="zensols.config.html#zensols.config.facbase.ConfigFactory" title="zensols.config.facbase.ConfigFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigFactory</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.support.CacheClearer.config_factory" title="Link to this definition">¶</a></dt>
+<dd><p>The parent application context factory, which is populated from the child
+configuration (see class docs).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.Cleaner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.support.</span></span><span class="sig-name descname"><span class="pre">Cleaner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#Cleaner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.Cleaner" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zensols.cli.lib.support.DryRunApplication" title="zensols.cli.lib.support.DryRunApplication"><code class="xref py py-class docutils literal notranslate"><span class="pre">DryRunApplication</span></code></a></p>
+<p>Clean (removes) files and directories not needed by the project.  The
+first tuple of paths will get deleted at any level, the next needs a level
+of 1 and so on.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.Cleaner.CLASS_INSPECTOR">
+<span class="sig-name descname"><span class="pre">CLASS_INSPECTOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#zensols.cli.lib.support.Cleaner.CLASS_INSPECTOR" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.Cleaner.CLI_META">
+<span class="sig-name descname"><span class="pre">CLI_META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'mnemonic_includes':</span> <span class="pre">{'clean'},</span> <span class="pre">'option_excludes':</span> <span class="pre">{'paths'},</span> <span class="pre">'option_overrides':</span> <span class="pre">{'clean_level':</span> <span class="pre">{'long_name':</span> <span class="pre">'clevel',</span> <span class="pre">'short_name':</span> <span class="pre">None},</span> <span class="pre">'dry_run':</span> <span class="pre">{'short_name':</span> <span class="pre">'d'}}}</span></em><a class="headerlink" href="#zensols.cli.lib.support.Cleaner.CLI_META" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.Cleaner.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">paths</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clean_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.cli.lib.support.Cleaner.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.Cleaner.clean">
+<span class="sig-name descname"><span class="pre">clean</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#Cleaner.clean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.Cleaner.clean" title="Link to this definition">¶</a></dt>
+<dd><p>Clean up unecessary files.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.Cleaner.clean_level">
+<span class="sig-name descname"><span class="pre">clean_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#zensols.cli.lib.support.Cleaner.clean_level" title="Link to this definition">¶</a></dt>
+<dd><p>The level at which to delete.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.Cleaner.paths">
+<span class="sig-name descname"><span class="pre">paths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a><span class="pre">[</span><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code><span class="pre">],</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a><span class="pre">],</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.support.Cleaner.paths" title="Link to this definition">¶</a></dt>
+<dd><p>Paths to delete (files or directories) with each group corresponding to a
+level (see class docs).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ConfigFormat">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.support.</span></span><span class="sig-name descname"><span class="pre">ConfigFormat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names=&lt;not</span> <span class="pre">given&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ConfigFormat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ConfigFormat" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Options for outputing the action list in <a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration" title="zensols.cli.lib.support.ShowConfiguration"><code class="xref py py-class docutils literal notranslate"><span class="pre">ShowConfiguration</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ConfigFormat.ini">
+<span class="sig-name descname"><span class="pre">ini</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#zensols.cli.lib.support.ConfigFormat.ini" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ConfigFormat.json">
+<span class="sig-name descname"><span class="pre">json</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#zensols.cli.lib.support.ConfigFormat.json" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ConfigFormat.shell">
+<span class="sig-name descname"><span class="pre">shell</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#zensols.cli.lib.support.ConfigFormat.shell" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ConfigFormat.text">
+<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#zensols.cli.lib.support.ConfigFormat.text" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ConfigFormat.yaml">
+<span class="sig-name descname"><span class="pre">yaml</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#zensols.cli.lib.support.ConfigFormat.yaml" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.DryRunApplication">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.support.</span></span><span class="sig-name descname"><span class="pre">DryRunApplication</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#DryRunApplication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.DryRunApplication" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.DryRunApplication.CLI_META">
+<span class="sig-name descname"><span class="pre">CLI_META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'option_overrides':</span> <span class="pre">{'dry_run':</span> <span class="pre">{'short_name':</span> <span class="pre">'d'}}}</span></em><a class="headerlink" href="#zensols.cli.lib.support.DryRunApplication.CLI_META" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.DryRunApplication.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.cli.lib.support.DryRunApplication.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.DryRunApplication.dry_run">
+<span class="sig-name descname"><span class="pre">dry_run</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#zensols.cli.lib.support.DryRunApplication.dry_run" title="Link to this definition">¶</a></dt>
+<dd><p>Don’t do anything; just act like it.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.EditConfiguration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.support.</span></span><span class="sig-name descname"><span class="pre">EditConfiguration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_factory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config_cli'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'emacsclient</span> <span class="pre">-n</span> <span class="pre">{path}'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#EditConfiguration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.EditConfiguration" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Edits the configuration file given on the command line.  This must be
+added <em>after</em> the <code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigurationImporter</span></code> class.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.EditConfiguration.CLI_META">
+<span class="sig-name descname"><span class="pre">CLI_META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'mnemonic_overrides':</span> <span class="pre">{'edit_configuration':</span> <span class="pre">'editconf'},</span> <span class="pre">'option_includes':</span> <span class="pre">{}}</span></em><a class="headerlink" href="#zensols.cli.lib.support.EditConfiguration.CLI_META" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.EditConfiguration.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_factory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'config_cli'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'emacsclient</span> <span class="pre">-n</span> <span class="pre">{path}'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.cli.lib.support.EditConfiguration.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.EditConfiguration.command">
+<span class="sig-name descname"><span class="pre">command</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'emacsclient</span> <span class="pre">-n</span> <span class="pre">{path}'</span></em><a class="headerlink" href="#zensols.cli.lib.support.EditConfiguration.command" title="Link to this definition">¶</a></dt>
+<dd><p>The command used on the <a class="reference external" href="https://docs.python.org/3/library/os.html#os.system" title="(in Python v3.14)"><code class="xref py py-func docutils literal notranslate"><span class="pre">os.system()</span></code></a> command to edit the file.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.EditConfiguration.config_factory">
+<span class="sig-name descname"><span class="pre">config_factory</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="zensols.config.html#zensols.config.facbase.ConfigFactory" title="zensols.config.facbase.ConfigFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigFactory</span></code></a></em><a class="headerlink" href="#zensols.cli.lib.support.EditConfiguration.config_factory" title="Link to this definition">¶</a></dt>
+<dd><p>The configuration factory which is returned from the app.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.EditConfiguration.edit_configuration">
+<span class="sig-name descname"><span class="pre">edit_configuration</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#EditConfiguration.edit_configuration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.EditConfiguration.edit_configuration" title="Link to this definition">¶</a></dt>
+<dd><p>Edit the configuration file.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.EditConfiguration.section_name">
+<span class="sig-name descname"><span class="pre">section_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'config_cli'</span></em><a class="headerlink" href="#zensols.cli.lib.support.EditConfiguration.section_name" title="Link to this definition">¶</a></dt>
+<dd><p>The section of the CLI configuration that contains the entry.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportEnvironment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.support.</span></span><span class="sig-name descname"><span class="pre">ExportEnvironment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ExportFormat.bash</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ExportEnvironment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ExportEnvironment" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>The class dumps a list of bash shell export statements for sourcing in
+build shell scripts.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportEnvironment.CLI_META">
+<span class="sig-name descname"><span class="pre">CLI_META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'option_includes':</span> <span class="pre">{'export_output_format',</span> <span class="pre">'output_path'},</span> <span class="pre">'option_overrides':</span> <span class="pre">{'export_output_format':</span> <span class="pre">{'long_name':</span> <span class="pre">'eformat',</span> <span class="pre">'short_name':</span> <span class="pre">None},</span> <span class="pre">'output_path':</span> <span class="pre">{'long_name':</span> <span class="pre">'eout',</span> <span class="pre">'short_name':</span> <span class="pre">None}}}</span></em><a class="headerlink" href="#zensols.cli.lib.support.ExportEnvironment.CLI_META" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportEnvironment.OUTPUT_FORMAT">
+<span class="sig-name descname"><span class="pre">OUTPUT_FORMAT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'export_output_format'</span></em><a class="headerlink" href="#zensols.cli.lib.support.ExportEnvironment.OUTPUT_FORMAT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportEnvironment.OUTPUT_PATH">
+<span class="sig-name descname"><span class="pre">OUTPUT_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'output_path'</span></em><a class="headerlink" href="#zensols.cli.lib.support.ExportEnvironment.OUTPUT_PATH" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportEnvironment.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">export_output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ExportFormat.bash</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.cli.lib.support.ExportEnvironment.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportEnvironment.config">
+<span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a></em><a class="headerlink" href="#zensols.cli.lib.support.ExportEnvironment.config" title="Link to this definition">¶</a></dt>
+<dd><p>The configuration used to get section information used to generate the
+export commands.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportEnvironment.export">
+<span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ExportEnvironment.export"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ExportEnvironment.export" title="Link to this definition">¶</a></dt>
+<dd><p>Create exports for shell sourcing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportEnvironment.export_output_format">
+<span class="sig-name descname"><span class="pre">export_output_format</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#zensols.cli.lib.support.ExportFormat" title="zensols.cli.lib.support.ExportFormat"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportFormat</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#zensols.cli.lib.support.ExportEnvironment.export_output_format" title="Link to this definition">¶</a></dt>
+<dd><p>The output format.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportEnvironment.output_path">
+<span class="sig-name descname"><span class="pre">output_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.support.ExportEnvironment.output_path" title="Link to this definition">¶</a></dt>
+<dd><p>The output file name for the export script.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportEnvironment.section">
+<span class="sig-name descname"><span class="pre">section</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#zensols.cli.lib.support.ExportEnvironment.section" title="Link to this definition">¶</a></dt>
+<dd><p>The section to dump as a series of export statements.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportFormat">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.support.</span></span><span class="sig-name descname"><span class="pre">ExportFormat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names=&lt;not</span> <span class="pre">given&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ExportFormat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ExportFormat" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>The format for the environment export with the
+<a class="reference internal" href="#zensols.cli.lib.support.ExportEnvironment" title="zensols.cli.lib.support.ExportEnvironment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExportEnvironment</span></code></a> first pass application.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportFormat.bash">
+<span class="sig-name descname"><span class="pre">bash</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#zensols.cli.lib.support.ExportFormat.bash" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ExportFormat.make">
+<span class="sig-name descname"><span class="pre">make</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#zensols.cli.lib.support.ExportFormat.make" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ListActions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.support.</span></span><span class="sig-name descname"><span class="pre">ListActions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_output_format=ListFormat.text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_to_string=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ListActions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ListActions" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="zensols.cli.html#zensols.cli.app.ApplicationObserver" title="zensols.cli.app.ApplicationObserver"><code class="xref py py-class docutils literal notranslate"><span class="pre">ApplicationObserver</span></code></a>, <a class="reference internal" href="zensols.config.html#zensols.config.dictable.Dictable" title="zensols.config.dictable.Dictable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dictable</span></code></a></p>
+<p>List command line actions with their help information.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ListActions.CLI_META">
+<span class="sig-name descname"><span class="pre">CLI_META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'option_includes':</span> <span class="pre">{'list_output_format'},</span> <span class="pre">'option_overrides':</span> <span class="pre">{'list_output_format':</span> <span class="pre">{'long_name':</span> <span class="pre">'lstfmt',</span> <span class="pre">'short_name':</span> <span class="pre">None}}}</span></em><a class="headerlink" href="#zensols.cli.lib.support.ListActions.CLI_META" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ListActions.LONG_NAME_SKIP">
+<span class="sig-name descname"><span class="pre">LONG_NAME_SKIP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'add_ConfigFactoryAccessor_to_app_config'</span></em><a class="headerlink" href="#zensols.cli.lib.support.ListActions.LONG_NAME_SKIP" title="Link to this definition">¶</a></dt>
+<dd><p>The <a class="reference internal" href="zensols.cli.html#zensols.cli.action.ActionCliMethod" title="zensols.cli.action.ActionCliMethod"><code class="xref py py-class docutils literal notranslate"><span class="pre">ActionCliMethod</span></code></a> name to skip,which indicates the first pass
+action used to get the application in the <a class="reference internal" href="zensols.cli.html#zensols.cli.harness.CliHarness" title="zensols.cli.harness.CliHarness"><code class="xref py py-class docutils literal notranslate"><span class="pre">CliHarness</span></code></a> used by
+<a class="reference internal" href="zensols.cli.html#zensols.cli.harness.ConfigFactoryAccessor" title="zensols.cli.harness.ConfigFactoryAccessor"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigFactoryAccessor</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ListActions.OUTPUT_FORMAT">
+<span class="sig-name descname"><span class="pre">OUTPUT_FORMAT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'list_output_format'</span></em><a class="headerlink" href="#zensols.cli.lib.support.ListActions.OUTPUT_FORMAT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ListActions.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_output_format=ListFormat.text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_to_string=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.cli.lib.support.ListActions.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ListActions.list">
+<span class="sig-name descname"><span class="pre">list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ListActions.list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ListActions.list" title="Link to this definition">¶</a></dt>
+<dd><p>List all actions and help.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ListActions.list_output_format">
+<span class="sig-name descname"><span class="pre">list_output_format</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#zensols.cli.lib.support.ListFormat" title="zensols.cli.lib.support.ListFormat"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListFormat</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#zensols.cli.lib.support.ListActions.list_output_format" title="Link to this definition">¶</a></dt>
+<dd><p>The output format for the action listing.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ListActions.type_to_string">
+<span class="sig-name descname"><span class="pre">type_to_string</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#zensols.cli.lib.support.ListActions.type_to_string" title="Link to this definition">¶</a></dt>
+<dd><p>Map Python type to a string used in the JSON formatted list output.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ListFormat">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.support.</span></span><span class="sig-name descname"><span class="pre">ListFormat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names=&lt;not</span> <span class="pre">given&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ListFormat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ListFormat" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Options for outputing the action list in <a class="reference internal" href="#zensols.cli.lib.support.ListActions" title="zensols.cli.lib.support.ListActions"><code class="xref py py-class docutils literal notranslate"><span class="pre">ListActions</span></code></a>.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ListFormat.json">
+<span class="sig-name descname"><span class="pre">json</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#zensols.cli.lib.support.ListFormat.json" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ListFormat.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#zensols.cli.lib.support.ListFormat.name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ListFormat.text">
+<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#zensols.cli.lib.support.ListFormat.text" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ProgramNameConfigurator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.support.</span></span><span class="sig-name descname"><span class="pre">ProgramNameConfigurator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'program'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prog'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ProgramNameConfigurator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ProgramNameConfigurator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Adds a section with the name of the program to use.  This is useful for
+adding the program name to the beginning of logging lines to confirm to
+UNIX conventions.</p>
+<p>To add it to the logging output add it to the
+<code class="xref py py-class docutils literal notranslate"><span class="pre">LogConfigurator</span></code> section’s <code class="docutils literal notranslate"><span class="pre">format</span></code> property.</p>
+<p>Example:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[add_prog_cli]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">zensols.cli.ProgramNameConfigurator</span>
+<span class="na">default</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">someprog</span>
+
+<span class="k">[log_cli]</span>
+<span class="na">class_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">zensols.cli.LogConfigurator</span>
+<span class="na">format</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">${program:name}: %%(message)s</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ProgramNameConfigurator.CLI_META">
+<span class="sig-name descname"><span class="pre">CLI_META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'always_invoke':</span> <span class="pre">True,</span> <span class="pre">'first_pass':</span> <span class="pre">True,</span> <span class="pre">'mnemonic_includes':</span> <span class="pre">{'add_program_name'},</span> <span class="pre">'option_includes':</span> <span class="pre">{}}</span></em><a class="headerlink" href="#zensols.cli.lib.support.ProgramNameConfigurator.CLI_META" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ProgramNameConfigurator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'program'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'prog'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.cli.lib.support.ProgramNameConfigurator.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ProgramNameConfigurator.add_program_name">
+<span class="sig-name descname"><span class="pre">add_program_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ProgramNameConfigurator.add_program_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ProgramNameConfigurator.add_program_name" title="Link to this definition">¶</a></dt>
+<dd><p>Add the program name as a single configuration section and parameter.</p>
+<dl class="field-list simple">
+<dt class="field-odd">See<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#zensols.cli.lib.support.ProgramNameConfigurator.section" title="zensols.cli.lib.support.ProgramNameConfigurator.section"><code class="xref py py-obj docutils literal notranslate"><span class="pre">section</span></code></a></p>
+</dd>
+<dt class="field-even">See<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#zensols.cli.lib.support.ProgramNameConfigurator.default" title="zensols.cli.lib.support.ProgramNameConfigurator.default"><code class="xref py py-obj docutils literal notranslate"><span class="pre">default</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ProgramNameConfigurator.config">
+<span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a></em><a class="headerlink" href="#zensols.cli.lib.support.ProgramNameConfigurator.config" title="Link to this definition">¶</a></dt>
+<dd><p>The parent configuration, which is populated with the package
+information.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ProgramNameConfigurator.create_section">
+<span class="sig-name descname"><span class="pre">create_section</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ProgramNameConfigurator.create_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ProgramNameConfigurator.create_section" title="Link to this definition">¶</a></dt>
+<dd><p>Return a dict with the contents of the program and name section.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – used to infer the program name from the entry point
+script, which defaults <code class="docutils literal notranslate"><span class="pre">sys.argv[0]</span></code></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ProgramNameConfigurator.default">
+<span class="sig-name descname"><span class="pre">default</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'prog'</span></em><a class="headerlink" href="#zensols.cli.lib.support.ProgramNameConfigurator.default" title="Link to this definition">¶</a></dt>
+<dd><p>The default progran name to use when can not be inferred.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ProgramNameConfigurator.infer_program_name">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">infer_program_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ProgramNameConfigurator.infer_program_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ProgramNameConfigurator.infer_program_name" title="Link to this definition">¶</a></dt>
+<dd><p>Infer the program name using the system arguments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry_path</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – used to infer the program name from the entry point
+script, which defaults <code class="docutils literal notranslate"><span class="pre">sys.argv[0]</span></code></p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ProgramNameConfigurator.section">
+<span class="sig-name descname"><span class="pre">section</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'program'</span></em><a class="headerlink" href="#zensols.cli.lib.support.ProgramNameConfigurator.section" title="Link to this definition">¶</a></dt>
+<dd><p>The name of the section to create with the package information.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ShowConfiguration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zensols.cli.lib.support.</span></span><span class="sig-name descname"><span class="pre">ShowConfiguration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_factory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ConfigFormat.text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ShowConfiguration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ShowConfiguration" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>The class dumps a list of bash shell export statements for sourcing in
+build shell scripts.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ShowConfiguration.CLI_META">
+<span class="sig-name descname"><span class="pre">CLI_META</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'mnemonic_overrides':</span> <span class="pre">{'show_config':</span> <span class="pre">'config'},</span> <span class="pre">'option_includes':</span> <span class="pre">{'config_output_format',</span> <span class="pre">'config_output_path',</span> <span class="pre">'evaluate',</span> <span class="pre">'sections'},</span> <span class="pre">'option_overrides':</span> <span class="pre">{'config_output_format':</span> <span class="pre">{'long_name':</span> <span class="pre">'cformat',</span> <span class="pre">'short_name':</span> <span class="pre">None},</span> <span class="pre">'config_output_path':</span> <span class="pre">{'long_name':</span> <span class="pre">'cout',</span> <span class="pre">'short_name':</span> <span class="pre">None},</span> <span class="pre">'evaluate':</span> <span class="pre">{'long_name':</span> <span class="pre">'eval',</span> <span class="pre">'short_name':</span> <span class="pre">None},</span> <span class="pre">'sections':</span> <span class="pre">{'long_name':</span> <span class="pre">'csec',</span> <span class="pre">'short_name':</span> <span class="pre">None}}}</span></em><a class="headerlink" href="#zensols.cli.lib.support.ShowConfiguration.CLI_META" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ShowConfiguration.EVAL_NAME">
+<span class="sig-name descname"><span class="pre">EVAL_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'evaluate'</span></em><a class="headerlink" href="#zensols.cli.lib.support.ShowConfiguration.EVAL_NAME" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ShowConfiguration.OUTPUT_FORMAT">
+<span class="sig-name descname"><span class="pre">OUTPUT_FORMAT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'config_output_format'</span></em><a class="headerlink" href="#zensols.cli.lib.support.ShowConfiguration.OUTPUT_FORMAT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ShowConfiguration.OUTPUT_PATH">
+<span class="sig-name descname"><span class="pre">OUTPUT_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'config_output_path'</span></em><a class="headerlink" href="#zensols.cli.lib.support.ShowConfiguration.OUTPUT_PATH" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ShowConfiguration.SECTION_NAME">
+<span class="sig-name descname"><span class="pre">SECTION_NAME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sections'</span></em><a class="headerlink" href="#zensols.cli.lib.support.ShowConfiguration.SECTION_NAME" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ShowConfiguration.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_factory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_output_format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ConfigFormat.text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#zensols.cli.lib.support.ShowConfiguration.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ShowConfiguration.config_factory">
+<span class="sig-name descname"><span class="pre">config_factory</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="zensols.config.html#zensols.config.facbase.ConfigFactory" title="zensols.config.facbase.ConfigFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigFactory</span></code></a></em><a class="headerlink" href="#zensols.cli.lib.support.ShowConfiguration.config_factory" title="Link to this definition">¶</a></dt>
+<dd><p>The configuration factory which is returned from the app.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ShowConfiguration.config_output_format">
+<span class="sig-name descname"><span class="pre">config_output_format</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#zensols.cli.lib.support.ConfigFormat" title="zensols.cli.lib.support.ConfigFormat"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigFormat</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#zensols.cli.lib.support.ShowConfiguration.config_output_format" title="Link to this definition">¶</a></dt>
+<dd><p>The output format.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ShowConfiguration.config_output_path">
+<span class="sig-name descname"><span class="pre">config_output_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#zensols.cli.lib.support.ShowConfiguration.config_output_path" title="Link to this definition">¶</a></dt>
+<dd><p>The output file name for the configuration.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ShowConfiguration.evaluate">
+<span class="sig-name descname"><span class="pre">evaluate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#zensols.cli.lib.support.ShowConfiguration.evaluate" title="Link to this definition">¶</a></dt>
+<dd><p>Whether to evaluate as the application sees it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zensols.cli.lib.support.ShowConfiguration.show_config">
+<span class="sig-name descname"><span class="pre">show_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/zensols/cli/lib/support.html#ShowConfiguration.show_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zensols.cli.lib.support.ShowConfiguration.show_config" title="Link to this definition">¶</a></dt>
+<dd><p>Print the configuration and exit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sections</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – comma separated sections to show, all if not given, or
+- for names</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="zensols.config.html#zensols.config.configbase.Configurable" title="zensols.config.configbase.Configurable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Configurable</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="zensols.config.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">zensols.config package</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="zensols.cli.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">zensols.cli package</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026 Paul Landes
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">zensols.cli.lib namespace</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-zensols.cli.lib.config">zensols.cli.lib.config module</a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.CLI_META"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.CLI_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.CONFIG_PATH_FIELD"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.CONFIG_PATH_FIELD</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.ENVIRON_SHARED_NAME"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.ENVIRON_SHARED_NAME</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.ENVIRON_VAR_REGEX"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.ENVIRON_VAR_REGEX</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.IMPORT_TYPE"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.IMPORT_TYPE</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.__init__"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.arguments"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.arguments</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.cache_path"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.cache_path</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.config"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.config</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.config_path"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.config_path</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.config_path_environ_name"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.config_path_environ_name</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.config_path_option_name"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.config_path_option_name</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.debug"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.debug</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.default"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.default</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.expect"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.expect</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.get_environ_path"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.get_environ_path()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.get_environ_var_from_app"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.get_environ_var_from_app()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.merge"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.merge()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.name"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.name</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.section"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.section</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationImporter.type"><code class="docutils literal notranslate"><span class="pre">ConfigurationImporter.type</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationOverrider"><code class="docutils literal notranslate"><span class="pre">ConfigurationOverrider</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationOverrider.CLI_META"><code class="docutils literal notranslate"><span class="pre">ConfigurationOverrider.CLI_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationOverrider.OVERRIDE_FIELD"><code class="docutils literal notranslate"><span class="pre">ConfigurationOverrider.OVERRIDE_FIELD</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationOverrider.__init__"><code class="docutils literal notranslate"><span class="pre">ConfigurationOverrider.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationOverrider.config"><code class="docutils literal notranslate"><span class="pre">ConfigurationOverrider.config</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationOverrider.disable"><code class="docutils literal notranslate"><span class="pre">ConfigurationOverrider.disable</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationOverrider.get_configurable"><code class="docutils literal notranslate"><span class="pre">ConfigurationOverrider.get_configurable()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationOverrider.merge"><code class="docutils literal notranslate"><span class="pre">ConfigurationOverrider.merge()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationOverrider.option_sep_regex"><code class="docutils literal notranslate"><span class="pre">ConfigurationOverrider.option_sep_regex</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.config.ConfigurationOverrider.override"><code class="docutils literal notranslate"><span class="pre">ConfigurationOverrider.override</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-zensols.cli.lib.log">zensols.cli.lib.log module</a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator"><code class="docutils literal notranslate"><span class="pre">LogConfigurator</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.CLI_META"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.CLI_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.__init__"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.config"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.config()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.config_file"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.config_file</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.debug"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.debug</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.default_app_level"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.default_app_level</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.default_level"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.default_level</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.format"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.format</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.level"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.level</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.log_name"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.log_name</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.loggers"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.loggers</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.reset"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.reset()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.set_format"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.set_format()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogConfigurator.skip_config"><code class="docutils literal notranslate"><span class="pre">LogConfigurator.skip_config</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogLevel"><code class="docutils literal notranslate"><span class="pre">LogLevel</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogLevel.crit"><code class="docutils literal notranslate"><span class="pre">LogLevel.crit</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogLevel.debug"><code class="docutils literal notranslate"><span class="pre">LogLevel.debug</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogLevel.err"><code class="docutils literal notranslate"><span class="pre">LogLevel.err</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogLevel.info"><code class="docutils literal notranslate"><span class="pre">LogLevel.info</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogLevel.notset"><code class="docutils literal notranslate"><span class="pre">LogLevel.notset</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogLevel.trace"><code class="docutils literal notranslate"><span class="pre">LogLevel.trace</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.log.LogLevel.warn"><code class="docutils literal notranslate"><span class="pre">LogLevel.warn</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-zensols.cli.lib.package">zensols.cli.lib.package module</a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.package.PackageInfoImporter"><code class="docutils literal notranslate"><span class="pre">PackageInfoImporter</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.package.PackageInfoImporter.CLI_META"><code class="docutils literal notranslate"><span class="pre">PackageInfoImporter.CLI_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.package.PackageInfoImporter.__init__"><code class="docutils literal notranslate"><span class="pre">PackageInfoImporter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.package.PackageInfoImporter.add"><code class="docutils literal notranslate"><span class="pre">PackageInfoImporter.add()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.package.PackageInfoImporter.config"><code class="docutils literal notranslate"><span class="pre">PackageInfoImporter.config</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.package.PackageInfoImporter.section"><code class="docutils literal notranslate"><span class="pre">PackageInfoImporter.section</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-zensols.cli.lib.support">zensols.cli.lib.support module</a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.support.CacheClearer"><code class="docutils literal notranslate"><span class="pre">CacheClearer</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.support.CacheClearer.CLASS_INSPECTOR"><code class="docutils literal notranslate"><span class="pre">CacheClearer.CLASS_INSPECTOR</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.CacheClearer.CLI_META"><code class="docutils literal notranslate"><span class="pre">CacheClearer.CLI_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.CacheClearer.__init__"><code class="docutils literal notranslate"><span class="pre">CacheClearer.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.CacheClearer.clear"><code class="docutils literal notranslate"><span class="pre">CacheClearer.clear()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.CacheClearer.clearables"><code class="docutils literal notranslate"><span class="pre">CacheClearer.clearables</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.CacheClearer.config_factory"><code class="docutils literal notranslate"><span class="pre">CacheClearer.config_factory</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.Cleaner"><code class="docutils literal notranslate"><span class="pre">Cleaner</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.support.Cleaner.CLASS_INSPECTOR"><code class="docutils literal notranslate"><span class="pre">Cleaner.CLASS_INSPECTOR</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.Cleaner.CLI_META"><code class="docutils literal notranslate"><span class="pre">Cleaner.CLI_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.Cleaner.__init__"><code class="docutils literal notranslate"><span class="pre">Cleaner.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.Cleaner.clean"><code class="docutils literal notranslate"><span class="pre">Cleaner.clean()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.Cleaner.clean_level"><code class="docutils literal notranslate"><span class="pre">Cleaner.clean_level</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.Cleaner.paths"><code class="docutils literal notranslate"><span class="pre">Cleaner.paths</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ConfigFormat"><code class="docutils literal notranslate"><span class="pre">ConfigFormat</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ConfigFormat.ini"><code class="docutils literal notranslate"><span class="pre">ConfigFormat.ini</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ConfigFormat.json"><code class="docutils literal notranslate"><span class="pre">ConfigFormat.json</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ConfigFormat.shell"><code class="docutils literal notranslate"><span class="pre">ConfigFormat.shell</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ConfigFormat.text"><code class="docutils literal notranslate"><span class="pre">ConfigFormat.text</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ConfigFormat.yaml"><code class="docutils literal notranslate"><span class="pre">ConfigFormat.yaml</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.DryRunApplication"><code class="docutils literal notranslate"><span class="pre">DryRunApplication</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.support.DryRunApplication.CLI_META"><code class="docutils literal notranslate"><span class="pre">DryRunApplication.CLI_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.DryRunApplication.__init__"><code class="docutils literal notranslate"><span class="pre">DryRunApplication.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.DryRunApplication.dry_run"><code class="docutils literal notranslate"><span class="pre">DryRunApplication.dry_run</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.EditConfiguration"><code class="docutils literal notranslate"><span class="pre">EditConfiguration</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.support.EditConfiguration.CLI_META"><code class="docutils literal notranslate"><span class="pre">EditConfiguration.CLI_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.EditConfiguration.__init__"><code class="docutils literal notranslate"><span class="pre">EditConfiguration.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.EditConfiguration.command"><code class="docutils literal notranslate"><span class="pre">EditConfiguration.command</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.EditConfiguration.config_factory"><code class="docutils literal notranslate"><span class="pre">EditConfiguration.config_factory</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.EditConfiguration.edit_configuration"><code class="docutils literal notranslate"><span class="pre">EditConfiguration.edit_configuration()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.EditConfiguration.section_name"><code class="docutils literal notranslate"><span class="pre">EditConfiguration.section_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportEnvironment"><code class="docutils literal notranslate"><span class="pre">ExportEnvironment</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportEnvironment.CLI_META"><code class="docutils literal notranslate"><span class="pre">ExportEnvironment.CLI_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportEnvironment.OUTPUT_FORMAT"><code class="docutils literal notranslate"><span class="pre">ExportEnvironment.OUTPUT_FORMAT</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportEnvironment.OUTPUT_PATH"><code class="docutils literal notranslate"><span class="pre">ExportEnvironment.OUTPUT_PATH</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportEnvironment.__init__"><code class="docutils literal notranslate"><span class="pre">ExportEnvironment.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportEnvironment.config"><code class="docutils literal notranslate"><span class="pre">ExportEnvironment.config</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportEnvironment.export"><code class="docutils literal notranslate"><span class="pre">ExportEnvironment.export()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportEnvironment.export_output_format"><code class="docutils literal notranslate"><span class="pre">ExportEnvironment.export_output_format</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportEnvironment.output_path"><code class="docutils literal notranslate"><span class="pre">ExportEnvironment.output_path</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportEnvironment.section"><code class="docutils literal notranslate"><span class="pre">ExportEnvironment.section</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportFormat"><code class="docutils literal notranslate"><span class="pre">ExportFormat</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportFormat.bash"><code class="docutils literal notranslate"><span class="pre">ExportFormat.bash</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ExportFormat.make"><code class="docutils literal notranslate"><span class="pre">ExportFormat.make</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ListActions"><code class="docutils literal notranslate"><span class="pre">ListActions</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ListActions.CLI_META"><code class="docutils literal notranslate"><span class="pre">ListActions.CLI_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ListActions.LONG_NAME_SKIP"><code class="docutils literal notranslate"><span class="pre">ListActions.LONG_NAME_SKIP</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ListActions.OUTPUT_FORMAT"><code class="docutils literal notranslate"><span class="pre">ListActions.OUTPUT_FORMAT</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ListActions.__init__"><code class="docutils literal notranslate"><span class="pre">ListActions.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ListActions.list"><code class="docutils literal notranslate"><span class="pre">ListActions.list()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ListActions.list_output_format"><code class="docutils literal notranslate"><span class="pre">ListActions.list_output_format</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ListActions.type_to_string"><code class="docutils literal notranslate"><span class="pre">ListActions.type_to_string</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ListFormat"><code class="docutils literal notranslate"><span class="pre">ListFormat</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ListFormat.json"><code class="docutils literal notranslate"><span class="pre">ListFormat.json</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ListFormat.name"><code class="docutils literal notranslate"><span class="pre">ListFormat.name</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ListFormat.text"><code class="docutils literal notranslate"><span class="pre">ListFormat.text</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ProgramNameConfigurator"><code class="docutils literal notranslate"><span class="pre">ProgramNameConfigurator</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ProgramNameConfigurator.CLI_META"><code class="docutils literal notranslate"><span class="pre">ProgramNameConfigurator.CLI_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ProgramNameConfigurator.__init__"><code class="docutils literal notranslate"><span class="pre">ProgramNameConfigurator.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ProgramNameConfigurator.add_program_name"><code class="docutils literal notranslate"><span class="pre">ProgramNameConfigurator.add_program_name()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ProgramNameConfigurator.config"><code class="docutils literal notranslate"><span class="pre">ProgramNameConfigurator.config</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ProgramNameConfigurator.create_section"><code class="docutils literal notranslate"><span class="pre">ProgramNameConfigurator.create_section()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ProgramNameConfigurator.default"><code class="docutils literal notranslate"><span class="pre">ProgramNameConfigurator.default</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ProgramNameConfigurator.infer_program_name"><code class="docutils literal notranslate"><span class="pre">ProgramNameConfigurator.infer_program_name()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ProgramNameConfigurator.section"><code class="docutils literal notranslate"><span class="pre">ProgramNameConfigurator.section</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration"><code class="docutils literal notranslate"><span class="pre">ShowConfiguration</span></code></a><ul>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration.CLI_META"><code class="docutils literal notranslate"><span class="pre">ShowConfiguration.CLI_META</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration.EVAL_NAME"><code class="docutils literal notranslate"><span class="pre">ShowConfiguration.EVAL_NAME</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration.OUTPUT_FORMAT"><code class="docutils literal notranslate"><span class="pre">ShowConfiguration.OUTPUT_FORMAT</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration.OUTPUT_PATH"><code class="docutils literal notranslate"><span class="pre">ShowConfiguration.OUTPUT_PATH</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration.SECTION_NAME"><code class="docutils literal notranslate"><span class="pre">ShowConfiguration.SECTION_NAME</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration.__init__"><code class="docutils literal notranslate"><span class="pre">ShowConfiguration.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration.config_factory"><code class="docutils literal notranslate"><span class="pre">ShowConfiguration.config_factory</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration.config_output_format"><code class="docutils literal notranslate"><span class="pre">ShowConfiguration.config_output_format</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration.config_output_path"><code class="docutils literal notranslate"><span class="pre">ShowConfiguration.config_output_path</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration.evaluate"><code class="docutils literal notranslate"><span class="pre">ShowConfiguration.evaluate</span></code></a></li>
+<li><a class="reference internal" href="#zensols.cli.lib.support.ShowConfiguration.show_config"><code class="docutils literal notranslate"><span class="pre">ShowConfiguration.show_config()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../_static/documentation_options.js?v=d5528024"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

@@ -1,0 +1,978 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../../../">
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html"><link rel="search" title="Search" href="../../../../search.html">
+
+    <!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+        <title>zensols.cli.lib.config - Zensols Utilities 1.16.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/sphinx-codeautolink.css?v=b2176991" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/codeautolink.css?v=57550ae3" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../../top.html"><div class="brand">Zensols Utilities 1.16.3 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../top.html">
+  
+  <span class="sidebar-brand-text">Zensols Utilities 1.16.3 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../doc/command-line.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../doc/configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../doc/persist.html">Persistence</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../api.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../../api/zensols.cli.html">zensols.cli package</a><input aria-label="Toggle navigation of zensols.cli package" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../api/zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/zensols.cli.lib.html">zensols.cli.lib namespace</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/zensols.config.html">zensols.config package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/zensols.introspect.html">zensols.introspect package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/zensols.multi.html">zensols.multi package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/zensols.persist.html">zensols.persist package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../api/zensols.util.html">zensols.util package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../CONTRIBUTING.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../LICENSE.html">License</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for zensols.cli.lib.config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Configuration merging first pass applications.  These utility applications</span>
+<span class="sd">allow a configuration option and then merge that configuration with the</span>
+<span class="sd">application context.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s1">&#39;Paul Landes&#39;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">string</span><span class="w"> </span><span class="kn">import</span> <span class="n">Template</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">parse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">par</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zensols.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">PackageResource</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zensols.persist</span><span class="w"> </span><span class="kn">import</span> <span class="n">persisted</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">zensols.config</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">rawconfig</span><span class="p">,</span> <span class="n">Configurable</span><span class="p">,</span> <span class="n">ConfigurableFactory</span><span class="p">,</span>
+    <span class="n">IniConfig</span><span class="p">,</span> <span class="n">ImportIniConfig</span><span class="p">,</span> <span class="n">StringConfig</span><span class="p">,</span> <span class="n">DictionaryConfig</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Dictable</span><span class="p">,</span> <span class="n">ActionCliError</span><span class="p">,</span> <span class="n">ApplicationError</span><span class="p">,</span> <span class="n">OptionMetaData</span><span class="p">,</span> <span class="n">ActionMetaData</span><span class="p">,</span>
+    <span class="n">ApplicationObserver</span><span class="p">,</span> <span class="n">Action</span><span class="p">,</span> <span class="n">Application</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_ConfiguratorImporterTemplate</span><span class="p">(</span><span class="n">Template</span><span class="p">):</span>
+    <span class="n">delimiter</span> <span class="o">=</span> <span class="s1">&#39;^&#39;</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_PreLoadImportIniConfig</span><span class="p">(</span><span class="n">ImportIniConfig</span><span class="p">):</span>
+    <span class="n">_PRELOAD_FORMAT</span> <span class="o">=</span> <span class="s1">&#39;preload:</span><span class="si">{}</span><span class="s1">&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">preloads</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Configurable</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preloads</span> <span class="o">=</span> <span class="n">preloads</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">format_preload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_PRELOAD_FORMAT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_preload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">pres</span><span class="p">:</span> <span class="n">par</span><span class="o">.</span><span class="n">Result</span> <span class="o">=</span> <span class="n">par</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_PRELOAD_FORMAT</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pres</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">pres</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                       <span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Configurable</span><span class="p">:</span>
+        <span class="n">conf</span><span class="p">:</span> <span class="n">Configurable</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">config_file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SINGLE_CONFIG_FILE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_preload</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preloads</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;create config &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">conf</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">conf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;matched a preload format &#39;</span><span class="si">{</span><span class="n">config_file</span><span class="si">}</span><span class="s2">&#39; &quot;</span> <span class="o">+</span>
+                               <span class="sa">f</span><span class="s2">&quot;with non-existing preload: &#39;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">conf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_create_config</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">conf</span>
+
+
+<div class="viewcode-block" id="ConfigurationOverrider">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationOverrider">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigurationOverrider</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Overrides configuration in the app config.  This is useful for replacing</span>
+<span class="sd">    on a per command line invocation basis.  Examples could include changing the</span>
+<span class="sd">    number of epochs trained for a model.</span>
+
+<span class="sd">    The :obj:`override` field either contains a path to a file that contains</span>
+<span class="sd">    the configuration file to use to clobber the given sections/values, or a</span>
+<span class="sd">    string to be interpreted by :class:`.StringConfig`.  This determination is</span>
+<span class="sd">    made by whether or not the string points to an existing file or directory.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">OVERRIDE_FIELD</span> <span class="o">=</span> <span class="s1">&#39;override&#39;</span>
+    <span class="n">CLI_META</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;first_pass&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># not a separate action</span>
+                <span class="s1">&#39;mnemonic_includes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;merge&#39;</span><span class="p">},</span>
+                <span class="c1"># better/shorter  long name, and reserve the short name</span>
+                <span class="s1">&#39;option_overrides&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">OVERRIDE_FIELD</span><span class="p">:</span>
+                                     <span class="p">{</span><span class="s1">&#39;metavar&#39;</span><span class="p">:</span> <span class="s1">&#39;&lt;FILE|DIR|STRING&gt;&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}},</span>
+                <span class="c1"># only the path to the configuration should be exposed as a</span>
+                <span class="c1"># an option on the comamnd line</span>
+                <span class="s1">&#39;option_includes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">OVERRIDE_FIELD</span><span class="p">}}</span>
+
+    <span class="n">config</span><span class="p">:</span> <span class="n">Configurable</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The parent configuration, which is populated from the child configuration</span>
+<span class="sd">    (see class docs).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">override</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A file/dir or a comma delimited ``section.key=value`` that overrides</span>
+<span class="sd">    config.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">option_sep_regex</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;\s*,\s*&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The string used to delimit the each key/value pair.&quot;&quot;&quot;</span>
+
+    <span class="n">disable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Whether to disable the application, which is useful to set to ``False``</span>
+<span class="sd">    when used with :class:`.ConfigurationImporter`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ConfigurationOverrider.get_configurable">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationOverrider.get_configurable">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_configurable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Configurable</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">override</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">override</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">cf</span> <span class="o">=</span> <span class="n">ConfigurableFactory</span><span class="p">()</span>
+                <span class="n">overrides</span> <span class="o">=</span> <span class="n">cf</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">overrides</span> <span class="o">=</span> <span class="n">StringConfig</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">override</span><span class="p">,</span>
+                    <span class="n">option_sep_regex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">option_sep_regex</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">overrides</span></div>
+
+
+<div class="viewcode-block" id="ConfigurationOverrider.merge">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationOverrider.merge">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Configurable</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Merge the string configuration with the application context.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;overriding with: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">override</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">disable</span><span class="p">:</span>
+            <span class="n">conf</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Configurable</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_configurable</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">conf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Configurable</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">()</span></div>
+
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_CacheConfigManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">ImportIniConfig</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+    <span class="n">watch_files</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_newer_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span>
+        <span class="n">prev_mtime</span><span class="p">:</span> <span class="nb">int</span>
+        <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">prev_mtime</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">cur_mtime</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span>
+            <span class="k">if</span> <span class="n">cur_mtime</span> <span class="o">&gt;</span> <span class="n">prev_mtime</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">path</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImportIniConfig</span><span class="p">:</span>
+        <span class="n">prev_config</span><span class="p">:</span> <span class="n">ImportIniConfig</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">prev_mng</span><span class="p">:</span> <span class="n">_CacheConfigManager</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">newer_files</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_get_newer_files</span><span class="p">(</span><span class="n">prev_mng</span><span class="o">.</span><span class="n">watch_files</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">newer_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;reusing cached config: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">prev_config</span> <span class="o">=</span> <span class="n">prev_mng</span><span class="o">.</span><span class="n">config</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">):</span>
+                    <span class="n">fnames</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">newer_files</span><span class="p">))</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;reloading since files changed: </span><span class="si">{</span><span class="n">fnames</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">prev_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">start_file_capture</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">prev_config</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">visited</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">stop_file_capture</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">watch_files</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">),</span> <span class="n">visited</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ConfigurationImporter">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationImporter">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConfigurationImporter</span><span class="p">(</span><span class="n">ApplicationObserver</span><span class="p">,</span> <span class="n">Dictable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class imports a child configuration in to the application context.</span>
+<span class="sd">    It does this by:</span>
+
+<span class="sd">      1. Attempt to load the configuration indicated by the ``--config``</span>
+<span class="sd">         option.</span>
+
+<span class="sd">      2. If the option doesn&#39;t exist, attempt to get the path to load from an</span>
+<span class="sd">         environment variable (see :meth:`get_environ_var_from_app`).  For</span>
+<span class="sd">         example, for package ``zensols.util``, the environment variable</span>
+<span class="sd">         ``UTILRC`` environment variable&#39;s path is used.</span>
+
+<span class="sd">      3. If the environment variable is not found, then look for the UNIX style</span>
+<span class="sd">         resource file (see :meth:`get_environ_path`).  For example, package</span>
+<span class="sd">         ``zensols.util`` would point to ``~/.utilrc``.</span>
+
+<span class="sd">      4. If the home directory ``~/&lt;app&gt;rc`` is not found, all paths (separated</span>
+<span class="sd">         by :obj:`os.pathsep`) set in the ``ZENSOLSRC`` environment variable are</span>
+<span class="sd">         searched.</span>
+
+<span class="sd">      5. Loads the *child* configuration.</span>
+
+<span class="sd">      6. Copy all sections from the child configuration to :obj:`config`.</span>
+
+<span class="sd">    The child configuration is created by :class:`.ConfigurableFactory`.  If</span>
+<span class="sd">    the child has a `.conf` extension, :class:`.ImportIniConfig` is used with</span>
+<span class="sd">    its child set as :obj:`config` so the two can reference each other at</span>
+<span class="sd">    property/factory resolve time.</span>
+
+<span class="sd">    Special mnemonic ``^{config_path}`` can be used in an</span>
+<span class="sd">    :class`.ImportIniConfig` import section in the `config_files` property to</span>
+<span class="sd">    load the referred configuration file in any order with the other loaded</span>
+<span class="sd">    files.  The special mnemonic ``^{override}`` does the same thing with the</span>
+<span class="sd">    :class:`.ConfigurationOverrider` one pass application as well.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_OVERRIDES_KEY</span> <span class="o">=</span> <span class="n">ConfigurationOverrider</span><span class="o">.</span><span class="n">OVERRIDE_FIELD</span>
+    <span class="n">_OVERRIDES_PRELOAD</span> <span class="o">=</span> <span class="n">_PreLoadImportIniConfig</span><span class="o">.</span><span class="n">format_preload</span><span class="p">(</span><span class="n">_OVERRIDES_KEY</span><span class="p">)</span>
+
+    <span class="n">CONFIG_PATH_FIELD</span> <span class="o">=</span> <span class="s1">&#39;config_path&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The field name in this class of the child configuration path.</span>
+
+<span class="sd">    :see: :obj:`config_path`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">CLI_META</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;first_pass&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>  <span class="c1"># not a separate action</span>
+                <span class="c1"># the mnemonic must be unique and used to referece the method</span>
+                <span class="s1">&#39;mnemonic_overrides&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;merge&#39;</span><span class="p">:</span> <span class="s1">&#39;_merge_config_as_import&#39;</span><span class="p">},</span>
+                <span class="s1">&#39;mnemonic_includes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;merge&#39;</span><span class="p">},</span>
+                <span class="c1"># better/shorter  long name, and reserve the short name</span>
+                <span class="s1">&#39;option_overrides&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">CONFIG_PATH_FIELD</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;long_name&#39;</span><span class="p">:</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span>
+                                                         <span class="s1">&#39;short_name&#39;</span><span class="p">:</span> <span class="s1">&#39;c&#39;</span><span class="p">}},</span>
+                <span class="c1"># only the path to the configuration should be exposed as a</span>
+                <span class="c1"># an option on the comamnd line</span>
+                <span class="s1">&#39;option_includes&#39;</span><span class="p">:</span> <span class="p">{</span><span class="n">CONFIG_PATH_FIELD</span><span class="p">}}</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Command line meta data to avoid having to decorate this class in the</span>
+<span class="sd">    configuration.  Given the complexity of this class, this configuration only</span>
+<span class="sd">    exposes the parts of this class necessary for the CLI.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">IMPORT_TYPE</span> <span class="o">=</span> <span class="s1">&#39;import&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The string value of the ``type`` parameter in the section config</span>
+<span class="sd">    identifying an :class:`.ImportIniConfig` import section.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ENVIRON_SHARED_NAME</span> <span class="o">=</span> <span class="s1">&#39;ZENSOLSRC&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Environment variable name that points to a directory for shared config</span>
+<span class="sd">    files (see :meth:`get_environ_path`).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ENVIRON_VAR_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^.+\.([a-z]+?)$&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A regular expression to parse the name from the package name for the</span>
+<span class="sd">    environment variable that might hold the configuration</span>
+<span class="sd">    (i.e. ``APPNAMERC``).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The section name.&quot;&quot;&quot;</span>
+
+    <span class="n">config</span><span class="p">:</span> <span class="n">Configurable</span> <span class="o">=</span> <span class="n">field</span><span class="p">()</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The parent configuration, which is populated from the child configuration</span>
+<span class="sd">    (see class docs).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">expect</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;If ``True``, raise an :class:`.ApplicationError` if the option is not</span>
+<span class="sd">    given.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">default</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use this file as the default when given on the command line, which is not</span>
+<span class="sd">    used unless :obj:``expect`` is set to ``False``.</span>
+
+<span class="sd">    If this is set to ``skip``, then do not load any file.  This is useful when</span>
+<span class="sd">    the entire configuration is loaded by this class and there are</span>
+<span class="sd">    configuration mentions in the ``app.conf`` application context.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config_path_environ_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An environment variable containing the default path to the configuration.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The type of :class:`.Configurable` use to create in</span>
+<span class="sd">    :class:`.ConfigurableFactory`.  If this is not provided, the factory</span>
+<span class="sd">    decides based on the file extension.</span>
+
+<span class="sd">    :see: :class:`.ConfigurableFactory`</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">arguments</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Additional arguments to pass to the :class:`.ConfigFactory` when created.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">section</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Additional which section to load as an import.  This is only valid and</span>
+<span class="sd">    used when :obj:`type` is set to `import`.  When it is, the section will</span>
+<span class="sd">    replace the string ``^{config_apth}`` (and any other field in this instance</span>
+<span class="sd">    using the same syntax) and load indicated remaining configuration using</span>
+<span class="sd">    :class:`~zensols.config.ImportIniConfig`.</span>
+
+<span class="sd">    See the `API documentation</span>
+<span class="sd">    &lt;https://plandes.github.io/util/doc/config.html#import-ini-configuration&gt;`_</span>
+<span class="sd">    for more information.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">config_path_option_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s1">&#39;config_path&#39;</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;If not ``None``, the name of the option to set in the section defined for</span>
+<span class="sd">    this instance (section = :obj:`name`).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Printn the configuration after the merge operation.&quot;&quot;&quot;</span>
+
+    <span class="n">cache_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A path to a binary file of the cached configuration.  This is useful for</span>
+<span class="sd">    large application contexts that have a lot of imports that take a long time</span>
+<span class="sd">    to load.</span>
+
+<span class="sd">    When this file is set, the imported configuration files and their modify</span>
+<span class="sd">    timestamps are written along with the loaded configuration to this specified</span>
+<span class="sd">    file.  On subsequent runs, previous configuration is used if none of the</span>
+<span class="sd">    configuration files have changed.  Otherwise, they are reloaded and cached</span>
+<span class="sd">    again.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># name of this field must match</span>
+    <span class="c1"># :obj:`ConfigurationImporter.CONFIG_PATH_FIELD`</span>
+    <span class="n">config_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;The configuration file.&quot;&quot;&quot;</span>
+
+    <span class="nd">@persisted</span><span class="p">(</span><span class="s1">&#39;_rc_prefix&#39;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_rc_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the resource prefix.  For example, if the package resource is</span>
+<span class="sd">        ``zensols.util`` the outupt is ``util``.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pkg_res</span><span class="p">:</span> <span class="n">PackageResource</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">package_resource</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">pkg_res</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;match environment variable &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; &quot;</span> <span class="o">+</span>
+                         <span class="sa">f</span><span class="s1">&#39;on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ENVIRON_VAR_REGEX</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ENVIRON_VAR_REGEX</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">name</span>
+
+<div class="viewcode-block" id="ConfigurationImporter.get_environ_var_from_app">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationImporter.get_environ_var_from_app">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_environ_var_from_app</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the environment variable based on the name of the application.</span>
+<span class="sd">        This returns the :obj:`config_path_environ_name` if set, otherwise, it</span>
+<span class="sd">        generates it based on the name returned from the packge + ``RC`` and</span>
+<span class="sd">        capitalizes it.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_path_environ_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_path_environ_name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_rc_prefix</span><span class="p">()</span><span class="si">}</span><span class="s1">rc&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;using environment variable &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="ConfigurationImporter.get_environ_path">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationImporter.get_environ_path">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_environ_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the path to the resource configuration file.  The following</span>
+<span class="sd">        files are searched in order:</span>
+
+<span class="sd">          1. This first uses :meth:`get_environ_var_from_app` to attempt to find</span>
+<span class="sd">             an environment variable with a reference to file,</span>
+
+<span class="sd">          2. A file pointed by the environment variable</span>
+<span class="sd">             ``ENVIRON_SHARED_NAME/&lt;application prefix&gt;`` *without* the trailing</span>
+<span class="sd">             ``rc`` (i.e. package ``zensols.util`` would point to</span>
+<span class="sd">             ``~/etc/util.{conf,yml}``),</span>
+
+<span class="sd">          3. UNIX style file naming conventionsin the home directory</span>
+<span class="sd">             (i.e. package ``zensols.util`` would point to ``~/.utilrc``).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rc_files</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">env_var</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_environ_var_from_app</span><span class="p">()</span>
+        <span class="n">env_var_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">env_var</span><span class="p">)</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_rc_prefix</span><span class="p">()</span>
+        <span class="n">home_rc_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;~/.</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s1">rc&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+        <span class="n">shared_rc_var</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ENVIRON_SHARED_NAME</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;loading config from environment &#39;</span> <span class="o">+</span>
+                         <span class="sa">f</span><span class="s2">&quot;varaibles &#39;</span><span class="si">{</span><span class="n">env_var</span><span class="si">}</span><span class="s2">&#39; = </span><span class="si">{</span><span class="n">env_var_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">env_var_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rc_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">env_var_path</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s1">&#39;loading config from environment referred shared directory &#39;</span> <span class="o">+</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">ENVIRON_SHARED_NAME</span><span class="si">}</span><span class="s2">&#39; = &#39;</span><span class="si">{</span><span class="n">shared_rc_var</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">shared_rc_var</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">spath</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="k">for</span> <span class="n">spath</span> <span class="ow">in</span> <span class="n">shared_rc_var</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="p">):</span>
+                <span class="n">sdir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">spath</span><span class="p">)</span>
+                <span class="n">rc_files</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s1">.conf&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">())</span>
+                <span class="n">rc_files</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sdir</span> <span class="o">/</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s1">.yml&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">home_rc_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">rc_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">home_rc_path</span><span class="p">)</span>
+        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">rc_files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;checking for RC file: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;found RC file: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">path</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_config_option</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the long option name (with dashes) as given on the command</span>
+<span class="sd">        line.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ameta</span><span class="p">:</span> <span class="n">ActionMetaData</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_action</span><span class="o">.</span><span class="n">meta_data</span>
+        <span class="n">ometa</span><span class="p">:</span> <span class="n">OptionMetaData</span> <span class="o">=</span> <span class="n">ameta</span><span class="o">.</span><span class="n">options_by_dest</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">CONFIG_PATH_FIELD</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ometa</span><span class="o">.</span><span class="n">long_option</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_application_created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">:</span> <span class="n">Application</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">Action</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;In this call back, set the app and action for using in the invocation</span>
+<span class="sd">        :meth:`merge`.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;configurator created with </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_app</span> <span class="o">=</span> <span class="n">app</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_action</span> <span class="o">=</span> <span class="n">action</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_override_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Configurable</span><span class="p">:</span>
+        <span class="n">conf</span><span class="p">:</span> <span class="n">Configurable</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">ac</span><span class="p">:</span> <span class="n">Action</span>
+        <span class="k">for</span> <span class="n">ac</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_app</span><span class="o">.</span><span class="n">actions</span><span class="p">:</span>
+            <span class="n">ctype</span><span class="p">:</span> <span class="n">Type</span> <span class="o">=</span> <span class="n">ac</span><span class="o">.</span><span class="n">class_meta</span><span class="o">.</span><span class="n">class_type</span>
+            <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">ctype</span><span class="p">,</span> <span class="n">ConfigurationOverrider</span><span class="p">):</span>
+                <span class="n">opts</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">ac</span><span class="o">.</span><span class="n">command_action</span><span class="o">.</span><span class="n">options</span>
+                <span class="n">sconf</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">opts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ConfigurationOverrider</span><span class="o">.</span><span class="n">OVERRIDE_FIELD</span><span class="p">)</span>
+                <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="n">ConfigurationOverrider</span><span class="o">.</span><span class="n">OVERRIDE_FIELD</span><span class="p">:</span> <span class="n">sconf</span><span class="p">}</span>
+                <span class="n">co</span> <span class="o">=</span> <span class="n">ConfigurationOverrider</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">)</span>
+                <span class="n">conf</span> <span class="o">=</span> <span class="n">co</span><span class="o">.</span><span class="n">get_configurable</span><span class="p">()</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">conf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">conf</span> <span class="o">=</span> <span class="n">DictionaryConfig</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">conf</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># the section attribute is only useful for ImportIniConfig imports</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">IMPORT_TYPE</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">section</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ActionCliError</span><span class="p">(</span><span class="s2">&quot;Cannot have a &#39;section&#39; entry &quot;</span> <span class="o">+</span>
+                                 <span class="sa">f</span><span class="s2">&quot;without type of &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">IMPORT_TYPE</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_populate_import_sections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Configurable</span><span class="p">)</span> <span class="o">-&gt;</span> \
+            <span class="n">Tuple</span><span class="p">[</span><span class="n">Configurable</span><span class="p">,</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+        <span class="n">sec</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">section</span><span class="p">)</span>
+        <span class="n">secs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">populated_sec</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">asdict</span><span class="p">()</span>
+        <span class="n">vals</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_OVERRIDES_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_OVERRIDES_PRELOAD</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sec</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">populated_sec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">vals</span><span class="p">)</span>
+        <span class="n">secs</span><span class="p">[</span><span class="n">ImportIniConfig</span><span class="o">.</span><span class="n">IMPORT_SECTION</span><span class="p">]</span> <span class="o">=</span> <span class="n">populated_sec</span>
+        <span class="n">preload_keys</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ImportIniConfig</span><span class="o">.</span><span class="n">SECTIONS_SECTION</span> <span class="ow">in</span> <span class="n">populated_sec</span><span class="p">:</span>
+            <span class="n">sub_secs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">parse_object</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_option</span><span class="p">(</span>
+                    <span class="n">ImportIniConfig</span><span class="o">.</span><span class="n">SECTIONS_SECTION</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">section</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">sub_secs</span><span class="p">:</span>
+                <span class="n">repl_sec</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">secs</span><span class="p">[</span><span class="n">sec</span><span class="p">]</span> <span class="o">=</span> <span class="n">repl_sec</span>
+                <span class="k">with</span> <span class="n">rawconfig</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span><span class="n">sec</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="n">tpl</span> <span class="o">=</span> <span class="n">_ConfiguratorImporterTemplate</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">vr</span> <span class="o">=</span> <span class="n">tpl</span><span class="o">.</span><span class="n">substitute</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">ActionCliError</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Bad config load special key </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> in: &#39;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">sec</span><span class="si">}</span><span class="s1">:</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1"> -&gt; </span><span class="si">{</span><span class="n">vr</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="n">pls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">serializer</span><span class="o">.</span><span class="n">parse_object</span><span class="p">(</span><span class="n">vr</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pls</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                            <span class="n">pls</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span>
+                                <span class="n">_PreLoadImportIniConfig</span><span class="o">.</span><span class="n">parse_preload</span><span class="p">,</span> <span class="n">pls</span><span class="p">)</span>
+                            <span class="n">pls</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">pls</span><span class="p">)</span>
+                            <span class="n">preload_keys</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pls</span><span class="p">)</span>
+                        <span class="n">repl_sec</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">vr</span>
+        <span class="k">return</span> <span class="n">DictionaryConfig</span><span class="p">(</span><span class="n">secs</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">),</span> <span class="n">preload_keys</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Configurable</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Once we have the path and the class used to load the configuration,</span>
+<span class="sd">        create the instance and load it.</span>
+
+<span class="sd">        Special handling is required to make options forward *and* backward</span>
+<span class="sd">        propogate.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;configurator loading section: &#39;</span> <span class="o">+</span>
+                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config_file</span><span class="si">}</span><span class="s1">:[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">]&#39;</span><span class="p">)</span>
+
+        <span class="c1"># the modified configuration that will returned</span>
+        <span class="n">modified_config</span><span class="p">:</span> <span class="n">Configurable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="c1"># sections created during this call to later be removed</span>
+        <span class="n">secs_to_del</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="c1"># create the command line specified config</span>
+        <span class="n">do_back_copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="c1"># config section sanity check</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate</span><span class="p">()</span>
+        <span class="c1"># create a configuration factory using the configuration file extension</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span>
+            <span class="n">cf</span> <span class="o">=</span> <span class="n">ConfigurableFactory</span><span class="p">(</span><span class="n">kwargs</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># this happens when expect=False and no configuration is given</span>
+                <span class="n">cl_config</span> <span class="o">=</span> <span class="n">DictionaryConfig</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cl_config</span> <span class="o">=</span> <span class="n">cf</span><span class="o">.</span><span class="n">from_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;config loaded </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="si">}</span><span class="s1"> as &#39;</span> <span class="o">+</span>
+                            <span class="sa">f</span><span class="s1">&#39;type </span><span class="si">{</span><span class="n">cl_config</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="c1"># import using ImportIniConfig as a section</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">IMPORT_TYPE</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span>
+            <span class="n">children</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Configurable</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">_app</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">children_configs</span>
+            <span class="n">ini</span><span class="p">:</span> <span class="n">IniConfig</span> <span class="o">=</span> <span class="n">IniConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+            <span class="n">dconf</span><span class="p">:</span> <span class="n">Configurable</span>
+            <span class="n">preload_keys</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+            <span class="n">dconf</span><span class="p">,</span> <span class="n">preload_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_populate_import_sections</span><span class="p">(</span><span class="n">ini</span><span class="p">)</span>
+            <span class="n">preloads</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Configurable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_OVERRIDES_KEY</span> <span class="ow">in</span> <span class="n">preload_keys</span><span class="p">:</span>
+                <span class="n">preloads</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_OVERRIDES_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_override_config</span><span class="p">()</span>
+            <span class="n">secs_to_del</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dconf</span><span class="o">.</span><span class="n">sections</span><span class="p">)</span>
+            <span class="n">dconf</span><span class="o">.</span><span class="n">copy_sections</span><span class="p">(</span><span class="n">ini</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">children</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># unit test cases will not have children configurables</span>
+                <span class="n">children</span> <span class="o">=</span> <span class="p">()</span>
+            <span class="k">with</span> <span class="n">rawconfig</span><span class="p">(</span><span class="n">ini</span><span class="p">):</span>
+                <span class="n">cl_config</span> <span class="o">=</span> <span class="n">_PreLoadImportIniConfig</span><span class="p">(</span>
+                    <span class="n">preloads</span><span class="o">=</span><span class="n">preloads</span><span class="p">,</span>
+                    <span class="n">config_file</span><span class="o">=</span><span class="n">ini</span><span class="p">,</span>
+                    <span class="n">children</span><span class="o">=</span><span class="n">children</span><span class="p">,</span>
+                    <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span>
+                    <span class="o">**</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">rawconfig</span><span class="p">(</span><span class="n">cl_config</span><span class="p">):</span>
+                <span class="n">cl_config</span><span class="o">.</span><span class="n">copy_sections</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+            <span class="n">modified_config</span> <span class="o">=</span> <span class="n">cl_config</span>
+            <span class="c1"># remove sections that were removed</span>
+            <span class="n">removed_secs</span><span class="p">:</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sections</span> <span class="o">-</span> <span class="n">cl_config</span><span class="o">.</span><span class="n">sections</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;removing additional sections: </span><span class="si">{</span><span class="n">removed_secs</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">secs_to_del</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">removed_secs</span><span class="p">)</span>
+            <span class="c1"># avoid the two way copy that happens later</span>
+            <span class="n">do_back_copy</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># otherwise, use the type to tell the configuraiton factory how to</span>
+        <span class="c1"># create it</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;config_file&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">}</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">arguments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arguments</span><span class="p">)</span>
+            <span class="n">cf</span> <span class="o">=</span> <span class="n">ConfigurableFactory</span><span class="p">(</span><span class="n">kwargs</span><span class="o">=</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">cl_config</span> <span class="o">=</span> <span class="n">cf</span><span class="o">.</span><span class="n">from_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;configurator loading </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="si">}</span><span class="s1"> from &#39;</span> <span class="o">+</span>
+                        <span class="sa">f</span><span class="s1">&#39;type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="c1"># For non-import configs, first inject our app context (app.conf) to</span>
+        <span class="c1"># the command line specified configuration (--config) skipping sections</span>
+        <span class="c1"># that have missing options.  Examples of those missing include</span>
+        <span class="c1"># cyclical dependencies such option references from our app context to</span>
+        <span class="c1"># the command line context.</span>
+        <span class="k">if</span> <span class="n">do_back_copy</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;copying app config to </span><span class="si">{</span><span class="n">cl_config</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">rawconfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">copy_sections</span><span class="p">(</span><span class="n">cl_config</span><span class="p">)</span>
+
+        <span class="c1"># copy the command line config to our app context letting it barf with</span>
+        <span class="c1"># any missing properties this time</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;copying to app config: </span><span class="si">{</span><span class="n">cl_config</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">do_back_copy</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">rawconfig</span><span class="p">(</span><span class="n">cl_config</span><span class="p">):</span>
+                <span class="n">cl_config</span><span class="o">.</span><span class="n">copy_sections</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="c1"># if we imported, we created ImportIniConfig sections we need to remove</span>
+        <span class="k">for</span> <span class="n">sec</span> <span class="ow">in</span> <span class="n">secs_to_del</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;removing (added) section: </span><span class="si">{</span><span class="n">sec</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">remove_section</span><span class="p">(</span><span class="n">sec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_raw_str</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">modified_config</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Configurable</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the configuration and update the application context.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">modified_config</span><span class="p">:</span> <span class="n">Configurable</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">cmng</span><span class="p">:</span> <span class="n">_CacheConfigManager</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">loaded</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">ImportIniConfig</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">logger</span><span class="o">.</span><span class="n">isEnabledFor</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;caching: to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">cmng</span> <span class="o">=</span> <span class="n">_CacheConfigManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># TODO: add entry point app.conf to watch files</span>
+                    <span class="n">cmng</span><span class="o">.</span><span class="n">watch_files</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">]</span> <span class="o">=</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span>
+                <span class="n">modified_config</span> <span class="o">=</span> <span class="n">cmng</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">modified_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">rawconfig</span><span class="p">(</span><span class="n">modified_config</span><span class="p">):</span>
+                        <span class="n">modified_config</span><span class="o">.</span><span class="n">copy_sections</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+                        <span class="n">modified_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+                    <span class="n">loaded</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;configured to cache config at&#39;</span> <span class="o">+</span>
+                               <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="si">}</span><span class="s1"> but configuration &#39;</span> <span class="o">+</span>
+                               <span class="sa">f</span><span class="s1">&#39;is not ImportIniConfig: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">modified_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">modified_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_configuration</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">cmng</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">loaded</span><span class="p">:</span>
+            <span class="n">cmng</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_path_option_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">val</span><span class="p">:</span> <span class="nb">str</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;path: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path_option_name</span><span class="p">,</span>
+                                   <span class="n">val</span><span class="p">,</span> <span class="n">section</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">modified_config</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset the Python logger configuration.&quot;&quot;&quot;</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">removeHandler</span><span class="p">,</span> <span class="n">root</span><span class="o">.</span><span class="n">handlers</span><span class="p">[:]))</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">removeFilter</span><span class="p">,</span> <span class="n">root</span><span class="o">.</span><span class="n">filters</span><span class="p">[:]))</span>
+
+<div class="viewcode-block" id="ConfigurationImporter.merge">
+<a class="viewcode-back" href="../../../../api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationImporter.merge">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Configurable</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Merge configuration at path to the current configuration.</span>
+
+<span class="sd">        :param config_path: the path to the configuration file</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># the modified configuration that will returned</span>
+        <span class="n">modified_config</span><span class="p">:</span> <span class="n">Configurable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span>
+        <span class="n">rc_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rc_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_environ_path</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">rc_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span> <span class="o">=</span> <span class="n">rc_path</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span> <span class="o">==</span> <span class="s1">&#39;skip&#39;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">expect</span><span class="p">:</span>
+                <span class="n">long_opt</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_config_option</span><span class="p">()</span>
+                <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Missing option </span><span class="si">{</span><span class="n">long_opt</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">modified_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">modified_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">modified_config</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Configurable</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">()</span></div>
+
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2026 Paul Landes
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../../../_static/documentation_options.js?v=d5528024"></script>
+    <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

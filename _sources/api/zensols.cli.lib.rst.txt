@@ -1,0 +1,39 @@
+zensols.cli.lib namespace
+=========================
+
+.. py:module:: zensols.cli.lib
+
+Submodules
+----------
+
+zensols.cli.lib.config module
+-----------------------------
+
+.. automodule:: zensols.cli.lib.config
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.lib.log module
+--------------------------
+
+.. automodule:: zensols.cli.lib.log
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.lib.package module
+------------------------------
+
+.. automodule:: zensols.cli.lib.package
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+zensols.cli.lib.support module
+------------------------------
+
+.. automodule:: zensols.cli.lib.support
+   :members:
+   :undoc-members:
+   :show-inheritance:
