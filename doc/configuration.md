@@ -1,22 +1,71 @@
 # Configuration
 
-This package provides advanced parsing of INI and YAML files that provide Java
-Spring like mechanism to create in memory Python object instance graphs.  This
-API also works with the [command line library](command-line.md) to easily
+This package provides advanced parsing of INI, YAML and JSON files that provide
+[Java Spring] like mechanism to create in memory Python object instance graphs.
+This API also works with the [command line library](command-line.md) to easily
 configure command line applications.
 
-There are many configuration options and classes to choose from.  However, the
-best place to start with the most functionality is the
-[ExtendedInterpolationEnvConfig] class, which reads an [INI] substitution based
-file.
+The configuration system uses [ImportIniConfig] and [ImportConfigFactory] to
+load, parse, and construct application objects from structured configuration
+resources. [ImportIniConfig] handles INI-style configuration files and supports
+layered, multi-resource configurations, while [ImportConfigFactory] is
+responsible for instantiating configured objects based on that parsed
+configuration.
 
-This will read an [INI] format uses the `configparser.ExtendedInterpolation`
-for [variable substitution].  See the [INI format] section for an
-example.
+Using [ImportIniConfig], you specify one or more configuration resources (for
+example, files on disk, classpath resources, or open streams).
+[ImportYamlConfig] is the analogue for configuration chaining as discussed in
+the [YAML section](#yaml-format).  Once parsed, that configuration is passed to
+[ImportConfigFactory] to construct application components and objects by
+name. This combination provides a clean and extensible mechanism for handling
+structured configurations in your application.
 
-While the [INI] format is preferred, the [YAML] format is also supported.
-Other formats (i.e. JSON) are easy to add by extending the [Configurable]
-class.  See the [YAML Format](#yaml-format) section for more information.
+
+## Configuration File Loading Order
+
+When an application uses the Zensols CLI infrastructure with
+[ConfigurationImporter], configuration is resolved from multiple sources in a
+defined precedence order. This order determines how overlapping or duplicate
+configuration properties are merged, with later sources overriding earlier
+ones.
+
+The typical configuration loading order is as follows:
+
+1. **Command-Line Configuration** Attempt to load the configuration specified
+   by the ``--config`` command-line option.
+
+2. **Environment Variable Configuration Path** If the ``--config`` option is
+   not provided, attempt to resolve the configuration path from an environment
+   variable (see :meth:`get_environ_var_from_app`).  For example, for the
+   package ``zensols.util``, the ``UTILRC`` environment variable is consulted
+   for the configuration file path.
+
+3. **User Home Resource File** If the environment variable is not defined, look
+   for a UNIX-style resource file in the user’s home directory (see
+   :meth:`get_environ_path`).  For example, the package ``zensols.util``
+   resolves to ``~/.utilrc``.
+
+4. **ZENSOLSRC Search Path** If the home directory resource file
+   (``~/<app>rc``) is not found, all paths specified in the ``ZENSOLSRC``
+   environment variable are searched.  Multiple paths may be specified and must
+   be separated by the operating system path separator (i.e. `:` under
+   UNIX/Linux).
+
+5. **Child Configuration Load** Load the *child* configuration, which
+   represents the resolved configuration from the previously discovered source.
+
+6. **Configuration Merge** Copy all sections from the child configuration,
+   allowing discovered configuration values to override existing defaults.
+   
+This layered approach ensures that *configuration settings are deterministic*,
+with user and command-line preferences taking precedence over application and
+library defaults. By structuring configuration sources in this order, you can
+supply broad defaults in code while empowering users and integrators to adjust
+behavior without modifying source or packaged resources.
+
+See the API documentation for [ConfigurationImporter] for more details on how
+these sources are combined and how priority is determined in your specific CLI
+application.
 
 
 ## INI Format
@@ -819,6 +868,7 @@ this documentation.
 [instance]: ../api/zensols.config.html#zensols.config.importfac.ImportConfigFactory.instance
 [new_instance]: ../api/zensols.config.html#zensols.config.importfac.ImportConfigFactory.new_instance
 [new_deep_instance]: ../api/zensols.config.html#zensols.config.importfac.ImportConfigFactory.new_deep_instance
+[ConfigurationImporter]: ../api/zensols.cli.lib.html#zensols.cli.lib.config.ConfigurationImporter
 [CliHarness]: ../api/zensols.cli.html#zensols.cli.harness.CliHarness
 [ExtendedInterpolationEnvConfig]: ../api/zensols.config.html#zensols.config.iniconfig.ExtendedInterpolationEnvConfig
 [populate]: ../api/zensols.config.html#zensols.config.configbase.Configurable.populate

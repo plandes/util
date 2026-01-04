@@ -195,9 +195,13 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
          resource file (see :meth:`get_environ_path`).  For example, package
          ``zensols.util`` would point to ``~/.utilrc``.
 
-      4. Loads the *child* configuration.
+      4. If the home directory ``~/<app>rc`` is not found, all paths (separated
+         by :obj:`os.pathsep`) set in the ``ZENSOLSRC`` environment variable are
+         searched.
 
-      5. Copy all sections from the child configuration to :obj:`config`.
+      5. Loads the *child* configuration.
+
+      6. Copy all sections from the child configuration to :obj:`config`.
 
     The child configuration is created by :class:`.ConfigurableFactory`.  If
     the child has a `.conf` extension, :class:`.ImportIniConfig` is used with
