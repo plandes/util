@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.16.3] - 2026-01-04
 ### Changed
 - Fix ignoring of prototype methods.  This is fixed by adding a `is_prototype`
   to `CLI_META`.
@@ -760,7 +761,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.16.2...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.16.3...HEAD
+[1.16.3]: https://github.com/plandes/util/compare/v1.16.2...v1.16.3
 [1.16.2]: https://github.com/plandes/util/compare/v1.16.1...v1.16.2
 [1.16.1]: https://github.com/plandes/util/compare/v1.16.0...v1.16.1
 [1.16.0]: https://github.com/plandes/util/compare/v1.15.14...v1.16.0
