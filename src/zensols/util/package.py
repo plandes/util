@@ -132,8 +132,7 @@ class PackageRequirement(Writable):
         return hash(self.requirement)
 
     def __str__(self) -> str:
-        # normalize requirement specs with URLs
-        return str(self.requirement).replace('@', ' @')
+        return str(self.requirement)
 
     def __repr__(self) -> str:
         return repr(self.requirement)

@@ -33,7 +33,7 @@ project:
       - 'frozendict~=2.4.6'
       # needed by zensols.util.package
       - 'pip'
-      - 'packaging~=25.0'
+      - 'packaging>=26.0,<27.0'
       # configuration classes
       - 'configparser~=5.2.0'
       - 'PyYAML~=6.0.1'

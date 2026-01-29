@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.16.4] - 2026-01-28
+### Changed
+- Fix upstream `packaging` dependency by nailing to v26.x.
+
+
 ## [1.16.3] - 2026-01-04
 ### Changed
 - Fix ignoring of prototype methods.  This is fixed by adding a `is_prototype`
@@ -761,7 +766,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.16.3...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.16.4...HEAD
+[1.16.4]: https://github.com/plandes/util/compare/v1.16.3...v1.16.4
 [1.16.3]: https://github.com/plandes/util/compare/v1.16.2...v1.16.3
 [1.16.2]: https://github.com/plandes/util/compare/v1.16.1...v1.16.2
 [1.16.1]: https://github.com/plandes/util/compare/v1.16.0...v1.16.1
