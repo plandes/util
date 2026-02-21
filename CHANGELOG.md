@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Fix YAML files parsed as INI files, which raised
+  `configparser.MissingSectionHeaderError` from the Python config parser.
+
+
 ## [1.16.4] - 2026-01-28
 ### Changed
 - Fix upstream `packaging` dependency by nailing to v26.x.

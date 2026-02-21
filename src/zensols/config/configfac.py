@@ -85,6 +85,11 @@ class ConfigurableFactory(object):
     TYPE_MAP: ClassVar[str] = 'type_map'
     """The section entry for type map (see :obj:`type_map`)."""
 
+    TYPE_PARAMS: ClassVar[str] = 'type_params'
+    """The section entry for configurable specific parameters (see
+    :obj:`TYPE_MAP`).  Keys are keys of :obj:`EXTENSION_TO_TYPE`.
+
+    """
     SINGLE_CONFIG_FILE: ClassVar[str] = 'config_file'
     """The section entry for the configuration file."""
 
@@ -108,11 +113,13 @@ class ConfigurableFactory(object):
 
     def _mod_name(self) -> str:
         """Return the ``config`` (parent) module name."""
-        mname = sys.modules[__name__].__name__
-        parts = mname.split('.')
-        if len(parts) > 1:
-            mname = '.'.join(parts[:-1])
-        return mname
+        if not hasattr(self, '_mod_name_val'):
+            mname = sys.modules[__name__].__name__
+            parts = mname.split('.')
+            if len(parts) > 1:
+                mname = '.'.join(parts[:-1])
+            self._mod_name_val = mname
+        return self._mod_name_val
 
     @property
     @persisted('_extension_to_type')
@@ -131,14 +138,32 @@ class ConfigurableFactory(object):
                  and created with :obj:`kwargs`
 
         """
+        return self._from_class_name(class_name, None)
+
+    def _from_class_name(self, class_name: str, config_type: str) -> \
+            Configurable:
+        """Create a configurable from the class name given.
+
+        :param class_name: a fully qualified class name
+                          (i.e. ``zensols.config.IniConfig``)
+
+        :return: a new instance of a configurable identified by ``class_name``
+                 and created with :obj:`kwargs`
+
+        """
         config_meta: _ConfigMeta = self._CONFIG_META.get(class_name)
+        params: dict[str, object] = dict(self.kwargs)
+        type_params: dict[str, object] = params.pop(self.TYPE_PARAMS, None)
         if config_meta is None:
             config_meta = _ConfigMeta(class_name)
-        params = dict(self.kwargs)
         if config_meta.takes_parent:
             params['parent'] = self.parent
         if config_meta.takes_name:
             params['parent_section_name'] = self.parent_section_name
+        if type_params is not None and config_type is not None:
+            add_params: dict[str, object] = type_params.get(config_type)
+            if add_params is not None:
+                params.update(add_params)
         return config_meta.class_importer.instance(**params)
 
     def from_type(self, config_type: str) -> Configurable:
@@ -151,16 +176,17 @@ class ConfigurableFactory(object):
                  and created with :obj:`kwargs`
 
         """
+        prefix: str = config_type
         mod_name: str = self._mod_name()
-        extension_to_type = self.extension_to_type
-        if config_type in extension_to_type:
-            config_type = extension_to_type[config_type].capitalize()
-        elif config_type in self.TYPE_TO_CLASS_PREFIX:
-            config_type = self.TYPE_TO_CLASS_PREFIX[config_type]
+        extension_to_type: str = self.extension_to_type
+        if prefix in extension_to_type:
+            prefix = extension_to_type[prefix].capitalize()
+        elif prefix in self.TYPE_TO_CLASS_PREFIX:
+            prefix = self.TYPE_TO_CLASS_PREFIX[prefix]
         else:
-            config_type = config_type.capitalize()
-        class_name = f'{mod_name}.{config_type}Config'
-        return self.from_class_name(class_name)
+            prefix = prefix.capitalize()
+        class_name = f'{mod_name}.{prefix}Config'
+        return self._from_class_name(class_name, config_type)
 
     def _path_to_type(self, path: Path) -> str:
         """Map a path to a ``config type``.  See :meth:`from_type`.
@@ -233,11 +259,16 @@ class ConfigurableFactory(object):
             config = DictionaryConfig(config_file)
         elif tpe is not None:
             del params[self.TYPE_NAME]
-            if tpe == 'import' and isinstance(config_file, Path):
+            if isinstance(config_file, Path):
                 ext: str = config_file.suffix[1:]
                 etype: str = self.extension_to_type.get(ext)
-                if etype is not None:
-                    tpe = f'import{etype}'
+                if tpe == 'import':
+                    if etype is not None:
+                        tpe = f'import{etype}'
+                if len(type_map) > 0 and etype is not None:
+                    # if conflicting information (both a map and explicit type)
+                    # don't interpret an INI when a yaml is given
+                    tpe = etype
             config = self.from_type(tpe)
         elif config_file is not None:
             config = self.from_path(config_file)
