@@ -3,9 +3,10 @@
 """
 __author__ = 'Paul Landes'
 
-from typing import Dict, Union, Any, Set, Tuple
+from typing import Dict, Union, Any, Set, Tuple, ClassVar
 from pathlib import Path
 import logging
+import re
 from string import Template
 from io import TextIOBase
 from . import (
@@ -27,6 +28,8 @@ class ImportYamlConfig(YamlConfig):
     import sections documented in :class:`.ImportIniConfig`.
 
     """
+    _KEY_PAT: ClassVar[re.Pattern] = re.compile(r"\$\{(?P<key>[a-z0-9_:]+)\}")
+
     def __init__(self, config_file: Union[Path, TextIOBase] = None,
                  default_section: str = None, sections_name: str = 'sections',
                  sections: Set[str] = None, import_name: str = 'import',
@@ -70,6 +73,19 @@ class ImportYamlConfig(YamlConfig):
         self._parse_values = parse_values
         self.children = children
 
+    def _interpolate(self, val: str, context: dict[str, object]):
+        repl: object = None
+        m: re.Match = self._KEY_PAT.match(val)
+        if m is not None:
+            key: str = m.group(1)
+            cval: object = context.get(key)
+            if cval is not None:
+                repl = cval
+        if repl is None:
+            template = _Template(val)
+            repl = template.safe_substitute(context)
+        return repl
+
     def _import_parse(self):
         def repl_node(par: Dict[str, Any]):
             repl = {}
@@ -79,8 +95,7 @@ class ImportYamlConfig(YamlConfig):
                 elif isinstance(c, list):
                     repl[k] = tuple(c)
                 elif isinstance(c, str):
-                    template = _Template(c)
-                    rc = template.safe_substitute(tpl_context)
+                    rc = self._interpolate(c, tpl_context)
                     if logger.isEnabledFor(logging.DEBUG):
                         logger.debug(f'subs: {c} -> {rc}')
                     repl[k] = rc

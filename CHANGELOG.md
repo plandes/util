@@ -8,9 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.16.5] - 2026-02-21
 ### Changed
 - Fix YAML files parsed as INI files, which raised
   `configparser.MissingSectionHeaderError` from the Python config parser.
+- Fix `ImportYamlConfig` flattening `ConfigParser`-like interpolated values.
 
 
 ## [1.16.4] - 2026-01-28
@@ -771,7 +773,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.16.4...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.16.5...HEAD
+[1.16.5]: https://github.com/plandes/util/compare/v1.16.4...v1.16.5
 [1.16.4]: https://github.com/plandes/util/compare/v1.16.3...v1.16.4
 [1.16.3]: https://github.com/plandes/util/compare/v1.16.2...v1.16.3
 [1.16.2]: https://github.com/plandes/util/compare/v1.16.1...v1.16.2
