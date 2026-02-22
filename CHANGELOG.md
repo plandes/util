@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.16.6] - 2026-02-21
+### Changed
+- Fix YAML parsing on partial string interpolation of keys.
+
+
 ## [1.16.5] - 2026-02-21
 ### Changed
 - Fix YAML files parsed as INI files, which raised
@@ -773,7 +778,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.16.5...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.16.6...HEAD
+[1.16.6]: https://github.com/plandes/util/compare/v1.16.5...v1.16.6
 [1.16.5]: https://github.com/plandes/util/compare/v1.16.4...v1.16.5
 [1.16.4]: https://github.com/plandes/util/compare/v1.16.3...v1.16.4
 [1.16.3]: https://github.com/plandes/util/compare/v1.16.2...v1.16.3

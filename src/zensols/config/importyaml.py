@@ -28,7 +28,7 @@ class ImportYamlConfig(YamlConfig):
     import sections documented in :class:`.ImportIniConfig`.
 
     """
-    _KEY_PAT: ClassVar[re.Pattern] = re.compile(r"\$\{(?P<key>[a-z0-9_:]+)\}")
+    _KEY_PAT: ClassVar[re.Pattern] = re.compile(r'^\$\{(?P<key>[a-z0-9_:]+)\}$')
 
     def __init__(self, config_file: Union[Path, TextIOBase] = None,
                  default_section: str = None, sections_name: str = 'sections',
