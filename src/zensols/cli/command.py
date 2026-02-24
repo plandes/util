@@ -330,6 +330,7 @@ class CommandLineParser(Deallocatable, Dictable):
                           metas: List[PositionalMetaData],
                           vals: List[str]) -> Tuple[Any, ...]:
         if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'action name: {action_name}')
             logger.debug(f'parsing positional args: {metas} <--> {vals}')
         action_meta: ActionMetaData = \
             self.config.actions_by_name.get(action_name)
@@ -357,9 +358,13 @@ class CommandLineParser(Deallocatable, Dictable):
                 logger.debug(f'fitting meta: {meta} -> {val}')
             parsed.append(self._parse_value(val, meta.dtype, meta.name))
         if len(vals) > 0 and extra_meta is None:
-            raise CommandLineError(
-                f"Action '{action_meta.name}' expects {mlen} " +
-                f"argument(s) but got {expect_len}: {', '.join(vals)}")
+            msg: str = (f"Action '{action_meta.name}' expects {mlen} " +
+                        f"argument(s) but got {expect_len}: {', '.join(vals)}")
+            if vals[0] == 'proto':
+                msg += ("; this probably due to 'proto' interpreted as an "
+                        "argument to the singleton default action; if so, "
+                        "add 'is_prototype': True to CLI_META")
+            raise CommandLineError(msg)
         if extra_meta is not None:
             meta: PositionalMetaData = extra_meta[1]
             val_err: str = meta.validate_args(vals)
