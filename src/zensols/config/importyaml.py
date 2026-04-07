@@ -117,7 +117,7 @@ class ImportYamlConfig(YamlConfig):
                 config = ConfigurableFactory.from_section(
                     params, sec_name, parent=self)
                 for sec in config.sections:
-                    cnf[sec] = config.get_options(section=sec)
+                    cnf[sec] = config.get_options(sec)
 
         self._config.update(cnf)
         if logger.isEnabledFor(logging.DEBUG):

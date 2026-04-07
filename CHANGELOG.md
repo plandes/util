@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+### Changed
+- Fix YAML import with configurables of subclass instance `TreeConfigurable`.
+
+
 ## [1.16.6] - 2026-02-21
 ### Changed
 - Fix YAML parsing on partial string interpolation of keys.
