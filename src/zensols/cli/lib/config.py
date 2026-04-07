@@ -270,7 +270,7 @@ class ConfigurationImporter(ApplicationObserver, Dictable):
     """
     default: Path = field(default=None)
     """Use this file as the default when given on the command line, which is not
-    used unless :obj:``expect`` is set to ``False``.
+    used unless :obj:`expect` is set to ``False``.
 
     If this is set to ``skip``, then do not load any file.  This is useful when
     the entire configuration is loaded by this class and there are
