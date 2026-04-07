@@ -3,9 +3,7 @@
 """
 from __future__ import annotations
 __author__ = 'Paul Landes'
-from typing import (
-    Tuple, Sequence, Dict, Set, Iterable, List, Any, Union, Optional, Type
-)
+from typing import Tuple, Dict, Set, Iterable, List, Any, Union, Optional, Type
 from abc import ABCMeta, abstractmethod
 import sys
 import logging
@@ -267,8 +265,8 @@ class Configurable(Dictable, metaclass=ABCMeta):
 
     def copy_sections(self, to_populate: Configurable,
                       sections: Iterable[str] = None,
-                      robust: bool = False) -> Exception:
-        """Copy all sections from this configuruable to ``to_populate``.
+                      robust: bool = False, clobber: bool = True) -> Exception:
+        """Copy all sections from this configurable to ``to_populate``.
 
         :param to_populate: the target configuration object
 
@@ -277,6 +275,10 @@ class Configurable(Dictable, metaclass=ABCMeta):
         :param robust: if ``True``, when any exception occurs (namely
                        interplation exceptions), don't copy and remove the
                        section in the target configuraiton
+
+        :param clobber: if ``True`` replace every value in the section;
+                        otherwise do not set the value if already present in
+                        ``to_populate``
 
         :return: the last exception that occured while trying to copy the
                  properties
@@ -293,7 +295,8 @@ class Configurable(Dictable, metaclass=ABCMeta):
                 if opts is None:
                     raise ConfigurableError(f"No such section: '{sec}'")
                 for k, v in opts.items():
-                    to_populate.set_option(k, v, sec)
+                    if clobber or not to_populate.has_option(k, sec):
+                        to_populate.set_option(k, v, sec)
             # robust is needed by lib.ConfigurationImporter._load(); but deal
             # only with interpolation errors
             except ConfigurableError as e:
@@ -305,33 +308,6 @@ class Configurable(Dictable, metaclass=ABCMeta):
                     to_populate.remove_section(sec)
                     last_ex = e
         return last_ex
-
-    def _copy_import_section(self, sections: Sequence[str],
-                             target: Configurable = None):
-        """Copy import section definitions defined in this instance to
-        ``target``.
-
-        :param sections: the name of the sections that have import definitions
-                         (per :meth:`.Configurable.from_section`)
-
-        :param target: the configurable to populate, which defaults to this
-                       instance
-
-        """
-        from . import ConfigurableFactory
-        target = self if target is None else target
-        secs: Dict[str, Dict[str, Any]] = \
-            dict(map(lambda s: (s, self.get_options(s)), sections))
-        sec_name: str
-        params: Dict[str, Any]
-        for sec_name, params in secs.items():
-            if params is None:
-                raise ConfigurableError(f"No section '{sec_name}' in {target}")
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f'import sec: {sec_name}')
-            src: Configurable = ConfigurableFactory.from_section(
-                params, sec_name, parent=self)
-            src.copy_sections(target)
 
     def remove_section(self, section: str):
         """Remove a seciton with the given name."""
@@ -614,7 +590,10 @@ class TreeConfigurable(Configurable, metaclass=ABCMeta):
         return self._options
 
     def has_option(self, name: str, section: str = None) -> bool:
-        opts = self.options
+        if section is None:
+            opts = self.options
+        else:
+            opts = self.options.get(name, {})
         return name in opts
 
     def get_option(self, name: str, section: str = None) -> str:
