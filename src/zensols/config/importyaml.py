@@ -10,7 +10,7 @@ import re
 from string import Template
 from io import TextIOBase
 from . import (
-    Serializer, Configurable, ConfigurableFactory,
+    ConfigurableError, Serializer, Configurable, ConfigurableFactory,
     DictionaryConfig, YamlConfig,
 )
 
@@ -19,6 +19,29 @@ logger = logging.getLogger(__name__)
 
 class _Template(Template):
     idpattern = r'[a-z0-9_:]+'
+
+
+def _dict_merge(dct, merge_dct):
+    """ Recursive dict merge. Inspired by :meth:``dict.update()``, instead of
+    updating only top-level keys, dict_merge recurses down into dicts nested
+    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into
+    ``dct``.
+
+    :param dct: dict onto which the merge is executed
+
+    :param merge_dct: dct merged into dct
+
+    :return: None
+
+    :see: `Attribution <https://gist.github.com/angstwad/bf22d1822c38a92ec0a9>`_
+
+    """
+    for k, v in merge_dct.items():
+        if (k in dct and isinstance(dct[k], dict) and \
+            isinstance(merge_dct[k], dict)):  # noqa
+            _dict_merge(dct[k], merge_dct[k])
+        else:
+            dct[k] = merge_dct[k]
 
 
 class ImportYamlConfig(YamlConfig):
@@ -35,7 +58,9 @@ class ImportYamlConfig(YamlConfig):
                  sections: Set[str] = None, import_name: str = 'import',
                  parse_values: bool = False,
                  children: Tuple[Configurable, ...] = (),
-                 parent: Configurable = None):
+                 parent: Configurable = None,
+                 merge_strategy_name: str = 'merge',
+                 default_merge_strategy: str = 'replace'):
         """Initialize with importation configuration.  The usage of
         ``default_vars`` in the super class is disabled since this
         implementation uses a mix of dot and colon (configparser) variable
@@ -64,6 +89,11 @@ class ImportYamlConfig(YamlConfig):
                              to false to keep data as strings for configuration
                              merging
 
+        :param merge_strategy_name: property name in the import section to
+                                    indicate how to merge imported sections
+
+        :param default_merge_strategy: merge strategy if not given
+
         """
         super().__init__(config_file, default_section, parent=parent,
                          default_vars=None, delimiter=None,
@@ -72,6 +102,8 @@ class ImportYamlConfig(YamlConfig):
         self.serializer = Serializer()
         self._parse_values = parse_values
         self.children = children
+        self.merge_strategy_name = merge_strategy_name
+        self.default_merge_strategy = default_merge_strategy
 
     def _interpolate(self, val: str, context: dict[str, object]):
         repl: object = None
@@ -85,6 +117,28 @@ class ImportYamlConfig(YamlConfig):
             template = _Template(val)
             repl = template.safe_substitute(context)
         return repl
+
+    def _merge_section(self, cnf: Dict[str, Any], section_name: str,
+                       child: Configurable, strategy: str):
+        child_section: Dict[str, Any] = child.get_options(section_name)
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f'merge: {child_section}')
+        if strategy == 'replace':
+            cnf[section_name] = child_section
+        elif strategy in {'child', 'parent'}:
+            parent_section: Dict[str, Any] = cnf.get(section_name)
+            if parent_section is None:
+                parent_section = {}
+            if strategy == 'child':
+                _dict_merge(parent_section, child_section)
+                cnf[section_name] = parent_section
+            else:
+                _dict_merge(child_section, parent_section)
+                cnf[section_name] = child_section
+        else:
+            raise ConfigurableError(
+                f'Unknown YAML section merge strategy: {strategy}, '
+                "must be one of 'replace', 'child', 'parent'")
 
     def _import_parse(self):
         def repl_node(par: Dict[str, Any]):
@@ -103,7 +157,7 @@ class ImportYamlConfig(YamlConfig):
 
         import_def: Dict[str, Any] = self.get_options(
             f'{self.root}.{self.import_name}')
-        cnf: Dict[str, Any] = {}
+        cnf: Dict[str, Any] = self._config
         context: Dict[str, str] = {}
         tpl_context = {}
 
@@ -111,15 +165,19 @@ class ImportYamlConfig(YamlConfig):
             logger.debug(f'import defs: {import_def}')
 
         if import_def is not None:
+            sec_name: str
+            params: Dict[str, Any]
             for sec_name, params in import_def.items():
                 if logger.isEnabledFor(logging.DEBUG):
                     logger.debug(f'import sec: {sec_name}')
-                config = ConfigurableFactory.from_section(
+                strategy = params.pop(
+                    self.merge_strategy_name, self.default_merge_strategy)
+                config: Configurable = ConfigurableFactory.from_section(
                     params, sec_name, parent=self)
-                for sec in config.sections:
-                    cnf[sec] = config.get_options(sec)
+                child_sec: str
+                for child_sec in config.sections:
+                    self._merge_section(cnf, child_sec, config, strategy)
 
-        self._config.update(cnf)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'updated config: {self._config}')
         self._flatten(context, '', self._config, ':')

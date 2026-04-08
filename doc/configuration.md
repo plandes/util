@@ -181,6 +181,18 @@ example = nlparse
 child_op = 1
 ```
 
+Each entry/section under `import:` optionally can take a `merge` field that
+indicates how to import child configurations.  The merge is done recursively
+for tree based configurations (such as YAML) but also works when importing
+other configuration such as INI.  The `merge` field takes the following values:
+
+* `replace`: completely replace the parent section (the parent contains the
+  import declaration) with the child section
+* `child`: keep parent sections, but clobber fields with children
+* `parent`: add children fields to parent sections for only those missing
+
+The value defaults to `replace` for backwards comparability.
+
 
 ### YAML Conditionals
 

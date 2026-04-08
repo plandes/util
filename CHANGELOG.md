@@ -8,8 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.16.7] - 2026-04-07
 ### Changed
 - Fix YAML import with configurables of subclass instance `TreeConfigurable`.
+- Add feature to specify how to recursively merge YAML imported configuration.
+  This allow parent configuration to clobber children section properties.
 
 
 ## [1.16.6] - 2026-02-21
@@ -782,7 +785,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.16.6...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.16.7...HEAD
+[1.16.7]: https://github.com/plandes/util/compare/v1.16.6...v1.16.7
 [1.16.6]: https://github.com/plandes/util/compare/v1.16.5...v1.16.6
 [1.16.5]: https://github.com/plandes/util/compare/v1.16.4...v1.16.5
 [1.16.4]: https://github.com/plandes/util/compare/v1.16.3...v1.16.4
