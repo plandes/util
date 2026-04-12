@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [1.16.8] - 2026-04-12
+This change is not backward compatible with the previous bug release for some
+configurations.
+
 ### Changed
 - Fix YAML child vs parent merge terminology and default behavior that mimics
   `ImportYamlConfig`.
