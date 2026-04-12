@@ -33,7 +33,7 @@ class _Condition(object):
             truthy = self.serializer.parse_object(truthy)
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f'truth value: {self.ifn} ({self.ifn}) -> '
-                         f'{truthy} ({truthy})')
+                         f'{truthy} ({type(truthy)})')
         if truthy:
             node = None if self.thn is None else self.thn
         else:

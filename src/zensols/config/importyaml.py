@@ -21,27 +21,25 @@ class _Template(Template):
     idpattern = r'[a-z0-9_:]+'
 
 
-def _dict_merge(dct, merge_dct):
+def _dict_merge(target: Dict[Any, Any], source: Dict[Any, Any]):
     """ Recursive dict merge. Inspired by :meth:``dict.update()``, instead of
     updating only top-level keys, dict_merge recurses down into dicts nested
-    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into
-    ``dct``.
+    to an arbitrary depth, updating keys. The ``source`` is merged into
+    ``target``.
 
-    :param dct: dict onto which the merge is executed
+    :param target: dict onto which the merge is executed
 
-    :param merge_dct: dct merged into dct
-
-    :return: None
+    :param source: merged into ``target``
 
     :see: `Attribution <https://gist.github.com/angstwad/bf22d1822c38a92ec0a9>`_
 
     """
-    for k, v in merge_dct.items():
-        if (k in dct and isinstance(dct[k], dict) and \
-            isinstance(merge_dct[k], dict)):  # noqa
-            _dict_merge(dct[k], merge_dct[k])
+    for k, v in source.items():
+        if (k in target and isinstance(target[k], dict) and \
+            isinstance(source[k], dict)):  # noqa
+            _dict_merge(target[k], source[k])
         else:
-            dct[k] = merge_dct[k]
+            target[k] = source[k]
 
 
 class ImportYamlConfig(YamlConfig):
@@ -60,7 +58,7 @@ class ImportYamlConfig(YamlConfig):
                  children: Tuple[Configurable, ...] = (),
                  parent: Configurable = None,
                  merge_strategy_name: str = 'merge',
-                 default_merge_strategy: str = 'replace'):
+                 default_merge_strategy: str = 'parent'):
         """Initialize with importation configuration.  The usage of
         ``default_vars`` in the super class is disabled since this
         implementation uses a mix of dot and colon (configparser) variable
@@ -129,7 +127,7 @@ class ImportYamlConfig(YamlConfig):
             parent_section: Dict[str, Any] = cnf.get(section_name)
             if parent_section is None:
                 parent_section = {}
-            if strategy == 'child':
+            if strategy == 'parent':
                 _dict_merge(parent_section, child_section)
                 cnf[section_name] = parent_section
             else:
@@ -151,7 +149,7 @@ class ImportYamlConfig(YamlConfig):
                 elif isinstance(c, str):
                     rc = self._interpolate(c, tpl_context)
                     if logger.isEnabledFor(logging.DEBUG):
-                        logger.debug(f'subs: {c} -> {rc}')
+                        logger.debug(f'subs: {k} = {c} -> {rc}')
                     repl[k] = rc
             par.update(repl)
 

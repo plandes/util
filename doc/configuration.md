@@ -188,10 +188,10 @@ other configuration such as INI.  The `merge` field takes the following values:
 
 * `replace`: completely replace the parent section (the parent contains the
   import declaration) with the child section
-* `child`: keep parent sections, but clobber fields with children
-* `parent`: add children fields to parent sections for only those missing
+* `parent`: clobber parent fields with children
+* `child`: add children fields for only those missing in the parent
 
-The value defaults to `replace` for backwards comparability.
+The value defaults to `parent` to closely mimic [ImportYamlConfig].
 
 
 ### YAML Conditionals
