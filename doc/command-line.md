@@ -450,7 +450,6 @@ obviates its [CLASS_META](#ConfigurationImporter.CLASS_META) meta data.  Adding
 this capability is as simple as adding it as an application:
 ```ini
 [cli]
-class_name = zensols.cli.ActionCliManager
 apps = list: config_cli, app
 
 [config_cli]
@@ -591,7 +590,6 @@ address this with the decorated [ActionCli] class by adding to the *decorated*
 section:
 ```ini
 [app_decorator]
-class_name = zensols.cli.ActionCli
 option_excludes = set: db
 mnemonics = dict: {
     'print_employees': 'show',
@@ -676,7 +674,6 @@ we've already given in the `main.py` class.  This can be done with the
 creates called `package` and refer to it from the [LogConfigurator] section:
 ```ini
 [cli]
-class_name = zensols.cli.ActionCliManager
 apps = list: config_cli, package_cli, log_cli, app
 doc = A payroll program.
 
