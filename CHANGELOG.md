@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.16.9] - 2026-06-28
+### Changed
+- Allow subclasses of `Dictable` to customize flattening objects before
+  serialization.
+
+
 ## [1.16.8] - 2026-04-12
 This change is not backward compatible with the previous bug release for some
 configurations.
@@ -794,7 +800,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.16.8...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.16.9...HEAD
+[1.16.9]: https://github.com/plandes/util/compare/v1.16.8...v1.16.9
 [1.16.8]: https://github.com/plandes/util/compare/v1.16.7...v1.16.8
 [1.16.7]: https://github.com/plandes/util/compare/v1.16.6...v1.16.7
 [1.16.6]: https://github.com/plandes/util/compare/v1.16.5...v1.16.6

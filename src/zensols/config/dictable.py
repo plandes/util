@@ -192,16 +192,23 @@ class Dictable(Writable):
             logger.debug(f'asdict: {type(self)}')
         return self._from_dictable(recurse, readable, class_name_param)
 
+    def _flatten(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """Return a :class:`dict` that can be serialized into a flat (i.e. JSON)
+        string.
+
+        """
+        io = StringIO()
+        json.dump(data, io)
+        io.seek(0)
+        return json.load(io)
+
     def asflatdict(self, *args, **kwargs) -> Dict[str, Any]:
         """Like :meth:`asdict` but flatten in to a data structure suitable for
         writing to JSON or YAML.
 
         """
         dct: Dict[str, Any] = self.asdict(*args, **kwargs)
-        io = StringIO()
-        json.dump(dct, io)
-        io.seek(0)
-        return json.load(io)
+        return self._flatten(dct)
 
     def asjson(self, writer: TextIOBase = None, recurse: bool = True,
                readable: bool = True, flatten: bool = True, **kwargs) -> str:
@@ -218,8 +225,8 @@ class Dictable(Writable):
         else:
             return json.dump(dct, writer, **kwargs)
 
-    def asyaml(self, writer: TextIOBase = None,
-               recurse: bool = True, readable: bool = True, **kwargs) -> str:
+    def asyaml(self, writer: TextIOBase = None, recurse: bool = True,
+               readable: bool = True, safe: bool = False, **kwargs) -> str:
         """Return a YAML string representing the data in this instance.
 
         """
@@ -227,7 +234,22 @@ class Dictable(Writable):
             recurse=recurse, readable=readable)
         if writer is None:
             writer = StringIO()
-            yaml.dump(dct, writer, **kwargs)
+            if safe:
+                params = dict(
+                    # block style, not inline JSON-ish style
+                    default_flow_style=False,
+                    # preserve dict insertion order
+                    sort_keys=False,
+                    allow_unicode=True,
+                    # output leading dashes
+                    explicit_start=False,
+                    explicit_end=False,
+                    indent=4,
+                    width=self.WRITABLE_MAX_COL)
+                params.update(kwargs)
+                yaml.safe_dump(dct, writer, **params)
+            else:
+                yaml.dump(dct, writer, **kwargs)
             return writer.getvalue()
         else:
             return yaml.dump(dct, writer, **kwargs)
