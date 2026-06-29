@@ -306,7 +306,7 @@ class PackageManager(object):
     def find_requirements(self, sources:
                           Tuple[Union[str, Path, PackageRequirement], ...]) -> \
             Tuple[PackageRequirement, ...]:
-        """The requirements contained in this manager.  .
+        """The requirements contained in this manager.
 
         :param sources: the :obj:PackageRequirement.spec`, requirements file, or
                         directory with requirements files

@@ -148,6 +148,7 @@ class TestPackageManagerFind(unittest.TestCase):
         reqs: Tuple[PackageRequirement, ...] = mng.find_requirements(
             [self.spec, nada_req, Path('test-resources/req/scispacy.txt')])
         self.assertEqual(tuple, type(reqs))
+        reqs = sorted(reqs)
         self.assertEqual(4, len(reqs))
         self._test_model_md_req(reqs[0], 'scispacy.txt')
         self._test_fd_req(reqs[1])
@@ -161,6 +162,7 @@ class TestPackageManagerFind(unittest.TestCase):
         reqs: Tuple[PackageRequirement, ...] = mng.find_requirements(
             [self.spec, Path('test-resources/req')])
         self.assertEqual(tuple, type(reqs))
+        reqs = sorted(reqs)
         self.assertEqual(6, len(reqs))
         self._test_model_sm_req(reqs[0])
         self._test_model_md_req(reqs[1], 'model.txt')
