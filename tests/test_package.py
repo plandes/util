@@ -141,6 +141,16 @@ class TestPackageManagerFind(unittest.TestCase):
         self.assertEqual(1, len(reqs))
         self._test_fd_req(reqs[0])
 
+    def _sort_reqs(self, reqs):
+        reqs = sorted(
+            reqs,
+            key=lambda r: (
+                r.name,
+                str(r.specifier or ''),
+                r.url or '',
+                r.source.name if r.source is not None else '',))
+        return reqs
+
     def test_parse_req_file(self):
         nada_name: str = 'nadapkg'
         nada_req = PackageRequirement.from_spec(nada_name)
@@ -148,7 +158,7 @@ class TestPackageManagerFind(unittest.TestCase):
         reqs: Tuple[PackageRequirement, ...] = mng.find_requirements(
             [self.spec, nada_req, Path('test-resources/req/scispacy.txt')])
         self.assertEqual(tuple, type(reqs))
-        reqs = sorted(reqs)
+        reqs = self._sort_reqs(reqs)
         self.assertEqual(4, len(reqs))
         self._test_model_md_req(reqs[0], 'scispacy.txt')
         self._test_fd_req(reqs[1])
@@ -162,7 +172,7 @@ class TestPackageManagerFind(unittest.TestCase):
         reqs: Tuple[PackageRequirement, ...] = mng.find_requirements(
             [self.spec, Path('test-resources/req')])
         self.assertEqual(tuple, type(reqs))
-        reqs = sorted(reqs)
+        reqs = self._sort_reqs(reqs)
         self.assertEqual(6, len(reqs))
         self._test_model_sm_req(reqs[0])
         self._test_model_md_req(reqs[1], 'model.txt')
