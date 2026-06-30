@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.16.10] - 2026-06-30
+### Added
+- Very simple dataclass relational mapping `DataclassMetadata`.
+
+
 ## [1.16.9] - 2026-06-28
 ### Changed
 - Allow subclasses of `Dictable` to customize flattening objects before
@@ -800,7 +805,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.16.9...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.16.10...HEAD
+[1.16.10]: https://github.com/plandes/util/compare/v1.16.9...v1.16.10
 [1.16.9]: https://github.com/plandes/util/compare/v1.16.8...v1.16.9
 [1.16.8]: https://github.com/plandes/util/compare/v1.16.7...v1.16.8
 [1.16.7]: https://github.com/plandes/util/compare/v1.16.6...v1.16.7
