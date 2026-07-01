@@ -1,0 +1,15 @@
+zensols.dataclasses namespace
+=============================
+
+.. py:module:: zensols.dataclasses
+
+Submodules
+----------
+
+zensols.dataclasses.inspect module
+----------------------------------
+
+.. automodule:: zensols.dataclasses.inspect
+   :members:
+   :undoc-members:
+   :show-inheritance:
