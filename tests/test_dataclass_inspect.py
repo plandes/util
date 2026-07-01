@@ -19,7 +19,7 @@ class Person(Dictable):
 class TestDataclassInspect(LogTestCase):
     DEBUG: bool = False
 
-    def _test_inspect(self):
+    def test_inspect(self):
         dm = DataclassMetadata(Person)
         self.assertEqual(2, len(dm.fields))
         self.assertEqual(2, len(dm.fields_by_order))
