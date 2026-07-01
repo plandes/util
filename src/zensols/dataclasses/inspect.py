@@ -32,13 +32,13 @@ class ClassField(IntrospectClassField, Dictable):
         data['dtype'] = str(data['dtype'].__name__)
         return data
 
-    def _flatten(self, data: dict[str, Any]) -> dict[str, Any]:
+    def _flatten_dict(self, data: dict[str, Any]) -> dict[str, Any]:
         data = self._flatten_class_field(data)
-        data = super()._flatten(data)
+        data = super()._flatten_dict(data)
         return data
 
     def __str__(self) -> str:
-        return f'{self.name} ({self.type.__name__})'
+        return f'{self.name} ({self.dtype.__name__})'
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -55,11 +55,12 @@ class DataclassMetadata(Dictable):
     class_type: Type = field()
     """The dataclass to map."""
 
-    def _flatten(self, data: dict[str, Any]) -> dict[str, Any]:
+    def _flatten_dict(self, data: dict[str, Any]) -> dict[str, Any]:
         data['class_type'] = str(data['class_type'])
-        data['fields_by_order'] = tuple(map(ClassField._flatten_class_field, data['fields_by_order']))
+        data['fields_by_order'] = tuple(map(
+            ClassField._flatten_class_field, data['fields_by_order']))
         data['class_type'] = ClassImporter.full_classname(self.class_type)
-        dct = super()._flatten(data)
+        dct = super()._flatten_dict(data)
         return dct
 
     def _get_attribute_docstrings(self) -> dict[str, str]:
@@ -128,7 +129,7 @@ class DataclassMetadata(Dictable):
 
     def _write(self, c):
         c(str(self.class_type), 'class_type')
-        c(self.doc.text, 'doc') 
+        c(self.doc.text, 'doc')
         meta: ClassField
         for meta in self.fields_by_order:
             fd: dict[str, Any] = meta.asdict()

@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.16.12] - 2026-07-01
+### Changed
+- Bug fix for `DataclassMetadata` metadata stringify.
+- Bug fix for method `_flatten` name collision in `Dictable`.
+
+
 ## [1.16.11] - 2026-06-30
 ### Changed
 - Loosen `packaging` dependencies to anything after 22.0 for down steam
@@ -811,7 +817,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.16.11...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.16.12...HEAD
+[1.16.12]: https://github.com/plandes/util/compare/v1.16.11...v1.16.12
 [1.16.11]: https://github.com/plandes/util/compare/v1.16.10...v1.16.11
 [1.16.10]: https://github.com/plandes/util/compare/v1.16.9...v1.16.10
 [1.16.9]: https://github.com/plandes/util/compare/v1.16.8...v1.16.9

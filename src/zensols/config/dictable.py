@@ -192,7 +192,7 @@ class Dictable(Writable):
             logger.debug(f'asdict: {type(self)}')
         return self._from_dictable(recurse, readable, class_name_param)
 
-    def _flatten(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    def _flatten_dict(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Return a :class:`dict` that can be serialized into a flat (i.e. JSON)
         string.
 
@@ -208,7 +208,7 @@ class Dictable(Writable):
 
         """
         dct: Dict[str, Any] = self.asdict(*args, **kwargs)
-        return self._flatten(dct)
+        return self._flatten_dict(dct)
 
     def asjson(self, writer: TextIOBase = None, recurse: bool = True,
                readable: bool = True, flatten: bool = True, **kwargs) -> str:
