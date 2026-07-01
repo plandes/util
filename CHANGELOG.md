@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [1.16.11] - 2026-06-30
+### Changed
+- Loosen `packaging` dependencies to anything after 22.0 for down steam
+  packages.
+
+
 ## [1.16.10] - 2026-06-30
 ### Added
 - Very simple dataclass relational mapping `DataclassMetadata`.
@@ -805,7 +811,8 @@ Major release.
 
 
 <!-- links -->
-[Unreleased]: https://github.com/plandes/util/compare/v1.16.10...HEAD
+[Unreleased]: https://github.com/plandes/util/compare/v1.16.11...HEAD
+[1.16.11]: https://github.com/plandes/util/compare/v1.16.10...v1.16.11
 [1.16.10]: https://github.com/plandes/util/compare/v1.16.9...v1.16.10
 [1.16.9]: https://github.com/plandes/util/compare/v1.16.8...v1.16.9
 [1.16.8]: https://github.com/plandes/util/compare/v1.16.7...v1.16.8
